@@ -2,6 +2,8 @@
 
 Read AGENTS.md, the master in full, IMPLEMENTATION_STATUS.md and docs/milestones/E0_M1_REPORT.md. Current work is on `engineer/e0-m1-foundation`, based on design commit `9b3c972872c224be164811954116dea1a5d3138f`.
 
+Owner standing instruction: each new completed milestone must include a published experimental package that the owner can install/run from Platform. This publication is authorized; see docs/MILESTONE_DELIVERY.md. Delivery is incomplete until the real catalog/download/install/launch path is verified. Preserve immutable old releases; PR publication is separate from main merge or acceptance.
+
 E0.M1 implements only the provisional lifecycle foundation and is a review candidate, not owner-accepted. Tests use the exact installed Platform 0.1.12 source; production code imports public SDK files/lease/loopback. The browser test starts the direct CLI and actual host/Hub with disposable roots, no user's profile or provider accounts. Run `npm ci --ignore-scripts`, `npm run check`, then install the pinned Playwright Chromium and run `npm run test:browser`.
 
 Tested implementation source: `7095daca0d861dccb6f7c5055b985ca9b50eec8b`. Publication of the review branch to Krozzeo/AxiomEngineerCAD is authorized. Inspect its exact PR head and current CI results; publication is separate from merge, release and owner milestone acceptance.

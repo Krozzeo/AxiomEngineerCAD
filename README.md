@@ -4,6 +4,10 @@ Local-first, browser-operated parametric mechanical CAD and engineering-document
 
 > **Status:** E0.M1 lifecycle foundation implemented as a review candidate; owner acceptance pending. The runnable shell edits provisional document metadata. Exact geometry, sketches, assemblies, drawings and AI are not implemented.
 
+## Install milestone builds from Platform
+
+Every completed review milestone is delivered as an experimental prepared installation. In Platform 0.1.12+, open **Installations → Add installation → Axiom Engineer CAD → Refresh**, select the published experimental build, download/install and activate. Then create an Engineer project. Source PRs and passing tests alone are not installable publications. See [milestone delivery](docs/MILESTONE_DELIVERY.md) for the publication and verification gate.
+
 ## Run the E0.M1 foundation
 
 Requires Node.js 24+. Install the integrity-locked Platform SDK:

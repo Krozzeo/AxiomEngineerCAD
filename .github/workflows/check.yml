@@ -1,4 +1,4 @@
-name: E0.M1 conformance
+name: Engineer acceptance
 on: [push, pull_request]
 permissions:
   contents: read

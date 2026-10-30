@@ -1,0 +1,103 @@
+name: Prepared Engineer publication
+on:
+  workflow_run:
+    workflows: ["Engineer acceptance"]
+    types: [completed]
+  push:
+    tags: ['v[0-9]+.[0-9]+.[0-9]+', 'experimental-pr-*']
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+concurrency:
+  group: prepared-${{ github.event.workflow_run.head_sha || github.sha }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    outputs:
+      eligible: ${{ steps.context.outputs.eligible }}
+      channel: ${{ steps.context.outputs.channel }}
+      commit: ${{ steps.context.outputs.commit }}
+      branch: ${{ steps.context.outputs.branch }}
+      pullRequest: ${{ steps.context.outputs.pullRequest }}
+      runId: ${{ steps.context.outputs.runId }}
+      tag: ${{ steps.context.outputs.tag }}
+      version: ${{ steps.context.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: Krozzeo/AxiomPlatform
+          ref: 6d240845cd77eb1879738d32c9f2b8fcfd7297c5
+          persist-credentials: false
+          path: tooling
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - id: context
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ACCEPTANCE_WORKFLOW: check.yml
+        run: node tooling/scripts/release-context.mjs
+  build:
+    needs: verify
+    if: needs.verify.outputs.eligible == 'true'
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.verify.outputs.commit }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --omit=dev --ignore-scripts
+      - name: Prepare exact accepted source
+        env:
+          AXIOM_RELEASE_CHANNEL: ${{ needs.verify.outputs.channel }}
+          AXIOM_RELEASE_COMMIT: ${{ needs.verify.outputs.commit }}
+          AXIOM_RELEASE_BRANCH: ${{ needs.verify.outputs.branch }}
+          AXIOM_RELEASE_PR: ${{ needs.verify.outputs.pullRequest }}
+          AXIOM_RELEASE_RUN_ID: ${{ needs.verify.outputs.runId }}
+        run: node node_modules/axiom-platform/scripts/prepare-release.mjs . .axiom/release
+      - name: Verify relocated installation and lifecycle
+        run: node scripts/verify-package.mjs .axiom/release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: prepared-engineer
+          path: .axiom/release/*
+          include-hidden-files: true
+          retention-days: 7
+  publish:
+    needs: [verify, build]
+    if: needs.verify.outputs.eligible == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: Krozzeo/AxiomPlatform
+          ref: 6d240845cd77eb1879738d32c9f2b8fcfd7297c5
+          persist-credentials: false
+          path: tooling
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/download-artifact@v4
+        with:
+          name: prepared-engineer
+          path: prepared
+      - name: Publish verified prepared package
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_CHANNEL: ${{ needs.verify.outputs.channel }}
+          RELEASE_COMMIT: ${{ needs.verify.outputs.commit }}
+          RELEASE_BRANCH: ${{ needs.verify.outputs.branch }}
+          RELEASE_PR: ${{ needs.verify.outputs.pullRequest }}
+          RELEASE_RUN_ID: ${{ needs.verify.outputs.runId }}
+          RELEASE_TAG: ${{ needs.verify.outputs.tag }}
+          RELEASE_VERSION: ${{ needs.verify.outputs.version }}
+        run: node tooling/scripts/publish-release.mjs prepared
