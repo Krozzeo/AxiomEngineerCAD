@@ -53,6 +53,8 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci --omit=dev --ignore-scripts
+      - name: Include verified corresponding sources and LGPL rebuild material
+        run: node scripts/fetch-corresponding-source.mjs
       - name: Prepare exact accepted source
         env:
           AXIOM_RELEASE_CHANNEL: ${{ needs.verify.outputs.channel }}

@@ -1,4 +1,4 @@
-import {lstat, readdir, realpath} from 'node:fs/promises';
+import {lstat, readdir, realpath, mkdir} from 'node:fs/promises';
 import {join, dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {acquireLease} from 'axiom-platform/lease';
@@ -7,6 +7,8 @@ import {blank, check, fail, FILENAME, readDocument, Document} from '../src/docum
 import {authorized} from '../src/paths.mjs';
 import {startEditor} from '../src/server.mjs';
 import manifest from './product.json' with {type:'json'};
+import {LabSession} from '../src/lab/session.mjs';
+import {recipe,KERNEL} from '../src/lab/profile.mjs';
 
 export class EngineerAdapter {
   constructor({start = startEditor} = {}) {
@@ -26,10 +28,10 @@ export class EngineerAdapter {
     return this.execute(m.method, m.params);
   }
   async execute(method, params) {
-    check(['initialize', ...manifest.capabilities, 'document.inspect', 'document.edit', 'document.buffer'].includes(method),
+    check(['initialize', ...manifest.capabilities, 'document.inspect', 'document.edit', 'document.buffer','lab.run','lab.inspect','lab.cancel','lab.apply'].includes(method),
       'unsupportedCapability', 'This build does not implement that operation.');
     // Buffer reports have their own monotonic client sequence; typing must not exhaust mutation receipts.
-    const mutation = !['initialize','project.detect','project.status','document.inspect','document.buffer'].includes(method);
+    const mutation = !['initialize','project.detect','project.status','document.inspect','document.buffer','lab.inspect'].includes(method);
     const key = JSON.stringify({method, params}), id = params.operationId;
     if (mutation) {
       check(typeof id === 'string' && /^[a-zA-Z0-9_-]{8,100}$/.test(id), 'invalidRequest', 'A unique operationId is required.');
@@ -72,6 +74,15 @@ export class EngineerAdapter {
     }
     check(this.root && !this.ended, 'cancelled', 'Initialize a live session first.');
     if (method === 'project.detect') return this.detect(p.path);
+    if (method === 'project.demos') {
+      check(!this.doc&&Array.isArray(p.demoIds)&&p.demoIds.length===1&&p.demoIds[0]==='e0-m2-lab','invalidRequest','Choose the declared E0.M2 lab demo.');
+      const destination=await authorized(this.root,p.destination);
+      check((await readdir(destination)).length===0,'projectBusy','Demos require a fresh empty destination.');
+      const folder=join(destination,'E0-M2-Geometry-Lab');await mkdir(folder);
+      const value={...blank('E0.M2 Geometry & Sketch Lab'),provisional:'E0.M2',experiment:{profile:'E0.M2-probe-v0',kernel:KERNEL,spec:recipe()}};
+      const path=join(folder,FILENAME);await atomicJson(path,value);
+      return {productVersion:manifest.productVersion,projects:[{demoId:'e0-m2-lab',path,...await this.detect(path)}]};
+    }
     if (method === 'project.create' || method === 'project.open') {
       check(!this.doc, 'projectBusy', 'A document is already open.');
       const create = method === 'project.create', detected = create ? null : await this.detect(p.path);
@@ -85,6 +96,7 @@ export class EngineerAdapter {
         const path = create ? join(folder, FILENAME) : detected.path;
         const value = create ? initial : await readDocument(await authorized(this.root, path));
         this.doc = new Document(path, value, {authorize:path => authorized(this.root, path)});
+        this.doc.lab = new LabSession(this.doc);
         this.runtime = await this.start({adapter:this, embeddingOrigin:this.embeddingOrigin});
         check(!this.ended, 'cancelled', 'Session closed before document creation completed.');
         if (create) await atomicJson(path, value);
@@ -96,6 +108,10 @@ export class EngineerAdapter {
     if (method === 'document.inspect') return this.doc.view();
     if (method === 'document.buffer') return this.doc.reportBuffer(p);
     if (method === 'document.edit') return this.doc.edit(p);
+    if (method === 'lab.inspect') return this.doc.lab.view();
+    if (method === 'lab.run') return this.doc.lab.start(p);
+    if (method === 'lab.cancel') return this.doc.lab.cancel();
+    if (method === 'lab.apply') return this.doc.lab.apply(p);
     if (method === 'project.save') return this.doc.save(p.expectedRevision);
     if (method === 'project.close') {
       this.doc.expect(p.expectedRevision);
@@ -111,6 +127,7 @@ export class EngineerAdapter {
   }
   async cleanup() {
     if (this.doc) this.doc.closed = true;
+    await this.doc?.lab?.close();
     const runtime = this.runtime; this.runtime = null;
     try { await runtime?.close(); } finally { const release = this.release; this.release = null; await release?.(); this.doc = null; }
   }

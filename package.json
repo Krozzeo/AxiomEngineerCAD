@@ -1,6 +1,6 @@
 {
   "name": "axiom-engineer-cad",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "type": "module",
   "license": "MIT",
@@ -14,7 +14,10 @@
     "test:browser": "node tests/browser.mjs"
   },
   "dependencies": {
-    "axiom-platform": "https://codeload.github.com/Krozzeo/AxiomPlatform/tar.gz/6d240845cd77eb1879738d32c9f2b8fcfd7297c5"
+    "@salusoft89/planegcs": "1.3.0",
+    "axiom-platform": "https://codeload.github.com/Krozzeo/AxiomPlatform/tar.gz/6d240845cd77eb1879738d32c9f2b8fcfd7297c5",
+    "replicad": "1.2.0",
+    "replicad-opencascadejs": "1.1.0"
   },
   "devDependencies": {
     "playwright": "1.56.1"

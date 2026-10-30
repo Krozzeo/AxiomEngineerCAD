@@ -34,7 +34,7 @@ $('metadata').addEventListener('submit', event => {
   });
 });
 $('reset').addEventListener('click', () => run(async () => { await report(false); pending = false; state = await request('document'); render(true); message('Fields reset to the working revision.'); }));
-$('save').addEventListener('click', () => run(async () => { const result = await request('save', {expectedRevision:state.status.revision}); state.status = result.status; render(); message('Document saved locally.'); }));
+$('save').addEventListener('click', () => { message('Saving document…');run(async () => { const result = await request('save', {expectedRevision:state.status.revision}); state.status = result.status; render(); message('Document saved locally.'); }); });
 $('close').addEventListener('click', () => $('close-dialog').showModal());
 for (const button of document.querySelectorAll('[data-decision]')) button.addEventListener('click', () => run(async () => {
   const result = await request('close', {expectedRevision:state.status.revision, decision:button.dataset.decision});
@@ -43,6 +43,7 @@ for (const button of document.querySelectorAll('[data-decision]')) button.addEve
 }));
 window.addEventListener('beforeunload', event => { if (!closed && (pending || state?.status.dirty)) { event.preventDefault(); event.returnValue = ''; } });
 run(async () => { state = await request('document'); render(true); });
+window.addEventListener('engineer-document-changed',event=>{state={...event.detail,hosted:state?.hosted};render(false);});
 let polling = false;
 setInterval(() => {
   if (!state || closed || polling) return;

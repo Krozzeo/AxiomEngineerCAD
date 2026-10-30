@@ -1,3 +1,11 @@
+# 0.0.2 — E0.M2 geometry and sketch lab (review candidate)
+
+- Add actual isolated OCCT extrusion, cuts, revolution, booleans, STEP roundtrip and analytic validity probes; conservative topology/history diagnostics.
+- Add PlaneGCS 2D constraints, independent residual/rank checks, conflicts, redundancy, singularity and drag fixtures; 29-case corpus.
+- Add editable CPU preview with depth-buffer face inspection, explicit recipe keep/save/reopen and the Platform Load Demos lab.
+- Preserve last good state on invalid, cancelled or stale jobs. Keep schema provisional and foundational ADRs experimental.
+- Include locked dependency licenses, corresponding source archives and rebuild material in installable packages; verify relocated packaged corpus.
+
 # 0.0.1 — E0.M1 lifecycle foundation (review candidate)
 
 - Deliver review milestones as Platform-installable experimental ZIP/manifest publications, gated on exact CI and relocated-package verification. Keep build and trusted publication permissions separate.
