@@ -1,4 +1,4 @@
-import {mkdir, lstat} from 'node:fs/promises';
+import {mkdir, lstat, realpath} from 'node:fs/promises';
 import {resolve, dirname} from 'node:path';
 import {randomUUID} from 'node:crypto';
 import {EngineerAdapter} from '../platform/adapter.mjs';
@@ -11,7 +11,11 @@ for (let i = 0; i < args.length; i += 2) {
   check(!Object.hasOwn(options, args[i]), 'invalidRequest', 'Do not repeat options.'); options[args[i]] = args[i + 1];
 }
 check(options['--root'] && !!options['--create'] !== !!options['--open'], 'invalidRequest', 'Choose a root and either --create or --open.');
-const root = resolve(options['--root']); await mkdir(root, {recursive:true});
+const requestedRoot = resolve(options['--root']); await mkdir(requestedRoot, {recursive:true});
+// Derive child paths from the same canonical root negotiated with the adapter.
+// Windows TEMP can spell an existing root with an 8.3 short-name prefix.
+check(!(await lstat(requestedRoot)).isSymbolicLink(), 'permissionDenied', 'Authorize an ordinary project root.');
+const root = await realpath(requestedRoot);
 const adapter = new EngineerAdapter(), sessionId = randomUUID();
 const call = (method, params) => { const requestId = randomUUID(); return adapter.request({protocolVersion:1, productId:'axiom.engineer-cad', requestId, correlationId:requestId, sessionId, actor:{kind:'human', id:'direct-cli'}, params, method}); };
 try {

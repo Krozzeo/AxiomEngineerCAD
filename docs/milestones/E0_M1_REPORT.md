@@ -23,4 +23,6 @@ No GPU, numerical geometry, model/provider, AI inference, final schema, historic
 
 ## Review and continuation
 
+Initial public Windows CI exposed a TEMP 8.3 alias mismatch: the adapter authorized a canonical long path while fixture/direct child paths could retain the short prefix. The direct CLI now canonicalizes its explicitly granted root before deriving child paths; fixtures match Platform's canonical path convention. Linked-root rejection and path-escape checks remain intact. Initial failing run: https://github.com/Krozzeo/AxiomEngineerCAD/actions/runs/41069739903. Final acceptance must use the corrected PR head.
+
 Follow README and E0_M1_PLAN.md to inspect the editable shell. Owner signoff is pending. E0.M2 is not started. Retain the version-0 envelope without freezing schema v1. Record final PR/CI links and exact source commit before merging; do not merge from stale green evidence.

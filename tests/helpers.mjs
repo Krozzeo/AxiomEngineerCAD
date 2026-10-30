@@ -1,10 +1,11 @@
-import {mkdtemp, mkdir, rm} from 'node:fs/promises';
+import {mkdtemp, mkdir, rm, realpath} from 'node:fs/promises';
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
 import {randomUUID} from 'node:crypto';
 import {EngineerAdapter} from '../platform/adapter.mjs';
 export async function fixture(t, options) {
-  const base = await mkdtemp(join(tmpdir(), 'engineer-e0-')), root = join(base, 'projects');
+  // Windows CI TEMP may use an 8.3 alias. Match Platform's canonical authorized paths.
+  const base = await realpath(await mkdtemp(join(tmpdir(), 'engineer-e0-'))), root = join(base, 'projects');
   await mkdir(root); const folder = join(root, 'part'); await mkdir(folder);
   const adapter = new EngineerAdapter(options), sessionId = randomUUID();
   const call = (method, params = {}) => { const id = randomUUID(); return adapter.request({protocolVersion:1, requestId:id, correlationId:id, sessionId,
