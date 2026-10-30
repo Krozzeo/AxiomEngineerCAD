@@ -9,7 +9,7 @@ import {startHost} from '../node_modules/axiom-platform/services/local-host/serv
 const root = await mkdtemp(join(tmpdir(), 'engineer-browser-')), evidence = resolve('test-results');
 await mkdir(evidence, {recursive:true});
 let browser, child, host, direct;
-const report = {milestone:'E0.M3', platform:'0.1.12', providerCommit:'6d240845cd77eb1879738d32c9f2b8fcfd7297c5',
+const report = {milestone:'E0.M4', platform:'0.1.12', providerCommit:'6d240845cd77eb1879738d32c9f2b8fcfd7297c5',
   runtime:process.version, os:process.platform, architecture:process.arch, criteria:[], pageErrors:[],
   renderer:'Canvas CPU preview derived from actual OCCT tessellation; exact metrics from isolated CPU/Wasm; no WebGPU or AI acceptance claimed'};
 try {
@@ -34,6 +34,7 @@ try {
   const nativePath = join(root, 'direct', 'study', 'project.engineer-provisional.json');
   assert.match(JSON.parse(await readFile(nativePath)).metadata.notes, /preserve this note/);
   report.criteria.push('Direct CLI launches an authenticated browser editor; pending fields block save; applied properties persist');
+  await direct.locator('#spatial-lab > summary').click();
   await direct.waitForFunction(()=>document.querySelector('#assembly-json').value.includes('shaft'));
   await direct.locator('#assembly-solve').click();await direct.locator('#assembly-status').filter({hasText:'UnderDefined · DOF 2'}).waitFor();
   await direct.locator('#assembly-move').click();await direct.locator('#assembly-status').filter({hasText:'drag accepted'}).waitFor();
@@ -134,8 +135,9 @@ try {
   const demoRow=hub.locator('#project-rows tr').filter({hasText:'E0.M3 Spatial Mate Lab'});await demoRow.getByRole('button',{name:'Open E0.M3 Spatial Mate Lab',exact:true}).click();await demoRow.getByText('Active · saved',{exact:true}).waitFor();
   const demoSessionId=await demoRow.getAttribute('data-session-id'),openedDemo=host.manager.catalog().sessions.find(s=>s.sessionId===demoSessionId);
   const demoPage=await context.newPage();observe(demoPage);await demoPage.goto(openedDemo.editorUrl);await demoPage.waitForFunction(()=>document.querySelector('#assembly-json').value.includes('E0.M3-datums-v0'));
-  await demoPage.locator('#assembly-solve').click();await demoPage.locator('#assembly-status').filter({hasText:'UnderDefined · DOF 2'}).waitFor();await demoPage.screenshot({path:join(evidence,'spatial-demo.png'),fullPage:true});
+  await demoPage.locator('#spatial-lab > summary').click();await demoPage.locator('#assembly-solve').click();await demoPage.locator('#assembly-status').filter({hasText:'UnderDefined · DOF 2'}).waitFor();await demoPage.screenshot({path:join(evidence,'spatial-demo.png'),fullPage:true});
   report.criteria.push('Actual Hub Load Demos registers both labs and opens/solves the native spatial demo in its installed product session');
+  const {verifyNativeUI}=await import('./browser-native.mjs');await verifyNativeUI({hub,context,host,evidence,observe,report});
   assert.deepEqual(report.pageErrors, []); report.passed = true;
 } catch (error) { report.failure = error.stack; if (direct) await direct.screenshot({path:join(evidence, 'failure.png')}).catch(() => {}); throw error; }
 finally {

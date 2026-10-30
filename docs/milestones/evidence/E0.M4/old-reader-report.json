@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "readerVersion": "0.0.3",
+  "scope": "Actual relocated prepared 0.0.3 runtime; not the GitHub public install path",
+  "archiveSha256": "c6c927a49d11bd2c6154bdf56d96a930fcdbff7d2a55ddb57288d38ea870c739",
+  "nativeBytesHash": "sha256:dc0c0f9fb28fac48a9d18e0fadee00051a067935e32d0f77c4487aed32051ed1",
+  "exitCode": 1,
+  "result": "incompatibleVersion; original bytes unchanged"
+}

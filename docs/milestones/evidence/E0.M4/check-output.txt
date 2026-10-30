@@ -1,0 +1,66 @@
+
+> axiom-engineer-cad@0.0.4 check
+> node --test --test-timeout=30000 tests/*.test.mjs
+
+✔ 28 independent spatial fixtures and motion-path samples pass in isolated worker (478.0593ms)
+✔ three-body drag moves the dependent cap while preserving independently known spacing (46.6284ms)
+✔ world/local datum frames and non-identity rigid rotations produce independent expected point placement (1.057ms)
+✔ invalid numerical frames, unknown keys, IDs and surface classes are refused without retargeting (7.0076ms)
+✔ assembly preview, explicit apply, save and reopen retain exact recipe plus E0.M2 geometry (1550.8424ms)
+✔ inconsistent, singular, missing and infeasible drag leave last good placement and saved bytes intact (686.3935ms)
+✔ spatial cancellation, deadline and stale apply cannot publish late poses (235.8674ms)
+✔ HTTP spatial operations share authority, reject stale drag and cancel on close (254.0402ms)
+✔ version-owned spatial demo is an actual portable native datum recipe (17.6747ms)
+✔ 29 exact-kernel / topology / 2D fixtures pass independent analytic and rank checks (2442.4504ms)
+✔ invalid/oversized/nonfinite recipes fail before dispatch (1.3644ms)
+✔ worker cancellation and deadline kill isolated jobs without a late result (129.5216ms)
+✔ non-driving reference radius does not constrain geometry (18.5697ms)
+✔ preview/apply/save/reopen preserve provisional recipe and original metadata (671.4636ms)
+✔ failed and cancelled lab jobs preserve last good preview and committed file (933.5524ms)
+✔ stale worker results cannot overwrite newer manual edits (2161.5387ms)
+✔ same worker authority is reachable through authenticated HTTP; close cancels owned jobs (225.8225ms)
+✔ version-owned demo creates actual native experiment and rejects nonempty destination (11.1571ms)
+✔ native lifecycle: read-only detect, edit/save, duplicate receipt, cancel/discard, reopen (64.4902ms)
+✔ pending fields block Save and Save-close; Cancel preserves; Discard releases lease (17.7561ms)
+✔ external document edits cannot be overwritten (18.2562ms)
+✔ failed persistence leaves working edit dirty and saved original intact (6.1714ms)
+✔ unknown format is rejected without a write or lease residue (8.1767ms)
+✔ missing experimental marker is rejected without a write or lease residue (7.7316ms)
+✔ invalid revision is rejected without a write or lease residue (7.701ms)
+✔ unexpected domain fields is rejected without a write or lease residue (9.213ms)
+✔ invalid JSON is rejected without a write or lease residue (6.0929ms)
+✔ unauthorized locations, symlink directories and hardlinked files are denied (7.5162ms)
+✔ two independent sessions cannot own the same project (19.7564ms)
+✔ editor-start failure rolls back lease and creates no document (7.8282ms)
+✔ session shutdown during startup cannot publish a late document (8.9003ms)
+✔ HTTP auth, origin, method and malformed inputs preserve document (57.1319ms)
+✔ IPC identity and unsupported capabilities cannot mutate state (15.1835ms)
+✔ explicit legacy conversion preserves identity, original bytes, native graph and save receipt (63.027ms)
+✔ content-addressed versions, publication and restore-as-new preserve immutable history (1885.3629ms)
+✔ two occurrences share one effective definition with independent transforms (979.2436ms)
+✔ Latest candidate is read-only until exact validation/adoption; historical closure stays unchanged (1919.7624ms)
+✔ Pinned remains fixed; incompatible and ambiguous Latest preserve cached state (1812.1024ms)
+✔ missing, relocated and replaced sources preserve verified cache with explicit diagnosis (2270.392ms)
+✔ portable copied folder opens offline with stable IDs, versions and geometry (1415.2313ms)
+✔ graph cycles, in-use deletion, invalid selectors, corrupt source and runtime changes are rejected (893.3075ms)
+✔ drawing revision advances independently and never silently rebinds its historical model (1466.0588ms)
+✔ stale/cancelled validation, changed source and unauthorized paths never apply candidates (2262.0464ms)
+✔ real process termination at prepared save boundary preserves verifiable state and receipt (97.9322ms)
+✔ real process termination at replaced save boundary preserves verifiable state and receipt (100.886ms)
+✔ explicit corrupt-byte recovery preserves backup, verifies current bytes and rejects unknown schema (48.3617ms)
+✔ journal hardlinks and unauthorized HTTP writes are denied without changing saved bytes (902.0303ms)
+✔ new source attachment stages without writes, rejects external document cycles and preserves identity (1403.9658ms)
+✔ native validation checks nonprimary solids and actual split selector ambiguity (863.5246ms)
+✔ pending graph draft blocks save and applies only its captured sequence/revision (893.3137ms)
+✔ recovering previous working checkpoint retains newer immutable versions/publications and original journal (1444.9457ms)
+✔ descriptor and SDK source are pinned and compatible; invalid descriptors rejected (5.2463ms)
+✔ real Platform host create/edit/stale-save/cancel/save/close/reopen and origin denial (780.4647ms)
+✔ actual product process rejects incompatible host; failed process never signals ready (290.9057ms)
+ℹ tests 54
+ℹ suites 0
+ℹ pass 54
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 20897.2415

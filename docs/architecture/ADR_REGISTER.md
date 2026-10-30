@@ -1,6 +1,6 @@
 # Architecture Decision Register — Axiom Engineer CAD
 
-**Design baseline:** Master Design v0.2.0. **Implementation status:** E0.M3 review candidate; foundational owner acceptance pending. **Authority:** Owner-approved design and reproducible milestone evidence. **Scope:** E0 proof and subsequent controlled redesign.
+**Design baseline:** Master Design v0.2.0. **Implementation status:** E0.M4 review candidate; foundational owner acceptance pending. **Authority:** Owner-approved design and reproducible milestone evidence. **Scope:** E0 proof and subsequent controlled redesign.
 
 E0.M1 implementation proposal: [ADR-015 — Provisional shell and Platform pin](ADR-015-E0-M1-PROVISIONAL-SHELL.md). This does not accept or replace pending foundational ADR-001–014.
 
@@ -19,8 +19,8 @@ An ADR records a real choice, never a speculative implementation claim. Each dec
 | [ADR-003](ADR-003-TOPOLOGY-PROBE.md) | Persistent geometric/topological identity | Feature lineage, split/merge, reorder, semantic selector and false-retarget tests | E0.M2 | Experimenting |
 | [ADR-004](ADR-004-NUMERIC-PROBE.md) | Units, tolerance and shape-scale profiles | Independent oracles, canonical units, precision and failure taxonomy | E0.M2/E0.M6 | Experimenting |
 | [ADR-005](ADR-005-SPATIAL-MATE-PROBE.md) | 3D mate solver and supported mate surfaces | Ground, spatial DOF, motion, singularity, conflict, license/runtime | E0.M3 | Experimenting |
-| ADR-006 | Native container and cross-document graph | Stable identities, portable paths, snapshot/atomicity/crash/migration | E0.M4 | Pending |
-| ADR-007 | Version publication and Latest compatibility resolver | Pinned/current/ambiguous, historical closure, safe update rollback | E0.M4; E4.M4 implementation | Pending |
+| [ADR-006](ADR-006-NATIVE-STORAGE.md) | Native container and cross-document graph | Stable identities, portable paths, snapshot/atomicity/crash/migration | E0.M4 | Experimenting |
+| [ADR-007](ADR-007-NATIVE-VERSION-RESOLVER.md) | Version publication and Latest compatibility resolver | Pinned/current/ambiguous, historical closure, safe update rollback | E0.M4; E4.M4 implementation | Experimenting |
 | ADR-008 | Semantic tool schemas and proposal Apply | Shared authority, stale base, permission envelopes, replay/rollback | E0.M5 | Pending |
 | ADR-009 | Browser/daemon/WebGPU CAD selection | Two launch modes, actual GPU, picking geometry correspondence, fallback | E0.M6 | Pending |
 | ADR-010 | Vector drawings and exact HLR | Independent view/dimension/reference PDF output checks | E0.M6 | Pending |

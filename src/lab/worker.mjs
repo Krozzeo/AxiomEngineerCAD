@@ -4,6 +4,7 @@ import {solveSketch,sketchFixture} from './sketch.mjs';
 import {check} from '../document.mjs';
 import {solveAssembly} from '../assembly/solver.mjs';
 import {assemblySuite} from '../assembly/suite.mjs';
+import {verifyNative} from '../native/verify.mjs';
 process.once('message',async message=>{
   try{
     let result;
@@ -12,6 +13,7 @@ process.once('message',async message=>{
     else if(message.kind==='sketch')result=await solveSketch(message.payload.primitives??sketchFixture(message.payload.fixture),{drag:message.payload.drag});
     else if(message.kind==='assembly')result=solveAssembly(message.payload.assembly,{drag:message.payload.drag});
     else if(message.kind==='assembly-suite')result=assemblySuite();
+    else if(message.kind==='native-verify')result=await verifyNative(message.payload.document);
     else check(false,'UnsupportedCapability','Unknown lab task.');
     const maxRssBytes=process.resourceUsage().maxRSS*1024;
     check(maxRssBytes<=768*1024*1024,'ResourceLimit','Worker peak RSS exceeded the experimental 768 MiB postcondition.');

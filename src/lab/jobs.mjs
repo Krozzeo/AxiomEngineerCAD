@@ -5,7 +5,7 @@ import {recipe} from './profile.mjs';
 import {validateSketch} from './sketch.mjs';
 import {assemblyRecipe} from '../assembly/profile.mjs';
 export function runWorker(kind,payload={}, {signal,timeoutMs=20000}={}) {
-  check(['geometry','suite','sketch','assembly','assembly-suite'].includes(kind),'UnsupportedCapability','Unknown lab task.');
+  check(['geometry','suite','sketch','assembly','assembly-suite','native-verify'].includes(kind),'UnsupportedCapability','Unknown lab task.');
   if(kind==='assembly')assemblyRecipe(payload.assembly);
   if(kind==='geometry')recipe(payload.spec);
   if(kind==='sketch'&&payload.primitives)validateSketch(payload.primitives);

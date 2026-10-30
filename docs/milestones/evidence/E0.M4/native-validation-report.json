@@ -1,0 +1,29 @@
+{
+  "runtime": "v24.21.0",
+  "os": "win32",
+  "architecture": "x64",
+  "cpu": "AMD Ryzen 5 3600 6-Core Processor              ",
+  "fixtureHash": "sha256:029d1067b8e8e3c0ae026c2f4627cc0067d524173ccfa893a0588148569a553c",
+  "expected": {
+    "consumerVolumeMm3": 11434.513322353838,
+    "sourceVolumeMm3": 12000,
+    "occurrences": 2
+  },
+  "result": {
+    "valid": true,
+    "inputHash": "sha256:30ccf9130d5f9bd691ab19ae1fe7c166f0fd0f43fbc8277b57418e669789ac77",
+    "geometry": {
+      "volumeMm3": 11434.513322353834,
+      "areaMm2": 4063.893782901543,
+      "reference": "ResolvedReidentified"
+    },
+    "assembly": null,
+    "featureEvidence": [],
+    "contentsChecked": 2
+  },
+  "resources": {
+    "peakRssBytes": 166637568,
+    "heapUsedBytes": 43541728,
+    "policy": "Isolated process, 192 MiB JS old-space, finite typed inputs, parent deadline; RSS postcondition is not an OS hard memory quota."
+  }
+}

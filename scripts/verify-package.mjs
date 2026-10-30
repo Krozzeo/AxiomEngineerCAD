@@ -48,12 +48,19 @@ try {
   await post('lab/apply',{kind:'assembly',jobId:motion.assembly.jobId,expectedRevision:1});await call({action:'save',sessionId:reopened.sessionId,expectedRevision:2});
   await call({action:'close', sessionId:reopened.sessionId, expectedRevision:2, decision:'save'});
   const restored=await call({action:'open',productId:manifest.productId,path:created.path});assert.equal(restored.status.revision,2);const saved=JSON.parse(await readFile(join(root,restored.path)));assert.ok(Math.abs(saved.assembly.bodies[1].pose.position[2]-35)<1e-5);
-  await call({action:'close',sessionId:restored.sessionId,expectedRevision:2,decision:'discard'});
+  const nativeUrl=new URL(restored.editorUrl),nativeToken=new URLSearchParams(nativeUrl.hash.slice(1)).get('token');
+  const nativePost=async(path,body)=>{const r=await fetch(nativeUrl.origin+'/v1/'+path,{method:'POST',headers:{Origin:nativeUrl.origin,Authorization:'Bearer '+nativeToken,'Content-Type':'application/json'},body:JSON.stringify({operationId:randomUUID(),...body})});assert.equal(r.status,200);return r.json();};
+  await nativePost('native/convert',{expectedRevision:2});await nativePost('lab/run',{kind:'native-verify',expectedRevision:3});let nativeProof;
+  for(let i=0;i<120;i++){nativeProof=await (await fetch(nativeUrl.origin+'/v1/lab',{headers:{Origin:nativeUrl.origin,Authorization:'Bearer '+nativeToken}})).json();if(nativeProof.job.state!=='running')break;await new Promise(r=>setTimeout(r,250));}
+  assert.equal(nativeProof.job.state,'completed',JSON.stringify(nativeProof.job));assert.equal(nativeProof.nativeVerification.result.valid,true);const version=await nativePost('native/snapshot',{expectedRevision:3});assert.match(version.versionId,/^sha256:/);await call({action:'save',sessionId:restored.sessionId,expectedRevision:4});
+  await call({action:'close',sessionId:restored.sessionId,expectedRevision:4,decision:'save'});const nativeReopened=await call({action:'open',productId:manifest.productId,path:created.path});assert.equal(nativeReopened.status.revision,4);const nativeSaved=JSON.parse(await readFile(join(root,nativeReopened.path)));assert.equal(nativeSaved.formatVersion,1);assert.equal(nativeSaved.native.versions[0].id,version.versionId);assert.equal(nativeReopened.status.recovery.state,'Committed');
+  await call({action:'close',sessionId:nativeReopened.sessionId,expectedRevision:4,decision:'discard'});
   const report = {passed:true, productId:manifest.productId, version:manifest.version, build:manifest.build ?? null,
     sha256:artifact.sha256, bytes:artifact.bytes, runtime:process.version, os:process.platform,
     geometryCorpus,spatialCorpus:{passed:spatial.assemblySuite.passed,total:spatial.assemblySuite.total,resources:spatial.job.resources},spatialSaveReopen:true,
     correspondingSourceArchives:sourceManifest.archives.length,
-    scope:'Relocated prepared ZIP, source hashes, real Platform lifecycle, 29 exact-kernel/2D and 28 spatial cases, spatial drag/keep/save/reopen; no user profile/provider, WebGPU or final CAD schema claims'};
+    nativeStorage:{schemaVersion:1,versionId:version.versionId,convertVerifyVersionSaveReopen:true,resources:nativeProof.job.resources},
+    scope:'Relocated prepared ZIP, source hashes, real Platform lifecycle, 29 exact-kernel/2D and 28 spatial cases, spatial drag/keep/save/reopen and native conversion/validation/version/save/reopen; no user profile/provider, WebGPU or final CAD schema claims'};
   await writeFile(join(folder, 'package-validation.json'), JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report));
 } finally { await host?.close(); await rm(base, {recursive:true, force:true}); }

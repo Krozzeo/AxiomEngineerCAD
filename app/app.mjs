@@ -13,6 +13,8 @@ function message(text) { $('message').className = ''; $('message').textContent =
 function render(fill = false) {
   if (!state || closed) return;
   const s = state.status; $('title').textContent = state.document.metadata.name;
+  $('format-footer').textContent=state.document.formatVersion===1?'Native v1 · pinned geometry / spatial profiles':'Legacy v0 · OCCT / PlaneGCS candidates';
+  $('document-format').textContent=state.document.formatVersion===1?'Native document · Version 1':'Legacy provisional · Version 0';
   $('revision').textContent = s.revision; $('saved').textContent = s.savedRevision;
   $('state').textContent = pending ? 'Pending fields · Apply before saving' : s.dirty ? 'Unsaved changes' : 'All changes saved locally';
   $('connection').textContent = 'Connected · Local session';
@@ -43,7 +45,7 @@ for (const button of document.querySelectorAll('[data-decision]')) button.addEve
 }));
 window.addEventListener('beforeunload', event => { if (!closed && (pending || state?.status.dirty)) { event.preventDefault(); event.returnValue = ''; } });
 run(async () => { state = await request('document'); render(true); });
-window.addEventListener('engineer-document-changed',event=>{state={...event.detail,hosted:state?.hosted};render(false);});
+window.addEventListener('engineer-document-changed',event=>{state={...event.detail,hosted:state?.hosted};render(!pending);});
 let polling = false;
 setInterval(() => {
   if (!state || closed || polling) return;
