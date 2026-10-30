@@ -1,0 +1,246 @@
+{
+  "profile": "E0.M6/1",
+  "status": "Experimental measured candidate; E0.M7 owner signoff pending",
+  "source": "Final source/CI/release identity on delivery PR; local development evidence",
+  "runtime": {
+    "node": "v24.21.0",
+    "os": "win32",
+    "osRelease": "10.0.19045",
+    "arch": "x64",
+    "platform": "0.1.12",
+    "platformCommit": "6d240845cd77eb1879738d32c9f2b8fcfd7297c5",
+    "kernel": "OCCT V8_0_1 / replicad-opencascadejs1.1.0",
+    "wrapper": "replicad1.2.0",
+    "sketch": "PlaneGCS1.3.0"
+  },
+  "hardware": {
+    "devices": [
+      {
+        "vendorId": 4318,
+        "deviceId": 8066,
+        "vendorString": "",
+        "deviceString": "NVIDIA GeForce GTX 1650",
+        "driverVendor": "NVIDIA",
+        "driverVersion": "32.0.16.1692"
+      },
+      {
+        "vendorId": 5140,
+        "deviceId": 140,
+        "vendorString": "",
+        "deviceString": "Microsoft Basic Render Driver",
+        "driverVendor": "",
+        "driverVersion": "10.0.19041.5794"
+      }
+    ],
+    "browser": "156.0.8078.74",
+    "flags": [
+      "--enable-unsafe-webgpu"
+    ],
+    "softwareForced": false
+  },
+  "webgpuAdapter": {
+    "state": "ready",
+    "vendor": "nvidia",
+    "architecture": "turing",
+    "device": "",
+    "description": "",
+    "isFallbackAdapter": false,
+    "classification": "hardware-adapter",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+    "picks": [
+      {
+        "case": "top face occludes bottom",
+        "role": "top",
+        "kind": "face"
+      },
+      {
+        "case": "top/front edge",
+        "role": "front+top",
+        "kind": "edge"
+      },
+      {
+        "case": "repeated component",
+        "path": [
+          "definition-main",
+          "instance-a"
+        ],
+        "kind": "instance"
+      },
+      {
+        "case": "repeated component",
+        "path": [
+          "definition-main",
+          "instance-b"
+        ],
+        "kind": "instance"
+      },
+      {
+        "case": "front face occludes back",
+        "role": "front",
+        "kind": "face"
+      }
+    ],
+    "deviceLoss": true,
+    "metrics": {
+      "drawCount": 18,
+      "renderTimes": [
+        51.325000047683716,
+        3.7849998474121094,
+        3.9700000286102295,
+        3.4600000381469727,
+        3.620000123977661,
+        0.7899999618530273,
+        2.9800000190734863,
+        3.5950000286102295,
+        3.1399998664855957,
+        2.9200000762939453,
+        1.5750000476837158,
+        1.0950000286102295,
+        1.3650000095367432,
+        1.5349998474121094,
+        2.870000123977661,
+        3,
+        4.490000009536743,
+        3.125
+      ],
+      "errors": [],
+      "buildMs": 418.58410000000003,
+      "resources": {
+        "peakRssBytes": 172892160,
+        "heapUsedBytes": 37860208,
+        "policy": "Isolated process, 192 MiB JS old-space, finite typed inputs, parent deadline; RSS postcondition is not an OS hard memory quota."
+      },
+      "pickReadbacks": [
+        4.559999942779541,
+        3.1449999809265137,
+        2.7699999809265137,
+        3.370000123977661,
+        2.8450000286102295
+      ]
+    }
+  },
+  "fixture": {
+    "id": "M6-PLATE-THROUGH-1",
+    "spec": {
+      "scenario": "cut",
+      "width": 40,
+      "height": 30,
+      "depth": 10,
+      "radius": 3,
+      "count": 1,
+      "unit": "mm",
+      "selectorRole": "top",
+      "selectorKind": "face"
+    },
+    "peer": {
+      "widthMm": 20,
+      "heightMm": 20,
+      "depthMm": 15,
+      "positionsMm": [
+        [
+          60,
+          0,
+          0
+        ],
+        [
+          100,
+          0,
+          0
+        ]
+      ]
+    },
+    "expected": {
+      "primaryVolumeMm3": 11717.256661176918,
+      "topVisible": 5,
+      "frontVisible": 4,
+      "rightVisible": 4,
+      "frontHidden": 2,
+      "rightHidden": 2,
+      "widthsMm": [
+        40,
+        60
+      ],
+      "occurrences": 3,
+      "uniqueDefinitions": 2
+    },
+    "inputSha256": "bf355692f440900be5c531da8dc779ae772d20c6515df42fc1867d1232895aa4"
+  },
+  "admissibleLimits": {
+    "shapeMm": {
+      "width": [
+        5,
+        80
+      ],
+      "height": [
+        5,
+        60
+      ],
+      "depth": [
+        1,
+        40
+      ]
+    },
+    "throughHoles": 4,
+    "directLocalOccurrences": 8,
+    "positionComponentsMm": [
+      -500,
+      500
+    ],
+    "workerDeadlineMs": 20000,
+    "oldSpaceMiB": 192,
+    "peakRssPostconditionMiB": 768,
+    "workerOutputBytes": 4194304,
+    "requestBytes": 16384,
+    "queryPreviewBytes": 16384,
+    "auditRecords": 32
+  },
+  "numeric": {
+    "projectionLengthOracleMm": 0.000001,
+    "pdfDimensionCheckMm": 0.0001,
+    "pdfCircleDeclaredDeviationMm": 0.0001,
+    "pdfCircleMeasuredDeviationMm": 2.126368534582923e-7,
+    "meshDeflectionMm": 0.05,
+    "gpuReadbackRadiusPixels": 3.1
+  },
+  "measured": {
+    "frameSubmitCompletionWallMs": {
+      "samples": 18,
+      "min": 0.7899999618530273,
+      "p50": 3.125,
+      "p95": 51.325000047683716,
+      "max": 51.325000047683716
+    },
+    "gpuPickReadbackWallMs": {
+      "samples": 5,
+      "min": 2.7699999809265137,
+      "p50": 3.1449999809265137,
+      "p95": 4.559999942779541,
+      "max": 4.559999942779541
+    },
+    "proofBuildMs": 418.58410000000003,
+    "workerPeakRssMiB": 164.8828125
+  },
+  "verification": {
+    "domainTests": 85,
+    "newM6Tests": 14,
+    "geometry2DCases": 29,
+    "spatialCases": 28,
+    "pdfIndependent": {
+      "pypdf": "6.10.0",
+      "pdfplumber": "0.11.9",
+      "pypdfium2": "5.14.0"
+    },
+    "physicalGpuPicks": 5,
+    "deviceLoss": "actual device.destroy() event; not arbitrary driver reset",
+    "offlineWithoutGPU": true
+  },
+  "unsupported": [
+    "general authored/persisted drawing sheets",
+    "arbitrary curves/surfaces",
+    "external/nested viewport occurrences",
+    "persistent GPU IDs or cross-edit topology inference",
+    "remote provider transmission",
+    "manufacturing approval",
+    "universal frame rate/device/OS sandbox guarantees"
+  ]
+}

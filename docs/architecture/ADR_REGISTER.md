@@ -1,6 +1,6 @@
 # Architecture Decision Register — Axiom Engineer CAD
 
-**Design baseline:** Master Design v0.2.0. **Implementation status:** E0.M4 review candidate; foundational owner acceptance pending. **Authority:** Owner-approved design and reproducible milestone evidence. **Scope:** E0 proof and subsequent controlled redesign.
+**Design baseline:** Master Design v0.2.0. **Implementation status:** E0.M6 review candidate; foundational owner acceptance pending. **Authority:** Owner-approved design and reproducible milestone evidence. **Scope:** E0 proof and subsequent controlled redesign.
 
 E0.M1 implementation proposal: [ADR-015 — Provisional shell and Platform pin](ADR-015-E0-M1-PROVISIONAL-SHELL.md). This does not accept or replace pending foundational ADR-001–014.
 
@@ -22,9 +22,9 @@ An ADR records a real choice, never a speculative implementation claim. Each dec
 | [ADR-006](ADR-006-NATIVE-STORAGE.md) | Native container and cross-document graph | Stable identities, portable paths, snapshot/atomicity/crash/migration | E0.M4 | Experimenting |
 | [ADR-007](ADR-007-NATIVE-VERSION-RESOLVER.md) | Version publication and Latest compatibility resolver | Pinned/current/ambiguous, historical closure, safe update rollback | E0.M4; E4.M4 implementation | Experimenting |
 | [ADR-008](ADR-008-SEMANTIC-REVIEW.md) | Semantic tool schemas and proposal Apply | Shared authority, stale base, permission envelopes, replay/rollback | E0.M5 | Experimenting |
-| ADR-009 | Browser/daemon/WebGPU CAD selection | Two launch modes, actual GPU, picking geometry correspondence, fallback | E0.M6 | Pending |
-| ADR-010 | Vector drawings and exact HLR | Independent view/dimension/reference PDF output checks | E0.M6 | Pending |
-| ADR-011 | Engineering-data external exposure default | Local/restricted/full, audit, offline and permission-denial tests | E0.M5–M6 | Pending |
+| [ADR-009](ADR-009-WEBGPU-CAD-PROOF.md) | Browser/daemon/WebGPU CAD selection | Two launch modes, actual GPU, picking geometry correspondence, fallback | E0.M6 | Experimenting |
+| [ADR-010](ADR-010-EXACT-VECTOR-PROOF.md) | Vector drawings and exact HLR | Independent view/dimension/reference PDF output checks | E0.M6 | Experimenting |
+| [ADR-011](ADR-011-LOCAL-EXPOSURE-PROOF.md) | Engineering-data external exposure default | Local/restricted/full, audit, offline and permission-denial tests | E0.M5–M6 | Experimenting |
 | ADR-012 | E0 integrated foundation go/no-go | Entire authoritative sketch→model→mate→drawing→proposed-edit slice | E0.M7 | Pending |
 | ADR-013 | STEP import/export bounded supported subset | Geometry/structure, units, invalid input, source preservation and licensing | E3.M5 | Pending |
 | ADR-014 | Provider/model-supported AI cohorts | Independent vector/raster and hosted/local capability matrix | E2/E5 | Pending |

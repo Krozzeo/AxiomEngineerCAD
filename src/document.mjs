@@ -4,10 +4,10 @@ import {recipe,KERNEL} from './lab/profile.mjs';
 import {assemblyRecipe} from './assembly/profile.mjs';
 import {validateNative} from './native/schema.mjs';
 import {readState,commitNative} from './native/storage.mjs';
+import {check,fail} from './errors.mjs';
+export {check,fail};
 
 export const FILENAME = 'project.engineer-provisional.json';
-export function fail(code, message) { throw Object.assign(new Error(message), {code}); }
-export function check(condition, code, message) { if (!condition) fail(code, message); }
 export function validateMetadata(metadata) {
   check(metadata && Object.keys(metadata).every(k => ['name', 'notes'].includes(k)) &&
     typeof metadata.name === 'string' && metadata.name.trim().length > 0 && metadata.name.length <= 128 &&
@@ -49,7 +49,7 @@ export class Document {
   status() {
     return {projectId:this.value.documentId, name:this.value.metadata.name, revision:this.value.revision,
       savedRevision:this.saved.revision, dirty:JSON.stringify(this.value) !== JSON.stringify(this.saved) || this.pending() || this.recovery?.state==='RecoveryRequired',
-      busy:!!this.lab?.running||!!this.commands?.running, pendingBuffers:this.pending(),recovery:this.recovery};
+      busy:!!this.lab?.running||!!this.commands?.running||!!this.proof?.running, pendingBuffers:this.pending(),recovery:this.recovery};
   }
   view() { return {document:structuredClone(this.value), status:this.status()}; }
   reportBuffer({clientId, sequence, dirty}) {
@@ -70,7 +70,7 @@ export class Document {
   async save(expectedRevision,operationId=randomUUID()) {
     this.expect(expectedRevision);
     check(!this.pending(), 'projectBusy', 'Apply pending fields before saving, or explicitly discard on close.');
-    check(!this.lab?.running&&!this.commands?.running, 'projectBusy', 'Wait for or cancel the lab/tool task before saving.');
+    check(!this.lab?.running&&!this.commands?.running&&!this.proof?.running, 'projectBusy', 'Wait for or cancel the lab/tool task before saving.');
     await this.authorize(this.path);
     const disk = await readDocument(this.path);
     check(JSON.stringify(disk) === JSON.stringify(this.saved), 'revisionConflict', 'Saved document changed externally. Original file was preserved.');

@@ -6,6 +6,7 @@ import {solveAssembly} from '../assembly/solver.mjs';
 import {assemblySuite} from '../assembly/suite.mjs';
 import {verifyNative} from '../native/verify.mjs';
 import {verifyCommand} from '../commands/worker.mjs';
+import {buildProof} from '../proof/kernel.mjs';
 process.once('message',async message=>{
   try{
     let result;
@@ -16,6 +17,7 @@ process.once('message',async message=>{
     else if(message.kind==='assembly-suite')result=assemblySuite();
     else if(message.kind==='native-verify')result=await verifyNative(message.payload.document);
     else if(message.kind==='command-validate')result=await verifyCommand(message.payload);
+    else if(message.kind==='drawing-proof')result=await buildProof(message.payload.document);
     else check(false,'UnsupportedCapability','Unknown lab task.');
     const maxRssBytes=process.resourceUsage().maxRSS*1024;
     check(maxRssBytes<=768*1024*1024,'ResourceLimit','Worker peak RSS exceeded the experimental 768 MiB postcondition.');

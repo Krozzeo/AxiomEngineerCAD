@@ -1,4 +1,4 @@
-import {check} from '../document.mjs';
+import {check} from '../errors.mjs';
 export const KERNEL = 'OCCT-V8_0_1/replicad-opencascadejs@1.1.0';
 export const SOLVER = 'PlaneGCS/@salusoft89/planegcs@1.3.0';
 export const TOLERANCES = Object.freeze({lengthMm:1e-7, relativeVolume:1e-8, absoluteVolumeMm3:1e-6,

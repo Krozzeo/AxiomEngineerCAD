@@ -46,7 +46,7 @@ function faceDetails(shape, spec, ref) {
       type:face.geomType, areaMm2:cad.measureArea(face), center:center.toTuple(), normal:normal.toTuple(), transient:true};
   });
 }
-export async function geometryExperiment(input, {includeMesh=true, includeStep=false}={}) {
+export async function geometryExperiment(input, {includeMesh=true, includeStep=false,inspectShape}={}) {
   const spec = recipe(input), oc = await initializeKernel(), f = UNITS[spec.unit];
   const [w,h,d,r] = ['width','height','depth','radius'].map(k=>spec[k]*f), started = performance.now();
   let shape = cad.drawRectangle(w,h).sketchOnPlane('XY').extrude(d);
@@ -122,7 +122,7 @@ export async function geometryExperiment(input, {includeMesh=true, includeStep=f
       validity:state,volumeMm3:actual,expectedVolumeMm3:expected,areaMm2:area,expectedAreaMm2:expectedArea,toleranceMm3:tolerance,
       bounds:spec.scenario==='delete'?null:shape.boundingBox.bounds,faces,mesh,step,
       reference:{state:ref.state,candidates:ref.candidates,reason:ref.reason,selector:{producer:'base-extrude',kind:spec.selectorKind,role:spec.selectorRole,kernel:KERNEL}},
-      history,elapsedMs:performance.now()-started};
+      history,...(inspectShape?{analysis:await inspectShape(shape,oc,spec)}:{}),elapsedMs:performance.now()-started};
   } finally {
     for (const item of new Set(retained)) { try { item.delete(); } catch {} }
   }

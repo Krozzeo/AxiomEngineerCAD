@@ -1,0 +1,73 @@
+{
+  "passed": true,
+  "productId": "axiom.engineer-cad",
+  "version": "0.0.6",
+  "build": null,
+  "sha256": "d3578780cedb51de68ac985d50fbb8da79f3f339428a6a1ab46fbd94d6307703",
+  "bytes": 100322941,
+  "runtime": "v24.21.0",
+  "os": "win32",
+  "geometryCorpus": {
+    "passed": 29,
+    "total": 29,
+    "resources": {
+      "peakRssBytes": 470941696,
+      "heapUsedBytes": 32811696,
+      "policy": "Isolated process, 192 MiB JS old-space, finite typed inputs, parent deadline; RSS postcondition is not an OS hard memory quota."
+    }
+  },
+  "spatialCorpus": {
+    "passed": 28,
+    "total": 28,
+    "resources": {
+      "peakRssBytes": 65093632,
+      "heapUsedBytes": 10307560,
+      "policy": "Isolated process, 192 MiB JS old-space, finite typed inputs, parent deadline; RSS postcondition is not an OS hard memory quota."
+    }
+  },
+  "spatialSaveReopen": true,
+  "correspondingSourceArchives": 6,
+  "nativeStorage": {
+    "schemaVersion": 1,
+    "versionId": "sha256:f448b18e9961e7f1900ffd8be97df7657dd5d64b4919179ed742454ebb9b93ad",
+    "convertVerifyVersionSaveReopen": true,
+    "resources": {
+      "peakRssBytes": 57049088,
+      "heapUsedBytes": 9981200,
+      "policy": "Isolated process, 192 MiB JS old-space, finite typed inputs, parent deadline; RSS postcondition is not an OS hard memory quota."
+    }
+  },
+  "semanticCommands": {
+    "passed": true,
+    "catalogTools": 17,
+    "scriptedOnly": true,
+    "realProviderEvaluated": false,
+    "volumeBeforeMm3": 12000,
+    "volumeAfterMm3": 18000,
+    "applyRevision": 6,
+    "applyOperationId": "a47d1219-d012-4ad0-825b-688677dce5a3",
+    "agentApplyDenied": true
+  },
+  "drawingProof": {
+    "passed": true,
+    "sourceCreator": {
+      "version": "0.0.6",
+      "commit": null,
+      "channel": "stable"
+    },
+    "sourceHash": "sha256:2221d2fc3254f858f397c30250ed969458e88c2b0bbf8c369ad70b420b45e85e",
+    "sheet": "A4",
+    "widthMm": 60,
+    "exportBytes": 1837,
+    "exportSha256": "e53fc797e8d5e4f6924b4b09b3ffd3d7be7349673d9d8005a89745997e6c706d",
+    "agentExportDenied": true,
+    "localTransmissionDenied": true,
+    "resources": {
+      "peakRssBytes": 168820736,
+      "heapUsedBytes": 44244240,
+      "policy": "Isolated process, 192 MiB JS old-space, finite typed inputs, parent deadline; RSS postcondition is not an OS hard memory quota."
+    },
+    "webgpuEvaluated": false
+  },
+  "scope": "Relocated prepared ZIP, source hashes, real Platform lifecycle, 29 exact-kernel/2D and 28 spatial cases, spatial drag/keep/save/reopen and native conversion/validation/version/save/reopen; no user profile/provider, WebGPU or final CAD schema claims"
+}

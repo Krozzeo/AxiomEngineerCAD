@@ -1,0 +1,89 @@
+{
+  "milestone": "E0.M6",
+  "platform": "0.1.12",
+  "providerCommit": "6d240845cd77eb1879738d32c9f2b8fcfd7297c5",
+  "runtime": "v24.21.0",
+  "os": "win32",
+  "architecture": "x64",
+  "criteria": [
+    "Direct CLI launches an authenticated browser editor; pending fields block save; applied properties persist",
+    "Spatial UI solves six-DOF poses, moves and pointer-drags within coaxial freedom, saves recipe, executes 28 cases, rejects conflicts and fully locked movement",
+    "Real kernel preview changes volume with width; recipe persists; invalid result retains last good preview; 29-case corpus and constrained circle drag pass",
+    "Visible depth-buffer face picking resolves the proven producer role",
+    "Direct Cancel retains session; Save and close releases the running editor",
+    "Hub UI creates real CAD adapter session",
+    "Editor changes appear in Hub status",
+    "Hub Cancel/Save/Close/Reopen preserve document identity and content",
+    "Actual Hub Load Demos registers both labs and opens/solves the native spatial demo in its installed product session",
+    "Actual native source/consumer demos: version, publish, restore, source dimension update, explicit verified candidate adoption, unchanged historical closure, normal reopen and corrupt-byte recovery with original backup",
+    "Real local scripted agent prepares isolated width change; full SDK review/human Apply saves exact geometry; forged authority, stale Apply and revoked grant are denied; manual shared command and saved reopen agree",
+    "E0.M6 exact A4 vector PDF/HLR and source-linked width regenerate 40→60, stale export refuses, save/reopen reproduces drawing; actual GPU picks are separately labeled; unavailable/lost GPU and denied/offline exposure preserve MAIN"
+  ],
+  "pageErrors": [],
+  "renderer": "Canvas CPU preview derived from actual OCCT tessellation; exact metrics from isolated CPU/Wasm; M6 WebGPU evidence is reported separately; no real AI model acceptance claimed",
+  "browser": "141.0.7390.37",
+  "native": {
+    "passed": true,
+    "schemaVersion": 1,
+    "creator": {
+      "version": "0.0.6",
+      "commit": null,
+      "channel": "development"
+    },
+    "sourceVolumeBefore": 12000,
+    "sourceVolumeAfter": 18000,
+    "retainedVersions": 2,
+    "recoveredOriginalBytes": true
+  },
+  "review": {
+    "passed": true,
+    "scriptedOnly": true,
+    "realProviderEvaluated": false,
+    "mainWidthAfterApply": 60,
+    "manualWidthAfterSaveReopen": 70,
+    "agentMainDenied": true,
+    "staleApplyDenied": true,
+    "retainedVersions": 1,
+    "creator": {
+      "version": "0.0.6",
+      "commit": null,
+      "channel": "development"
+    }
+  },
+  "proof": {
+    "passed": true,
+    "creator": {
+      "version": "0.0.6",
+      "commit": null,
+      "channel": "development"
+    },
+    "drawing": {
+      "sheet": "A4",
+      "widthBeforeMm": 40,
+      "widthAfterMm": 60,
+      "hiddenFront": 2,
+      "hiddenRight": 2,
+      "staleExportDenied": true,
+      "saveReopen": true
+    },
+    "gpu": {
+      "state": "unsupported",
+      "message": "No WebGPU adapter available.",
+      "picks": [],
+      "deviceLoss": false,
+      "metrics": {
+        "drawCount": 0,
+        "renderTimes": [],
+        "buildMs": 432.7051,
+        "resources": {
+          "peakRssBytes": 174657536,
+          "heapUsedBytes": 37826392,
+          "policy": "Isolated process, 192 MiB JS old-space, finite typed inputs, parent deadline; RSS postcondition is not an OS hard memory quota."
+        }
+      }
+    },
+    "offlineNoGPU": true,
+    "remoteTransmission": false
+  },
+  "passed": true
+}
