@@ -14,7 +14,7 @@
     "Hub UI creates real CAD adapter session",
     "Editor changes appear in Hub status",
     "Hub Cancel/Save/Close/Reopen preserve document identity and content",
-    "Actual Hub Load Demos creates and registers both version-owned native labs"
+    "Actual Hub Load Demos registers both labs and opens/solves the native spatial demo in its installed product session"
   ],
   "pageErrors": [],
   "renderer": "Canvas CPU preview derived from actual OCCT tessellation; exact metrics from isolated CPU/Wasm; no WebGPU or AI acceptance claimed",

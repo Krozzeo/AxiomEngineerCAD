@@ -130,7 +130,12 @@ try {
   assert.ok(demoEntry,'Version-owned demo was not registered');
   const demoDoc=JSON.parse(await readFile(demoEntry.path));assert.equal(demoDoc.experiment.spec.scenario,'cut');
   const spatialDemo=host.manager.catalog().recents.find(p=>p.name==='E0.M3 Spatial Mate Lab');assert.ok(spatialDemo);assert.equal(JSON.parse(await readFile(spatialDemo.path)).assembly.profile,'E0.M3-datums-v0');
-  report.criteria.push('Actual Hub Load Demos creates and registers both version-owned native labs');
+  await hub.getByRole('link',{name:'Projects',exact:true}).click();
+  const demoRow=hub.locator('#project-rows tr').filter({hasText:'E0.M3 Spatial Mate Lab'});await demoRow.getByRole('button',{name:'Open E0.M3 Spatial Mate Lab',exact:true}).click();await demoRow.getByText('Active · saved',{exact:true}).waitFor();
+  const demoSessionId=await demoRow.getAttribute('data-session-id'),openedDemo=host.manager.catalog().sessions.find(s=>s.sessionId===demoSessionId);
+  const demoPage=await context.newPage();observe(demoPage);await demoPage.goto(openedDemo.editorUrl);await demoPage.waitForFunction(()=>document.querySelector('#assembly-json').value.includes('E0.M3-datums-v0'));
+  await demoPage.locator('#assembly-solve').click();await demoPage.locator('#assembly-status').filter({hasText:'UnderDefined · DOF 2'}).waitFor();await demoPage.screenshot({path:join(evidence,'spatial-demo.png'),fullPage:true});
+  report.criteria.push('Actual Hub Load Demos registers both labs and opens/solves the native spatial demo in its installed product session');
   assert.deepEqual(report.pageErrors, []); report.passed = true;
 } catch (error) { report.failure = error.stack; if (direct) await direct.screenshot({path:join(evidence, 'failure.png')}).catch(() => {}); throw error; }
 finally {
