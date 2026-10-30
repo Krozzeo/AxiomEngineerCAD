@@ -10,7 +10,7 @@ Platform remains 0.1.12 at 6d240845cd77eb1879738d32c9f2b8fcfd7297c5; geometry/so
 
 ## Executable evidence
 
-Local Windows x64, Node v24.21.0, Chromium141.0.7390.37: **53 tests passed**, including 17 native tests, plus retained 29 exact-kernel/2D and 28 spatial cases. All are real domain/storage checks, not synthetic UI counters. Actual Chromium direct and Platform flows passed with zero page errors.
+Local Windows x64, Node v24.21.0, Chromium141.0.7390.37: **54 tests passed**, including 18 native tests, plus retained 29 exact-kernel/2D and 28 spatial cases. All are real domain/storage checks, not synthetic UI counters. Actual Chromium direct and Platform flows passed with zero page errors.
 
 Native fixtures cover: original-byte-preserving conversion; immutable version/publication/restore; shared source with distinct occurrences; read-only Latest candidate, exact validation/adoption and historical closure retention; fixed Pinned, incompatible/ambiguous/missing/relocated/foreign source; portable copy/offline regeneration; internal and external cycles, in-use deletion, source corruption and runtime refusal; independent drawing revision/model binding; stale/cancelled worker and changed-source rejection; journal hardlink and unauthorized HTTP refusal; new attachment preview; nonprimary invalid solids and actual split-face ambiguity; pending graph buffers and captured revisions.
 
