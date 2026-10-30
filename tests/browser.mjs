@@ -9,7 +9,7 @@ import {startHost} from '../node_modules/axiom-platform/services/local-host/serv
 const root = await mkdtemp(join(tmpdir(), 'engineer-browser-')), evidence = resolve('test-results');
 await mkdir(evidence, {recursive:true});
 let browser, child, host, direct;
-const report = {milestone:'E0.M2', platform:'0.1.12', providerCommit:'6d240845cd77eb1879738d32c9f2b8fcfd7297c5',
+const report = {milestone:'E0.M3', platform:'0.1.12', providerCommit:'6d240845cd77eb1879738d32c9f2b8fcfd7297c5',
   runtime:process.version, os:process.platform, architecture:process.arch, criteria:[], pageErrors:[],
   renderer:'Canvas CPU preview derived from actual OCCT tessellation; exact metrics from isolated CPU/Wasm; no WebGPU or AI acceptance claimed'};
 try {
@@ -34,13 +34,36 @@ try {
   const nativePath = join(root, 'direct', 'study', 'project.engineer-provisional.json');
   assert.match(JSON.parse(await readFile(nativePath)).metadata.notes, /preserve this note/);
   report.criteria.push('Direct CLI launches an authenticated browser editor; pending fields block save; applied properties persist');
+  await direct.waitForFunction(()=>document.querySelector('#assembly-json').value.includes('shaft'));
+  await direct.locator('#assembly-solve').click();await direct.locator('#assembly-status').filter({hasText:'UnderDefined · DOF 2'}).waitFor();
+  await direct.locator('#assembly-move').click();await direct.locator('#assembly-status').filter({hasText:'drag accepted'}).waitFor();
+  await direct.locator('#assembly-pose').filter({hasText:'35.000000'}).waitFor();
+  const canvasBox=await direct.locator('#assembly-canvas').boundingBox();
+  await direct.mouse.move(canvasBox.x+canvasBox.width/2,canvasBox.y+canvasBox.height/2);await direct.mouse.down();await direct.mouse.move(canvasBox.x+canvasBox.width/2,canvasBox.y+canvasBox.height/2-40);await direct.mouse.up();
+  await direct.locator('#assembly-status').filter({hasText:'UnderDefined · DOF 2 · drag accepted'}).waitFor();
+  await direct.waitForFunction(()=>!document.querySelector('#assembly-pose').textContent.includes('35.000000'));
+  await direct.locator('#assembly-keep').click();await direct.locator('#revision').filter({hasText:'2'}).waitFor();
+  const spatialSaved=direct.waitForResponse(r=>r.url().endsWith('/v1/save'));await direct.locator('#save').click();await spatialSaved;
+  assert.ok(JSON.parse(await readFile(nativePath)).assembly.bodies[1].pose.position[2]>35);
+  await direct.locator('#assembly-suite').click();await direct.locator('#assembly-suite-summary').filter({hasText:'Passed 28 / 28'}).waitFor();
+  await direct.locator('#assembly-suite-details > summary').click();
+  await direct.locator('#assembly-fixture').selectOption('conflict-distance');await direct.waitForFunction(()=>document.querySelector('#assembly-json').value.includes('distance-conflict'));
+  await direct.locator('#assembly-solve').click();await direct.locator('#assembly-status').filter({hasText:'Inconsistent'}).waitFor();assert.equal(await direct.locator('#assembly-keep').isDisabled(),true);
+  await direct.locator('#assembly-fixture').selectOption('locked');await direct.waitForFunction(()=>document.querySelector('#assembly-json').value.includes('"lock"'));
+  await direct.locator('#assembly-solve').click();await direct.locator('#assembly-status').filter({hasText:'FullyDefined · DOF 0'}).waitFor();
+  await direct.locator('#assembly-move').click();await direct.locator('#assembly-status').filter({hasText:'drag rejected'}).waitFor();
+  await direct.locator('#assembly-fixture').selectOption('coaxial');await direct.waitForFunction(()=>document.querySelector('#assembly-json').value.includes('"coaxial"'));
+  await direct.locator('#assembly-solve').click();await direct.locator('#assembly-status').filter({hasText:'UnderDefined · DOF 2'}).waitFor();
+  report.criteria.push('Spatial UI solves six-DOF poses, moves and pointer-drags within coaxial freedom, saves recipe, executes 28 cases, rejects conflicts and fully locked movement');
+  await direct.screenshot({path:join(evidence,'spatial.png'),fullPage:true});
+  await direct.locator('#geometry-lab > summary').click();
   await direct.locator('#lab-form').getByRole('button',{name:'Build exact preview',exact:true}).click();
   await direct.locator('#lab-status').filter({hasText:'Completed geometry'}).waitFor();
   await direct.locator('#lab-metrics').filter({hasText:'11434.513322'}).waitFor();
   await direct.locator('#lab-width').fill('60');await direct.locator('#lab-build').click();
   await direct.locator('#lab-status').filter({hasText:'Completed geometry'}).waitFor();
   await direct.locator('#lab-metrics').filter({hasText:'17434.513322'}).waitFor();
-  await direct.locator('#lab-keep').click();await direct.locator('#revision').filter({hasText:'2'}).waitFor();
+  await direct.locator('#lab-keep').click();await direct.locator('#revision').filter({hasText:'3'}).waitFor();
   const persisted=direct.waitForResponse(r=>r.url().endsWith('/v1/save'));
   await direct.locator('#save').click();await persisted;await direct.locator('#message').filter({hasText:'Document saved locally'}).waitFor();
   assert.equal(JSON.parse(await readFile(nativePath)).experiment.spec.width,60);
@@ -106,7 +129,13 @@ try {
   const demoEntry=host.manager.catalog().recents.find(p=>p.name==='E0.M2 Geometry & Sketch Lab');
   assert.ok(demoEntry,'Version-owned demo was not registered');
   const demoDoc=JSON.parse(await readFile(demoEntry.path));assert.equal(demoDoc.experiment.spec.scenario,'cut');
-  report.criteria.push('Actual Hub Load Demos creates and registers this version’s native lab document');
+  const spatialDemo=host.manager.catalog().recents.find(p=>p.name==='E0.M3 Spatial Mate Lab');assert.ok(spatialDemo);assert.equal(JSON.parse(await readFile(spatialDemo.path)).assembly.profile,'E0.M3-datums-v0');
+  await hub.getByRole('link',{name:'Projects',exact:true}).click();
+  const demoRow=hub.locator('#project-rows tr').filter({hasText:'E0.M3 Spatial Mate Lab'});await demoRow.getByRole('button',{name:'Open E0.M3 Spatial Mate Lab',exact:true}).click();await demoRow.getByText('Active · saved',{exact:true}).waitFor();
+  const demoSessionId=await demoRow.getAttribute('data-session-id'),openedDemo=host.manager.catalog().sessions.find(s=>s.sessionId===demoSessionId);
+  const demoPage=await context.newPage();observe(demoPage);await demoPage.goto(openedDemo.editorUrl);await demoPage.waitForFunction(()=>document.querySelector('#assembly-json').value.includes('E0.M3-datums-v0'));
+  await demoPage.locator('#assembly-solve').click();await demoPage.locator('#assembly-status').filter({hasText:'UnderDefined · DOF 2'}).waitFor();await demoPage.screenshot({path:join(evidence,'spatial-demo.png'),fullPage:true});
+  report.criteria.push('Actual Hub Load Demos registers both labs and opens/solves the native spatial demo in its installed product session');
   assert.deepEqual(report.pageErrors, []); report.passed = true;
 } catch (error) { report.failure = error.stack; if (direct) await direct.screenshot({path:join(evidence, 'failure.png')}).catch(() => {}); throw error; }
 finally {

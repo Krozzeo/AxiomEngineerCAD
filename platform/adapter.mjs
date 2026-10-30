@@ -9,6 +9,7 @@ import {startEditor} from '../src/server.mjs';
 import manifest from './product.json' with {type:'json'};
 import {LabSession} from '../src/lab/session.mjs';
 import {recipe,KERNEL} from '../src/lab/profile.mjs';
+import {assemblyFixture} from '../src/assembly/fixtures.mjs';
 
 export class EngineerAdapter {
   constructor({start = startEditor} = {}) {
@@ -28,10 +29,10 @@ export class EngineerAdapter {
     return this.execute(m.method, m.params);
   }
   async execute(method, params) {
-    check(['initialize', ...manifest.capabilities, 'document.inspect', 'document.edit', 'document.buffer','lab.run','lab.inspect','lab.cancel','lab.apply'].includes(method),
+    check(['initialize', ...manifest.capabilities, 'document.inspect', 'document.edit', 'document.buffer','lab.run','lab.inspect','lab.cancel','lab.apply','lab.fixture'].includes(method),
       'unsupportedCapability', 'This build does not implement that operation.');
     // Buffer reports have their own monotonic client sequence; typing must not exhaust mutation receipts.
-    const mutation = !['initialize','project.detect','project.status','document.inspect','document.buffer','lab.inspect'].includes(method);
+    const mutation = !['initialize','project.detect','project.status','document.inspect','document.buffer','lab.inspect','lab.fixture'].includes(method);
     const key = JSON.stringify({method, params}), id = params.operationId;
     if (mutation) {
       check(typeof id === 'string' && /^[a-zA-Z0-9_-]{8,100}$/.test(id), 'invalidRequest', 'A unique operationId is required.');
@@ -75,13 +76,13 @@ export class EngineerAdapter {
     check(this.root && !this.ended, 'cancelled', 'Initialize a live session first.');
     if (method === 'project.detect') return this.detect(p.path);
     if (method === 'project.demos') {
-      check(!this.doc&&Array.isArray(p.demoIds)&&p.demoIds.length===1&&p.demoIds[0]==='e0-m2-lab','invalidRequest','Choose the declared E0.M2 lab demo.');
+      check(!this.doc&&Array.isArray(p.demoIds)&&p.demoIds.length>0&&p.demoIds.length<=2&&new Set(p.demoIds).size===p.demoIds.length&&p.demoIds.every(id=>manifest.demos.some(d=>d.id===id)),'invalidRequest','Choose the declared version-owned demos.');
       const destination=await authorized(this.root,p.destination);
       check((await readdir(destination)).length===0,'projectBusy','Demos require a fresh empty destination.');
-      const folder=join(destination,'E0-M2-Geometry-Lab');await mkdir(folder);
-      const value={...blank('E0.M2 Geometry & Sketch Lab'),provisional:'E0.M2',experiment:{profile:'E0.M2-probe-v0',kernel:KERNEL,spec:recipe()}};
-      const path=join(folder,FILENAME);await atomicJson(path,value);
-      return {productVersion:manifest.productVersion,projects:[{demoId:'e0-m2-lab',path,...await this.detect(path)}]};
+      const projects=[];for(const demoId of p.demoIds){const spatial=demoId==='e0-m3-mates',folder=join(destination,spatial?'E0-M3-Spatial-Lab':'E0-M2-Geometry-Lab');await mkdir(folder);
+        const value=spatial?{...blank('E0.M3 Spatial Mate Lab'),provisional:'E0.M3',assembly:assemblyFixture('coaxial')}:{...blank('E0.M2 Geometry & Sketch Lab'),provisional:'E0.M2',experiment:{profile:'E0.M2-probe-v0',kernel:KERNEL,spec:recipe()}};
+        const path=join(folder,FILENAME);await atomicJson(path,value);projects.push({demoId,path,...await this.detect(path)});}
+      return {productVersion:manifest.productVersion,projects};
     }
     if (method === 'project.create' || method === 'project.open') {
       check(!this.doc, 'projectBusy', 'A document is already open.');
@@ -109,6 +110,7 @@ export class EngineerAdapter {
     if (method === 'document.buffer') return this.doc.reportBuffer(p);
     if (method === 'document.edit') return this.doc.edit(p);
     if (method === 'lab.inspect') return this.doc.lab.view();
+    if (method === 'lab.fixture') return {assembly:assemblyFixture(p.fixture)};
     if (method === 'lab.run') return this.doc.lab.start(p);
     if (method === 'lab.cancel') return this.doc.lab.cancel();
     if (method === 'lab.apply') return this.doc.lab.apply(p);

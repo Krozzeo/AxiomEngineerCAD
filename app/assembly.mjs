@@ -1,0 +1,40 @@
+const $=id=>document.getElementById(id);
+let active=null,good=null,report=null,displayed=null,pointer=null,loading=false,diagramScale=4;
+const token=()=>new URLSearchParams(location.hash.slice(1)).get('token')??sessionStorage.getItem('engineer-token');
+async function api(path,data){const r=await fetch('/v1/'+path,{method:data?'POST':'GET',headers:{Authorization:'Bearer '+token(),...(data?{'Content-Type':'application/json'}:{})},body:data?JSON.stringify({...data,operationId:crypto.randomUUID()}):undefined});const v=await r.json();if(!r.ok)throw Error((v.code??'OperationFailed')+': '+v.message);return v;}
+const status=text=>{$('assembly-status').textContent=text;};
+function setRecipe(r){$('assembly-json').value=JSON.stringify(r,null,2);}
+async function fixture(){if($('assembly-fixture').value==='saved')return;try{setRecipe((await api('lab/fixture',{fixture:$('assembly-fixture').value})).assembly);}catch(e){status(e.message);}}
+$('assembly-fixture').addEventListener('change',fixture);
+async function run(kind,options={}){$('assembly-keep').disabled=true;try{const d=await api('document'),r=await api('lab/run',{kind,expectedRevision:d.status.revision,...options});active=r.job.id;$('assembly-keep').disabled=true;$('assembly-cancel').disabled=false;status('Computing '+kind+' in an isolated local worker…');}catch(e){status(e.message);}}
+$('assembly-solve').addEventListener('click',()=>{try{run('assembly',{assembly:JSON.parse($('assembly-json').value)});}catch{status('InvalidInput: Enter a valid assembly recipe.');}});
+$('assembly-suite').addEventListener('click',()=>run('assembly-suite'));
+$('assembly-cancel').addEventListener('click',async()=>{try{await api('lab/cancel',{});status('Cancellation requested. Saved poses are unchanged.');}catch(e){status(e.message);}});
+function moving(result){return result.poses.find(p=>p.bodyId==='collar')??result.poses.find(p=>!result.recipe.bodies.find(b=>b.id===p.bodyId).grounded)??result.poses[1];}
+function move(z){if(!good?.solvedRecipe)return;const p=moving(good);run('assembly',{assembly:good.solvedRecipe,drag:{bodyId:p.bodyId,position:[p.position[0],p.position[1],z]}});}
+$('assembly-move').addEventListener('click',()=>move(Number($('assembly-z').value)));
+$('assembly-keep').addEventListener('click',async()=>{try{const d=await api('document'),applied=await api('lab/apply',{kind:'assembly',jobId:good.jobId,expectedRevision:d.status.revision});window.dispatchEvent(new CustomEvent('engineer-document-changed',{detail:applied}));$('assembly-keep').disabled=true;status('Assembly recipe kept in working revision. Save document to persist it.');}catch(e){status(e.message);}});
+$('assembly-download').addEventListener('click',()=>{if(!report)return;const a=document.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify(report,null,2)],{type:'application/json'}));a.href=url;a.download='Axiom-E0-M3-evidence.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
+function draw(result){const canvas=$('assembly-canvas'),ctx=canvas.getContext('2d');ctx.clearRect(0,0,900,320);const raw=([x,y,z])=>[x-y,(x+y)*.433-z],points=result.poses.flatMap(p=>[p.position,[p.position[0]+25,p.position[1]+25,p.position[2]+30],[p.position[0]-25,p.position[1]-25,p.position[2]-10]]).map(raw),xs=points.map(p=>p[0]),ys=points.map(p=>p[1]),cx=(Math.max(...xs)+Math.min(...xs))/2,cy=(Math.max(...ys)+Math.min(...ys))/2;diagramScale=Math.min(6,740/Math.max(1,Math.max(...xs)-Math.min(...xs)),250/Math.max(1,Math.max(...ys)-Math.min(...ys)));const project=v=>{const p=raw(v);return [450+(p[0]-cx)*diagramScale,160+(p[1]-cy)*diagramScale];};
+  const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],rotate=(q,v)=>{const c=cross(q.slice(0,3),v),cc=cross(q.slice(0,3),c);return v.map((x,i)=>x+2*(q[3]*c[i]+cc[i]));};
+  ctx.font='14px sans-serif';const line=(a,b,color)=>{ctx.strokeStyle=color;ctx.beginPath();ctx.moveTo(...project(a));ctx.lineTo(...project(b));ctx.stroke();};
+  for(const [index,p]of result.poses.entries()){const b=result.recipe.bodies.find(b=>b.id===p.bodyId),color=b.grounded?'#d1ad59':['#69baff','#68d6b5','#cb9aff'][index%3],world=v=>rotate(p.quaternion,v).map((x,i)=>x+p.position[i]);
+    const corners=Array.from({length:8},(_,i)=>world([i&1?8:-8,i&2?8:-8,i&4?4:-4]));ctx.lineWidth=1.5;for(let i=0;i<8;i++)for(const bit of [1,2,4])if(!(i&bit))line(corners[i],corners[i|bit],color);
+    for(const [axis,c]of [[[14,0,0],'#ff9c8c'],[[0,14,0],'#68d6b5'],[[0,0,25],'#69baff']])line(p.position,world(axis),c);
+    ctx.fillStyle=color;const screen=project(p.position);ctx.fillText(p.bodyId+(b.grounded?' · grounded':''),screen[0]+35,screen[1]);
+  }
+}
+function show(r,lastGood){$('assembly-metrics').replaceChildren();for(const [label,value]of [['Solve state',r.status],['Remaining DOF',r.remainingDOF??'indeterminate'],['Local rank',r.rank+' / '+r.variables],['Length residual (mm)',r.evidence.maxLengthResidualMm.toExponential(2)],['Angular residual (rad)',r.evidence.maxAngularResidualRad.toExponential(2)]]){const box=document.createElement('div'),l=document.createElement('small'),v=document.createElement('strong');l.textContent=label;v.textContent=value;box.append(l,v);$('assembly-metrics').append(box);}
+  $('assembly-detail').textContent=JSON.stringify(r,null,2);if(lastGood){good=lastGood;draw(good);const p=moving(good);$('assembly-pose').textContent='Last feasible collar position (mm): '+p.position.map(x=>x.toFixed(6)).join(', ')+'. Failed or singular solves retain this placement.';$('assembly-move').disabled=false;}
+  $('assembly-keep').disabled=!r.applicable||r.jobId!==lastGood?.jobId;status(r.status+' · DOF '+(r.remainingDOF??'indeterminate')+(r.drag?' · drag '+(r.drag.accepted?'accepted':'rejected; previous poses retained'):'')+(r.conflicts.length?' · violated mates: '+r.conflicts.join(', '):'')+(r.redundant.length?' · redundant: '+r.redundant.join(', '):''));
+}
+$('assembly-canvas').addEventListener('pointerdown',e=>{if(good&&e.isPrimary){pointer={id:e.pointerId,y:e.clientY,z:moving(good).position[2]};e.currentTarget.setPointerCapture(e.pointerId);}});
+$('assembly-canvas').addEventListener('pointercancel',()=>{pointer=null;});
+$('assembly-canvas').addEventListener('pointerup',e=>{if(!pointer||pointer.id!==e.pointerId)return;const z=Math.max(-100,Math.min(100,pointer.z-(e.clientY-pointer.y)*320/e.currentTarget.getBoundingClientRect().height/diagramScale));e.currentTarget.releasePointerCapture(e.pointerId);pointer=null;$('assembly-z').value=z.toFixed(3);move(z);});
+function suite(r){$('assembly-suite-details').open=true;$('assembly-suite-summary').textContent=`Passed ${r.passed} / ${r.total} · Failed ${r.failed}`;$('assembly-suite-results').replaceChildren();for(const c of r.cases){const row=document.createElement('details'),summary=document.createElement('summary'),text=document.createElement('pre');summary.textContent=(c.passed?'PASS · ':'FAIL · ')+c.id;text.textContent=JSON.stringify(c,null,2);row.append(summary,text);$('assembly-suite-results').append(row);}}
+async function poll(){if(loading)return;loading=true;try{const v=await api('lab'),job=v.job;if(active&&job?.id===active&&job.state!=='running'){active=null;$('assembly-cancel').disabled=true;if(job.state==='completed'){if(job.kind==='assembly'){show(v.assemblyResult,v.assembly);displayed=v.assemblyResult?.jobId;}else{suite(v.assemblySuite);status('Spatial corpus completed · '+v.assemblySuite.passed+'/'+v.assemblySuite.total);}
+      report={job,result:v.assemblyResult,suite:v.assemblySuite};$('assembly-download').disabled=false;
+    }else status(job.state+' · '+(job.error?.message??'No committed changes.'));}
+  if(!active&&v.assembly&&v.assembly.jobId!==displayed&&!good){show(v.assembly,v.assembly);displayed=v.assembly.jobId;}
+  }catch(e){status(e.message);}finally{loading=false;}}
+(async()=>{try{const d=await api('document');if(d.document.assembly){$('assembly-fixture').value='saved';setRecipe(d.document.assembly);}else await fixture();}catch(e){status(e.message);}setInterval(poll,350);})();

@@ -3,6 +3,7 @@ import {open, lstat} from 'node:fs/promises';
 import {constants} from 'node:fs';
 import {atomicJson} from 'axiom-platform/files';
 import {recipe,KERNEL} from './lab/profile.mjs';
+import {assemblyRecipe} from './assembly/profile.mjs';
 
 export const FILENAME = 'project.engineer-provisional.json';
 export function fail(code, message) { throw Object.assign(new Error(message), {code}); }
@@ -14,16 +15,17 @@ export function validateMetadata(metadata) {
   'invalidRequest', 'Use a name of 1–128 characters and notes up to 8192 characters.');
 }
 export function validate(value) {
-  check(value?.formatId === 'axiom.engineer-document' && value.formatVersion === 0 && ['E0.M1','E0.M2'].includes(value.provisional),
-    'incompatibleVersion', 'This build opens only E0.M1/E0.M2 provisional documents (version 0).');
-  check(Object.keys(value).every(k => ['formatId','formatVersion','provisional','documentId','revision','metadata',...(value.provisional==='E0.M2'?['experiment']:[])].includes(k)) &&
+  check(value?.formatId === 'axiom.engineer-document' && value.formatVersion === 0 && ['E0.M1','E0.M2','E0.M3'].includes(value.provisional),
+    'incompatibleVersion', 'This build opens only E0.M1/M2/M3 provisional documents (version 0).');
+  check(Object.keys(value).every(k => ['formatId','formatVersion','provisional','documentId','revision','metadata',...(value.provisional!=='E0.M1'?['experiment']:[]),...(value.provisional==='E0.M3'?['assembly']:[])].includes(k)) &&
     /^engineer-document:\/\/[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(value.documentId) &&
     Number.isSafeInteger(value.revision) && value.revision >= 0, 'invalidRequest', 'Invalid provisional document envelope.');
   validateMetadata(value.metadata);
-  if(value.provisional==='E0.M2'){
+  if(value.provisional==='E0.M2'||Object.hasOwn(value,'experiment')){
     check(value.experiment?.profile==='E0.M2-probe-v0'&&value.experiment.kernel===KERNEL&&Object.keys(value.experiment).every(k=>['profile','kernel','spec'].includes(k)),'incompatibleVersion','Unverified experiment/kernel profile. Original source was preserved.');
     recipe(value.experiment.spec);
   }
+  if(value.provisional==='E0.M3')assemblyRecipe(value.assembly);
   return value;
 }
 export function blank(name) {
