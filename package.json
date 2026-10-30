@@ -1,0 +1,22 @@
+{
+  "name": "axiom-engineer-cad",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "start": "node src/cli.mjs",
+    "check": "node --test --test-timeout=30000 tests/*.test.mjs",
+    "test": "node --test --test-timeout=30000 tests/*.test.mjs",
+    "test:browser": "node tests/browser.mjs"
+  },
+  "dependencies": {
+    "axiom-platform": "https://codeload.github.com/Krozzeo/AxiomPlatform/tar.gz/6d240845cd77eb1879738d32c9f2b8fcfd7297c5"
+  },
+  "devDependencies": {
+    "playwright": "1.56.1"
+  }
+}
