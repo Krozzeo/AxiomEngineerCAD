@@ -2,12 +2,16 @@ import {geometryExperiment} from './kernel.mjs';
 import {runSuite} from './suite.mjs';
 import {solveSketch,sketchFixture} from './sketch.mjs';
 import {check} from '../document.mjs';
+import {solveAssembly} from '../assembly/solver.mjs';
+import {assemblySuite} from '../assembly/suite.mjs';
 process.once('message',async message=>{
   try{
     let result;
     if(message.kind==='geometry')result=await geometryExperiment(message.payload.spec,{includeStep:!!message.payload.includeStep});
     else if(message.kind==='suite')result=await runSuite();
     else if(message.kind==='sketch')result=await solveSketch(message.payload.primitives??sketchFixture(message.payload.fixture),{drag:message.payload.drag});
+    else if(message.kind==='assembly')result=solveAssembly(message.payload.assembly,{drag:message.payload.drag});
+    else if(message.kind==='assembly-suite')result=assemblySuite();
     else check(false,'UnsupportedCapability','Unknown lab task.');
     const maxRssBytes=process.resourceUsage().maxRSS*1024;
     check(maxRssBytes<=768*1024*1024,'ResourceLimit','Worker peak RSS exceeded the experimental 768 MiB postcondition.');

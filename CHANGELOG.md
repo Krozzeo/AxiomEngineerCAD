@@ -1,3 +1,10 @@
+# 0.0.3 — E0.M3 spatial mate lab (review candidate)
+
+- Record owner validation of E0.M2; add original MIT six-DOF rigid-component solver experiment with analytic semantic datums and grounding.
+- Add coincident/concentric/distance/angle/parallel/perpendicular/fixed probes; local rank, redundancy, conflict and singularity diagnostics, constrained translation/spin and safe rejected drag.
+- Add 28 spatial fixtures and a 21-sample motion path, editable native demo, CPU datum diagram, numeric/pointer movement and explicit keep/save/reopen. Preserve M1/M2 documents and geometry.
+- Verify cancellation, stale results, invalid references, last-good recovery and relocated packaged corpora; retain final-schema and full-assembly gates.
+
 # 0.0.2 — E0.M2 geometry and sketch lab (review candidate)
 
 - Add actual isolated OCCT extrusion, cuts, revolution, booleans, STEP roundtrip and analytic validity probes; conservative topology/history diagnostics.

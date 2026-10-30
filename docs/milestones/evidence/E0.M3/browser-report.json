@@ -1,0 +1,23 @@
+{
+  "milestone": "E0.M3",
+  "platform": "0.1.12",
+  "providerCommit": "6d240845cd77eb1879738d32c9f2b8fcfd7297c5",
+  "runtime": "v24.21.0",
+  "os": "win32",
+  "architecture": "x64",
+  "criteria": [
+    "Direct CLI launches an authenticated browser editor; pending fields block save; applied properties persist",
+    "Spatial UI solves six-DOF poses, moves and pointer-drags within coaxial freedom, saves recipe, executes 28 cases, rejects conflicts and fully locked movement",
+    "Real kernel preview changes volume with width; recipe persists; invalid result retains last good preview; 29-case corpus and constrained circle drag pass",
+    "Visible depth-buffer face picking resolves the proven producer role",
+    "Direct Cancel retains session; Save and close releases the running editor",
+    "Hub UI creates real CAD adapter session",
+    "Editor changes appear in Hub status",
+    "Hub Cancel/Save/Close/Reopen preserve document identity and content",
+    "Actual Hub Load Demos creates and registers both version-owned native labs"
+  ],
+  "pageErrors": [],
+  "renderer": "Canvas CPU preview derived from actual OCCT tessellation; exact metrics from isolated CPU/Wasm; no WebGPU or AI acceptance claimed",
+  "browser": "141.0.7390.37",
+  "passed": true
+}

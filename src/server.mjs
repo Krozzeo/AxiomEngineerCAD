@@ -14,7 +14,7 @@ export async function startEditor({adapter, embeddingOrigin}) {
   };
   const respond = (res, status, value) => { res.writeHead(status, {...headers, 'Content-Type':'application/json'}); res.end(JSON.stringify(value)); };
   const routes = {'/v1/document':'document.inspect', '/v1/edit':'document.edit', '/v1/buffer':'document.buffer', '/v1/save':'project.save',
-    '/v1/lab':'lab.inspect','/v1/lab/run':'lab.run','/v1/lab/cancel':'lab.cancel','/v1/lab/apply':'lab.apply'};
+    '/v1/lab':'lab.inspect','/v1/lab/run':'lab.run','/v1/lab/cancel':'lab.cancel','/v1/lab/apply':'lab.apply','/v1/lab/fixture':'lab.fixture'};
   const server = createServer(async (req, res) => {
     try {
       check(req.headers.host === new URL(origin).host, 'permissionDenied', 'Invalid local host.');
@@ -38,7 +38,7 @@ export async function startEditor({adapter, embeddingOrigin}) {
         if (result.closed) res.once('finish', () => { void adapter.shutdown(); });
         return respond(res, 200, {...result, hosted:!!embeddingOrigin});
       }
-      const assets = {'/':['index.html','text/html'], '/app.mjs':['app.mjs','text/javascript'], '/styles.css':['styles.css','text/css'], '/lab.mjs':['lab.mjs','text/javascript']};
+      const assets = {'/':['index.html','text/html'], '/app.mjs':['app.mjs','text/javascript'], '/styles.css':['styles.css','text/css'], '/lab.mjs':['lab.mjs','text/javascript'], '/assembly.mjs':['assembly.mjs','text/javascript']};
       const asset = assets[url.pathname];
       if (req.method !== 'GET' || !asset) return respond(res, 404, {code:'unsupportedCapability', message:'Not found.'});
       res.writeHead(200, {...headers, 'Content-Type':asset[1] + '; charset=utf-8'});
