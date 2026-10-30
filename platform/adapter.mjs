@@ -10,6 +10,9 @@ import manifest from './product.json' with {type:'json'};
 import {LabSession} from '../src/lab/session.mjs';
 import {recipe,KERNEL} from '../src/lab/profile.mjs';
 import {assemblyFixture} from '../src/assembly/fixtures.mjs';
+import {NativeSession} from '../src/native/session.mjs';
+import {readState} from '../src/native/storage.mjs';
+import {nativeDemo} from '../src/native/demo.mjs';
 
 export class EngineerAdapter {
   constructor({start = startEditor} = {}) {
@@ -29,10 +32,10 @@ export class EngineerAdapter {
     return this.execute(m.method, m.params);
   }
   async execute(method, params) {
-    check(['initialize', ...manifest.capabilities, 'document.inspect', 'document.edit', 'document.buffer','lab.run','lab.inspect','lab.cancel','lab.apply','lab.fixture'].includes(method),
+    check(['initialize', ...manifest.capabilities, 'document.inspect', 'document.edit', 'document.buffer','lab.run','lab.inspect','lab.cancel','lab.apply','lab.fixture','native.inspect','native.convert','native.graph','native.snapshot','native.publish','native.restore','native.refresh','native.attach','native.adopt','native.recover','native.removeVersion'].includes(method),
       'unsupportedCapability', 'This build does not implement that operation.');
     // Buffer reports have their own monotonic client sequence; typing must not exhaust mutation receipts.
-    const mutation = !['initialize','project.detect','project.status','document.inspect','document.buffer','lab.inspect','lab.fixture'].includes(method);
+    const mutation = !['initialize','project.detect','project.status','document.inspect','document.buffer','lab.inspect','lab.fixture','native.inspect','native.refresh'].includes(method);
     const key = JSON.stringify({method, params}), id = params.operationId;
     if (mutation) {
       check(typeof id === 'string' && /^[a-zA-Z0-9_-]{8,100}$/.test(id), 'invalidRequest', 'A unique operationId is required.');
@@ -56,7 +59,7 @@ export class EngineerAdapter {
   }
   async detect(path) {
     path = await authorized(this.root, path);
-    if ((await lstat(path)).isDirectory()) path = await authorized(this.root, join(path, FILENAME));
+    if ((await lstat(path)).isDirectory()) path = join(path, FILENAME);
     const doc = await readDocument(path);
     return {path, projectId:doc.documentId, name:doc.metadata.name, projectRevision:doc.revision,
       formatId:doc.formatId, formatVersion:doc.formatVersion};
@@ -76,10 +79,11 @@ export class EngineerAdapter {
     check(this.root && !this.ended, 'cancelled', 'Initialize a live session first.');
     if (method === 'project.detect') return this.detect(p.path);
     if (method === 'project.demos') {
-      check(!this.doc&&Array.isArray(p.demoIds)&&p.demoIds.length>0&&p.demoIds.length<=2&&new Set(p.demoIds).size===p.demoIds.length&&p.demoIds.every(id=>manifest.demos.some(d=>d.id===id)),'invalidRequest','Choose the declared version-owned demos.');
+      check(!this.doc&&Array.isArray(p.demoIds)&&p.demoIds.length>0&&p.demoIds.length<=manifest.demos.length&&new Set(p.demoIds).size===p.demoIds.length&&p.demoIds.every(id=>manifest.demos.some(d=>d.id===id)),'invalidRequest','Choose the declared version-owned demos.');
       const destination=await authorized(this.root,p.destination);
       check((await readdir(destination)).length===0,'projectBusy','Demos require a fresh empty destination.');
-      const projects=[];for(const demoId of p.demoIds){const spatial=demoId==='e0-m3-mates',folder=join(destination,spatial?'E0-M3-Spatial-Lab':'E0-M2-Geometry-Lab');await mkdir(folder);
+      const projects=[];let nativePaths;if(p.demoIds.some(id=>id.startsWith('e0-m4-'))){const docs=await nativeDemo();nativePaths={};for(const [id,key,folderName]of [['e0-m4-source','source','E0-M4-Source'],['e0-m4-native','consumer','E0-M4-Native']]){const folder=join(destination,folderName);await mkdir(folder);const path=join(folder,FILENAME);await atomicJson(path,docs[key]);nativePaths[id]=path;}}
+      for(const demoId of p.demoIds){if(nativePaths?.[demoId]){projects.push({demoId,path:nativePaths[demoId],...await this.detect(nativePaths[demoId])});continue;}const spatial=demoId==='e0-m3-mates',folder=join(destination,spatial?'E0-M3-Spatial-Lab':'E0-M2-Geometry-Lab');await mkdir(folder);
         const value=spatial?{...blank('E0.M3 Spatial Mate Lab'),provisional:'E0.M3',assembly:assemblyFixture('coaxial')}:{...blank('E0.M2 Geometry & Sketch Lab'),provisional:'E0.M2',experiment:{profile:'E0.M2-probe-v0',kernel:KERNEL,spec:recipe()}};
         const path=join(folder,FILENAME);await atomicJson(path,value);projects.push({demoId,path,...await this.detect(path)});}
       return {productVersion:manifest.productVersion,projects};
@@ -95,8 +99,9 @@ export class EngineerAdapter {
         this.release = await acquireLease(folder, this.sessionId);
         if (create) check((await readdir(folder)).every(n => n === '.axiom-platform-session.lock'), 'projectBusy', 'Project folder changed during creation.');
         const path = create ? join(folder, FILENAME) : detected.path;
-        const value = create ? initial : await readDocument(await authorized(this.root, path));
-        this.doc = new Document(path, value, {authorize:path => authorized(this.root, path)});
+        const state=create?{value:initial}:await readState(path),value=state.value;
+        this.doc = new Document(path, value, {authorize:path => authorized(this.root, path),diskHash:state.diskHash,recovery:state.recovery});
+        this.doc.native = new NativeSession(this.doc,this.root);
         this.doc.lab = new LabSession(this.doc);
         this.runtime = await this.start({adapter:this, embeddingOrigin:this.embeddingOrigin});
         check(!this.ended, 'cancelled', 'Session closed before document creation completed.');
@@ -114,9 +119,20 @@ export class EngineerAdapter {
     if (method === 'lab.run') return this.doc.lab.start(p);
     if (method === 'lab.cancel') return this.doc.lab.cancel();
     if (method === 'lab.apply') return this.doc.lab.apply(p);
-    if (method === 'project.save') return this.doc.save(p.expectedRevision);
+    if(method==='native.inspect')return this.doc.native.inspect();
+    if(method==='native.convert')return this.doc.native.convert(p);
+    if(method==='native.graph')return this.doc.native.editGraph(p);
+    if(method==='native.snapshot')return this.doc.native.snapshot(p);
+    if(method==='native.publish')return this.doc.native.publish(p);
+    if(method==='native.restore')return this.doc.native.restore(p);
+    if(method==='native.refresh')return this.doc.native.refresh();
+    if(method==='native.attach')return this.doc.native.attach(p);
+    if(method==='native.adopt')return this.doc.native.adopt(p);
+    if(method==='native.recover')return this.doc.native.recover(p);
+    if(method==='native.removeVersion')fail('ReferencedVersion','Immutable versions are append-only; deletion/garbage collection is unsupported.');
+    if (method === 'project.save') {if(this.doc.recovery?.state==='Committed'&&this.doc.recovery.operationId===p.operationId&&p.expectedRevision===this.doc.value.revision)return {status:this.doc.status(),receiptConfirmed:true};return this.doc.save(p.expectedRevision,p.operationId);}
     if (method === 'project.close') {
-      this.doc.expect(p.expectedRevision);
+      this.doc.expect(p.expectedRevision,{allowRecovery:p.decision!=='save'});
       check(['save','discard','cancel'].includes(p.decision), 'invalidRequest', 'Choose Save, Discard or Cancel.');
       if (p.decision === 'cancel') return {closed:false, cancelled:true, status:this.doc.status()};
       if (p.decision === 'save') await this.doc.save(p.expectedRevision);

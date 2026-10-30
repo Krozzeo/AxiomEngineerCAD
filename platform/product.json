@@ -3,13 +3,14 @@
   "protocolVersion": 1,
   "productId": "axiom.engineer-cad",
   "displayName": "Axiom Engineer CAD",
-  "productVersion": "0.0.3",
+  "productVersion": "0.0.4",
   "platformApiRange": ">=0.1.0 <0.2.0",
   "projectFormats": [
     {
       "id": "axiom.engineer-document",
       "versions": [
-        0
+        0,
+        1
       ]
     }
   ],
@@ -30,6 +31,14 @@
     {
       "id": "e0-m3-mates",
       "name": "E0.M3 Spatial Mate Lab"
+    },
+    {
+      "id": "e0-m4-source",
+      "name": "E0.M4 Source Plate"
+    },
+    {
+      "id": "e0-m4-native",
+      "name": "E0.M4 Native Version Lab"
     }
   ],
   "launch": {

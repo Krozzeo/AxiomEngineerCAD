@@ -1,3 +1,11 @@
+# 0.0.4 — E0.M4 native graph, version closure and recovery (review candidate)
+
+- Add validated native format1, typed stable graph/occurrence identities and explicit legacy conversion with original-byte backup.
+- Add immutable content hashes, local publications, explicit Latest/Pinned dependency candidates, verified offline effective snapshots and independent drawing source/revision bindings.
+- Add durable base/next journal and save receipt, real process-termination checks, explicit original-preserving recovery and unknown-schema/runtime refusal.
+- Add native source/consumer demos, current/candidate worker verification, captured graph drafts and actual Hub source-update/history/reopen/recovery flows.
+- Preserve earlier labs and all versioned source/license pins. Full assembly auto-follow, drawing renderers, schema/container acceptance and hardware power-loss guarantees are separate gates.
+
 # 0.0.3 — E0.M3 spatial mate lab (review candidate)
 
 - Record owner validation of E0.M2; add original MIT six-DOF rigid-component solver experiment with analytic semantic datums and grounding.

@@ -26,7 +26,7 @@ try {
     try { await lstat(path); } catch (error) { if (error.code !== 'ENOENT') throw error; await mkdir(path); }
   }
   const result = await call(options['--create'] ? 'project.create' : 'project.open', {path, name:options['--name'] ?? 'Untitled engineering document', operationId:randomUUID()});
-  console.log(JSON.stringify({ready:true, product:'Axiom Engineer CAD', milestone:'E0.M1', editorUrl:result.editorUrl, status:result.status}));
+  console.log(JSON.stringify({ready:true, product:'Axiom Engineer CAD', milestone:'E0.M4', editorUrl:result.editorUrl, status:result.status}));
 } catch (error) { await adapter.shutdown(); throw error; }
 for (const signal of ['SIGINT','SIGTERM']) process.once(signal, () => {
   if (adapter.doc?.status().dirty) console.error('Unsaved edits will be discarded. Previously saved data is preserved.');
