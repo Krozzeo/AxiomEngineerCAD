@@ -9,7 +9,7 @@ import {startHost} from '../node_modules/axiom-platform/services/local-host/serv
 const root = await mkdtemp(join(tmpdir(), 'engineer-browser-')), evidence = resolve('test-results');
 await mkdir(evidence, {recursive:true});
 let browser, child, host, direct;
-const report = {milestone:'E0.M4', platform:'0.1.12', providerCommit:'6d240845cd77eb1879738d32c9f2b8fcfd7297c5',
+const report = {milestone:'E0.M5', platform:'0.1.12', providerCommit:'6d240845cd77eb1879738d32c9f2b8fcfd7297c5',
   runtime:process.version, os:process.platform, architecture:process.arch, criteria:[], pageErrors:[],
   renderer:'Canvas CPU preview derived from actual OCCT tessellation; exact metrics from isolated CPU/Wasm; no WebGPU or AI acceptance claimed'};
 try {
@@ -138,6 +138,7 @@ try {
   await demoPage.locator('#spatial-lab > summary').click();await demoPage.locator('#assembly-solve').click();await demoPage.locator('#assembly-status').filter({hasText:'UnderDefined · DOF 2'}).waitFor();await demoPage.screenshot({path:join(evidence,'spatial-demo.png'),fullPage:true});
   report.criteria.push('Actual Hub Load Demos registers both labs and opens/solves the native spatial demo in its installed product session');
   const {verifyNativeUI}=await import('./browser-native.mjs');await verifyNativeUI({hub,context,host,evidence,observe,report});
+  const {verifyReviewUI}=await import('./browser-review.mjs');await verifyReviewUI({hub,context,host,evidence,observe,report});
   assert.deepEqual(report.pageErrors, []); report.passed = true;
 } catch (error) { report.failure = error.stack; if (direct) await direct.screenshot({path:join(evidence, 'failure.png')}).catch(() => {}); throw error; }
 finally {

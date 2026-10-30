@@ -10,6 +10,7 @@ export class LabSession {
   view(){const {controller,promise,...job}=this.job??{};return structuredClone({job:this.job?job:null,preview:this.preview,sketch:this.sketch,suite:this.suite,assembly:this.assembly??null,assemblyResult:this.assemblyResult??null,assemblySuite:this.assemblySuite??null,nativeVerification:this.nativeVerification??null});}
   start({kind='geometry',spec,fixture,drag,primitives,assembly,candidateId,expectedRevision}){
     this.document.expect(expectedRevision);check(!this.closed,'Cancelled','Lab session is closed.');
+    check(!this.document.commands?.running,'projectBusy','Finish or cancel the semantic tool job first.');
     check(!this.running,'projectBusy','Cancel or wait for the current lab task.');
     check(['geometry','suite','sketch','assembly','assembly-suite','native-verify'].includes(kind),'UnsupportedCapability','Unknown lab task.');
     const payload=kind==='geometry'?{spec:recipe(spec)}:kind==='sketch'?{fixture,drag,primitives}:kind==='assembly'?{assembly:assemblyRecipe(assembly),drag}:kind==='native-verify'?{document:structuredClone(this.document.native.verificationDocument(candidateId))}:{};
@@ -34,6 +35,7 @@ export class LabSession {
   cancel(){if(this.running)this.job.controller.abort();return this.view();}
   apply({expectedRevision,jobId,kind='geometry'}){
     this.document.expect(expectedRevision);check(!this.running,'projectBusy','Wait for the worker before applying.');
+    check(!this.document.commands?.running,'projectBusy','Finish or cancel the semantic tool job first.');
     check(['geometry','assembly'].includes(kind),'UnsupportedCapability','Unknown apply kind.');
     if(kind==='assembly'){
       const r=this.assembly;

@@ -1,6 +1,6 @@
 # Axiom Engineer CAD — Semantic Tool and Transaction Contract
 
-**Baseline:** Master v0.2.0. **First normative schema gate:** E0.M5. **Status:** planned API design, not installed or implemented. Generic transport/account/provider/review primitives belong to [Axiom Platform](https://github.com/Krozzeo/AxiomPlatform/blob/main/docs/architecture/AI_CONTRACT.md); CAD semantics belong to Engineer.
+**Baseline:** Master v0.2.0. **First normative schema gate:** E0.M5. **Status:** E0.M5 bounded executable experiment in 0.0.5; owner review pending. [Implemented versioned catalog](SEMANTIC_TOOLS_V1.json) and [ADR-008](../architecture/ADR-008-SEMANTIC-REVIEW.md) define the actual installed subset and transaction limits. The broader contract below remains the target for later capabilities. Generic transport/account/provider/review primitives belong to [Axiom Platform](https://github.com/Krozzeo/AxiomPlatform/blob/main/docs/architecture/AI_CONTRACT.md); CAD semantics belong to Engineer.
 
 ## 1. One authoritative command path
 

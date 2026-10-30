@@ -21,7 +21,7 @@ An ADR records a real choice, never a speculative implementation claim. Each dec
 | [ADR-005](ADR-005-SPATIAL-MATE-PROBE.md) | 3D mate solver and supported mate surfaces | Ground, spatial DOF, motion, singularity, conflict, license/runtime | E0.M3 | Experimenting |
 | [ADR-006](ADR-006-NATIVE-STORAGE.md) | Native container and cross-document graph | Stable identities, portable paths, snapshot/atomicity/crash/migration | E0.M4 | Experimenting |
 | [ADR-007](ADR-007-NATIVE-VERSION-RESOLVER.md) | Version publication and Latest compatibility resolver | Pinned/current/ambiguous, historical closure, safe update rollback | E0.M4; E4.M4 implementation | Experimenting |
-| ADR-008 | Semantic tool schemas and proposal Apply | Shared authority, stale base, permission envelopes, replay/rollback | E0.M5 | Pending |
+| [ADR-008](ADR-008-SEMANTIC-REVIEW.md) | Semantic tool schemas and proposal Apply | Shared authority, stale base, permission envelopes, replay/rollback | E0.M5 | Experimenting |
 | ADR-009 | Browser/daemon/WebGPU CAD selection | Two launch modes, actual GPU, picking geometry correspondence, fallback | E0.M6 | Pending |
 | ADR-010 | Vector drawings and exact HLR | Independent view/dimension/reference PDF output checks | E0.M6 | Pending |
 | ADR-011 | Engineering-data external exposure default | Local/restricted/full, audit, offline and permission-denial tests | E0.M5–M6 | Pending |

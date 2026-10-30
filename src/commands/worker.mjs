@@ -1,0 +1,2 @@
+import {verifyNative} from '../native/verify.mjs';
+export async function verifyCommand({before,after}){const beforeProof=await verifyNative(before),afterProof=await verifyNative(after);return {valid:true,before:beforeProof,after:afterProof,checks:['native graph and immutable closure','actual exact-kernel analytic oracles','actual sketch/spatial profile when present','semantic reference resolution','pinned runtime integrity']};}

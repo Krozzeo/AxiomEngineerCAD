@@ -8,7 +8,7 @@ const id=()=>randomUUID();
 export function createVersion(value,proof){check(proof?.valid&&proof.inputHash===hash(contentOf(value)),'revisionConflict','Validate the exact current content before taking a version.');const content={...contentOf(value),verification:structuredClone(proof)};return {id:hash(content),content};}
 export class NativeSession{
   constructor(document,root){this.doc=document;this.root=root;this.candidates=new Map();this.lastDependencies=[];}
-  ready(revision,ignoreBuffer){this.doc.expect(revision);check(![...this.doc.buffers].some(([id,b])=>id!==ignoreBuffer&&b.dirty)&&!this.doc.lab?.running,'projectBusy','Apply pending fields and finish/cancel the worker first.');}
+  ready(revision,ignoreBuffer){this.doc.expect(revision);check(![...this.doc.buffers].some(([id,b])=>id!==ignoreBuffer&&b.dirty)&&!this.doc.lab?.running&&!this.doc.commands?.running,'projectBusy','Apply pending fields and finish/cancel the worker first.');}
   native(){check(this.doc.value.formatVersion===1,'incompatibleVersion','Convert explicitly to native v1 first.');}
   set(next,revision,ignoreBuffer){this.ready(revision,ignoreBuffer);next.revision=revision+1;validate(next);this.doc.value=structuredClone(next);if(ignoreBuffer)this.doc.buffers.get(ignoreBuffer).dirty=false;this.candidates.clear();this.lastDependencies=[];return this.doc.view();}
   convert(p){this.ready(p.expectedRevision);check(this.doc.value.formatVersion===0,'incompatibleVersion','This document is already native.');return this.set(upgrade(this.doc.value),p.expectedRevision);}

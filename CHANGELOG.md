@@ -1,3 +1,10 @@
+# 0.0.5 — E0.M5 semantic commands and human review (review candidate)
+
+- Add 17 versioned typed tools using Platform registry/schema, paging, diff/review and task journal primitives, with shared manual/proposal domain and exact numerical validation.
+- Add isolated proposals, server-bound revocable agent grants, complete human review and atomic revision/dependency/source-bound Apply & Save; Local-only exposure denies remote transport.
+- Add durable operation reconciliation, cancellation/staleness/permission safeguards, native Review Lab demo and actual installed command/review/reopen proof.
+- Add 17 semantic tests (71 total); retain all native storage, 29 geometry/2D and 28 spatial cases. No model/provider quality or drawing/GPU acceptance claim.
+
 # 0.0.4 — E0.M4 native graph, version closure and recovery (review candidate)
 
 - Add validated native format1, typed stable graph/occurrence identities and explicit legacy conversion with original-byte backup.
