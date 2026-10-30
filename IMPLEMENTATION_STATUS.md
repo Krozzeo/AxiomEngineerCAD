@@ -2,6 +2,8 @@
 
 Date: 2026-10-30. Master: v0.2.0. Software: 0.0.1 experimental lifecycle foundation.
 
+Implementation source commit: `7095daca0d861dccb6f7c5055b985ca9b50eec8b`. Delivery documentation/evidence may advance separately. The branch remains local: automatic permission review rejected public push without explicit publication authorization. No remote CI, PR or release is claimed.
+
 | Milestone | State | Evidence |
 | --- | --- | --- |
 | E0.M1 | Review candidate — owner acceptance pending | [Plan](docs/milestones/E0_M1_PLAN.md), [report](docs/milestones/E0_M1_REPORT.md), tests and browser artifacts |
