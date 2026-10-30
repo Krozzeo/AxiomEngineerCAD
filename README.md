@@ -2,7 +2,46 @@
 
 Local-first, browser-operated parametric mechanical CAD and engineering-documentation product in the Axiom family, designed from the outset for both human users and AI agents.
 
-> **Status:** Foundational design approved; implementation has not started. No functional CAD capabilities are claimed yet.
+> **Status:** E0.M1 lifecycle foundation implemented as a review candidate; owner acceptance pending. The runnable shell edits provisional document metadata. Exact geometry, sketches, assemblies, drawings and AI are not implemented.
+
+## Run the E0.M1 foundation
+
+Requires Node.js 24+. Install the integrity-locked Platform SDK:
+
+```sh
+npm ci --ignore-scripts
+npm start -- --root .local/projects --create first-study --name "First engineering study"
+```
+
+Open the authenticated editor URL printed in the terminal. Edit Name/Notes, choose **Apply properties**, then **Save document**. Pending fields must be applied or reset before saving. Direct sessions provide Save/Discard/Cancel on close. To reopen:
+
+```sh
+npm start -- --root .local/projects --open first-study
+```
+
+The saved file is `project.engineer-provisional.json`, reserved format ID `axiom.engineer-document`, experimental version **0**, marker E0.M1. It is not the final CAD schema or `.axcad` package. Keep existing documents; incompatible formats are refused without modification.
+
+### Through Axiom Platform 0.1.12
+
+Add this prepared source installation's `platform/product.json` through **Installations → Add installation → local folder**, activate Engineer CAD, then create an Engineer project. Dependencies must already be installed. Alternatively, launch the pinned provider directly with disposable paths:
+
+```sh
+node node_modules/axiom-platform/services/local-host/cli.mjs --product platform/product.json --projects-root .local/hub-projects --settings-root .local/hub-profile --port 0 --open
+```
+
+Host and direct modes use the same document commands and exclusive lease. Hosted close is managed by the Hub. No account is required. The CLI above enables Platform's ordinary public release discovery; the product itself makes no external requests.
+
+### Verify
+
+```sh
+npm run check
+npx playwright install chromium --only-shell
+npm run test:browser
+```
+
+Tests use temporary projects and a disposable Platform profile, never your saved accounts. Browser artifacts are written to `test-results/`. They prove lifecycle/UI behavior, not GPU rendering or CAD correctness. [Current implementation](IMPLEMENTATION_STATUS.md), [handoff](AI_HANDOFF.md), [milestone plan](docs/milestones/E0_M1_PLAN.md), [evidence](docs/milestones/E0_M1_REPORT.md), [third-party notices](THIRD_PARTY_NOTICES.md).
+
+After an abrupt process termination, inspect saved identity/revision and the lease owner before recovery; this build does not automatically delete stale leases or implement migrations. Do not blindly repeat an operation whose result is unknown.
 
 ## Start here
 
@@ -19,7 +58,7 @@ Coding agents: read [AGENTS.md](AGENTS.md) and the full master before modifying 
 
 ## Architecture and implementation contracts
 
-The v0.2 design review moved the highest-risk feasibility questions into Generation **E0.M1–E0.M7** before freezing native schema and building broad CAD features. The functional MVP remains unchanged. These are specifications and test plans, **not implemented functionality**.
+The v0.2 design review moved the highest-risk feasibility questions into Generation **E0.M1–E0.M7** before freezing native schema and building broad CAD features. The functional MVP remains unchanged. These contracts specify future CAD behavior; consult IMPLEMENTATION_STATUS.md for actual evidence.
 
 - [ADRs and architecture gates](docs/architecture/ADR_REGISTER.md)
 - [Native engineering documents, external references and versioning](docs/contracts/NATIVE_DATA_VERSIONING.md)

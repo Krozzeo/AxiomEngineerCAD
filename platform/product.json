@@ -1,0 +1,11 @@
+{
+  "manifestVersion": 1,
+  "protocolVersion": 1,
+  "productId": "axiom.engineer-cad",
+  "displayName": "Axiom Engineer CAD",
+  "productVersion": "0.0.1",
+  "platformApiRange": ">=0.1.0 <0.2.0",
+  "projectFormats": [{ "id": "axiom.engineer-document", "versions": [0] }],
+  "capabilities": ["project.detect", "project.create", "project.open", "project.status", "project.save", "project.close"],
+  "launch": { "adapter": "official-local", "entry": "adapter.mjs" }
+}

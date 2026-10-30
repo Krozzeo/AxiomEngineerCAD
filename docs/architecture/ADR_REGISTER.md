@@ -1,6 +1,8 @@
 # Architecture Decision Register — Axiom Engineer CAD
 
-**Design baseline:** Master Design v0.2.0. **Implementation status:** Not started. **Authority:** Owner-approved design and reproducible milestone evidence. **Scope:** E0 proof and subsequent controlled redesign.
+**Design baseline:** Master Design v0.2.0. **Implementation status:** E0.M1 review candidate; owner acceptance pending. **Authority:** Owner-approved design and reproducible milestone evidence. **Scope:** E0 proof and subsequent controlled redesign.
+
+E0.M1 implementation proposal: [ADR-015 — Provisional shell and Platform pin](ADR-015-E0-M1-PROVISIONAL-SHELL.md). This does not accept or replace pending foundational ADR-001–014.
 
 ## Rules
 
