@@ -15,6 +15,7 @@ import {command,featureOf,featureContext} from './domain.mjs';
 export const dependencies=v=>(v.native?.graph.dependencies??[]).map(d=>({id:d.id,versionId:d.effectiveVersion})).sort((a,b)=>a.id.localeCompare(b.id));
 const proposalSummary=p=>({id:p.id,label:p.label,state:p.state,baseRevision:p.baseRevision,revision:p.revision,commands:p.commands.length,validation:p.proof?.valid??false,owner:p.owner});
 const failure=(code,message)=>Object.assign(Error(message),{code});
+const receiptIdentity=id=>typeof id==='string'&&id.length<=96?id:null;
 function errorOf(e){if(['ENOENT','EACCES','EPERM','EIO','ENOSPC'].includes(e.code))return {code:e.code==='ENOENT'?'MissingDependency':'OperationFailed',message:'Local storage is missing or unavailable; inspect the receipt before retrying.'};const map={AX_AGENT_0001:'InvalidInput',AX_AGENT_0003:'ResourceLimit',AX_AGENT_0004:'UnsupportedCapability',invalidRequest:'InvalidInput',incompatibleVersion:'IncompatibleVersion',permissionDenied:'PermissionDenied',revisionConflict:'RevisionConflict',projectBusy:'ResourceLimit',InvalidNativeGraph:'InvalidInput',InvalidDependency:'MissingDependency',IntegrityError:'InvalidGeometry',DependencyCycle:'InvalidInput'};return {code:map[e.code]??e.code??'OperationFailed',message:e.code?e.message:'The operation failed safely; inspect its receipt before retrying.'};}
 const budget=input=>Math.min(input.maxBytes??8192,14000);
 export class CommandSession{
@@ -42,7 +43,7 @@ export class CommandSession{
       key=hash({envelope,grantId:actor.grantId});const old=this.receipts.get(envelope.operationId);if(old){check(old.key===key,'InvalidInput','Operation ID reused with different input or actor.');return structuredClone(old.initial);}check(this.receipts.size<256,'ResourceLimit','Tool receipt limit reached; reopen the session.');
       this.doc.expect(envelope.expectedDocumentRevision);check(canonical(dependencies(this.doc.value))===canonical([...envelope.expectedDependencyVersions].sort((a,b)=>a.id.localeCompare(b.id))),'RevisionConflict','Effective dependency versions changed.');
       entry={key,envelope:structuredClone(envelope),actor,initial:null,final:null};this.receipts.set(envelope.operationId,entry);const result=await this.handle(tool,envelope,actor,entry);entry.initial={receipt:this.receipt(envelope,result?.jobId?'accepted':'completed',result)};validateSchema(RECEIPT_SCHEMA,entry.initial.receipt);bounded(entry.initial,16384);return structuredClone(entry.initial);
-    }catch(e){const result={receipt:{schemaVersion:1,operationId:envelope?.operationId??null,traceId:envelope?.traceId??null,outcome:'rejected',error:errorOf(e)}};if(entry)entry.initial=result;return result;}
+    }catch(e){const result={receipt:{schemaVersion:1,operationId:receiptIdentity(envelope?.operationId),traceId:receiptIdentity(envelope?.traceId),outcome:'rejected',error:errorOf(e)}};if(entry)entry.initial=result;return result;}
   }
   receipt(e,outcome,result){return {schemaVersion:1,operationId:e.operationId,traceId:e.traceId,actor:e.actor,scope:e.scope,toolName:e.toolName,toolVersion:e.toolVersion,effectClass:e.effectClass,baseRevision:e.expectedDocumentRevision,outcome,result};}
   async handle(tool,e,actor,entry){const name=tool.name,input=e.inputs,value=this.doc.value,proposalId=input.proposalId??e.scope.proposalId;
