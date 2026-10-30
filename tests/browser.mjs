@@ -85,8 +85,12 @@ try {
   await direct.locator('#close').click(); await direct.locator('[data-decision=cancel]').click();
   await direct.locator('#close-dialog').waitFor({state:'hidden'});
   assert.equal(await direct.locator('#connection').textContent(), 'Connected · Local session');
+  // Hold the close response across a polling tick: queued reads must not outlive close.
+  await direct.route('**/v1/close',async route=>{const response=await route.fetch();await new Promise(r=>setTimeout(r,1400));await route.fulfill({response});});
   await direct.locator('#close').click(); await direct.locator('[data-decision=save]').click();
   await direct.locator('#connection').filter({hasText:'Session closed'}).waitFor();
+  await direct.waitForTimeout(1200);
+  assert.equal(await direct.locator('#connection').textContent(),'Session closed');
   await direct.close(); direct = null;
   report.criteria.push('Direct Cancel retains session; Save and close releases the running editor');
 
