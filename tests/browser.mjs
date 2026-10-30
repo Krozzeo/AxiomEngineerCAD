@@ -9,9 +9,9 @@ import {startHost} from '../node_modules/axiom-platform/services/local-host/serv
 const root = await mkdtemp(join(tmpdir(), 'engineer-browser-')), evidence = resolve('test-results');
 await mkdir(evidence, {recursive:true});
 let browser, child, host, direct;
-const report = {milestone:'E0.M1', platform:'0.1.12', providerCommit:'6d240845cd77eb1879738d32c9f2b8fcfd7297c5',
+const report = {milestone:'E0.M2', platform:'0.1.12', providerCommit:'6d240845cd77eb1879738d32c9f2b8fcfd7297c5',
   runtime:process.version, os:process.platform, architecture:process.arch, criteria:[], pageErrors:[],
-  renderer:'No renderer — lifecycle UI only; no WebGPU, exact geometry or AI acceptance claimed'};
+  renderer:'Canvas CPU preview derived from actual OCCT tessellation; exact metrics from isolated CPU/Wasm; no WebGPU or AI acceptance claimed'};
 try {
   browser = await chromium.launch({headless:true}); report.browser = browser.version();
   const context = await browser.newContext({viewport:{width:1440, height:960}});
@@ -34,6 +34,29 @@ try {
   const nativePath = join(root, 'direct', 'study', 'project.engineer-provisional.json');
   assert.match(JSON.parse(await readFile(nativePath)).metadata.notes, /preserve this note/);
   report.criteria.push('Direct CLI launches an authenticated browser editor; pending fields block save; applied properties persist');
+  await direct.locator('#lab-form').getByRole('button',{name:'Build exact preview',exact:true}).click();
+  await direct.locator('#lab-status').filter({hasText:'Completed geometry'}).waitFor();
+  await direct.locator('#lab-metrics').filter({hasText:'11434.513322'}).waitFor();
+  await direct.locator('#lab-width').fill('60');await direct.locator('#lab-build').click();
+  await direct.locator('#lab-status').filter({hasText:'Completed geometry'}).waitFor();
+  await direct.locator('#lab-metrics').filter({hasText:'17434.513322'}).waitFor();
+  await direct.locator('#lab-keep').click();await direct.locator('#revision').filter({hasText:'2'}).waitFor();
+  const persisted=direct.waitForResponse(r=>r.url().endsWith('/v1/save'));
+  await direct.locator('#save').click();await persisted;await direct.locator('#message').filter({hasText:'Document saved locally'}).waitFor();
+  assert.equal(JSON.parse(await readFile(nativePath)).experiment.spec.width,60);
+  await direct.locator('#lab-scenario').selectOption('invalid-profile');await direct.locator('#lab-build').click();
+  await direct.locator('#lab-status').filter({hasText:'failed'}).waitFor();
+  assert.match(await direct.locator('#lab-metrics').textContent(),/17434\.513322/);
+  await direct.locator('#lab-suite').click();await direct.locator('#suite-summary').filter({hasText:'Passed 29 / 29'}).waitFor();
+  await direct.locator('#sketch-solve').click();await direct.locator('#sketch-status').filter({hasText:'FullyDefined'}).waitFor();
+  await direct.locator('#sketch-drag').click();await direct.locator('#sketch-status').filter({hasText:'UnderDefined · remaining DOF: 2'}).waitFor();
+  report.criteria.push('Real kernel preview changes volume with width; recipe persists; invalid result retains last good preview; 29-case corpus and constrained circle drag pass');
+  await direct.locator('#lab-scenario').selectOption('cut');await direct.locator('#lab-build').click();
+  await direct.locator('#lab-status').filter({hasText:'Completed geometry'}).waitFor();
+  await direct.locator('#lab-canvas').click({position:{x:450,y:110}});
+  await direct.locator('#lab-selection').filter({hasText:'Selected semantic reference'}).waitFor();
+  report.criteria.push('Visible depth-buffer face picking resolves the proven producer role');
+  await direct.locator('#suite-details > summary').click();
   await direct.screenshot({path:join(evidence, 'direct.png'), fullPage:true});
   await direct.locator('#close').click(); await direct.locator('[data-decision=cancel]').click();
   await direct.locator('#close-dialog').waitFor({state:'hidden'});
@@ -77,6 +100,13 @@ try {
   const reopened = host.manager.catalog().sessions.find(s => s.state === 'ready');
   assert.equal(reopened.status.projectId, session.status.projectId);
   report.criteria.push('Hub UI creates real CAD adapter session', 'Editor changes appear in Hub status', 'Hub Cancel/Save/Close/Reopen preserve document identity and content');
+  await hub.locator('[data-route="/installations"]').click();
+  await hub.getByRole('button',{name:'Load Demos',exact:true}).click();
+  await hub.waitForFunction(()=>document.querySelector('.load-demos')?.textContent==='Load Demos');
+  const demoEntry=host.manager.catalog().recents.find(p=>p.name==='E0.M2 Geometry & Sketch Lab');
+  assert.ok(demoEntry,'Version-owned demo was not registered');
+  const demoDoc=JSON.parse(await readFile(demoEntry.path));assert.equal(demoDoc.experiment.spec.scenario,'cut');
+  report.criteria.push('Actual Hub Load Demos creates and registers this version’s native lab document');
   assert.deepEqual(report.pageErrors, []); report.passed = true;
 } catch (error) { report.failure = error.stack; if (direct) await direct.screenshot({path:join(evidence, 'failure.png')}).catch(() => {}); throw error; }
 finally {

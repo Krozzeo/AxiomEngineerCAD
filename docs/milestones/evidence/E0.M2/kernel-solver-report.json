@@ -1,0 +1,788 @@
+{
+  "result": {
+    "schema": "E0.M2-evidence-v0",
+    "kernel": "OCCT-V8_0_1/replicad-opencascadejs@1.1.0",
+    "solver": "PlaneGCS/@salusoft89/planegcs@1.3.0",
+    "profile": {
+      "lengthMm": 1e-7,
+      "relativeVolume": 1e-8,
+      "absoluteVolumeMm3": 0.000001,
+      "solverResidualMm": 1e-7,
+      "rankRelative": 1e-7,
+      "meshDeflectionMm": 0.5
+    },
+    "cases": [
+      {
+        "id": "GEO-EXTRUDE",
+        "passed": true,
+        "expected": {
+          "volumeMm3": 12000,
+          "reference": "ResolvedStable"
+        },
+        "actual": {
+          "volumeMm3": 12000,
+          "areaMm2": 3800,
+          "validity": {
+            "brepValid": true,
+            "solids": 1,
+            "null": false
+          },
+          "reference": {
+            "state": "ResolvedStable",
+            "candidates": 1,
+            "reason": "Explicit rectangular extrusion producer role.",
+            "selector": {
+              "producer": "base-extrude",
+              "kind": "face",
+              "role": "top",
+              "kernel": "OCCT-V8_0_1/replicad-opencascadejs@1.1.0"
+            }
+          },
+          "step": {
+            "bytes": 15915,
+            "volume": 12000
+          }
+        },
+        "elapsedMs": 449.074
+      },
+      {
+        "id": "GEO-CUT",
+        "passed": true,
+        "expected": {
+          "volumeMm3": 11434.513322353838,
+          "reference": "ResolvedReidentified"
+        },
+        "actual": {
+          "volumeMm3": 11434.513322353834,
+          "areaMm2": 4063.893782901543,
+          "validity": {
+            "brepValid": true,
+            "solids": 1,
+            "null": false
+          },
+          "reference": {
+            "state": "ResolvedReidentified",
+            "candidates": 1,
+            "reason": "Unique OCCT Modified lineage.",
+            "selector": {
+              "producer": "base-extrude",
+              "kind": "face",
+              "role": "top",
+              "kernel": "OCCT-V8_0_1/replicad-opencascadejs@1.1.0"
+            }
+          },
+          "step": null
+        },
+        "elapsedMs": 151.70659999999998
+      },
+      {
+        "id": "GEO-REVOLVE",
+        "passed": true,
+        "expected": {
+          "volumeMm3": 282.7433388230814,
+          "reference": "LostReference"
+        },
+        "actual": {
+          "volumeMm3": 282.7433388230814,
+          "areaMm2": 245.04422698000386,
+          "validity": {
+            "brepValid": true,
+            "solids": 1,
+            "null": false
+          },
+          "reference": {
+            "state": "LostReference",
+            "candidates": 0,
+            "reason": "The rectangular extrusion producer is absent from this revolution.",
+            "selector": {
+              "producer": "base-extrude",
+              "kind": "face",
+              "role": "top",
+              "kernel": "OCCT-V8_0_1/replicad-opencascadejs@1.1.0"
+            }
+          },
+          "step": null
+        },
+        "elapsedMs": 13.593200000000024
+      },
+      {
+        "id": "GEO-FUSE",
+        "passed": true,
+        "expected": {
+          "volumeMm3": 18000,
+          "reference": "AmbiguousReference"
+        },
+        "actual": {
+          "volumeMm3": 18000,
+          "areaMm2": 5399.999999999999,
+          "validity": {
+            "brepValid": true,
+            "solids": 1,
+            "null": false
+          },
+          "reference": {
+            "state": "AmbiguousReference",
+            "candidates": 2,
+            "reason": "OCCT split one selected subelement into multiple descendants.",
+            "selector": {
+              "producer": "base-extrude",
+              "kind": "face",
+              "role": "top",
+              "kernel": "OCCT-V8_0_1/replicad-opencascadejs@1.1.0"
+            }
+          },
+          "step": null
+        },
+        "elapsedMs": 26.760599999999954
+      },
+      {
+        "id": "GEO-COMMON",
+        "passed": true,
+        "expected": {
+          "volumeMm3": 6000,
+          "reference": "ResolvedReidentified"
+        },
+        "actual": {
+          "volumeMm3": 6000,
+          "areaMm2": 2200,
+          "validity": {
+            "brepValid": true,
+            "solids": 1,
+            "null": false
+          },
+          "reference": {
+            "state": "ResolvedReidentified",
+            "candidates": 1,
+            "reason": "Unique OCCT Modified lineage.",
+            "selector": {
+              "producer": "base-extrude",
+              "kind": "face",
+              "role": "top",
+              "kernel": "OCCT-V8_0_1/replicad-opencascadejs@1.1.0"
+            }
+          },
+          "step": null
+        },
+        "elapsedMs": 15.412400000000048
+      },
+      {
+        "id": "TOPO-SPLIT",
+        "passed": true,
+        "expected": {
+          "volumeMm3": 10800,
+          "reference": "AmbiguousReference"
+        },
+        "actual": {
+          "volumeMm3": 10800,
+          "areaMm2": 4080,
+          "validity": {
+            "brepValid": true,
+            "solids": 2,
+            "null": false
+          },
+          "reference": {
+            "state": "AmbiguousReference",
+            "candidates": 2,
+            "reason": "OCCT split one selected subelement into multiple descendants.",
+            "selector": {
+              "producer": "base-extrude",
+              "kind": "face",
+              "role": "top",
+              "kernel": "OCCT-V8_0_1/replicad-opencascadejs@1.1.0"
+            }
+          },
+          "step": null
+        },
+        "elapsedMs": 17.838999999999942
+      },
+      {
+        "id": "TOPO-MERGE",
+        "passed": true,
+        "expected": {
+          "volumeMm3": 12000,
+          "reference": "LostReference"
+        },
+        "actual": {
+          "volumeMm3": 12000,
+          "areaMm2": 3800,
+          "validity": {
+            "brepValid": true,
+            "solids": 1,
+            "null": false
+          },
+          "reference": {
+            "state": "LostReference",
+            "candidates": 0,
+            "reason": "Split-fragment lineage is not proven after same-domain merge; explicit repair required.",
+            "selector": {
+              "producer": "base-extrude",
+              "kind": "face",
+              "role": "top",
+              "kernel": "OCCT-V8_0_1/replicad-opencascadejs@1.1.0"
+            }
+          },
+          "step": null
+        },
+        "elapsedMs": 39.38659999999993
+      },
+      {
+        "id": "TOPO-SUPPRESS",
+        "passed": true,
+        "expected": {
+          "volumeMm3": 12000,
+          "reference": "ResolvedStable"
+        },
+        "actual": {
+          "volumeMm3": 12000,
+          "areaMm2": 3800,
+          "validity": {
+            "brepValid": true,
+            "solids": 1,
+            "null": false
+          },
+          "reference": {
+            "state": "ResolvedStable",
+            "candidates": 1,
+            "reason": "Explicit rectangular extrusion producer role.",
+            "selector": {
+              "producer": "base-extrude",
+              "kind": "face",
+              "role": "top",
+              "kernel": "OCCT-V8_0_1/replicad-opencascadejs@1.1.0"
+            }
+          },
+          "step": null
+        },
+        "elapsedMs": 5.012699999999995
+      },
+      {
+        "id": "TOPO-REORDER",
+        "passed": true,
+        "expected": {
+          "volumeMm3": 11434.513322353838,
+          "reference": "ResolvedReidentified"
+        },
+        "actual": {
+          "volumeMm3": 11434.513322353834,
+          "areaMm2": 4063.893782901543,
+          "validity": {
+            "brepValid": true,
+            "solids": 1,
+            "null": false
+          },
+          "reference": {
+            "state": "ResolvedReidentified",
+            "candidates": 1,
+            "reason": "Unique OCCT Modified lineage.",
+            "selector": {
+              "producer": "base-extrude",
+              "kind": "face",
+              "role": "top",
+              "kernel": "OCCT-V8_0_1/replicad-opencascadejs@1.1.0"
+            }
+          },
+          "step": null
+        },
+        "elapsedMs": 30.358900000000062
+      },
+      {
+        "id": "TOPO-DELETE",
+        "passed": true,
+        "expected": {
+          "volumeMm3": 0,
+          "reference": "LostReference"
+        },
+        "actual": {
+          "volumeMm3": 0,
+          "areaMm2": 0,
+          "validity": {
+            "brepValid": true,
+            "solids": 0,
+            "null": false
+          },
+          "reference": {
+            "state": "LostReference",
+            "candidates": 0,
+            "reason": "OCCT reports the selected subelement deleted.",
+            "selector": {
+              "producer": "base-extrude",
+              "kind": "face",
+              "role": "top",
+              "kernel": "OCCT-V8_0_1/replicad-opencascadejs@1.1.0"
+            }
+          },
+          "step": null
+        },
+        "elapsedMs": 10.23849999999993
+      },
+      {
+        "id": "TOPO-IMPORT",
+        "passed": true,
+        "expected": {
+          "volumeMm3": 11434.513322353838,
+          "reference": "LostReference"
+        },
+        "actual": {
+          "volumeMm3": 11434.513322353834,
+          "areaMm2": 4063.893782901543,
+          "validity": {
+            "brepValid": true,
+            "solids": 1,
+            "null": false
+          },
+          "reference": {
+            "state": "LostReference",
+            "candidates": 0,
+            "reason": "Imported/healed B-Rep has no proven native feature lineage; no proximity reassignment.",
+            "selector": {
+              "producer": "base-extrude",
+              "kind": "face",
+              "role": "top",
+              "kernel": "OCCT-V8_0_1/replicad-opencascadejs@1.1.0"
+            }
+          },
+          "step": {
+            "bytes": 35696,
+            "volume": 11434.513322353812
+          }
+        },
+        "elapsedMs": 70.48490000000004
+      },
+      {
+        "id": "TOPO-KERNEL-REFUSAL",
+        "passed": true,
+        "expected": {
+          "volumeMm3": 11434.513322353838,
+          "reference": "LostReference"
+        },
+        "actual": {
+          "volumeMm3": 11434.513322353834,
+          "areaMm2": 4063.893782901543,
+          "validity": {
+            "brepValid": true,
+            "solids": 1,
+            "null": false
+          },
+          "reference": {
+            "state": "LostReference",
+            "candidates": 0,
+            "reason": "Kernel lineage not verified across a different runtime profile; refused safely. No second runtime was executed.",
+            "selector": {
+              "producer": "base-extrude",
+              "kind": "face",
+              "role": "top",
+              "kernel": "OCCT-V8_0_1/replicad-opencascadejs@1.1.0"
+            }
+          },
+          "step": null
+        },
+        "elapsedMs": 52.25109999999995
+      },
+      {
+        "id": "TOPO-PATTERN-COUNT",
+        "passed": true,
+        "expected": {
+          "volumeMm3": 11497.345175425633,
+          "reference": "ResolvedReidentified"
+        },
+        "actual": {
+          "volumeMm3": 11497.345175425637,
+          "areaMm2": 4202.123859659493,
+          "validity": {
+            "brepValid": true,
+            "solids": 1,
+            "null": false
+          },
+          "reference": {
+            "state": "ResolvedReidentified",
+            "candidates": 1,
+            "reason": "Unique OCCT Modified lineage.",
+            "selector": {
+              "producer": "base-extrude",
+              "kind": "face",
+              "role": "top",
+              "kernel": "OCCT-V8_0_1/replicad-opencascadejs@1.1.0"
+            }
+          },
+          "step": null
+        },
+        "elapsedMs": 70.85070000000007
+      },
+      {
+        "id": "TOPO-BASE-DIMENSION",
+        "passed": true,
+        "expected": {
+          "volumeMm3": 17434.513322353836,
+          "reference": "ResolvedReidentified"
+        },
+        "actual": {
+          "volumeMm3": 17434.51332235384,
+          "areaMm2": 5663.893782901543,
+          "validity": {
+            "brepValid": true,
+            "solids": 1,
+            "null": false
+          },
+          "reference": {
+            "state": "ResolvedReidentified",
+            "candidates": 1,
+            "reason": "Unique OCCT Modified lineage.",
+            "selector": {
+              "producer": "base-extrude",
+              "kind": "face",
+              "role": "top",
+              "kernel": "OCCT-V8_0_1/replicad-opencascadejs@1.1.0"
+            }
+          },
+          "step": null
+        },
+        "elapsedMs": 32.75729999999999
+      },
+      {
+        "id": "TOPO-EDGE",
+        "passed": true,
+        "expected": {
+          "volumeMm3": 12000,
+          "reference": "ResolvedStable"
+        },
+        "actual": {
+          "volumeMm3": 12000,
+          "areaMm2": 3800,
+          "validity": {
+            "brepValid": true,
+            "solids": 1,
+            "null": false
+          },
+          "reference": {
+            "state": "ResolvedStable",
+            "candidates": 1,
+            "reason": "Explicit rectangular extrusion producer role.",
+            "selector": {
+              "producer": "base-extrude",
+              "kind": "edge",
+              "role": "top",
+              "kernel": "OCCT-V8_0_1/replicad-opencascadejs@1.1.0"
+            }
+          },
+          "step": {
+            "bytes": 15915,
+            "volume": 12000
+          }
+        },
+        "elapsedMs": 21.188499999999976
+      },
+      {
+        "id": "UNITS-INCH",
+        "passed": true,
+        "expected": {
+          "volumeMm3": 16387.064,
+          "reference": "ResolvedStable"
+        },
+        "actual": {
+          "volumeMm3": 16387.063999999995,
+          "areaMm2": 3870.959999999999,
+          "validity": {
+            "brepValid": true,
+            "solids": 1,
+            "null": false
+          },
+          "reference": {
+            "state": "ResolvedStable",
+            "candidates": 1,
+            "reason": "Explicit rectangular extrusion producer role.",
+            "selector": {
+              "producer": "base-extrude",
+              "kind": "face",
+              "role": "top",
+              "kernel": "OCCT-V8_0_1/replicad-opencascadejs@1.1.0"
+            }
+          },
+          "step": {
+            "bytes": 16062,
+            "volume": 16387.063999999995
+          }
+        },
+        "elapsedMs": 20.44060000000013
+      },
+      {
+        "id": "UNITS-CM",
+        "passed": true,
+        "expected": {
+          "volumeMm3": 12000,
+          "reference": "ResolvedStable"
+        },
+        "actual": {
+          "volumeMm3": 12000,
+          "areaMm2": 3800,
+          "validity": {
+            "brepValid": true,
+            "solids": 1,
+            "null": false
+          },
+          "reference": {
+            "state": "ResolvedStable",
+            "candidates": 1,
+            "reason": "Explicit rectangular extrusion producer role.",
+            "selector": {
+              "producer": "base-extrude",
+              "kind": "face",
+              "role": "top",
+              "kernel": "OCCT-V8_0_1/replicad-opencascadejs@1.1.0"
+            }
+          },
+          "step": {
+            "bytes": 15915,
+            "volume": 12000
+          }
+        },
+        "elapsedMs": 23.738000000000056
+      },
+      {
+        "id": "GEO-SMALL-SCALE",
+        "passed": true,
+        "expected": {
+          "volumeMm3": 0.001,
+          "reference": "ResolvedStable"
+        },
+        "actual": {
+          "volumeMm3": 0.001,
+          "areaMm2": 0.06000000000000001,
+          "validity": {
+            "brepValid": true,
+            "solids": 1,
+            "null": false
+          },
+          "reference": {
+            "state": "ResolvedStable",
+            "candidates": 1,
+            "reason": "Explicit rectangular extrusion producer role.",
+            "selector": {
+              "producer": "base-extrude",
+              "kind": "face",
+              "role": "top",
+              "kernel": "OCCT-V8_0_1/replicad-opencascadejs@1.1.0"
+            }
+          },
+          "step": {
+            "bytes": 16107,
+            "volume": 0.001
+          }
+        },
+        "elapsedMs": 15.942600000000084
+      },
+      {
+        "id": "GEO-REJECT-invalid-profile",
+        "passed": true,
+        "expected": {
+          "code": "InvalidGeometry"
+        },
+        "actual": {
+          "rejected": true,
+          "code": "InvalidGeometry",
+          "message": "Exact output rejected: B-Rep valid=false, solids=1; closed single-solid contract required."
+        },
+        "elapsedMs": 4.523599999999988
+      },
+      {
+        "id": "GEO-REJECT-open-shell",
+        "passed": true,
+        "expected": {
+          "code": "InvalidGeometry"
+        },
+        "actual": {
+          "rejected": true,
+          "code": "InvalidGeometry",
+          "message": "Exact output rejected: B-Rep valid=true, solids=0; closed single-solid contract required."
+        },
+        "elapsedMs": 12.078600000000051
+      },
+      {
+        "id": "GEO-REJECT-nonmanifold",
+        "passed": true,
+        "expected": {
+          "code": "InvalidGeometry"
+        },
+        "actual": {
+          "rejected": true,
+          "code": "InvalidGeometry",
+          "message": "Exact output rejected: B-Rep valid=true, solids=2; closed single-solid contract required."
+        },
+        "elapsedMs": 6.438099999999849
+      },
+      {
+        "id": "SOLVER2D-rectangle",
+        "passed": true,
+        "expected": {
+          "status": "FullyDefined",
+          "dof": 0
+        },
+        "actual": {
+          "status": "FullyDefined",
+          "dof": 0,
+          "reportedDOF": 0,
+          "residual": 0,
+          "rank": 6,
+          "conflicts": [],
+          "redundant": []
+        },
+        "elapsedMs": 27.480099999999993
+      },
+      {
+        "id": "SOLVER2D-free-circle",
+        "passed": true,
+        "expected": {
+          "status": "UnderDefined",
+          "dof": 2
+        },
+        "actual": {
+          "status": "UnderDefined",
+          "dof": 2,
+          "reportedDOF": 2,
+          "residual": 0,
+          "rank": 1,
+          "conflicts": [],
+          "redundant": []
+        },
+        "elapsedMs": 9.067299999999932
+      },
+      {
+        "id": "SOLVER2D-redundant",
+        "passed": true,
+        "expected": {
+          "status": "RedundantConsistent",
+          "dof": 0
+        },
+        "actual": {
+          "status": "RedundantConsistent",
+          "dof": 0,
+          "reportedDOF": 0,
+          "residual": 0,
+          "rank": 2,
+          "conflicts": [],
+          "redundant": [
+            "x_again"
+          ]
+        },
+        "elapsedMs": 10.583799999999883
+      },
+      {
+        "id": "SOLVER2D-conflict",
+        "passed": true,
+        "expected": {
+          "status": "Inconsistent",
+          "dof": 0
+        },
+        "actual": {
+          "status": "Inconsistent",
+          "dof": 0,
+          "reportedDOF": -1,
+          "residual": 17,
+          "rank": 2,
+          "conflicts": [
+            "x",
+            "x_again"
+          ],
+          "redundant": []
+        },
+        "elapsedMs": 8.187999999999874
+      },
+      {
+        "id": "SOLVER2D-singular",
+        "passed": true,
+        "expected": {
+          "status": "SingularOrIndeterminate",
+          "dof": null
+        },
+        "actual": {
+          "status": "SingularOrIndeterminate",
+          "dof": null,
+          "reportedDOF": 2,
+          "residual": 0,
+          "rank": 1,
+          "conflicts": [],
+          "redundant": [
+            "zero_distance"
+          ]
+        },
+        "elapsedMs": 5.871300000000019
+      },
+      {
+        "id": "SOLVER2D-DRAG",
+        "passed": true,
+        "expected": {
+          "center": [
+            20,
+            15
+          ],
+          "radius": 4,
+          "dof": 2
+        },
+        "actual": {
+          "accepted": true,
+          "dof": 2,
+          "center": {
+            "id": "center",
+            "type": "point",
+            "x": 20,
+            "y": 15,
+            "fixed": false
+          },
+          "radius": 4,
+          "residual": 0
+        },
+        "elapsedMs": 12.759599999999864
+      },
+      {
+        "id": "SOLVER2D-FIXED-DRAG",
+        "passed": true,
+        "expected": {
+          "accepted": false,
+          "unchanged": true
+        },
+        "actual": {
+          "accepted": false,
+          "point": {
+            "id": "fixed",
+            "type": "point",
+            "x": 0,
+            "y": 0,
+            "fixed": true
+          }
+        },
+        "elapsedMs": 4.574099999999817
+      },
+      {
+        "id": "SOLVER2D-REFERENCE",
+        "passed": true,
+        "expected": {
+          "dof": 3,
+          "radius": 4,
+          "measured": 4
+        },
+        "actual": {
+          "status": "UnderDefined",
+          "dof": 3,
+          "radius": 4,
+          "measured": 4
+        },
+        "elapsedMs": 6.789800000000014
+      }
+    ],
+    "passed": 29,
+    "failed": 0,
+    "total": 29,
+    "elapsedMs": 1175.8645000000001,
+    "limits": [
+      "No final CAD schema",
+      "No general topology naming guarantee",
+      "No second-kernel numerical migration execution",
+      "No 3D assembly solver",
+      "No WebGPU or drawing acceptance"
+    ]
+  },
+  "resources": {
+    "peakRssBytes": 467910656,
+    "heapUsedBytes": 32599184,
+    "policy": "Isolated process, 192 MiB JS old-space, finite typed inputs, parent deadline; RSS postcondition is not an OS hard memory quota."
+  }
+}

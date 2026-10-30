@@ -2,13 +2,15 @@
 
 Local-first, browser-operated parametric mechanical CAD and engineering-documentation product in the Axiom family, designed from the outset for both human users and AI agents.
 
-> **Status:** E0.M1 lifecycle foundation implemented as a review candidate; owner acceptance pending. The runnable shell edits provisional document metadata. Exact geometry, sketches, assemblies, drawings and AI are not implemented.
+> **Status:** E0.M2 geometry and 2D sketch feasibility lab implemented as a review candidate; owner acceptance pending. Real OCCT/PlaneGCS probes and a Platform demo are available. General feature editing, assemblies, drawings, AI and the final CAD format remain planned.
 
 ## Install milestone builds from Platform
 
 Every completed review milestone is delivered as an experimental prepared installation. In Platform 0.1.12+, open **Installations → Add installation → Axiom Engineer CAD → Refresh**, select the published experimental build, download/install and activate. Then create an Engineer project. Source PRs and passing tests alone are not installable publications. See [milestone delivery](docs/MILESTONE_DELIVERY.md) for the publication and verification gate.
 
-## Run the E0.M1 foundation
+For a guided test, choose **Load Demos** on the Engineer 0.0.2 installation card, then open **E0.M2 Geometry & Sketch Lab**. Click **Build exact preview**, change width and rebuild, run the 29-case corpus, and try the sketch fixtures/drag. **Keep experiment → Save document** persists the recipe; reopen and rebuild it. New Engineer projects also expose the lab. Its CPU preview comes from real exact-kernel tessellation; the diagnostics report numerical results and conservative reference failures.
+
+## Run the E0.M2 lab
 
 Requires Node.js 24+. Install the integrity-locked Platform SDK:
 
@@ -23,7 +25,7 @@ Open the authenticated editor URL printed in the terminal. Edit Name/Notes, choo
 npm start -- --root .local/projects --open first-study
 ```
 
-The saved file is `project.engineer-provisional.json`, reserved format ID `axiom.engineer-document`, experimental version **0**, marker E0.M1. It is not the final CAD schema or `.axcad` package. Keep existing documents; incompatible formats are refused without modification.
+The saved file is `project.engineer-provisional.json`, reserved format ID `axiom.engineer-document`, experimental version **0**, marker E0.M1 or E0.M2 after keeping a recipe. It is not the final CAD schema or `.axcad` package. Keep existing documents; incompatible formats are refused without modification.
 
 ### Through Axiom Platform 0.1.12
 
@@ -43,7 +45,7 @@ npx playwright install chromium --only-shell
 npm run test:browser
 ```
 
-Tests use temporary projects and a disposable Platform profile, never your saved accounts. Browser artifacts are written to `test-results/`. They prove lifecycle/UI behavior, not GPU rendering or CAD correctness. [Current implementation](IMPLEMENTATION_STATUS.md), [handoff](AI_HANDOFF.md), [milestone plan](docs/milestones/E0_M1_PLAN.md), [evidence](docs/milestones/E0_M1_REPORT.md), [third-party notices](THIRD_PARTY_NOTICES.md).
+Tests use temporary projects and a disposable Platform profile, never your saved accounts. Browser artifacts are written to `test-results/`. They check lifecycle/UI behavior and the bounded exact-kernel/solver corpus, without GPU or general CAD acceptance. [Current implementation](IMPLEMENTATION_STATUS.md), [handoff](AI_HANDOFF.md), [milestone plan](docs/milestones/E0_M2_PLAN.md), [evidence](docs/milestones/E0_M2_REPORT.md), [third-party notices](THIRD_PARTY_NOTICES.md).
 
 After an abrupt process termination, inspect saved identity/revision and the lease owner before recovery; this build does not automatically delete stale leases or implement migrations. Do not blindly repeat an operation whose result is unknown.
 
