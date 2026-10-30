@@ -1,0 +1,232 @@
+{
+  "schemaVersion": 1,
+  "introducedIn": "0.0.6",
+  "status": "E0.M6 experimental; owner review pending",
+  "profile": "E0.M6-proof/1",
+  "prefix": "/v1/proof/",
+  "authority": "human bearer + server-issued document/session + expected revision and proof manifest",
+  "readMethods": [
+    "catalog",
+    "status",
+    "result"
+  ],
+  "inputSchemas": {
+    "build": {
+      "type": "object",
+      "properties": {
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "operationId",
+        "expectedRevision"
+      ],
+      "additionalProperties": false
+    },
+    "cancel": {
+      "type": "object",
+      "properties": {
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        }
+      },
+      "required": [
+        "operationId"
+      ],
+      "additionalProperties": false
+    },
+    "pick": {
+      "type": "object",
+      "properties": {
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "manifestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "selectionId": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4096
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "face",
+            "edge",
+            "instance"
+          ]
+        }
+      },
+      "required": [
+        "operationId",
+        "expectedRevision",
+        "manifestId",
+        "selectionId",
+        "kind"
+      ],
+      "additionalProperties": false
+    },
+    "export": {
+      "type": "object",
+      "properties": {
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "manifestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "confirmation": {
+          "type": "string",
+          "const": "DownloadLocalPDF"
+        }
+      },
+      "required": [
+        "operationId",
+        "expectedRevision",
+        "manifestId",
+        "confirmation"
+      ],
+      "additionalProperties": false
+    },
+    "preflight": {
+      "type": "object",
+      "properties": {
+        "operationId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "expectedRevision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "manifestId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "profile": {
+          "type": "string",
+          "enum": [
+            "Local",
+            "RemoteRestricted",
+            "RemoteFull"
+          ]
+        },
+        "provider": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "supportsImages": {
+          "type": "boolean"
+        },
+        "classes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "metadata",
+              "parameters",
+              "face",
+              "drawing"
+            ]
+          }
+        },
+        "selectionIds": {
+          "type": "array",
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4096
+          }
+        }
+      },
+      "required": [
+        "operationId",
+        "expectedRevision",
+        "manifestId",
+        "profile",
+        "provider",
+        "model",
+        "supportsImages",
+        "classes",
+        "selectionIds"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "effects": {
+    "build": "ReadOnly",
+    "pick": "ReadOnly",
+    "preflight": "ReadOnly",
+    "export": "FileExport"
+  },
+  "units": {
+    "length": "mm",
+    "area": "mm2",
+    "frame": "definition-local",
+    "occurrence": "stable path + position mm/quaternion"
+  },
+  "limits": {
+    "requestBytes": 16384,
+    "workerOutputBytes": 4194304,
+    "selectionIds": 4096,
+    "occurrences": 8,
+    "auditRecords": 32,
+    "deadlineMs": 20000
+  },
+  "outputDescriptions": {
+    "build": "accepted job/status; result available only after completed",
+    "pick": "exact producer role, entity kind, area/length, stable occurrence path, source revision/hash and explicit local frame/transform",
+    "export": "current source-bound local PDF bytes/preparation receipt/audit ID; no claim browser saved a file",
+    "preflight": "minimized preview, redacted audit ID, allowed=false and externalTransmission=false",
+    "failure": "typed code/message; original native document preserved"
+  },
+  "notImplemented": [
+    "remote provider dispatch/consent",
+    "general drawing or model editor",
+    "persistent GPU IDs",
+    "arbitrary B-Rep selector history"
+  ]
+}

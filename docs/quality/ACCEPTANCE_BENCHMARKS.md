@@ -1,6 +1,6 @@
 # Acceptance Profiles, Benchmarks and Evidence
 
-**Baseline:** Master v0.2.0. **Status:** acceptance *schema* approved; numerical thresholds and supported hardware/complexity bounds **TBD pending E0.M6 measurements/E0.M7 owner signoff**. Never present a proposed target as a measured result.
+**Baseline:** Master v0.2.0. **Status:** acceptance *schema* approved; E0.M6 candidate measured bounds are recorded in [profile v1](E0_M6_PROFILE_V1.json); integrated acceptance still requires E0.M7 owner signoff. Never present a proposed target as a measured result.
 
 ## 1. Profile dimensions to freeze in E0
 

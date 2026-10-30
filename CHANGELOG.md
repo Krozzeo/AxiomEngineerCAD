@@ -1,3 +1,11 @@
+# 0.0.6 — E0.M6 exact drawing, GPU picking and security (review candidate)
+
+- Add exact OCCT HLR top/front/right A4 vector PDF/SVG, source-linked width and stale-export refusal; independent PDF readers/rendered QA.
+- Add original WebGPU color/depth/ID renderer, exact server-resolved face/edge/occurrence selection, explicit camera modes and real NVIDIA hardware proof.
+- Add Drawing & GPU Lab, human-only local download, minimized denied sharing preview, redacted audit and offline/lost/unavailable-GPU behavior.
+- Add 14 domain tests (85 total), actual Hub/drawing/selection/reopen regressions and installed-package proof. Retain native format1, all runtime/source pins, prior documents/labs and review guards.
+- General authored drawings, arbitrary/external/nested viewport scenes, real-model AI and remote dispatch remain future gates; no manufacturing or integrated E0 acceptance.
+
 # 0.0.5 — E0.M5 semantic commands and human review (review candidate)
 
 - Add 17 versioned typed tools using Platform registry/schema, paging, diff/review and task journal primitives, with shared manual/proposal domain and exact numerical validation.

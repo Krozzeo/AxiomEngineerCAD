@@ -1,4 +1,4 @@
-import {check} from '../document.mjs';
+import {check} from '../errors.mjs';
 import {norm} from './math.mjs';
 export const SPATIAL='Engineer-rigid-LM/0.0.1';
 export const PROFILE='E0.M3-datums-v0';

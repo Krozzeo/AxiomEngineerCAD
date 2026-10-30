@@ -1,6 +1,6 @@
 {
   "name": "axiom-engineer-cad",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "private": true,
   "type": "module",
   "license": "MIT",
@@ -11,7 +11,9 @@
     "start": "node src/cli.mjs",
     "check": "node --test --test-timeout=30000 tests/*.test.mjs",
     "test": "node --test --test-timeout=30000 tests/*.test.mjs",
-    "test:browser": "node tests/browser.mjs"
+    "test:browser": "node tests/browser.mjs",
+    "test:hardware": "node tests/hardware-proof.mjs",
+    "test:pdf": "python scripts/verify-vector-pdf.py"
   },
   "dependencies": {
     "@salusoft89/planegcs": "1.3.0",

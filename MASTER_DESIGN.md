@@ -4,7 +4,7 @@
 **Date:** 2026-10-28  
 **Product:** Axiom Engineer CAD  
 **Repository:** https://github.com/Krozzeo/AxiomEngineerCAD  
-**Status:** Approved MVP functional scope, revised staged engineering contracts and risk gates; **E0.M2 validated, progression after E0.M4 authorized; E0.M5 semantic transactions are a review candidate; full CAD and final container/schema acceptance remain pending** (see IMPLEMENTATION_STATUS.md)
+**Status:** Approved MVP functional scope, revised staged engineering contracts and risk gates; **E0.M2 validated, progression after E0.M5 authorized; E0.M6 drawing/GPU/security experiments are a review candidate; full CAD and final container/schema acceptance remain pending** (see IMPLEMENTATION_STATUS.md)
 **Audience:** Product owner, human contributors, coding agents, CAD/geometry specialists, test agents
 
 > **Authority and interpretation.** This is the canonical product-intent, architecture, MVP-scope and delivery-plan document for Axiom Engineer CAD. It consolidates owner-approved decisions. It is **not** evidence that features exist. An implementation, solver, data format, provider integration or hardware profile is accepted only after its milestone tests and owner review. Specific third-party technologies are candidates until their E0 gates pass. Do not infer missing product requirements from Axiom Game Engine implementation details.

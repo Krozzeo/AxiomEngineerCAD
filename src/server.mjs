@@ -17,6 +17,7 @@ export async function startEditor({adapter, embeddingOrigin}) {
     '/v1/lab':'lab.inspect','/v1/lab/run':'lab.run','/v1/lab/cancel':'lab.cancel','/v1/lab/apply':'lab.apply','/v1/lab/fixture':'lab.fixture'};
   for(const name of ['inspect','convert','graph','snapshot','publish','restore','refresh','attach','adopt','recover','removeVersion'])routes['/v1/native/'+name]='native.'+name;
   for(const name of ['catalog','context','status','invoke','grant','revoke','cancel'])routes['/v1/cad/'+name]='cad.'+name;
+  for(const name of ['catalog','status','result','build','cancel','pick','export','preflight'])routes['/v1/proof/'+name]='proof.'+name;
   const server = createServer(async (req, res) => {
     try {
       check(req.headers.host === new URL(origin).host, 'permissionDenied', 'Invalid local host.');
@@ -32,7 +33,7 @@ export async function startEditor({adapter, embeddingOrigin}) {
         const close = url.pathname === '/v1/close';
         check(!close || !embeddingOrigin, 'permissionDenied', 'Close this hosted session from Axiom Platform.');
         const method = routes[url.pathname] ?? (close ? 'project.close' : null);
-        const reads=['document.inspect','lab.inspect','native.inspect','cad.catalog','cad.context','cad.status'];
+        const reads=['document.inspect','lab.inspect','native.inspect','cad.catalog','cad.context','cad.status','proof.catalog','proof.status','proof.result'];
         check(method && (req.method === 'GET' && reads.includes(method) || req.method === 'POST' && !reads.includes(method)), 'unsupportedCapability', 'Unknown endpoint or HTTP method.');
         let bytes = 0; const chunks = [];
         for await (const chunk of req) { bytes += chunk.length; check(bytes <= (url.pathname.startsWith('/v1/native/')?131072:32768), 'invalidRequest', 'Request exceeds its bounded body limit.'); chunks.push(chunk); }
@@ -44,9 +45,9 @@ export async function startEditor({adapter, embeddingOrigin}) {
           try { return await adapter.execute(method, params); } finally { adapter.httpClosing = false; }
         });
         if (result.closed) res.once('finish', () => { void adapter.shutdown(); });
-        return respond(res, 200, method.startsWith('cad.')?result:{...result, hosted:!!embeddingOrigin});
+        return respond(res, 200, (method.startsWith('cad.')||method.startsWith('proof.'))?result:{...result, hosted:!!embeddingOrigin});
       }
-      const assets = {'/':['index.html','text/html'], '/app.mjs':['app.mjs','text/javascript'], '/styles.css':['styles.css','text/css'], '/lab.mjs':['lab.mjs','text/javascript'], '/assembly.mjs':['assembly.mjs','text/javascript'], '/native.mjs':['native.mjs','text/javascript'], '/review.mjs':['review.mjs','text/javascript']};
+      const assets = {'/':['index.html','text/html'], '/app.mjs':['app.mjs','text/javascript'], '/styles.css':['styles.css','text/css'], '/lab.mjs':['lab.mjs','text/javascript'], '/assembly.mjs':['assembly.mjs','text/javascript'], '/native.mjs':['native.mjs','text/javascript'], '/review.mjs':['review.mjs','text/javascript'], '/proof.mjs':['proof.mjs','text/javascript'], '/gpu-view.mjs':['gpu-view.mjs','text/javascript'], '/cad-camera.mjs':['cad-camera.mjs','text/javascript']};
       const asset = assets[url.pathname];
       if (req.method !== 'GET' || !asset) return respond(res, 404, {code:'unsupportedCapability', message:'Not found.'});
       res.writeHead(200, {...headers, 'Content-Type':asset[1] + '; charset=utf-8'});

@@ -1,6 +1,6 @@
 # Engineering IP, Provider Exposure and Agent Permission Contract
 
-**Baseline:** Master v0.2.0. **Implementation:** E0.M5 implements Local-only refusal, scoped revocable local agent grants and human Apply. Remote exposure/provider transport, broader source-input hardening and ADR-011 remain pending E0.M6. See [ADR-008](../architecture/ADR-008-SEMANTIC-REVIEW.md). **Principle:** a user's model/drawing is sensitive engineering data; provider connection does not automatically grant project-wide data export, Apply or publication.
+**Baseline:** Master v0.2.0. **Implementation:** E0.M5 implements Local-only refusal, scoped revocable local agent grants and human Apply. E0.M6 adds minimized denied/offline preflight, human-only local vector PDF preparation, literal-title handling and redacted audit: [ADR-011](../architecture/ADR-011-LOCAL-EXPOSURE-PROOF.md). Remote dispatch/consent and general import hardening remain later gates. See [ADR-008](../architecture/ADR-008-SEMANTIC-REVIEW.md). **Principle:** a user's model/drawing is sensitive engineering data; provider connection does not automatically grant project-wide data export, Apply or publication.
 
 ## 1. Data classes
 
