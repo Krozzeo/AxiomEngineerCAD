@@ -2,19 +2,21 @@
 
 Local-first, browser-operated parametric mechanical CAD and engineering-documentation product in the Axiom family, designed from the outset for both human users and AI agents.
 
-> **Status:** E0.M4 native document/version foundation is a review candidate. Format1, immutable snapshots, explicit dependency candidates and recoverable storage are executable. Full modeling/assembly/drawing editors, automatic version following and final container/schema acceptance remain planned.
+> **Status:** E0.M5 semantic command and human proposal review experiment (0.0.5). Shared typed commands, isolated proposals, exact validation and explicit human Apply & Save are executable. Full CAD editors, real AI models, remote exposure, drawings and GPU remain planned.
 
 ## Install milestone builds from Platform
 
 Every completed review milestone is delivered as an experimental prepared installation. In Platform 0.1.12+, open **Installations → Add installation → Axiom Engineer CAD → Refresh**, select the published experimental build, download/install and activate. Then create an Engineer project. Source PRs and passing tests alone are not installable publications. See [milestone delivery](docs/MILESTONE_DELIVERY.md) for the publication and verification gate.
 
-For a guided native-data test choose **Load Demos** on installation **0.0.4**, then open **E0.M4 Native Version Lab**. Edit Notes → Apply properties, **Validate current content → Create immutable version → Save document**. Select an older version and **Restore as new revision**; history stays intact.
+For the new review demo choose **Load Demos** on installation **0.0.5**, open **E0.M5 Review Lab**, choose **Run local scripted proposal → Validate proposal → Review changes**, inspect the changes, confirm and **Apply & Save**. The scripted agent uses actual scoped local tools; it is not a real AI model. Manual dimension changes use the same command and require Save. See [E0.M5 evidence](docs/milestones/E0_M5_REPORT.md) and [tool catalog](docs/contracts/SEMANTIC_TOOLS_V1.json).
+
+For a guided native-data test choose **Load Demos** on installation **0.0.5**, then open **E0.M4 Native Version Lab**. Edit Notes → Apply properties, **Validate current content → Create immutable version → Save document**. Select an older version and **Restore as new revision**; history stays intact.
 
 The companion **E0.M4 Source Plate** demonstrates a real external definition. Change width in its geometry lab, build/keep, then validate/create version/publish/save. In the consumer choose **Check source updates → Validate candidate → Adopt validated candidate → Save**. Missing sources preserve the embedded effective snapshot; Pinned never auto-follows. The earlier spatial/geometry demos remain in expandable panels.
 
 Legacy projects stay unchanged until **Convert to native v1 → Save document**, which keeps their original bytes in a backup. The historical basename remains for Platform compatibility; formatVersion1 is the decoder discriminator. Keep project files, recovery journals and original backups when copying a study. Native snapshots carry the verified dependency closure for offline reopening. See [native storage ADR](docs/architecture/ADR-006-NATIVE-STORAGE.md) and [version resolver ADR](docs/architecture/ADR-007-NATIVE-VERSION-RESOLVER.md) for exact tested bounds.
 
-## Run the E0.M4 lab
+## Run the E0.M5 lab
 
 Requires Node.js 24+. Install the integrity-locked Platform SDK:
 
@@ -49,7 +51,7 @@ npx playwright install chromium --only-shell
 npm run test:browser
 ```
 
-Tests use temporary projects and a disposable Platform profile, never your saved accounts. Browser artifacts are written to `test-results/`. They check lifecycle/UI behavior and the bounded exact-kernel/solver corpus, without GPU or general CAD acceptance. [Current implementation](IMPLEMENTATION_STATUS.md), [handoff](AI_HANDOFF.md), [milestone plan](docs/milestones/E0_M4_PLAN.md), [evidence](docs/milestones/E0_M4_REPORT.md), [third-party notices](THIRD_PARTY_NOTICES.md).
+Tests use temporary projects and a disposable Platform profile, never your saved accounts. Browser artifacts are written to `test-results/`. They check lifecycle/UI behavior and the bounded exact-kernel/solver corpus, without GPU or general CAD acceptance. [Current implementation](IMPLEMENTATION_STATUS.md), [handoff](AI_HANDOFF.md), [milestone plan](docs/milestones/E0_M5_PLAN.md), [evidence](docs/milestones/E0_M5_REPORT.md), [third-party notices](THIRD_PARTY_NOTICES.md).
 
 After abrupt termination, inspect identity/revision and the lease owner before recovery. This build never automatically deletes Platform stale leases. Once ownership is available, its verified journal offers explicit original-preserving checkpoint recovery. Unknown schema/runtime is refused. Do not blindly repeat an operation whose result is unknown.
 

@@ -1,6 +1,6 @@
 # Engineering IP, Provider Exposure and Agent Permission Contract
 
-**Baseline:** Master v0.2.0. **Implementation:** pending E0.M5–M6. **Principle:** a user's model/drawing is sensitive engineering data; provider connection does not automatically grant project-wide data export, Apply or publication.
+**Baseline:** Master v0.2.0. **Implementation:** E0.M5 implements Local-only refusal, scoped revocable local agent grants and human Apply. Remote exposure/provider transport, broader source-input hardening and ADR-011 remain pending E0.M6. See [ADR-008](../architecture/ADR-008-SEMANTIC-REVIEW.md). **Principle:** a user's model/drawing is sensitive engineering data; provider connection does not automatically grant project-wide data export, Apply or publication.
 
 ## 1. Data classes
 

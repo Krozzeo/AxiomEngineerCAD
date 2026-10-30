@@ -51,11 +51,13 @@ setInterval(() => {
   if (!state || closed || polling) return;
   polling = true;
   run(async () => {
+  if (closed) { polling = false; return; }
   try {
     const current = await request('document');
     if (!pending) { const changed = current.status.revision !== state.status.revision; state = current; render(changed); }
     else if (current.status.revision !== state.status.revision) message('The document changed elsewhere. Reset fields to reload before applying.');
   } catch {
+    if (closed) return;
     $('connection').textContent = 'Disconnected · Keep this tab to preserve pending fields';
     for (const id of ['name','notes','save','apply','reset','close']) $(id).disabled = true;
   } finally { polling = false; }

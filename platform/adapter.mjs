@@ -13,6 +13,8 @@ import {assemblyFixture} from '../src/assembly/fixtures.mjs';
 import {NativeSession} from '../src/native/session.mjs';
 import {readState} from '../src/native/storage.mjs';
 import {nativeDemo} from '../src/native/demo.mjs';
+import {CommandSession} from '../src/commands/session.mjs';
+import {reviewDemo} from '../src/commands/demo.mjs';
 
 export class EngineerAdapter {
   constructor({start = startEditor} = {}) {
@@ -32,6 +34,7 @@ export class EngineerAdapter {
     return this.execute(m.method, m.params);
   }
   async execute(method, params) {
+    if(['cad.catalog','cad.context','cad.status','cad.invoke','cad.grant','cad.revoke','cad.cancel'].includes(method)){check(this.doc&&!this.ended,'cancelled','Open a live study first.');return this.handle(method,params);}
     check(['initialize', ...manifest.capabilities, 'document.inspect', 'document.edit', 'document.buffer','lab.run','lab.inspect','lab.cancel','lab.apply','lab.fixture','native.inspect','native.convert','native.graph','native.snapshot','native.publish','native.restore','native.refresh','native.attach','native.adopt','native.recover','native.removeVersion'].includes(method),
       'unsupportedCapability', 'This build does not implement that operation.');
     // Buffer reports have their own monotonic client sequence; typing must not exhaust mutation receipts.
@@ -82,7 +85,7 @@ export class EngineerAdapter {
       check(!this.doc&&Array.isArray(p.demoIds)&&p.demoIds.length>0&&p.demoIds.length<=manifest.demos.length&&new Set(p.demoIds).size===p.demoIds.length&&p.demoIds.every(id=>manifest.demos.some(d=>d.id===id)),'invalidRequest','Choose the declared version-owned demos.');
       const destination=await authorized(this.root,p.destination);
       check((await readdir(destination)).length===0,'projectBusy','Demos require a fresh empty destination.');
-      const projects=[];let nativePaths;if(p.demoIds.some(id=>id.startsWith('e0-m4-'))){const docs=await nativeDemo();nativePaths={};for(const [id,key,folderName]of [['e0-m4-source','source','E0-M4-Source'],['e0-m4-native','consumer','E0-M4-Native']]){const folder=join(destination,folderName);await mkdir(folder);const path=join(folder,FILENAME);await atomicJson(path,docs[key]);nativePaths[id]=path;}}
+      const projects=[];let nativePaths;if(p.demoIds.some(id=>id.startsWith('e0-m4-')||id==='e0-m5-review')){const docs=await nativeDemo();nativePaths={};for(const [id,key,folderName]of [['e0-m4-source','source','E0-M4-Source'],['e0-m4-native','consumer','E0-M4-Native']]){const folder=join(destination,folderName);await mkdir(folder);const path=join(folder,FILENAME);await atomicJson(path,docs[key]);nativePaths[id]=path;}if(p.demoIds.includes('e0-m5-review')){const folder=join(destination,'E0-M5-Review');await mkdir(folder);const path=join(folder,FILENAME);await atomicJson(path,await reviewDemo(docs.consumer));nativePaths['e0-m5-review']=path;}}
       for(const demoId of p.demoIds){if(nativePaths?.[demoId]){projects.push({demoId,path:nativePaths[demoId],...await this.detect(nativePaths[demoId])});continue;}const spatial=demoId==='e0-m3-mates',folder=join(destination,spatial?'E0-M3-Spatial-Lab':'E0-M2-Geometry-Lab');await mkdir(folder);
         const value=spatial?{...blank('E0.M3 Spatial Mate Lab'),provisional:'E0.M3',assembly:assemblyFixture('coaxial')}:{...blank('E0.M2 Geometry & Sketch Lab'),provisional:'E0.M2',experiment:{profile:'E0.M2-probe-v0',kernel:KERNEL,spec:recipe()}};
         const path=join(folder,FILENAME);await atomicJson(path,value);projects.push({demoId,path,...await this.detect(path)});}
@@ -103,6 +106,7 @@ export class EngineerAdapter {
         this.doc = new Document(path, value, {authorize:path => authorized(this.root, path),diskHash:state.diskHash,recovery:state.recovery});
         this.doc.native = new NativeSession(this.doc,this.root);
         this.doc.lab = new LabSession(this.doc);
+        this.doc.commands = new CommandSession(this.doc,{sessionId:this.sessionId,root:this.root});await this.doc.commands.load();
         this.runtime = await this.start({adapter:this, embeddingOrigin:this.embeddingOrigin});
         check(!this.ended, 'cancelled', 'Session closed before document creation completed.');
         if (create) await atomicJson(path, value);
@@ -114,6 +118,13 @@ export class EngineerAdapter {
     if (method === 'document.inspect') return this.doc.view();
     if (method === 'document.buffer') return this.doc.reportBuffer(p);
     if (method === 'document.edit') return this.doc.edit(p);
+    if(method==='cad.catalog')return this.doc.commands.catalog();
+    if(method==='cad.context')return this.doc.commands.context();
+    if(method==='cad.status')return this.doc.commands.status();
+    if(method==='cad.invoke')return this.doc.commands.invoke(p);
+    if(method==='cad.grant')return this.doc.commands.grant();
+    if(method==='cad.revoke')return this.doc.commands.revoke();
+    if(method==='cad.cancel')return this.doc.commands.cancelJob();
     if (method === 'lab.inspect') return this.doc.lab.view();
     if (method === 'lab.fixture') return {assembly:assemblyFixture(p.fixture)};
     if (method === 'lab.run') return this.doc.lab.start(p);
@@ -145,6 +156,7 @@ export class EngineerAdapter {
   }
   async cleanup() {
     if (this.doc) this.doc.closed = true;
+    await this.doc?.commands?.close();
     await this.doc?.lab?.close();
     const runtime = this.runtime; this.runtime = null;
     try { await runtime?.close(); } finally { const release = this.release; this.release = null; await release?.(); this.doc = null; }

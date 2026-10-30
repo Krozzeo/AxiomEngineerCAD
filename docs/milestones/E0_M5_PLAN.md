@@ -1,0 +1,13 @@
+# E0.M5 — Shared semantic commands and reviewed proposals
+
+Owner authorized progression after delivered E0.M4, baseline bbedf5d9c8d47d250769914752f5e770a74078ba. Platform0.1.12 stays pinned. CAD-R009/R011 plus revision, numerical and security conformance from CAD-R004/008/022/023.
+
+Reuse public Platform ToolRegistry/schema/budget/pagination, changes/digest/requireHuman/requireReview and TaskJournal. Engineer supplies versioned CAD schemas, original shared pure handlers, native validation and atomic application. No new provider transport, credential store or model invocation. Prove a deterministic local agent separately from model reasoning.
+
+Bound the first catalog to shipped geometry feature creation/dimension edits and metadata, semantic entity/feature queries, actual measurements/sketch/spatial diagnostics, proposal create/inspect/validate/review/apply/cancel, receipts and Local exposure preflight. Unsupported future sketch editors/drawings/export remain explicit capability exclusions. Typed dimensions, IDs, units, effects, actor/project/session scope, expected document/proposal revisions and effective dependency versions are mandatory. Bounded responses never require dumping attachments or whole documents.
+
+Human UI and headless tools call identical handlers and isolated workers. Separate human session authority from explicitly issued/revocable local agent grants; agent tokens permit ReadOnly/LocalProposal only and never Apply/MainMutation/export/publication. Client actor fields cannot upgrade server-issued authority. Local profile denies external transmission even if an account exists.
+
+Proposal state is isolated and journaled, with exact base/content/dependency stamps, bounded command log, real numerical validation, SDK diff/review hash and human complete review. Apply rechecks every base/dependency/review/permission, then commits and saves atomically using native recovery/receipts. Cancelled/stale/failed/unreviewed operations never alter MAIN. Pending/reopened proposals need fresh work/review; authorizations are never persisted. Test post-write uncertainty and history-journal failure without blind replay.
+
+Acceptance: manual/headless parity, deterministic replay, bad tool/schema/unit/nonfinite/reference, scope/actor forgery, response budgets, duplicate IDs, stale command/review/dependency, cancellation/close/revocation, failed postcondition/storage and recovery. Visible Review Lab demo, exact Windows/Linux CI, 0.0.5 experimental and actual public Platform install/demo/apply/save/reopen verification. No main merge, owner acceptance or real-provider/GPU claim.

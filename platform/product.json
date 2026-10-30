@@ -3,7 +3,7 @@
   "protocolVersion": 1,
   "productId": "axiom.engineer-cad",
   "displayName": "Axiom Engineer CAD",
-  "productVersion": "0.0.4",
+  "productVersion": "0.0.5",
   "platformApiRange": ">=0.1.0 <0.2.0",
   "projectFormats": [
     {
@@ -39,6 +39,10 @@
     {
       "id": "e0-m4-native",
       "name": "E0.M4 Native Version Lab"
+    },
+    {
+      "id": "e0-m5-review",
+      "name": "E0.M5 Review Lab"
     }
   ],
   "launch": {
