@@ -151,5 +151,13 @@
     "separateModelWheel": true,
     "documentUnchanged": true,
     "errors": []
+  },
+  "embeddedPlatformSeparateWindows": {
+    "passed": true,
+    "inspectorSelectionSync": true,
+    "modelCameraSync": true,
+    "returnAndNativeClose": true,
+    "sameAdapterSession": true,
+    "nativeUnchanged": true
   }
 }

@@ -1,3 +1,5 @@
+Platform popup isolation: ADR017 uses a panel-only authenticated frontend of the same live adapter/session under the actual Hub iframe, with source-bound ordered BroadcastChannel camera/selection sync. Standalone mode moves original nodes. Child preferences never overwrite the parent layout; no COOP/COEP weakening/new lease/domain schema. tests/browser-embedded-panels.mjs is a required regression.
+
 Current correction branch: engineer/e1-m1-docking-ux, based on delivered0.1.0 SHA652bd5fe3dc0c07b2d935b48b9da0ea490a54916;0.1.1 UX review, not E1.M2.
 
 > **0.1.1 UX revision:** compact CAD header/ribbon, Game Engine five-zone docking/Separate Windows and persistent layout, Panels reopen/reset, reversed horizontal orbit and cursor-centered wheel zoom. [Test guide](docs/milestones/E1_M1_UX_0_1_1.md), [ADR017](docs/architecture/ADR-017-CAD-DOCKING-UX.md). E1.M2 remains unstarted; exact-head CI and fresh public Platform install are delivery gates. Native schema/data and runtime pins unchanged.

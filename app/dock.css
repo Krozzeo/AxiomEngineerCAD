@@ -7,3 +7,7 @@ html,body{height:100%;width:100%;margin:0;overflow:hidden}.docked-cad{display:fl
 .docked-cad .dock-tabs>[data-panel]{min-width:0;flex:0 1 auto}.dock-tabs>[data-panel]>span{overflow:hidden;text-overflow:ellipsis;min-width:0}.dock-tabs>[data-panel]>svg{flex:none}.detached-editor>.detached-header .dock-panel-controls{display:flex}.docked-cad.detached-editor .dock-panel{height:auto}
 
 .docked-cad .statusbar #proof-status{flex:1;min-width:0;padding:0;line-height:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.docked-cad .statusbar #proof-renderer{position:static;font-size:9px;flex:none;max-width:150px}.activity-status{margin:0;font-size:10px;color:#8cbab1}
+
+.separated-panel>.command-ribbon,.separated-panel>.statusbar{display:none}.separated-panel .dock-tabs{display:none!important}.separated-panel #editor-workspace{gap:0;grid-template-columns:0 minmax(0,1fr) 0!important;grid-template-rows:0 minmax(0,1fr) 0!important}.separated-panel>.topbar{font-size:11px}.separated-panel>.topbar>button{display:flex;align-items:center;gap:7px;padding:3px 7px;font-size:11px}.separated-panel .dock-panel-controls{display:none!important}
+
+.separated-panel>.topbar>*{display:none!important}.separated-panel>.topbar>.panel-return,.separated-panel>.topbar>.panel-label{display:flex!important}
