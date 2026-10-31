@@ -1,0 +1,86 @@
+{
+  "passed": true,
+  "productId": "axiom.engineer-cad",
+  "version": "0.0.7",
+  "build": null,
+  "sha256": "754879cc431a6e0f9e742666a31f72869566c9823b7d2afd1e759c380896d38b",
+  "bytes": 102539506,
+  "runtime": "v24.21.0",
+  "os": "win32",
+  "geometryCorpus": {
+    "passed": 29,
+    "total": 29,
+    "resources": {
+      "peakRssBytes": 445919232,
+      "heapUsedBytes": 31820448,
+      "policy": "Isolated process, 192 MiB JS old-space, finite typed inputs, parent deadline; RSS postcondition is not an OS hard memory quota."
+    }
+  },
+  "spatialCorpus": {
+    "passed": 28,
+    "total": 28,
+    "resources": {
+      "peakRssBytes": 65617920,
+      "heapUsedBytes": 10484688,
+      "policy": "Isolated process, 192 MiB JS old-space, finite typed inputs, parent deadline; RSS postcondition is not an OS hard memory quota."
+    }
+  },
+  "spatialSaveReopen": true,
+  "correspondingSourceArchives": 6,
+  "nativeStorage": {
+    "schemaVersion": 1,
+    "versionId": "sha256:366b40470e63fa8e63047a551af31bd9e01fb38aae4af7ea8519a47da4b4ab52",
+    "convertVerifyVersionSaveReopen": true,
+    "resources": {
+      "peakRssBytes": 58011648,
+      "heapUsedBytes": 10190504,
+      "policy": "Isolated process, 192 MiB JS old-space, finite typed inputs, parent deadline; RSS postcondition is not an OS hard memory quota."
+    }
+  },
+  "semanticCommands": {
+    "passed": true,
+    "catalogTools": 19,
+    "scriptedOnly": true,
+    "realProviderEvaluated": false,
+    "volumeBeforeMm3": 12000,
+    "volumeAfterMm3": 18000,
+    "applyRevision": 6,
+    "applyOperationId": "8043c7b7-509e-4bee-9101-7d02ecda8ca6",
+    "agentApplyDenied": true
+  },
+  "drawingProof": {
+    "passed": true,
+    "sourceCreator": {
+      "version": "0.0.7",
+      "commit": null,
+      "channel": "stable"
+    },
+    "sourceHash": "sha256:2f0d1f266698e70345ae8af495a3d39e79bf4482723848d2007f81530c0a01cf",
+    "sheet": "A4",
+    "widthMm": 60,
+    "exportBytes": 1891,
+    "exportSha256": "8c9b6114d72eda21fc4d6e92379f33642e96b8a0e25ac15f06bcefcfde7c0927",
+    "agentExportDenied": true,
+    "localTransmissionDenied": true,
+    "resources": {
+      "peakRssBytes": 170840064,
+      "heapUsedBytes": 44405608,
+      "policy": "Isolated process, 192 MiB JS old-space, finite typed inputs, parent deadline; RSS postcondition is not an OS hard memory quota."
+    },
+    "webgpuEvaluated": false
+  },
+  "integratedProof": {
+    "passed": true,
+    "loadedFromActualPlatformDemoJob": true,
+    "version": "0.0.7",
+    "manualDepthMm": 15,
+    "sketchDof": 0,
+    "mateDof": 3,
+    "historicalDepthMm": 10,
+    "historicalReadOnly": true,
+    "vectorPdf": true,
+    "saveReopen": true,
+    "ownerDecision": "Pending Go / Redesign / Stop"
+  },
+  "scope": "Relocated prepared ZIP, source hashes, real Platform lifecycle, 29 exact-kernel/2D and 28 spatial cases, spatial drag/keep/save/reopen and native conversion/validation/version/save/reopen; no user profile/provider, WebGPU or final CAD schema claims"
+}

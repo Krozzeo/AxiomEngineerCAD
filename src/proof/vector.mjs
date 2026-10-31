@@ -17,6 +17,7 @@ export function vectorSheet(drawing){
     }}
   }
   const dim=drawing.dimension,y=dim.yMm,x1=dim.x1Mm,x2=dim.x2Mm;line([x1,y-3],[x1,dim.extensionToYmm]);line([x2,y-3],[x2,dim.extensionToYmm]);line([x1,y],[x2,y]);for(const [x,sign]of [[x1,1],[x2,-1]]){line([x,y],[x+sign*2,y+1]);line([x,y],[x+sign*2,y-1]);}text((x1+x2)/2-8,y+3,3.5,`${dim.valueMm.toFixed(3)} mm`);
+  text(115,13,2.4,drawing.source.versionId?'Retained '+drawing.source.versionId.slice(0,23):'Working model');
   const stream=`q\n2.834645669291339 0 0 2.834645669291339 0 0 cm\n0.18 w\n0.09 0.17 0.25 RG\n${ops.join('\n')}\nQ\n`;
   const objects=['<< /Type /Catalog /Pages 2 0 R >>','<< /Type /Pages /Kids [3 0 R] /Count 1 >>',`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${n(w*72/25.4)} ${n(h*72/25.4)}] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>`,'<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',`<< /Length ${Buffer.byteLength(stream)} >>\nstream\n${stream}endstream`];
   let pdf='%PDF-1.4\n',offsets=[0];for(let i=0;i<objects.length;i++){offsets.push(Buffer.byteLength(pdf));pdf+=`${i+1} 0 obj\n${objects[i]}\nendobj\n`;}const xref=Buffer.byteLength(pdf);pdf+=`xref\n0 ${objects.length+1}\n0000000000 65535 f \n${offsets.slice(1).map(x=>String(x).padStart(10,'0')+' 00000 n \n').join('')}trailer\n<< /Size ${objects.length+1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF\n`;

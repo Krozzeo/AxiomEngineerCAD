@@ -1,0 +1,301 @@
+{
+  "passed": true,
+  "creator": {
+    "version": "0.0.7",
+    "commit": null,
+    "channel": "development"
+  },
+  "initial": {
+    "profile": "E0.M7-chain/1",
+    "sketch": {
+      "id": "sketch-main",
+      "status": "FullyDefined",
+      "dof": 0,
+      "maxResidualMm": 0,
+      "widthMm": 40,
+      "heightMm": 30
+    },
+    "extrusion": {
+      "id": "extrude-base",
+      "sourceSketchId": "sketch-main",
+      "volumeMm3": 12000,
+      "topFaceZmm": 10
+    },
+    "dependent": {
+      "id": "feature-geometry",
+      "producerId": "extrude-base",
+      "role": "top",
+      "state": "ResolvedReidentified",
+      "volumeMm3": 11717.256661176916,
+      "areaMm2": 3931.9468914507706
+    },
+    "mate": {
+      "id": "mate-on-top",
+      "instanceId": "instance-cap",
+      "status": "UnderDefined",
+      "dof": 3,
+      "position": [
+        -10,
+        0,
+        10.000000749060682
+      ],
+      "sourceFaceZmm": 10,
+      "childBottomZmm": 0,
+      "maxResidualMm": 7.490606819260393e-7
+    },
+    "drawing": {
+      "id": "drawing-binding",
+      "producerId": "feature-geometry",
+      "parameterId": "parameter-width",
+      "widthMm": 40,
+      "template": "A4-third-angle/1"
+    }
+  },
+  "current": {
+    "profile": "E0.M7-chain/1",
+    "sketch": {
+      "id": "sketch-main",
+      "status": "FullyDefined",
+      "dof": 0,
+      "maxResidualMm": 0,
+      "widthMm": 60,
+      "heightMm": 30
+    },
+    "extrusion": {
+      "id": "extrude-base",
+      "sourceSketchId": "sketch-main",
+      "volumeMm3": 27000,
+      "topFaceZmm": 15
+    },
+    "dependent": {
+      "id": "feature-geometry",
+      "producerId": "extrude-base",
+      "role": "top",
+      "state": "ResolvedReidentified",
+      "volumeMm3": 26575.88499176538,
+      "areaMm2": 6526.194671058466
+    },
+    "mate": {
+      "id": "mate-on-top",
+      "instanceId": "instance-cap",
+      "status": "UnderDefined",
+      "dof": 3,
+      "position": [
+        -15,
+        0,
+        15.00000074906201
+      ],
+      "sourceFaceZmm": 15,
+      "childBottomZmm": 0,
+      "maxResidualMm": 7.490620106409551e-7
+    },
+    "drawing": {
+      "id": "drawing-binding",
+      "producerId": "feature-geometry",
+      "parameterId": "parameter-width",
+      "widthMm": 60,
+      "template": "A4-third-angle/1"
+    }
+  },
+  "historical": {
+    "profile": "E0.M7-chain/1",
+    "sketch": {
+      "id": "sketch-main",
+      "status": "FullyDefined",
+      "dof": 0,
+      "maxResidualMm": 0,
+      "widthMm": 40,
+      "heightMm": 30
+    },
+    "extrusion": {
+      "id": "extrude-base",
+      "sourceSketchId": "sketch-main",
+      "volumeMm3": 12000,
+      "topFaceZmm": 10
+    },
+    "dependent": {
+      "id": "feature-geometry",
+      "producerId": "extrude-base",
+      "role": "top",
+      "state": "ResolvedReidentified",
+      "volumeMm3": 11717.256661176916,
+      "areaMm2": 3931.9468914507706
+    },
+    "mate": {
+      "id": "mate-on-top",
+      "instanceId": "instance-cap",
+      "status": "UnderDefined",
+      "dof": 3,
+      "position": [
+        -10,
+        0,
+        10.000000749060682
+      ],
+      "sourceFaceZmm": 10,
+      "childBottomZmm": 0,
+      "maxResidualMm": 7.490606819260393e-7
+    },
+    "drawing": {
+      "id": "drawing-binding",
+      "producerId": "feature-geometry",
+      "parameterId": "parameter-width",
+      "widthMm": 40,
+      "template": "A4-third-angle/1"
+    }
+  },
+  "retainedVersion": "sha256:838c42f0bed0ed453f906164d545db8bab2b94b902499c877e5c947cc0e9a341",
+  "initialVolumeMm3": 11717.256661176916,
+  "currentVolumeMm3": 26575.88499176538,
+  "manualThicknessMm": 15,
+  "reviewedWidthMm": 60,
+  "saveReopen": true,
+  "historicalReadOnly": true,
+  "gpu": {
+    "state": "ready",
+    "vendor": "nvidia",
+    "architecture": "turing",
+    "device": "",
+    "description": "",
+    "isFallbackAdapter": false,
+    "classification": "hardware-adapter",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36"
+  },
+  "picks": [
+    {
+      "kind": "face",
+      "role": "top",
+      "areaMm2": 1171.7256661176916,
+      "centerOfAreaMm": [
+        1.1102230246251565e-15,
+        -4.280347578419995e-17,
+        10
+      ],
+      "planeNormal": [
+        0,
+        0,
+        1
+      ],
+      "occurrencePath": [
+        "definition-main"
+      ],
+      "definitionId": "definition-main",
+      "producerId": "feature-geometry",
+      "source": {
+        "documentId": "engineer-document://1bcde291-e559-4a5c-8944-f997b8fd2c4d",
+        "revision": 0,
+        "contentHash": "sha256:405d99ef895900dc87886b8b2228ff82c8f0b4cfc5d8c3138b1a0bfee39a0996",
+        "versionId": null,
+        "readOnly": false
+      },
+      "canonicalUnit": "mm",
+      "frame": "definition-local",
+      "occurrenceTransform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "resolution": "ResolvedStable",
+      "authority": "exact supported producer role; GPU ID is transient"
+    },
+    {
+      "kind": "face",
+      "role": "top",
+      "areaMm2": 144,
+      "centerOfAreaMm": [
+        0,
+        1.2952601953960158e-16,
+        8
+      ],
+      "planeNormal": [
+        0,
+        0,
+        1
+      ],
+      "occurrencePath": [
+        "definition-main",
+        "instance-cap"
+      ],
+      "definitionId": "definition-cap",
+      "producerId": "feature-cap",
+      "source": {
+        "documentId": "engineer-document://1bcde291-e559-4a5c-8944-f997b8fd2c4d",
+        "revision": 0,
+        "contentHash": "sha256:405d99ef895900dc87886b8b2228ff82c8f0b4cfc5d8c3138b1a0bfee39a0996",
+        "versionId": null,
+        "readOnly": false
+      },
+      "canonicalUnit": "mm",
+      "frame": "definition-local",
+      "occurrenceTransform": {
+        "position": [
+          -10,
+          0,
+          10
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "resolution": "ResolvedStable",
+      "authority": "exact supported producer role; GPU ID is transient"
+    },
+    {
+      "kind": "face",
+      "role": "top",
+      "areaMm2": 144,
+      "centerOfAreaMm": [
+        0,
+        1.2952601953960158e-16,
+        8
+      ],
+      "planeNormal": [
+        0,
+        0,
+        1
+      ],
+      "occurrencePath": [
+        "definition-main",
+        "instance-cap"
+      ],
+      "definitionId": "definition-cap",
+      "producerId": "feature-cap",
+      "source": {
+        "documentId": "engineer-document://1bcde291-e559-4a5c-8944-f997b8fd2c4d",
+        "revision": 1,
+        "contentHash": "sha256:f03b50b642caba9834d517eb774f1beb1f4e967c6ae318c837516b683f7dea68",
+        "versionId": null,
+        "readOnly": false
+      },
+      "canonicalUnit": "mm",
+      "frame": "definition-local",
+      "occurrenceTransform": {
+        "position": [
+          -10,
+          0,
+          15
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "resolution": "ResolvedStable",
+      "authority": "exact supported producer role; GPU ID is transient"
+    }
+  ],
+  "ownerDecision": "Pending Go / Redesign / Stop",
+  "e1Started": false
+}

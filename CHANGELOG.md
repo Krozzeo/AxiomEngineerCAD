@@ -1,3 +1,10 @@
+# 0.0.7 — E0.M7 integrated foundation (review candidate)
+
+- Connect persisted solved sketch, actual extrusion, face-dependent cut, measured plane mate and associative drawing in one portable study.
+- Shared driving dimensions, actual proposal/full human review, retained read-only historical model/PDF and saved reopen.
+- Four versioned feature decoders (new-study reader0.0.7), two read tools,15 tests (100 total), actual Hub/hardware/PDF/relocated installation proof.
+- ADR012/risk ledger/quantitative corpus. Owner Go/Redesign/Stop pending; E1 unstarted. Prior native documents/releases/runtime/source pins and authority/recovery guards preserved.
+
 # 0.0.6 — E0.M6 exact drawing, GPU picking and security (review candidate)
 
 - Add exact OCCT HLR top/front/right A4 vector PDF/SVG, source-linked width and stale-export refusal; independent PDF readers/rendered QA.

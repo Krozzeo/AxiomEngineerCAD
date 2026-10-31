@@ -3,7 +3,7 @@
   "protocolVersion": 1,
   "productId": "axiom.engineer-cad",
   "displayName": "Axiom Engineer CAD",
-  "productVersion": "0.0.6",
+  "productVersion": "0.0.7",
   "platformApiRange": ">=0.1.0 <0.2.0",
   "projectFormats": [
     {
@@ -47,6 +47,10 @@
     {
       "id": "e0-m6-drawing-gpu",
       "name": "E0.M6 Drawing & GPU Lab"
+    },
+    {
+      "id": "e0-m7-integrated",
+      "name": "E0.M7 Integrated Foundation Lab"
     }
   ],
   "launch": {

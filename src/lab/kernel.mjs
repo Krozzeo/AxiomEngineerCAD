@@ -46,10 +46,10 @@ function faceDetails(shape, spec, ref) {
       type:face.geomType, areaMm2:cad.measureArea(face), center:center.toTuple(), normal:normal.toTuple(), transient:true};
   });
 }
-export async function geometryExperiment(input, {includeMesh=true, includeStep=false,inspectShape}={}) {
+export async function geometryExperiment(input, {includeMesh=true, includeStep=false,inspectShape,baseProfile,dependentTool}={}) {
   const spec = recipe(input), oc = await initializeKernel(), f = UNITS[spec.unit];
   const [w,h,d,r] = ['width','height','depth','radius'].map(k=>spec[k]*f), started = performance.now();
-  let shape = cad.drawRectangle(w,h).sketchOnPlane('XY').extrude(d);
+  let shape = baseProfile?await baseProfile():cad.drawRectangle(w,h).sketchOnPlane('XY').extrude(d);
   let ref = {state:'ResolvedStable',kind:spec.selectorKind,element:roleElement(shape,spec.selectorKind,spec.selectorRole),candidates:1,reason:'Explicit rectangular extrusion producer role.'};
   let expected = w*h*d, expectedArea = 2*(w*h+w*d+h*d), step = null;
   const history = [], retained = [shape];
@@ -63,7 +63,7 @@ export async function geometryExperiment(input, {includeMesh=true, includeStep=f
     if (['cut','reorder','import','kernel-change'].includes(spec.scenario)) {
       const indexes = Array.from({length:spec.count},(_,i)=>i);
       if (spec.scenario === 'reorder') indexes.reverse();
-      for (const i of indexes) apply('BRepAlgoAPI_Cut',cad.drawCircle(r).sketchOnPlane('XY').extrude(d+2).translate([-w/2+w*(i+1)/(spec.count+1),0,-1]));
+      for (const i of indexes) apply('BRepAlgoAPI_Cut',dependentTool?await dependentTool({shape,reference:ref,index:i}):cad.drawCircle(r).sketchOnPlane('XY').extrude(d+2).translate([-w/2+w*(i+1)/(spec.count+1),0,-1]));
       expected -= spec.count*Math.PI*r*r*d;
       expectedArea += spec.count*(2*Math.PI*r*d-2*Math.PI*r*r);
     } else if (spec.scenario === 'split') {

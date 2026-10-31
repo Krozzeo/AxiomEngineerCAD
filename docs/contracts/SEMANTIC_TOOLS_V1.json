@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "status": "E0.M5 experimental; owner review pending",
-  "productVersion": "0.0.5",
+  "productVersion": "0.0.7",
   "envelope": {
     "type": "object",
     "properties": {
@@ -246,6 +246,280 @@
     "additionalProperties": false
   },
   "tools": [
+    {
+      "name": "cad.integration.inspect.v1",
+      "version": "1",
+      "schemaVersion": 1,
+      "capability": "cad.integration.inspect",
+      "effects": [
+        "ReadOnly"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "receipt": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "type": "integer",
+                "const": 1
+              },
+              "operationId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 96
+              },
+              "traceId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 96
+              },
+              "actor": {
+                "type": "object"
+              },
+              "scope": {
+                "type": "object"
+              },
+              "toolName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96
+              },
+              "toolVersion": {
+                "type": "string",
+                "const": "1"
+              },
+              "effectClass": {
+                "type": "string",
+                "enum": [
+                  "ReadOnly",
+                  "LocalProposal",
+                  "MainMutation"
+                ]
+              },
+              "baseRevision": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "outcome": {
+                "type": "string",
+                "enum": [
+                  "accepted",
+                  "completed",
+                  "rejected",
+                  "failed",
+                  "cancelled"
+                ]
+              },
+              "result": {
+                "type": "object"
+              },
+              "error": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "message": {
+                    "type": "string",
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "code",
+                  "message"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "operationId",
+              "traceId",
+              "outcome"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "receipt"
+        ],
+        "additionalProperties": false
+      },
+      "description": "Inspect the persisted E0.M7 feature/parameter dependency chain; owner Go remains separate.",
+      "units": {
+        "length": [
+          "mm",
+          "cm",
+          "m",
+          "inch"
+        ],
+        "count": "scalar",
+        "volume": "mm3",
+        "area": "mm2",
+        "angle": "rad"
+      },
+      "preconditions": [
+        "server-issued actor/session authority",
+        "expected document/dependency revisions",
+        "native v1 for model mutations"
+      ],
+      "recovery": "Inspect operation receipt; never blindly replay unknown effects.",
+      "limits": {
+        "maxInputBytes": 16384,
+        "maxOutputBytes": 16384
+      }
+    },
+    {
+      "name": "cad.integration.validate.v1",
+      "version": "1",
+      "schemaVersion": 1,
+      "capability": "cad.integration.validate",
+      "effects": [
+        "ReadOnly"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "receipt": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "type": "integer",
+                "const": 1
+              },
+              "operationId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 96
+              },
+              "traceId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 96
+              },
+              "actor": {
+                "type": "object"
+              },
+              "scope": {
+                "type": "object"
+              },
+              "toolName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96
+              },
+              "toolVersion": {
+                "type": "string",
+                "const": "1"
+              },
+              "effectClass": {
+                "type": "string",
+                "enum": [
+                  "ReadOnly",
+                  "LocalProposal",
+                  "MainMutation"
+                ]
+              },
+              "baseRevision": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "outcome": {
+                "type": "string",
+                "enum": [
+                  "accepted",
+                  "completed",
+                  "rejected",
+                  "failed",
+                  "cancelled"
+                ]
+              },
+              "result": {
+                "type": "object"
+              },
+              "error": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "message": {
+                    "type": "string",
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "code",
+                  "message"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "operationId",
+              "traceId",
+              "outcome"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "receipt"
+        ],
+        "additionalProperties": false
+      },
+      "description": "Regenerate the actual saved integrated sketch, B-Rep, mate and immutable closure in the bounded worker.",
+      "units": {
+        "length": [
+          "mm",
+          "cm",
+          "m",
+          "inch"
+        ],
+        "count": "scalar",
+        "volume": "mm3",
+        "area": "mm2",
+        "angle": "rad"
+      },
+      "preconditions": [
+        "server-issued actor/session authority",
+        "expected document/dependency revisions",
+        "native v1 for model mutations"
+      ],
+      "recovery": "Inspect operation receipt; never blindly replay unknown effects.",
+      "limits": {
+        "maxInputBytes": 16384,
+        "maxOutputBytes": 16384
+      }
+    },
     {
       "name": "cad.document.inspect.v1",
       "version": "1",

@@ -14,8 +14,10 @@ results = []
 def near(a, b, eps=0.0001):
     assert abs(a - b) < eps, (a, b)
 
-for width in (40, 60):
-    path = folder / f'drawing-a4-{width}.pdf'
+integrated = '--integrated' in sys.argv
+fixtures = [('integrated-a4-40',40,10),('integrated-a4-60',60,15),('integrated-a4-historical',40,10)] if integrated else [('drawing-a4-40',40,10),('drawing-a4-60',60,10)]
+for stem,width,depth in fixtures:
+    path = folder / f'{stem}.pdf'
     reader = PdfReader(path, strict=True)
     assert len(reader.pages) == 1
     page = reader.pages[0]
@@ -36,7 +38,7 @@ for width in (40, 60):
         hidden = [line for line in p.lines if line['dash'][0]]
         assert len(hidden) == 4
         for line in hidden:
-            near(line['height'] / pt, 10)
+            near(line['height'] / pt, depth)
             near(line['width'], 0)
         assert len(p.curves) == 1
         circle = p.curves[0]
@@ -60,9 +62,9 @@ for width in (40, 60):
                 cubics += 1
         assert cubics == 16
         assert deviation < .0001, deviation
-        image = folder / f'drawing-a4-{width}-rendered.png'
+        image = folder / f'{stem}-rendered.png'
         p.to_image(resolution=120).save(image)
-        results.append({'file':path.name, 'sha256':hashlib.sha256(raw).hexdigest(), 'pageMm':[210,297], 'widthMm':width, 'rasterImages':0, 'hiddenLines':len(hidden), 'circleCubicSegments':cubics, 'maxMeasuredCircleDeviationMm':deviation, 'rendered':image.name})
-report = {'passed':True, 'profile':'E0.M6-independent-pdf/1', 'readers':{n:importlib.metadata.version(n) for n in ['pypdf','pdfplumber','pypdfium2']}, 'files':results}
-(folder / 'pdf-validation.json').write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
+        results.append({'file':path.name, 'sha256':hashlib.sha256(raw).hexdigest(), 'pageMm':[210,297], 'widthMm':width, 'depthMm':depth, 'rasterImages':0, 'hiddenLines':len(hidden), 'circleCubicSegments':cubics, 'maxMeasuredCircleDeviationMm':deviation, 'rendered':image.name})
+report = {'passed':True, 'profile':'E0.M7-independent-pdf/1' if integrated else 'E0.M6-independent-pdf/1', 'readers':{n:importlib.metadata.version(n) for n in ['pypdf','pdfplumber','pypdfium2']}, 'files':results}
+(folder / ('integrated-pdf-validation.json' if integrated else 'pdf-validation.json')).write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
 print(json.dumps(report))
