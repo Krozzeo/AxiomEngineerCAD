@@ -158,6 +158,7 @@
     "modelCameraSync": true,
     "returnAndNativeClose": true,
     "sameAdapterSession": true,
+    "reusesVerifiedProof": true,
     "nativeUnchanged": true
   }
 }

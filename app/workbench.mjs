@@ -31,7 +31,7 @@ window.addEventListener('engineer-document-changed',refresh);window.addEventList
 setInterval(()=>{$('wb-close').hidden=$('close').hidden;},500);
 const resize=new ResizeObserver(entries=>{const r=entries[0].contentRect;if(r.width>0&&r.height>0)viewport.renderer.resize(r.width,r.height).catch(e=>message(e.message));});resize.observe($('proof-canvas'));window.addEventListener('pagehide',()=>resize.disconnect());$('wb-navigation').addEventListener('change',()=>{$('wb-hint').textContent=$('wb-navigation').value==='trackpad'?'Select · Alt + left drag orbits · Shift + Alt drag pans · F fits':'Select · Middle drag orbits · Shift + middle pans · F fits';});
 window.addEventListener('engineer-renderer-state',e=>{if(e.detail.state==='ready'){const r=$('proof-canvas').getBoundingClientRect();viewport.renderer.resize(r.width,r.height).catch(err=>message(err.message));}});
-await refresh();if(!legacy)await viewport.build({automatic:true}).catch(e=>message(e.message));
+await refresh();if(!legacy&&!new URLSearchParams(location.search).has('panel'))await viewport.build({automatic:true}).catch(e=>message(e.message));
 
 document.body.dataset.workbenchReady='true';
 
