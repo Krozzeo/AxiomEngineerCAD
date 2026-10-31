@@ -58,3 +58,7 @@ Moderate is **not** an acceptable sole criterion. Each project must specify actu
 Every milestone result records: requirement IDs; exact code commit and upstream/library versions; named profile/fixture hashes; positive/negative/lifecycle case IDs; commands; measured values and pass/fail; real hardware/provider vs simulator/mock labels; crash/recovery and security outcome; screenshots/PDF where meaningful; known unsupported cases; deviations/ADRs; owner acceptance status. CI pass cannot replace owner-visible milestone review. Never declare a milestone passed from stale SHAs, empty wrappers, synthetic counters or unaudited visual plausibility.
 
 References: [Master §§17–20](../../MASTER_DESIGN.md#17-nonfunctional-acceptance-contracts), [Requirements matrix](REQUIREMENTS_TRACEABILITY.md), [AI protocol](AI_EVALUATION.md).
+
+## E0.M7 integrated candidate baseline
+
+[ADR012](../architecture/ADR-012-INTEGRATED-E0-GATE.md) and [corpus](E0_M7_ACCEPTANCE_CORPUS_V1.json) connect sketch/kernel/topology/mate/native closure/tool review/drawing/GPU/IP gates.15 new tests+85 retained; actual Hub human workflow, separately labeled physical GPU, independent current/historical PDF parsing/rendering, actual installed demo. The archived0.0.6 decoder refuses new profiles without writes. Final exact CI/public provenance belongs to delivery PR/release. Owner decision pending; E1 unstarted.

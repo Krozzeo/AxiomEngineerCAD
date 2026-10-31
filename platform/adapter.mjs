@@ -10,7 +10,9 @@ import manifest from './product.json' with {type:'json'};
 import {LabSession} from '../src/lab/session.mjs';
 import {recipe,KERNEL} from '../src/lab/profile.mjs';
 import {assemblyFixture} from '../src/assembly/fixtures.mjs';
-import {NativeSession} from '../src/native/session.mjs';
+import {NativeSession,createVersion} from '../src/native/session.mjs';
+import {runWorker} from '../src/lab/jobs.mjs';
+import {integratedDemo} from '../src/integration/demo.mjs';
 import {readState} from '../src/native/storage.mjs';
 import {nativeDemo} from '../src/native/demo.mjs';
 import {CommandSession} from '../src/commands/session.mjs';
@@ -89,7 +91,7 @@ export class EngineerAdapter {
       const destination=await authorized(this.root,p.destination);
       check((await readdir(destination)).length===0,'projectBusy','Demos require a fresh empty destination.');
       const projects=[];let nativePaths;if(p.demoIds.some(id=>id.startsWith('e0-m4-')||id==='e0-m5-review')){const docs=await nativeDemo();nativePaths={};for(const [id,key,folderName]of [['e0-m4-source','source','E0-M4-Source'],['e0-m4-native','consumer','E0-M4-Native']]){const folder=join(destination,folderName);await mkdir(folder);const path=join(folder,FILENAME);await atomicJson(path,docs[key]);nativePaths[id]=path;}if(p.demoIds.includes('e0-m5-review')){const folder=join(destination,'E0-M5-Review');await mkdir(folder);const path=join(folder,FILENAME);await atomicJson(path,await reviewDemo(docs.consumer));nativePaths['e0-m5-review']=path;}}
-      for(const demoId of p.demoIds){if(demoId==='e0-m6-drawing-gpu'){const folder=join(destination,'E0-M6-Drawing-GPU');await mkdir(folder);const path=join(folder,FILENAME);await atomicJson(path,proofDemo());projects.push({demoId,path,...await this.detect(path)});continue;}if(nativePaths?.[demoId]){projects.push({demoId,path:nativePaths[demoId],...await this.detect(nativePaths[demoId])});continue;}const spatial=demoId==='e0-m3-mates',folder=join(destination,spatial?'E0-M3-Spatial-Lab':'E0-M2-Geometry-Lab');await mkdir(folder);
+      for(const demoId of p.demoIds){if(demoId==='e0-m7-integrated'){const folder=join(destination,'E0-M7-Integrated');await mkdir(folder);const path=join(folder,FILENAME),value=integratedDemo(),proof=(await runWorker('native-verify',{document:value})).result,version=createVersion(value,proof);value.native.versions.push(version);value.native.graph.drawings.push({id:'drawing-history',revision:0,sheets:[{id:'sheet-history',size:'A4',views:[{id:'view-history',model:{documentId:value.documentId,definitionId:value.native.graph.primaryDefinitionId,versionId:version.id}}],notes:[{id:'note-history',viewId:'view-history',text:'Initial integrated width40/depth10; retained immutable source.'}]}]});await atomicJson(path,value);projects.push({demoId,path,...await this.detect(path)});continue;}if(demoId==='e0-m6-drawing-gpu'){const folder=join(destination,'E0-M6-Drawing-GPU');await mkdir(folder);const path=join(folder,FILENAME);await atomicJson(path,proofDemo());projects.push({demoId,path,...await this.detect(path)});continue;}if(nativePaths?.[demoId]){projects.push({demoId,path:nativePaths[demoId],...await this.detect(nativePaths[demoId])});continue;}const spatial=demoId==='e0-m3-mates',folder=join(destination,spatial?'E0-M3-Spatial-Lab':'E0-M2-Geometry-Lab');await mkdir(folder);
         const value=spatial?{...blank('E0.M3 Spatial Mate Lab'),provisional:'E0.M3',assembly:assemblyFixture('coaxial')}:{...blank('E0.M2 Geometry & Sketch Lab'),provisional:'E0.M2',experiment:{profile:'E0.M2-probe-v0',kernel:KERNEL,spec:recipe()}};
         const path=join(folder,FILENAME);await atomicJson(path,value);projects.push({demoId,path,...await this.detect(path)});}
       return {productVersion:manifest.productVersion,projects};

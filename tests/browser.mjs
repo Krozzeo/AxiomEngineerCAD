@@ -9,11 +9,11 @@ import {startHost} from '../node_modules/axiom-platform/services/local-host/serv
 const root = await mkdtemp(join(tmpdir(), 'engineer-browser-')), evidence = resolve(process.env.ENGINEER_EVIDENCE??'test-results');
 await mkdir(evidence, {recursive:true});
 let browser, child, host, direct;
-const report = {milestone:'E0.M6', platform:'0.1.12', providerCommit:'6d240845cd77eb1879738d32c9f2b8fcfd7297c5',
+const report = {milestone:'E0.M7', platform:'0.1.12', providerCommit:'6d240845cd77eb1879738d32c9f2b8fcfd7297c5',
   runtime:process.version, os:process.platform, architecture:process.arch, criteria:[], pageErrors:[],
   renderer:'Canvas CPU preview derived from actual OCCT tessellation; exact metrics from isolated CPU/Wasm; M6 WebGPU evidence is reported separately; no real AI model acceptance claimed'};
 try {
-  browser = await chromium.launch(process.env.ENGINEER_HARDWARE==='1'?{executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true,ignoreDefaultArgs:['--disable-gpu-compositing'],args:['--enable-unsafe-webgpu']}:{headless:true});if(process.env.ENGINEER_HARDWARE==='1'){const cdp=await browser.newBrowserCDPSession(),info=await cdp.send('SystemInfo.getInfo');report.hardware={devices:info.gpu.devices.map(d=>({vendorId:d.vendorId,deviceId:d.deviceId,vendorString:d.vendorString,deviceString:d.deviceString,driverVendor:d.driverVendor,driverVersion:d.driverVersion})),browser:browser.version(),flags:['--enable-unsafe-webgpu'],softwareForced:false};} report.browser = browser.version();
+  browser = await chromium.launch(process.env.ENGINEER_HARDWARE==='1'?{executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true,ignoreDefaultArgs:['--disable-gpu-compositing']}:{headless:true});if(process.env.ENGINEER_HARDWARE==='1'){const cdp=await browser.newBrowserCDPSession(),info=await cdp.send('SystemInfo.getInfo');report.hardware={devices:info.gpu.devices.map(d=>({vendorId:d.vendorId,deviceId:d.deviceId,vendorString:d.vendorString,deviceString:d.deviceString,driverVendor:d.driverVendor,driverVersion:d.driverVersion})),browser:browser.version(),flags:[],softwareForced:false};} report.browser = browser.version();
   const context = await browser.newContext({viewport:{width:1440, height:960}});
   const observe = page => { page.setDefaultTimeout(15000); page.on('pageerror', e => report.pageErrors.push(e.message)); };
   child = spawn(process.execPath, ['src/cli.mjs', '--root', join(root, 'direct'), '--create', 'study', '--name', 'Direct lifecycle study'], {cwd:resolve('.'), windowsHide:true, stdio:['ignore','pipe','pipe']});
@@ -144,6 +144,7 @@ try {
   const {verifyNativeUI}=await import('./browser-native.mjs');await verifyNativeUI({hub,context,host,evidence,observe,report});
   const {verifyReviewUI}=await import('./browser-review.mjs');await verifyReviewUI({hub,context,host,evidence,observe,report});
   const {verifyProofUI}=await import('./browser-proof.mjs');await verifyProofUI({hub,context,host,evidence,observe,report});if(process.env.ENGINEER_HARDWARE==='1')assert.equal(report.proof.gpu.classification,'hardware-adapter');
+  const {verifyIntegrationUI}=await import('./browser-integration.mjs');await verifyIntegrationUI({hub,context,host,evidence,observe,report});
   assert.deepEqual(report.pageErrors, []); report.passed = true;
 } catch (error) { report.failure = error.stack; if (direct) await direct.screenshot({path:join(evidence, 'failure.png')}).catch(() => {}); throw error; }
 finally {

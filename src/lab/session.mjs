@@ -1,3 +1,4 @@
+import {hasIntegration} from '../integration/profile.mjs';
 import {randomUUID} from 'node:crypto';
 import {runWorker} from './jobs.mjs';
 import {recipe,KERNEL} from './profile.mjs';
@@ -34,7 +35,7 @@ export class LabSession {
   }
   cancel(){if(this.running)this.job.controller.abort();return this.view();}
   apply({expectedRevision,jobId,kind='geometry'}){
-    this.document.expect(expectedRevision);check(!this.document.proof?.running,'projectBusy','Finish the drawing/viewport worker first.');check(!this.running,'projectBusy','Wait for the worker before applying.');
+    this.document.expect(expectedRevision);check(!hasIntegration(this.document.value),'UnsupportedCapability','Integrated studies use their persisted driving chain; legacy Keep cannot replace it.');check(!this.document.proof?.running,'projectBusy','Finish the drawing/viewport worker first.');check(!this.running,'projectBusy','Wait for the worker before applying.');
     check(!this.document.commands?.running,'projectBusy','Finish or cancel the semantic tool job first.');
     check(['geometry','assembly'].includes(kind),'UnsupportedCapability','Unknown apply kind.');
     if(kind==='assembly'){

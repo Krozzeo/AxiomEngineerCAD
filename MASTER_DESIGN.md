@@ -1042,3 +1042,5 @@ This is **master v0.2.0**, not a software release or milestone acceptance. Futur
 ---
 
 **Master-design closure note:** v0.2 retains the approved MVP and strengthens falsifiable architecture gates. CAD features, numeric results and provider capabilities remain planned until measured milestone evidence exists.
+
+Implementation evidence update2026-10-31: E0.M7 review candidate0.0.7 connects the bounded sketch/solid/face/mate/drawing/proposal/native chain. [Report](docs/milestones/E0_M7_REPORT.md), [ADR012](docs/architecture/ADR-012-INTEGRATED-E0-GATE.md). Implementation progress only; approved MVP unchanged, owner Go/Redesign/Stop and E1 authorization remain pending.

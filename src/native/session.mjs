@@ -1,3 +1,4 @@
+import {hasIntegration} from '../integration/profile.mjs';
 import {randomUUID} from 'node:crypto';
 import {dirname,resolve} from 'node:path';
 import {check,validate} from '../document.mjs';
@@ -12,7 +13,7 @@ export class NativeSession{
   native(){check(this.doc.value.formatVersion===1,'incompatibleVersion','Convert explicitly to native v1 first.');}
   set(next,revision,ignoreBuffer){this.ready(revision,ignoreBuffer);next.revision=revision+1;validate(next);this.doc.value=structuredClone(next);if(ignoreBuffer)this.doc.buffers.get(ignoreBuffer).dirty=false;this.candidates.clear();this.lastDependencies=[];return this.doc.view();}
   convert(p){this.ready(p.expectedRevision);check(this.doc.value.formatVersion===0,'incompatibleVersion','This document is already native.');return this.set(upgrade(this.doc.value),p.expectedRevision);}
-  editGraph(p){this.native();if(p.clientId)check(this.doc.buffers.get(p.clientId)?.sequence===p.bufferSequence,'revisionConflict','Graph draft changed while applying.');const value=structuredClone(this.doc.value),g=structuredClone(p.graph);validateGraph(g,{documentId:value.documentId,versions:value.native.versions});
+  editGraph(p){this.native();check(!hasIntegration(this.doc.value)&&!hasIntegration({graph:p.graph}),'UnsupportedCapability','Use the shared driving-parameter commands for integrated studies; arbitrary graph edits are E1+.');if(p.clientId)check(this.doc.buffers.get(p.clientId)?.sequence===p.bufferSequence,'revisionConflict','Graph draft changed while applying.');const value=structuredClone(this.doc.value),g=structuredClone(p.graph);validateGraph(g,{documentId:value.documentId,versions:value.native.versions});
     for(const old of value.native.graph.drawings){const now=g.drawings.find(d=>d.id===old.id);if(now&&canonical(now)!==canonical(old))check(now.revision===old.revision+1,'revisionConflict','A drawing edit increments its own revision exactly once.');}
     value.native.graph=g;for(const [key,type]of [['experiment','geometry-probe'],['assembly','spatial-probe']]){const f=g.features.find(f=>f.definitionId===g.primaryDefinitionId&&f.type===type);if(f)value[key]=f.data;else delete value[key];}return this.set(value,p.expectedRevision,p.clientId);
   }

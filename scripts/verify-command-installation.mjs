@@ -3,7 +3,7 @@ import {randomUUID} from 'node:crypto';
 export async function verifyCommandInstallation(editorUrl){
   const url=new URL(editorUrl),human=new URLSearchParams(url.hash.slice(1)).get('token');
   const request=async(path,data,token=human)=>{const r=await fetch(url.origin+'/v1/cad/'+path,{method:data?'POST':'GET',headers:{Origin:url.origin,Authorization:'Bearer '+token,...(data?{'Content-Type':'application/json'}:{})},body:data?JSON.stringify(data):undefined});assert.equal(r.status,200);return r.json();};
-  const catalog=await request('catalog');assert.equal(catalog.tools.length,17);
+  const catalog=await request('catalog');assert.equal(catalog.tools.length,19);
   const invoke=async(name,inputs,effect='ReadOnly',proposal,grant)=>{const {effects,...context}=await request(grant?'agent/context':'context',null,grant?.token),tool=catalog.tools.find(t=>t.name==='cad.'+name+'.v1'),value=await request(grant?'agent/invoke':'invoke',{...context,operationId:randomUUID(),traceId:randomUUID(),toolName:tool.name,toolVersion:'1',capability:tool.capability,effectClass:effect,inputs,...(proposal?{scope:{...context.scope,workspace:'proposal',proposalId:proposal.id},expectedProposalRevision:proposal.revision}:{})},grant?.token);return value.receipt;};
   const ok=r=>{assert.notEqual(r.outcome,'rejected',JSON.stringify(r));return r.result;};
   const complete=async()=>{for(let i=0;i<120;i++){const s=await request('status');if(s.job?.state!=='running'){assert.equal(s.job.state,'completed',JSON.stringify(s.job));return s;}await new Promise(r=>setTimeout(r,250));}throw Error('Installed command deadline');};

@@ -2,23 +2,25 @@
 
 Local-first, browser-operated parametric mechanical CAD and engineering-documentation product in the Axiom family, designed from the outset for both human users and AI agents.
 
-> **Status:** E0.M6 drawing/WebGPU/security experiment (0.0.6). Exact HLR/vector A4 output, GPU face/edge/component selection and denied sharing preflight are executable within a bounded profile. Full CAD/drawing editors, real AI model workflows and remote dispatch remain planned.
+> **Status:** E0.M7 integrated foundation experiment (0.0.7); owner Go / Redesign / Stop pending. Exact HLR/vector A4 output, GPU face/edge/component selection and denied sharing preflight are executable within a bounded profile. Full CAD/drawing editors, real AI model workflows and remote dispatch remain planned.
 
 ## Install milestone builds from Platform
 
 Every completed review milestone is delivered as an experimental prepared installation. In Platform 0.1.12+, open **Installations → Add installation → Axiom Engineer CAD → Refresh**, select the published experimental build, download/install and activate. Then create an Engineer project. Source PRs and passing tests alone are not installable publications. See [milestone delivery](docs/MILESTONE_DELIVERY.md) for the publication and verification gate.
 
-For the new drawing/GPU demo install **0.0.6**, choose **Load Demos → E0.M6 Drawing & GPU Lab → Build from model**. Select Faces/Edges/Components and standard views; choose **Drawing → Download vector PDF**. Change width through the expandable reviewed-command panel, rebuild and compare the source-linked dimension. Unsupported/software GPUs are labeled; CPU drawing works without GPU. [M6 report](docs/milestones/E0_M6_REPORT.md), [measured profile](docs/quality/E0_M6_PROFILE_V1.json).
+**New integrated demo:** install0.0.7, choose **Load Demos → E0.M7 Integrated Foundation Lab → Build from model**. Change Thickness15, Apply driving dimension, Save and rebuild. Review/Apply a scripted width60 proposal, rebuild and inspect drawing. Source Retained1 previews original40/depth10 read-only; Working model remains current60/depth15 after reopen. [Test steps](docs/milestones/E0_M7_REPORT.md), [owner gate](docs/architecture/ADR-012-INTEGRATED-E0-GATE.md). New profiles require0.0.7; old documents remain readable unchanged.
 
-For the earlier review demo choose **Load Demos** on installation **0.0.6**, open **E0.M5 Review Lab**, choose **Run local scripted proposal → Validate proposal → Review changes**, inspect the changes, confirm and **Apply & Save**. The scripted agent uses actual scoped local tools; it is not a real AI model. Manual dimension changes use the same command and require Save. See [E0.M5 evidence](docs/milestones/E0_M5_REPORT.md) and [tool catalog](docs/contracts/SEMANTIC_TOOLS_V1.json).
+For the earlier drawing/GPU demo install **0.0.7**, choose **Load Demos → E0.M6 Drawing & GPU Lab → Build from model**. Select Faces/Edges/Components and standard views; choose **Drawing → Download vector PDF**. Change width through the expandable reviewed-command panel, rebuild and compare the source-linked dimension. Unsupported/software GPUs are labeled; CPU drawing works without GPU. [M6 report](docs/milestones/E0_M6_REPORT.md), [measured profile](docs/quality/E0_M6_PROFILE_V1.json).
 
-For a guided native-data test choose **Load Demos** on installation **0.0.6**, then open **E0.M4 Native Version Lab**. Edit Notes → Apply properties, **Validate current content → Create immutable version → Save document**. Select an older version and **Restore as new revision**; history stays intact.
+For the earlier review demo choose **Load Demos** on installation **0.0.7**, open **E0.M5 Review Lab**, choose **Run local scripted proposal → Validate proposal → Review changes**, inspect the changes, confirm and **Apply & Save**. The scripted agent uses actual scoped local tools; it is not a real AI model. Manual dimension changes use the same command and require Save. See [E0.M5 evidence](docs/milestones/E0_M5_REPORT.md) and [tool catalog](docs/contracts/SEMANTIC_TOOLS_V1.json).
+
+For a guided native-data test choose **Load Demos** on installation **0.0.7**, then open **E0.M4 Native Version Lab**. Edit Notes → Apply properties, **Validate current content → Create immutable version → Save document**. Select an older version and **Restore as new revision**; history stays intact.
 
 The companion **E0.M4 Source Plate** demonstrates a real external definition. Change width in its geometry lab, build/keep, then validate/create version/publish/save. In the consumer choose **Check source updates → Validate candidate → Adopt validated candidate → Save**. Missing sources preserve the embedded effective snapshot; Pinned never auto-follows. The earlier spatial/geometry demos remain in expandable panels.
 
 Legacy projects stay unchanged until **Convert to native v1 → Save document**, which keeps their original bytes in a backup. The historical basename remains for Platform compatibility; formatVersion1 is the decoder discriminator. Keep project files, recovery journals and original backups when copying a study. Native snapshots carry the verified dependency closure for offline reopening. See [native storage ADR](docs/architecture/ADR-006-NATIVE-STORAGE.md) and [version resolver ADR](docs/architecture/ADR-007-NATIVE-VERSION-RESOLVER.md) for exact tested bounds.
 
-## Run the E0.M6 lab
+## Run the E0.M7 lab
 
 Requires Node.js 24+. Install the integrity-locked Platform SDK:
 

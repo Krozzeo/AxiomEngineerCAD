@@ -47,7 +47,7 @@ export async function startEditor({adapter, embeddingOrigin}) {
         if (result.closed) res.once('finish', () => { void adapter.shutdown(); });
         return respond(res, 200, (method.startsWith('cad.')||method.startsWith('proof.'))?result:{...result, hosted:!!embeddingOrigin});
       }
-      const assets = {'/':['index.html','text/html'], '/app.mjs':['app.mjs','text/javascript'], '/styles.css':['styles.css','text/css'], '/lab.mjs':['lab.mjs','text/javascript'], '/assembly.mjs':['assembly.mjs','text/javascript'], '/native.mjs':['native.mjs','text/javascript'], '/review.mjs':['review.mjs','text/javascript'], '/proof.mjs':['proof.mjs','text/javascript'], '/gpu-view.mjs':['gpu-view.mjs','text/javascript'], '/cad-camera.mjs':['cad-camera.mjs','text/javascript']};
+      const assets = {'/':['index.html','text/html'], '/app.mjs':['app.mjs','text/javascript'], '/styles.css':['styles.css','text/css'], '/lab.mjs':['lab.mjs','text/javascript'], '/assembly.mjs':['assembly.mjs','text/javascript'], '/native.mjs':['native.mjs','text/javascript'], '/review.mjs':['review.mjs','text/javascript'], '/proof.mjs':['proof.mjs','text/javascript'], '/gpu-view.mjs':['gpu-view.mjs','text/javascript'], '/cad-camera.mjs':['cad-camera.mjs','text/javascript'], '/integration.mjs':['integration.mjs','text/javascript']};
       const asset = assets[url.pathname];
       if (req.method !== 'GET' || !asset) return respond(res, 404, {code:'unsupportedCapability', message:'Not found.'});
       res.writeHead(200, {...headers, 'Content-Type':asset[1] + '; charset=utf-8'});

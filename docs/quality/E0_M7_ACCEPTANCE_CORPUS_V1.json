@@ -1,0 +1,257 @@
+{
+  "profile": "E0.M7-acceptance/1",
+  "status": "Measured experimental candidate; owner decision pending",
+  "nativeEnvelope": 1,
+  "minimumReaderForNewProfiles": "0.0.7",
+  "platform": "0.1.12",
+  "platformCommit": "6d240845cd77eb1879738d32c9f2b8fcfd7297c5",
+  "dependencies": {
+    "replicad": "1.2.0",
+    "replicad-opencascadejs": "1.1.0",
+    "planegcs": "1.3.0"
+  },
+  "boundsMm": {
+    "width": [
+      30,
+      70
+    ],
+    "height": [
+      20,
+      50
+    ],
+    "depth": [
+      5,
+      25
+    ],
+    "radius": [
+      1,
+      4
+    ]
+  },
+  "tolerances": {
+    "volumeAbsoluteMm3": 1e-06,
+    "matePositionAbsoluteMm": 1e-06,
+    "sketchResidualMm": 1e-07,
+    "pdfCoordinateMm": 0.0001
+  },
+  "fixtures": [
+    {
+      "id": "integrated-initial",
+      "width": 40,
+      "height": 30,
+      "depth": 10,
+      "radius": 3,
+      "volumeOracle": "12000 - 90*pi",
+      "sketchDof": 0,
+      "mateDof": 3,
+      "instanceZmm": 10
+    },
+    {
+      "id": "integrated-manual-depth",
+      "width": 40,
+      "height": 30,
+      "depth": 15,
+      "radius": 3,
+      "volumeOracle": "18000 - 135*pi",
+      "instanceZmm": 15
+    },
+    {
+      "id": "integrated-reviewed-width",
+      "width": 60,
+      "height": 30,
+      "depth": 15,
+      "radius": 3,
+      "volumeOracle": "27000 - 135*pi",
+      "instanceZmm": 15
+    },
+    {
+      "id": "integrated-retained-initial",
+      "width": 40,
+      "height": 30,
+      "depth": 10,
+      "radius": 3,
+      "readOnly": true
+    }
+  ],
+  "tests": "tests/integration.test.mjs (15) plus retained85; browser-integration.mjs; verify-vector-pdf.py --integrated; verify-integration-installation.mjs",
+  "failureCases": [
+    "unknown profile version",
+    "actual 0.0.6 reader",
+    "lost face/sketch/parameter/mate/drawing identity",
+    "legacy graph/Keep bypass",
+    "agent Apply",
+    "stale and cancelled proposal",
+    "portable copy",
+    "writer killed at prepared/replaced"
+  ],
+  "hardware": {
+    "devices": [
+      {
+        "vendorId": 4318,
+        "deviceId": 8066,
+        "vendorString": "",
+        "deviceString": "NVIDIA GeForce GTX 1650",
+        "driverVendor": "NVIDIA",
+        "driverVersion": "32.0.16.1692"
+      },
+      {
+        "vendorId": 5140,
+        "deviceId": 140,
+        "vendorString": "",
+        "deviceString": "Microsoft Basic Render Driver",
+        "driverVendor": "",
+        "driverVersion": "10.0.19041.5794"
+      }
+    ],
+    "browser": "156.0.8078.74",
+    "flags": [],
+    "softwareForced": false
+  },
+  "actualGpu": {
+    "state": "ready",
+    "vendor": "nvidia",
+    "architecture": "turing",
+    "device": "",
+    "description": "",
+    "isFallbackAdapter": false,
+    "classification": "hardware-adapter",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36"
+  },
+  "measuredInitial": {
+    "profile": "E0.M7-chain/1",
+    "sketch": {
+      "id": "sketch-main",
+      "status": "FullyDefined",
+      "dof": 0,
+      "maxResidualMm": 0,
+      "widthMm": 40,
+      "heightMm": 30
+    },
+    "extrusion": {
+      "id": "extrude-base",
+      "sourceSketchId": "sketch-main",
+      "volumeMm3": 12000,
+      "topFaceZmm": 10
+    },
+    "dependent": {
+      "id": "feature-geometry",
+      "producerId": "extrude-base",
+      "role": "top",
+      "state": "ResolvedReidentified",
+      "volumeMm3": 11717.256661176916,
+      "areaMm2": 3931.9468914507706
+    },
+    "mate": {
+      "id": "mate-on-top",
+      "instanceId": "instance-cap",
+      "status": "UnderDefined",
+      "dof": 3,
+      "position": [
+        -10,
+        0,
+        10.000000749060682
+      ],
+      "sourceFaceZmm": 10,
+      "childBottomZmm": 0,
+      "maxResidualMm": 7.490606819260393e-07
+    },
+    "drawing": {
+      "id": "drawing-binding",
+      "producerId": "feature-geometry",
+      "parameterId": "parameter-width",
+      "widthMm": 40,
+      "template": "A4-third-angle/1"
+    }
+  },
+  "measuredCurrent": {
+    "profile": "E0.M7-chain/1",
+    "sketch": {
+      "id": "sketch-main",
+      "status": "FullyDefined",
+      "dof": 0,
+      "maxResidualMm": 0,
+      "widthMm": 60,
+      "heightMm": 30
+    },
+    "extrusion": {
+      "id": "extrude-base",
+      "sourceSketchId": "sketch-main",
+      "volumeMm3": 27000,
+      "topFaceZmm": 15
+    },
+    "dependent": {
+      "id": "feature-geometry",
+      "producerId": "extrude-base",
+      "role": "top",
+      "state": "ResolvedReidentified",
+      "volumeMm3": 26575.88499176538,
+      "areaMm2": 6526.194671058466
+    },
+    "mate": {
+      "id": "mate-on-top",
+      "instanceId": "instance-cap",
+      "status": "UnderDefined",
+      "dof": 3,
+      "position": [
+        -15,
+        0,
+        15.00000074906201
+      ],
+      "sourceFaceZmm": 15,
+      "childBottomZmm": 0,
+      "maxResidualMm": 7.490620106409551e-07
+    },
+    "drawing": {
+      "id": "drawing-binding",
+      "producerId": "feature-geometry",
+      "parameterId": "parameter-width",
+      "widthMm": 60,
+      "template": "A4-third-angle/1"
+    }
+  },
+  "ownerDecision": null,
+  "e1Started": false,
+  "fixtureGraphHash": "sha256:f29aec666d68d7a8dae5dfdbfefb790ed0c945997421a30299fc7b7453739221",
+  "measuredIntegratedProof": {
+    "fixture": "integrated-initial",
+    "runs": [
+      {
+        "wallMs": 591.7867,
+        "kernelBuildMs": 437.94180000000006,
+        "peakRssBytes": 177209344,
+        "heapUsedBytes": 41107072,
+        "policy": "Isolated process, 192 MiB JS old-space, finite typed inputs, parent deadline; RSS postcondition is not an OS hard memory quota."
+      },
+      {
+        "wallMs": 608.9264000000001,
+        "kernelBuildMs": 458.25169999999997,
+        "peakRssBytes": 176570368,
+        "heapUsedBytes": 39317856,
+        "policy": "Isolated process, 192 MiB JS old-space, finite typed inputs, parent deadline; RSS postcondition is not an OS hard memory quota."
+      },
+      {
+        "wallMs": 600.7682,
+        "kernelBuildMs": 450.28720000000004,
+        "peakRssBytes": 174940160,
+        "heapUsedBytes": 37764616,
+        "policy": "Isolated process, 192 MiB JS old-space, finite typed inputs, parent deadline; RSS postcondition is not an OS hard memory quota."
+      },
+      {
+        "wallMs": 603.5026000000003,
+        "kernelBuildMs": 449.6343,
+        "peakRssBytes": 175849472,
+        "heapUsedBytes": 38760592,
+        "policy": "Isolated process, 192 MiB JS old-space, finite typed inputs, parent deadline; RSS postcondition is not an OS hard memory quota."
+      },
+      {
+        "wallMs": 601.2269999999999,
+        "kernelBuildMs": 452.49580000000003,
+        "peakRssBytes": 175063040,
+        "heapUsedBytes": 37716688,
+        "policy": "Isolated process, 192 MiB JS old-space, finite typed inputs, parent deadline; RSS postcondition is not an OS hard memory quota."
+      }
+    ],
+    "scope": "Five isolated cold workers on recorded Windows/Node device; observed values, not universal guarantees",
+    "hardLimits": "Existing60s maximum parent deadline;192MiB JS old-space; process RSS postcondition is not OS quota"
+  }
+}
