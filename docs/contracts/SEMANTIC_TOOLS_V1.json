@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "status": "E0.M5 experimental; owner review pending",
-  "productVersion": "0.0.7",
+  "status": "E0 measured baseline Go approved; E1.M1 ReadOnly additions in review",
+  "productVersion": "0.1.0",
   "envelope": {
     "type": "object",
     "properties": {
@@ -246,6 +246,340 @@
     "additionalProperties": false
   },
   "tools": [
+    {
+      "name": "cad.workbench.inspect.v1",
+      "version": "1",
+      "schemaVersion": 1,
+      "capability": "cad.workbench.inspect",
+      "effects": [
+        "ReadOnly"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 4096
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 25
+          },
+          "maxBytes": {
+            "type": "integer",
+            "minimum": 512,
+            "maximum": 16384
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "receipt": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "type": "integer",
+                "const": 1
+              },
+              "operationId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 96
+              },
+              "traceId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 96
+              },
+              "actor": {
+                "type": "object"
+              },
+              "scope": {
+                "type": "object"
+              },
+              "toolName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96
+              },
+              "toolVersion": {
+                "type": "string",
+                "const": "1"
+              },
+              "effectClass": {
+                "type": "string",
+                "enum": [
+                  "ReadOnly",
+                  "LocalProposal",
+                  "MainMutation"
+                ]
+              },
+              "baseRevision": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "outcome": {
+                "type": "string",
+                "enum": [
+                  "accepted",
+                  "completed",
+                  "rejected",
+                  "failed",
+                  "cancelled"
+                ]
+              },
+              "result": {
+                "type": "object"
+              },
+              "error": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "message": {
+                    "type": "string",
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "code",
+                  "message"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "operationId",
+              "traceId",
+              "outcome"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "receipt"
+        ],
+        "additionalProperties": false
+      },
+      "description": "Page source-linked feature, component, mate and canonical datum identities without modifying the document.",
+      "units": {
+        "length": [
+          "mm",
+          "cm",
+          "m",
+          "inch"
+        ],
+        "count": "scalar",
+        "volume": "mm3",
+        "area": "mm2",
+        "angle": "rad"
+      },
+      "preconditions": [
+        "server-issued actor/session authority",
+        "expected document/dependency revisions",
+        "native v1 for model mutations"
+      ],
+      "recovery": "Inspect operation receipt; never blindly replay unknown effects.",
+      "limits": {
+        "maxInputBytes": 16384,
+        "maxOutputBytes": 16384
+      }
+    },
+    {
+      "name": "cad.selection.inspect.v1",
+      "version": "1",
+      "schemaVersion": 1,
+      "capability": "cad.selection.inspect",
+      "effects": [
+        "ReadOnly"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "vertex",
+              "edge",
+              "face",
+              "body",
+              "instance",
+              "feature",
+              "datum"
+            ]
+          },
+          "definitionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 96
+          },
+          "producerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 96
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 96
+          },
+          "occurrencePath": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 9,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 96
+            }
+          }
+        },
+        "required": [
+          "kind",
+          "definitionId",
+          "producerId",
+          "role",
+          "occurrencePath"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "receipt": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "type": "integer",
+                "const": 1
+              },
+              "operationId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 96
+              },
+              "traceId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 96
+              },
+              "actor": {
+                "type": "object"
+              },
+              "scope": {
+                "type": "object"
+              },
+              "toolName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96
+              },
+              "toolVersion": {
+                "type": "string",
+                "const": "1"
+              },
+              "effectClass": {
+                "type": "string",
+                "enum": [
+                  "ReadOnly",
+                  "LocalProposal",
+                  "MainMutation"
+                ]
+              },
+              "baseRevision": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "outcome": {
+                "type": "string",
+                "enum": [
+                  "accepted",
+                  "completed",
+                  "rejected",
+                  "failed",
+                  "cancelled"
+                ]
+              },
+              "result": {
+                "type": "object"
+              },
+              "error": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "message": {
+                    "type": "string",
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "code",
+                  "message"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "operationId",
+              "traceId",
+              "outcome"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "receipt"
+        ],
+        "additionalProperties": false
+      },
+      "description": "Resolve a stable semantic target in its exact occurrence through the real worker, independently of GPU pixel IDs.",
+      "units": {
+        "length": [
+          "mm",
+          "cm",
+          "m",
+          "inch"
+        ],
+        "count": "scalar",
+        "volume": "mm3",
+        "area": "mm2",
+        "angle": "rad"
+      },
+      "preconditions": [
+        "server-issued actor/session authority",
+        "expected document/dependency revisions",
+        "native v1 for model mutations"
+      ],
+      "recovery": "Inspect operation receipt; never blindly replay unknown effects.",
+      "limits": {
+        "maxInputBytes": 16384,
+        "maxOutputBytes": 16384
+      }
+    },
     {
       "name": "cad.integration.inspect.v1",
       "version": "1",

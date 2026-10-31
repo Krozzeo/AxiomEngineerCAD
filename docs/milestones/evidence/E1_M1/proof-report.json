@@ -1,0 +1,105 @@
+{
+  "passed": true,
+  "creator": {
+    "version": "0.1.0",
+    "commit": null,
+    "channel": "development"
+  },
+  "drawing": {
+    "sheet": "A4",
+    "widthBeforeMm": 40,
+    "widthAfterMm": 60,
+    "hiddenFront": 2,
+    "hiddenRight": 2,
+    "staleExportDenied": true,
+    "saveReopen": true
+  },
+  "gpu": {
+    "state": "ready",
+    "vendor": "nvidia",
+    "architecture": "turing",
+    "device": "",
+    "description": "",
+    "isFallbackAdapter": false,
+    "classification": "hardware-adapter",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+    "picks": [
+      {
+        "case": "top face occludes bottom",
+        "role": "top",
+        "kind": "face"
+      },
+      {
+        "case": "top/front edge",
+        "role": "front+top",
+        "kind": "edge"
+      },
+      {
+        "case": "repeated component",
+        "path": [
+          "definition-main",
+          "instance-a"
+        ],
+        "kind": "instance"
+      },
+      {
+        "case": "repeated component",
+        "path": [
+          "definition-main",
+          "instance-b"
+        ],
+        "kind": "instance"
+      },
+      {
+        "case": "front face occludes back",
+        "role": "front",
+        "kind": "face"
+      }
+    ],
+    "deviceLoss": true,
+    "metrics": {
+      "drawCount": 23,
+      "renderTimes": [
+        48.859999895095825,
+        4.684999942779541,
+        3.380000114440918,
+        4.75,
+        5.68500018119812,
+        2.8550000190734863,
+        1.6150000095367432,
+        4.710000038146973,
+        3.5999999046325684,
+        3.4049999713897705,
+        2.81000018119812,
+        2.8299999237060547,
+        3.9100000858306885,
+        5.335000038146973,
+        3.115000009536743,
+        1.244999885559082,
+        3.825000047683716,
+        3.1999998092651367,
+        3.5399999618530273,
+        5.565000057220459,
+        3.0950000286102295,
+        6.5950000286102295,
+        3.380000114440918
+      ],
+      "errors": [],
+      "buildMs": 447.707,
+      "resources": {
+        "peakRssBytes": 173445120,
+        "heapUsedBytes": 37511360,
+        "policy": "Isolated process, 192 MiB JS old-space, finite typed inputs, parent deadline; RSS postcondition is not an OS hard memory quota."
+      },
+      "pickReadbacks": [
+        4.1549999713897705,
+        2.630000114440918,
+        3.684999942779541,
+        3.1499998569488525,
+        2.804999828338623
+      ]
+    }
+  },
+  "offlineNoGPU": true,
+  "remoteTransmission": false
+}

@@ -1,13 +1,15 @@
 import {geometryExperiment} from './kernel.mjs';
 import {runSuite} from './suite.mjs';
 import {solveSketch,sketchFixture} from './sketch.mjs';
-import {check} from '../document.mjs';
+import {check,validate} from '../document.mjs';
+import {hash,PROVENANCE} from '../native/schema.mjs';
 import {solveAssembly} from '../assembly/solver.mjs';
 import {assemblySuite} from '../assembly/suite.mjs';
 import {verifyNative} from '../native/verify.mjs';
 import {verifyCommand} from '../commands/worker.mjs';
 import {buildProof} from '../proof/kernel.mjs';
 import {regenerateIntegration} from '../integration/engine.mjs';
+import {resolveSceneSelection,baseDatums} from '../workbench/model.mjs';
 process.once('message',async message=>{
   try{
     let result;
@@ -18,7 +20,8 @@ process.once('message',async message=>{
     else if(message.kind==='assembly-suite')result=assemblySuite();
     else if(message.kind==='native-verify')result=await verifyNative(message.payload.document);
     else if(message.kind==='command-validate')result=await verifyCommand(message.payload);
-    else if(message.kind==='drawing-proof')result=await buildProof(message.payload.document,{versionId:message.payload.versionId});
+    else if(message.kind==='drawing-proof')result=await buildProof(message.payload.document,{versionId:message.payload.versionId,viewportOnly:message.payload.viewportOnly});
+    else if(message.kind==='selection-inspect'){validate(message.payload.document);const proof=message.payload.target.kind==='datum'?{scene:{models:[],occurrences:[],datums:baseDatums(message.payload.document)}}:await buildProof(message.payload.document,{viewportOnly:true});result={...resolveSceneSelection(proof.scene,message.payload.target),source:{documentId:message.payload.document.documentId,revision:message.payload.document.revision,contentHash:hash(message.payload.document),creator:PROVENANCE.creator},authority:message.payload.target.kind==='datum'?'canonical definition reference frame':'exact supported B-Rep role'};}
     else if(message.kind==='integrated-geometry')result=(await regenerateIntegration(message.payload.document)).exact;
     else check(false,'UnsupportedCapability','Unknown lab task.');
     const maxRssBytes=process.resourceUsage().maxRSS*1024;

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "introducedIn": "0.0.6",
-  "status": "E0.M6 experimental; owner review pending",
+  "status": "E0 baseline Go approved; E1.M1 additive viewportOnly/selection filters in review",
   "profile": "E0.M6-proof/1",
   "prefix": "/v1/proof/",
   "authority": "human bearer + server-issued document/session + expected revision and proof manifest",
@@ -23,6 +23,13 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        },
+        "viewportOnly": {
+          "type": "boolean"
+        },
+        "versionId": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
         }
       },
       "required": [
@@ -71,9 +78,13 @@
         "kind": {
           "type": "string",
           "enum": [
-            "face",
+            "vertex",
             "edge",
-            "instance"
+            "face",
+            "body",
+            "instance",
+            "feature",
+            "datum"
           ]
         }
       },

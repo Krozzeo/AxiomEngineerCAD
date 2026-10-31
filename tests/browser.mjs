@@ -1,3 +1,4 @@
+import {waitEditorIdle} from './browser-support.mjs';
 import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';
 import {mkdtemp, mkdir, rm, readFile, writeFile} from 'node:fs/promises';
@@ -9,13 +10,14 @@ import {startHost} from '../node_modules/axiom-platform/services/local-host/serv
 const root = await mkdtemp(join(tmpdir(), 'engineer-browser-')), evidence = resolve(process.env.ENGINEER_EVIDENCE??'test-results');
 await mkdir(evidence, {recursive:true});
 let browser, child, host, direct;
-const report = {milestone:'E0.M7', platform:'0.1.12', providerCommit:'6d240845cd77eb1879738d32c9f2b8fcfd7297c5',
+const report = {milestone:'E1.M1', platform:'0.1.12', providerCommit:'6d240845cd77eb1879738d32c9f2b8fcfd7297c5',
   runtime:process.version, os:process.platform, architecture:process.arch, criteria:[], pageErrors:[],
   renderer:'Canvas CPU preview derived from actual OCCT tessellation; exact metrics from isolated CPU/Wasm; M6 WebGPU evidence is reported separately; no real AI model acceptance claimed'};
 try {
   browser = await chromium.launch(process.env.ENGINEER_HARDWARE==='1'?{executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true,ignoreDefaultArgs:['--disable-gpu-compositing']}:{headless:true});if(process.env.ENGINEER_HARDWARE==='1'){const cdp=await browser.newBrowserCDPSession(),info=await cdp.send('SystemInfo.getInfo');report.hardware={devices:info.gpu.devices.map(d=>({vendorId:d.vendorId,deviceId:d.deviceId,vendorString:d.vendorString,deviceString:d.deviceString,driverVendor:d.driverVendor,driverVersion:d.driverVersion})),browser:browser.version(),flags:[],softwareForced:false};} report.browser = browser.version();
   const context = await browser.newContext({viewport:{width:1440, height:960}});
   const observe = page => { page.setDefaultTimeout(15000); page.on('pageerror', e => report.pageErrors.push(e.message)); };
+  context.on('page',observe);
   child = spawn(process.execPath, ['src/cli.mjs', '--root', join(root, 'direct'), '--create', 'study', '--name', 'Direct lifecycle study'], {cwd:resolve('.'), windowsHide:true, stdio:['ignore','pipe','pipe']});
   const ready = await new Promise((yes, no) => {
     let output = '', errors = ''; const timer = setTimeout(() => no(Error('Direct startup deadline: ' + errors)), 15000);
@@ -24,7 +26,7 @@ try {
     child.once('exit', code => { clearTimeout(timer); no(Error('Direct process exited ' + code + ': ' + errors)); });
   });
   assert.equal(ready.ready, true);
-  direct = await context.newPage(); observe(direct); await direct.goto(ready.editorUrl);
+  direct = await context.newPage(); observe(direct); await direct.goto((ready.editorUrl).replace('/#','/?workspace=labs#'));await waitEditorIdle(direct);
   await direct.locator('#name:not([disabled])').waitFor();
   assert.equal(await direct.locator('#name').inputValue(), 'Direct lifecycle study');
   await direct.locator('#notes').fill('Provisional design intent: preserve this note after reopening.');
@@ -105,7 +107,7 @@ try {
   const card = hub.locator('#project-rows tr').first(); await card.getByText('Active · saved', {exact:true}).waitFor();
   const sessionId = await card.getAttribute('data-session-id');
   const session = host.manager.catalog().sessions.find(s => s.sessionId === sessionId);
-  await editor.goto(session.editorUrl); await editor.locator('#name:not([disabled])').waitFor();
+  await editor.goto((session.editorUrl).replace('/#','/?workspace=labs#'));await waitEditorIdle(editor); await editor.locator('#name:not([disabled])').waitFor();
   assert.equal(await editor.locator('#close').isVisible(), false);
   await editor.locator('#notes').fill('Created through the actual Platform Hub.');
   await editor.locator('#apply').click(); await editor.locator('#message').filter({hasText:'Properties applied'}).waitFor();
@@ -138,14 +140,14 @@ try {
   await hub.getByRole('link',{name:'Projects',exact:true}).click();
   const demoRow=hub.locator('#project-rows tr').filter({hasText:'E0.M3 Spatial Mate Lab'});await demoRow.getByRole('button',{name:'Open E0.M3 Spatial Mate Lab',exact:true}).click();await demoRow.getByText('Active · saved',{exact:true}).waitFor();
   const demoSessionId=await demoRow.getAttribute('data-session-id'),openedDemo=host.manager.catalog().sessions.find(s=>s.sessionId===demoSessionId);
-  const demoPage=await context.newPage();observe(demoPage);await demoPage.goto(openedDemo.editorUrl);await demoPage.waitForFunction(()=>document.querySelector('#assembly-json').value.includes('E0.M3-datums-v0'));
+  const demoPage=await context.newPage();observe(demoPage);await demoPage.goto((openedDemo.editorUrl).replace('/#','/?workspace=labs#'));await waitEditorIdle(demoPage);await demoPage.waitForFunction(()=>document.querySelector('#assembly-json').value.includes('E0.M3-datums-v0'));
   await demoPage.locator('#spatial-lab > summary').click();await demoPage.locator('#assembly-solve').click();await demoPage.locator('#assembly-status').filter({hasText:'UnderDefined · DOF 2'}).waitFor();await demoPage.screenshot({path:join(evidence,'spatial-demo.png'),fullPage:true});
   report.criteria.push('Actual Hub Load Demos registers both labs and opens/solves the native spatial demo in its installed product session');
   const {verifyNativeUI}=await import('./browser-native.mjs');await verifyNativeUI({hub,context,host,evidence,observe,report});
   const {verifyReviewUI}=await import('./browser-review.mjs');await verifyReviewUI({hub,context,host,evidence,observe,report});
   const {verifyProofUI}=await import('./browser-proof.mjs');await verifyProofUI({hub,context,host,evidence,observe,report});if(process.env.ENGINEER_HARDWARE==='1')assert.equal(report.proof.gpu.classification,'hardware-adapter');
   const {verifyIntegrationUI}=await import('./browser-integration.mjs');await verifyIntegrationUI({hub,context,host,evidence,observe,report});
-  assert.deepEqual(report.pageErrors, []); report.passed = true;
+  const {verifyWorkbenchUI}=await import('./browser-workbench.mjs');await verifyWorkbenchUI({hub,context,host,evidence,observe,report});assert.deepEqual(report.pageErrors, []); report.passed = true;
 } catch (error) { report.failure = error.stack; if (direct) await direct.screenshot({path:join(evidence, 'failure.png')}).catch(() => {}); throw error; }
 finally {
   await writeFile(join(evidence, 'browser-report.json'), JSON.stringify(report, null, 2) + '\n');

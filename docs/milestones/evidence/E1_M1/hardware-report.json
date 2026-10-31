@@ -1,0 +1,841 @@
+{
+  "milestone": "E1.M1",
+  "platform": "0.1.12",
+  "runtime": "v24.21.0",
+  "os": "win32",
+  "architecture": "x64",
+  "criteria": [
+    "E0.M6 exact A4 vector PDF/HLR and source-linked width regenerate 40→60, stale export refuses, save/reopen reproduces drawing; actual GPU picks are separately labeled; unavailable/lost GPU and denied/offline exposure preserve MAIN",
+    "E0.M7 one persisted sketch → actual extrusion → face-dependent cut → measured spatial mate → associative vector drawing; manual thickness and human-reviewed proposal width regenerate; retained version stays read-only; save/reopen preserves exact chain",
+    "E1.M1 actual default CAD workbench, tree/Inspector/source highlight, seven-class exact selection, keyboard/navigation and stable headless agent selection parity; UI-only changes preserve model; metadata save/reopen passes"
+  ],
+  "pageErrors": [],
+  "hardware": {
+    "devices": [
+      {
+        "vendorId": 4318,
+        "deviceId": 8066,
+        "vendorString": "",
+        "deviceString": "NVIDIA GeForce GTX 1650",
+        "driverVendor": "NVIDIA",
+        "driverVersion": "32.0.16.1692"
+      },
+      {
+        "vendorId": 5140,
+        "deviceId": 140,
+        "vendorString": "",
+        "deviceString": "Microsoft Basic Render Driver",
+        "driverVendor": "",
+        "driverVersion": "10.0.19041.5794"
+      }
+    ],
+    "browser": "156.0.8078.74",
+    "flags": [],
+    "softwareForced": false
+  },
+  "proof": {
+    "passed": true,
+    "creator": {
+      "version": "0.1.0",
+      "commit": null,
+      "channel": "development"
+    },
+    "drawing": {
+      "sheet": "A4",
+      "widthBeforeMm": 40,
+      "widthAfterMm": 60,
+      "hiddenFront": 2,
+      "hiddenRight": 2,
+      "staleExportDenied": true,
+      "saveReopen": true
+    },
+    "gpu": {
+      "state": "ready",
+      "vendor": "nvidia",
+      "architecture": "turing",
+      "device": "",
+      "description": "",
+      "isFallbackAdapter": false,
+      "classification": "hardware-adapter",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+      "picks": [
+        {
+          "case": "top face occludes bottom",
+          "role": "top",
+          "kind": "face"
+        },
+        {
+          "case": "top/front edge",
+          "role": "front+top",
+          "kind": "edge"
+        },
+        {
+          "case": "repeated component",
+          "path": [
+            "definition-main",
+            "instance-a"
+          ],
+          "kind": "instance"
+        },
+        {
+          "case": "repeated component",
+          "path": [
+            "definition-main",
+            "instance-b"
+          ],
+          "kind": "instance"
+        },
+        {
+          "case": "front face occludes back",
+          "role": "front",
+          "kind": "face"
+        }
+      ],
+      "deviceLoss": true,
+      "metrics": {
+        "drawCount": 23,
+        "renderTimes": [
+          48.859999895095825,
+          4.684999942779541,
+          3.380000114440918,
+          4.75,
+          5.68500018119812,
+          2.8550000190734863,
+          1.6150000095367432,
+          4.710000038146973,
+          3.5999999046325684,
+          3.4049999713897705,
+          2.81000018119812,
+          2.8299999237060547,
+          3.9100000858306885,
+          5.335000038146973,
+          3.115000009536743,
+          1.244999885559082,
+          3.825000047683716,
+          3.1999998092651367,
+          3.5399999618530273,
+          5.565000057220459,
+          3.0950000286102295,
+          6.5950000286102295,
+          3.380000114440918
+        ],
+        "errors": [],
+        "buildMs": 447.707,
+        "resources": {
+          "peakRssBytes": 173445120,
+          "heapUsedBytes": 37511360,
+          "policy": "Isolated process, 192 MiB JS old-space, finite typed inputs, parent deadline; RSS postcondition is not an OS hard memory quota."
+        },
+        "pickReadbacks": [
+          4.1549999713897705,
+          2.630000114440918,
+          3.684999942779541,
+          3.1499998569488525,
+          2.804999828338623
+        ]
+      }
+    },
+    "offlineNoGPU": true,
+    "remoteTransmission": false
+  },
+  "integration": {
+    "passed": true,
+    "creator": {
+      "version": "0.1.0",
+      "commit": null,
+      "channel": "development"
+    },
+    "initial": {
+      "profile": "E0.M7-chain/1",
+      "sketch": {
+        "id": "sketch-main",
+        "status": "FullyDefined",
+        "dof": 0,
+        "maxResidualMm": 0,
+        "widthMm": 40,
+        "heightMm": 30
+      },
+      "extrusion": {
+        "id": "extrude-base",
+        "sourceSketchId": "sketch-main",
+        "volumeMm3": 12000,
+        "topFaceZmm": 10
+      },
+      "dependent": {
+        "id": "feature-geometry",
+        "producerId": "extrude-base",
+        "role": "top",
+        "state": "ResolvedReidentified",
+        "volumeMm3": 11717.256661176916,
+        "areaMm2": 3931.9468914507706
+      },
+      "mate": {
+        "id": "mate-on-top",
+        "instanceId": "instance-cap",
+        "status": "UnderDefined",
+        "dof": 3,
+        "position": [
+          -10,
+          0,
+          10.000000749060682
+        ],
+        "sourceFaceZmm": 10,
+        "childBottomZmm": 0,
+        "maxResidualMm": 7.490606819260393e-7
+      },
+      "drawing": {
+        "id": "drawing-binding",
+        "producerId": "feature-geometry",
+        "parameterId": "parameter-width",
+        "widthMm": 40,
+        "template": "A4-third-angle/1"
+      }
+    },
+    "current": {
+      "profile": "E0.M7-chain/1",
+      "sketch": {
+        "id": "sketch-main",
+        "status": "FullyDefined",
+        "dof": 0,
+        "maxResidualMm": 0,
+        "widthMm": 60,
+        "heightMm": 30
+      },
+      "extrusion": {
+        "id": "extrude-base",
+        "sourceSketchId": "sketch-main",
+        "volumeMm3": 27000,
+        "topFaceZmm": 15
+      },
+      "dependent": {
+        "id": "feature-geometry",
+        "producerId": "extrude-base",
+        "role": "top",
+        "state": "ResolvedReidentified",
+        "volumeMm3": 26575.88499176538,
+        "areaMm2": 6526.194671058466
+      },
+      "mate": {
+        "id": "mate-on-top",
+        "instanceId": "instance-cap",
+        "status": "UnderDefined",
+        "dof": 3,
+        "position": [
+          -15,
+          0,
+          15.00000074906201
+        ],
+        "sourceFaceZmm": 15,
+        "childBottomZmm": 0,
+        "maxResidualMm": 7.490620106409551e-7
+      },
+      "drawing": {
+        "id": "drawing-binding",
+        "producerId": "feature-geometry",
+        "parameterId": "parameter-width",
+        "widthMm": 60,
+        "template": "A4-third-angle/1"
+      }
+    },
+    "historical": {
+      "profile": "E0.M7-chain/1",
+      "sketch": {
+        "id": "sketch-main",
+        "status": "FullyDefined",
+        "dof": 0,
+        "maxResidualMm": 0,
+        "widthMm": 40,
+        "heightMm": 30
+      },
+      "extrusion": {
+        "id": "extrude-base",
+        "sourceSketchId": "sketch-main",
+        "volumeMm3": 12000,
+        "topFaceZmm": 10
+      },
+      "dependent": {
+        "id": "feature-geometry",
+        "producerId": "extrude-base",
+        "role": "top",
+        "state": "ResolvedReidentified",
+        "volumeMm3": 11717.256661176916,
+        "areaMm2": 3931.9468914507706
+      },
+      "mate": {
+        "id": "mate-on-top",
+        "instanceId": "instance-cap",
+        "status": "UnderDefined",
+        "dof": 3,
+        "position": [
+          -10,
+          0,
+          10.000000749060682
+        ],
+        "sourceFaceZmm": 10,
+        "childBottomZmm": 0,
+        "maxResidualMm": 7.490606819260393e-7
+      },
+      "drawing": {
+        "id": "drawing-binding",
+        "producerId": "feature-geometry",
+        "parameterId": "parameter-width",
+        "widthMm": 40,
+        "template": "A4-third-angle/1"
+      }
+    },
+    "retainedVersion": "sha256:663ca404a9f2a66083b74bba3b08a0cdce63d5e5e96995f733c723b7e5012b3c",
+    "initialVolumeMm3": 11717.256661176916,
+    "currentVolumeMm3": 26575.88499176538,
+    "manualThicknessMm": 15,
+    "reviewedWidthMm": 60,
+    "saveReopen": true,
+    "historicalReadOnly": true,
+    "gpu": {
+      "state": "ready",
+      "vendor": "nvidia",
+      "architecture": "turing",
+      "device": "",
+      "description": "",
+      "isFallbackAdapter": false,
+      "classification": "hardware-adapter",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36"
+    },
+    "picks": [
+      {
+        "kind": "face",
+        "role": "top",
+        "areaMm2": 1171.7256661176916,
+        "centerOfAreaMm": [
+          1.1102230246251565e-15,
+          -4.280347578419995e-17,
+          10
+        ],
+        "planeNormal": [
+          0,
+          0,
+          1
+        ],
+        "occurrencePath": [
+          "definition-main"
+        ],
+        "definitionId": "definition-main",
+        "producerId": "feature-geometry",
+        "source": {
+          "documentId": "engineer-document://7151da26-2666-4d10-ad26-5d0b3cdeb041",
+          "revision": 0,
+          "contentHash": "sha256:2bd16a3ca238d302fdf4e197889c38a156910dbaf832a2ab839275afa3ea3010",
+          "versionId": null,
+          "readOnly": false
+        },
+        "canonicalUnit": "mm",
+        "frame": "definition-local",
+        "occurrenceTransform": {
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "quaternion": [
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        "resolution": "ResolvedStable",
+        "authority": "exact supported producer role; GPU ID is transient"
+      },
+      {
+        "kind": "face",
+        "role": "top",
+        "areaMm2": 144,
+        "centerOfAreaMm": [
+          0,
+          1.2952601953960158e-16,
+          8
+        ],
+        "planeNormal": [
+          0,
+          0,
+          1
+        ],
+        "occurrencePath": [
+          "definition-main",
+          "instance-cap"
+        ],
+        "definitionId": "definition-cap",
+        "producerId": "feature-cap",
+        "source": {
+          "documentId": "engineer-document://7151da26-2666-4d10-ad26-5d0b3cdeb041",
+          "revision": 0,
+          "contentHash": "sha256:2bd16a3ca238d302fdf4e197889c38a156910dbaf832a2ab839275afa3ea3010",
+          "versionId": null,
+          "readOnly": false
+        },
+        "canonicalUnit": "mm",
+        "frame": "definition-local",
+        "occurrenceTransform": {
+          "position": [
+            -10,
+            0,
+            10
+          ],
+          "quaternion": [
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        "resolution": "ResolvedStable",
+        "authority": "exact supported producer role; GPU ID is transient"
+      },
+      {
+        "kind": "face",
+        "role": "top",
+        "areaMm2": 144,
+        "centerOfAreaMm": [
+          0,
+          1.2952601953960158e-16,
+          8
+        ],
+        "planeNormal": [
+          0,
+          0,
+          1
+        ],
+        "occurrencePath": [
+          "definition-main",
+          "instance-cap"
+        ],
+        "definitionId": "definition-cap",
+        "producerId": "feature-cap",
+        "source": {
+          "documentId": "engineer-document://7151da26-2666-4d10-ad26-5d0b3cdeb041",
+          "revision": 1,
+          "contentHash": "sha256:c2c617726c798455fc48feb349372fa4de344c1d1463c017a3193574f60647a7",
+          "versionId": null,
+          "readOnly": false
+        },
+        "canonicalUnit": "mm",
+        "frame": "definition-local",
+        "occurrenceTransform": {
+          "position": [
+            -10,
+            0,
+            15
+          ],
+          "quaternion": [
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        "resolution": "ResolvedStable",
+        "authority": "exact supported producer role; GPU ID is transient"
+      }
+    ],
+    "ownerDecision": "Go approved; E1.M1 review pending",
+    "e1Started": true
+  },
+  "workbench": {
+    "passed": true,
+    "metrics": {
+      "initialBuildMs": 497.87829999999997,
+      "initialResources": {
+        "peakRssBytes": 181862400,
+        "heapUsedBytes": 40360488,
+        "policy": "Isolated process, 192 MiB JS old-space, finite typed inputs, parent deadline; RSS postcondition is not an OS hard memory quota."
+      },
+      "pickReadbacksMs": [
+        3.884999990463257,
+        3.4600000381469727,
+        3.494999885559082,
+        2.6499998569488525,
+        3.4100000858306885,
+        2.575000047683716,
+        3.1449999809265137
+      ],
+      "resolution": [
+        1135,
+        595
+      ],
+      "renderTimes": [
+        36.230000019073486,
+        4.3999998569488525,
+        2.5250000953674316,
+        3.7350001335144043,
+        2.9800000190734863,
+        24.43499994277954,
+        2.7899999618530273,
+        3.6750001907348633,
+        3.9100000858306885,
+        3.2100000381469727,
+        3.575000047683716,
+        4.134999990463257,
+        3.7749998569488525,
+        3.1649999618530273,
+        3.4700000286102295,
+        3.7149999141693115,
+        4.109999895095825,
+        4.045000076293945,
+        3.930000066757202,
+        3.880000114440918,
+        4.639999866485596,
+        3.9649999141693115,
+        3.734999895095825,
+        3.5749998092651367,
+        3.5950000286102295,
+        2.9749999046325684,
+        2.9799997806549072,
+        2.330000162124634,
+        7.700000047683716,
+        2.9750001430511475,
+        3,
+        4.894999980926514,
+        3.555000066757202,
+        4.419999837875366,
+        3.509999990463257,
+        3.4649999141693115,
+        2.990000009536743,
+        3.115000009536743,
+        2.7699999809265137,
+        2.9800000190734863,
+        3.549999952316284,
+        3.265000104904175,
+        3.049999952316284,
+        3.674999952316284,
+        3.4749999046325684,
+        2.994999885559082,
+        3.684999942779541,
+        2.93999981880188,
+        2.990000009536743,
+        3.3500001430511475,
+        2.805000066757202,
+        3.134999990463257,
+        3.080000162124634,
+        2.9800000190734863,
+        2.990000009536743,
+        3.075000047683716,
+        3.5799999237060547,
+        2.6649999618530273,
+        3.0850000381469727,
+        3.06499981880188,
+        4.069999933242798,
+        3.049999952316284,
+        9.505000114440918,
+        3.565000057220459,
+        4.865000009536743,
+        3.510000228881836,
+        5.380000114440918,
+        5.325000047683716
+      ],
+      "reopenedRenderTimes": [
+        35.09999990463257
+      ]
+    },
+    "creator": {
+      "version": "0.1.0",
+      "commit": null,
+      "channel": "development"
+    },
+    "profile": "E1.M1-workbench/1",
+    "emptyProjectReferenceUI": true,
+    "gpu": {
+      "state": "ready",
+      "vendor": "nvidia",
+      "architecture": "turing",
+      "device": "",
+      "description": "",
+      "isFallbackAdapter": false,
+      "classification": "hardware-adapter",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36"
+    },
+    "picks": [
+      {
+        "kind": "vertex",
+        "role": "back+right+top",
+        "pointMm": [
+          20,
+          15,
+          10
+        ],
+        "occurrencePath": [
+          "definition-main"
+        ],
+        "definitionId": "definition-main",
+        "producerId": "feature-geometry",
+        "source": {
+          "documentId": "engineer-document://25bb3f7f-d11a-42af-8107-4a0bd7a389a6",
+          "revision": 0,
+          "contentHash": "sha256:b0b6972f508a4904c601db5c404bd134f2b03810b50f0ac0d47d4ec8921988bf",
+          "versionId": null,
+          "readOnly": false
+        },
+        "canonicalUnit": "mm",
+        "frame": "definition-local",
+        "occurrenceTransform": {
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "quaternion": [
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        "resolution": "ResolvedStable",
+        "authority": "exact supported producer role; GPU ID is transient"
+      },
+      {
+        "kind": "edge",
+        "role": "front+top",
+        "lengthMm": 40,
+        "occurrencePath": [
+          "definition-main"
+        ],
+        "definitionId": "definition-main",
+        "producerId": "feature-geometry",
+        "source": {
+          "documentId": "engineer-document://25bb3f7f-d11a-42af-8107-4a0bd7a389a6",
+          "revision": 0,
+          "contentHash": "sha256:b0b6972f508a4904c601db5c404bd134f2b03810b50f0ac0d47d4ec8921988bf",
+          "versionId": null,
+          "readOnly": false
+        },
+        "canonicalUnit": "mm",
+        "frame": "definition-local",
+        "occurrenceTransform": {
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "quaternion": [
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        "resolution": "ResolvedStable",
+        "authority": "exact supported producer role; GPU ID is transient"
+      },
+      {
+        "kind": "face",
+        "role": "top",
+        "areaMm2": 1171.7256661176916,
+        "centerOfAreaMm": [
+          1.1102230246251565e-15,
+          -4.280347578419995e-17,
+          10
+        ],
+        "planeNormal": [
+          0,
+          0,
+          1
+        ],
+        "occurrencePath": [
+          "definition-main"
+        ],
+        "definitionId": "definition-main",
+        "producerId": "feature-geometry",
+        "source": {
+          "documentId": "engineer-document://25bb3f7f-d11a-42af-8107-4a0bd7a389a6",
+          "revision": 0,
+          "contentHash": "sha256:b0b6972f508a4904c601db5c404bd134f2b03810b50f0ac0d47d4ec8921988bf",
+          "versionId": null,
+          "readOnly": false
+        },
+        "canonicalUnit": "mm",
+        "frame": "definition-local",
+        "occurrenceTransform": {
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "quaternion": [
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        "resolution": "ResolvedStable",
+        "authority": "exact supported producer role; GPU ID is transient"
+      },
+      {
+        "occurrencePath": [
+          "definition-main"
+        ],
+        "definitionId": "definition-main",
+        "producerId": "feature-geometry",
+        "kind": "body",
+        "role": "solid",
+        "volumeMm3": 11717.256661176918,
+        "areaMm2": 3931.9468914507706,
+        "source": {
+          "documentId": "engineer-document://25bb3f7f-d11a-42af-8107-4a0bd7a389a6",
+          "revision": 0,
+          "contentHash": "sha256:b0b6972f508a4904c601db5c404bd134f2b03810b50f0ac0d47d4ec8921988bf",
+          "versionId": null,
+          "readOnly": false
+        },
+        "canonicalUnit": "mm",
+        "frame": "definition-local",
+        "occurrenceTransform": {
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "quaternion": [
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        "resolution": "ResolvedStable",
+        "authority": "exact supported producer role; GPU ID is transient"
+      },
+      {
+        "occurrencePath": [
+          "definition-main"
+        ],
+        "definitionId": "definition-main",
+        "producerId": "feature-geometry",
+        "kind": "feature",
+        "role": "result",
+        "source": {
+          "documentId": "engineer-document://25bb3f7f-d11a-42af-8107-4a0bd7a389a6",
+          "revision": 0,
+          "contentHash": "sha256:b0b6972f508a4904c601db5c404bd134f2b03810b50f0ac0d47d4ec8921988bf",
+          "versionId": null,
+          "readOnly": false
+        },
+        "canonicalUnit": "mm",
+        "frame": "definition-local",
+        "occurrenceTransform": {
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "quaternion": [
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        "resolution": "ResolvedStable",
+        "authority": "exact supported producer role; GPU ID is transient"
+      },
+      {
+        "occurrencePath": [
+          "definition-main",
+          "instance-cap"
+        ],
+        "definitionId": "definition-cap",
+        "producerId": "feature-cap",
+        "kind": "instance",
+        "role": "occurrence",
+        "source": {
+          "documentId": "engineer-document://25bb3f7f-d11a-42af-8107-4a0bd7a389a6",
+          "revision": 0,
+          "contentHash": "sha256:b0b6972f508a4904c601db5c404bd134f2b03810b50f0ac0d47d4ec8921988bf",
+          "versionId": null,
+          "readOnly": false
+        },
+        "canonicalUnit": "mm",
+        "frame": "definition-local",
+        "occurrenceTransform": {
+          "position": [
+            -10,
+            0,
+            10
+          ],
+          "quaternion": [
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        "resolution": "ResolvedStable",
+        "authority": "exact supported producer role; GPU ID is transient"
+      },
+      {
+        "id": "datum-xy",
+        "kind": "datum",
+        "datumType": "plane",
+        "role": "xy",
+        "name": "XY plane",
+        "originMm": [
+          0,
+          0,
+          0
+        ],
+        "normal": [
+          0,
+          0,
+          1
+        ],
+        "definitionId": "definition-main",
+        "producerId": "reference-frame",
+        "occurrencePath": [
+          "definition-main"
+        ],
+        "selectionId": 62,
+        "source": {
+          "documentId": "engineer-document://25bb3f7f-d11a-42af-8107-4a0bd7a389a6",
+          "revision": 0,
+          "contentHash": "sha256:b0b6972f508a4904c601db5c404bd134f2b03810b50f0ac0d47d4ec8921988bf",
+          "versionId": null,
+          "readOnly": false
+        },
+        "canonicalUnit": "mm",
+        "frame": "definition-local",
+        "occurrenceTransform": {
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "quaternion": [
+            0,
+            0,
+            0,
+            1
+          ]
+        },
+        "resolution": "ResolvedStable",
+        "authority": "exact supported producer role; GPU ID is transient"
+      }
+    ],
+    "semanticToolAgentParity": true,
+    "keyboard": true,
+    "navigation": [
+      "select drag unchanged",
+      "middle orbit",
+      "shift middle pan",
+      "Escape rollback",
+      "trackpad preset",
+      "keyboard",
+      "orthographic/perspective",
+      "normal-to",
+      "fit"
+    ],
+    "sourceHighlight": true,
+    "documentUnchangedByNavigation": true,
+    "saveReopen": true,
+    "errors": []
+  },
+  "passed": true
+}

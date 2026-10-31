@@ -1,10 +1,11 @@
+import {waitEditorIdle} from './browser-support.mjs';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {join} from 'node:path';
 import {randomUUID} from 'node:crypto';
 export async function verifyReviewUI({hub,context,host,evidence,observe,report}){
   const name='E0.M5 Review Lab',entry=host.manager.catalog().recents.find(p=>p.name===name);assert.ok(entry);
-  const open=async()=>{const row=hub.locator('#project-rows tr').filter({hasText:name});await row.getByRole('button',{name:'Open '+name,exact:true}).click();await row.getByText('Active · saved',{exact:true}).waitFor();const sid=await row.getAttribute('data-session-id'),session=host.manager.catalog().sessions.find(s=>s.sessionId===sid),page=await context.newPage();observe(page);await page.goto(session.editorUrl);await page.locator('#review-lab > summary').click();await page.locator('#review-feature option[value="feature-geometry"]').waitFor({state:'attached'});return {row,session,page};};
+  const open=async()=>{const row=hub.locator('#project-rows tr').filter({hasText:name});await row.getByRole('button',{name:'Open '+name,exact:true}).click();await row.getByText('Active · saved',{exact:true}).waitFor();const sid=await row.getAttribute('data-session-id'),session=host.manager.catalog().sessions.find(s=>s.sessionId===sid),page=await context.newPage();observe(page);await page.goto((session.editorUrl).replace('/#','/?workspace=labs#'));await waitEditorIdle(page);await page.locator('#review-lab > summary').click();await page.locator('#review-feature option[value="feature-geometry"]').waitFor({state:'attached'});return {row,session,page};};
   const save=async(p,revision)=>{await p.waitForFunction(r=>document.querySelector('#revision').textContent===String(r),revision);const r=p.waitForResponse(r=>r.url().endsWith('/v1/save'));await p.locator('#save').click();const response=await r;assert.equal(response.status(),200,await response.text());};
   let item=await open(),p=item.page;const before=await readFile(entry.path);
   await p.locator('#review-script').click();await p.locator('#review-status').filter({hasText:'Isolated proposal prepared'}).waitFor();assert.deepEqual(await readFile(entry.path),before);

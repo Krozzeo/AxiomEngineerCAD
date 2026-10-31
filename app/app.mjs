@@ -1,7 +1,7 @@
 const $ = id => document.getElementById(id);
 let token = new URLSearchParams(location.hash.slice(1)).get('token') ?? sessionStorage.getItem('engineer-token');
 if (token) sessionStorage.setItem('engineer-token', token);
-history.replaceState(null, '', location.pathname);
+history.replaceState(null, '', location.pathname+location.search);
 let state, pending = false, closed = false, sequence = 0, chain = Promise.resolve();
 const clientId = crypto.randomUUID();
 async function request(path, data) {

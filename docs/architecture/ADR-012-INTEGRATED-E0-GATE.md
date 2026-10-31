@@ -28,3 +28,7 @@ Rejected alternatives: flat final recipe alone fails to prove stored sketch/feat
 ## Owner decision
 
 **Go:** accept measured E0 architecture candidate and authorize E1 planning with remaining risks above. **Redesign:** name the rejected foundation/profile; require a new ADR/proof before dependent expansion. **Stop:** preserve builds/documents/evidence and halt expansion. Owner decision/date: **pending**. CI/publication and previous milestone validation do not sign this gate.
+
+## Owner progression decision —2026-10-31
+
+After the published0.0.7 dossier and actual public installation proof, owner instructed: “Genial, comienza con la siguiente E, la 0.1.0”. Recorded as **Go for E1 progression within the measured E0 bounds**; see [decision record](E0_OWNER_GO_2026_10_31.json). Prior pending text above is the original review-candidate state, not the current gate. Remaining broad risks stay tracked; no main merge/full MVP acceptance implied.
