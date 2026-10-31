@@ -1,3 +1,4 @@
+import {editorDocument as document} from './editor-document.mjs';
 const $ = id => document.getElementById(id);
 let token = new URLSearchParams(location.hash.slice(1)).get('token') ?? sessionStorage.getItem('engineer-token');
 if (token) sessionStorage.setItem('engineer-token', token);

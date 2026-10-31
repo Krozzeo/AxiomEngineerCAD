@@ -1,3 +1,4 @@
+import {editorDocument as document} from './editor-document.mjs';
 const $=id=>document.getElementById(id);
 let documentState,labState,lastReport=null,active=null,loading=false,triangles=[],selected=null,sketchTransform=null,rasterHits=null;
 const token=()=>new URLSearchParams(location.hash.slice(1)).get('token')??sessionStorage.getItem('engineer-token');

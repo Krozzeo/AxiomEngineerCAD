@@ -1,3 +1,4 @@
+import {editorDocument as document} from './editor-document.mjs';
 const $=id=>document.getElementById(id);let catalog,context,selected=null,job=null,phase=null,automation=null,reviewHash=null,polling=false,lastWidth=null;
 const humanToken=()=>sessionStorage.getItem('engineer-token')??new URLSearchParams(location.hash.slice(1)).get('token');
 async function api(path,data,agent=false){const r=await fetch('/v1/cad/'+(agent?'agent/':'')+path,{method:data?'POST':'GET',headers:{Authorization:'Bearer '+(agent?automation.token:humanToken()),...(data?{'Content-Type':'application/json'}:{})},body:data?JSON.stringify(data):undefined});const v=await r.json();if(!r.ok)throw Error((v.code??'OperationFailed')+': '+v.message);return v;}

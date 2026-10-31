@@ -1,0 +1,155 @@
+{
+  "profile": "E1.M1-UX/1",
+  "software": "0.1.1",
+  "platform": "0.1.12",
+  "engineReference": "fc2613243f0e52623dc053de5d9bd0796e4e7024",
+  "evidenceKind": "Local physical Chrome156 / NVIDIA Turing, no forced software adapter; final public-install evidence is external to this pre-publication profile",
+  "tests": 123,
+  "docking": {
+    "passed": true,
+    "fit": [
+      {
+        "width": 1650,
+        "height": 1050,
+        "scrollWidth": 1650,
+        "scrollHeight": 1050,
+        "canvas": {
+          "x": 224,
+          "y": 149,
+          "width": 1132,
+          "height": 722,
+          "top": 149,
+          "right": 1356,
+          "bottom": 871,
+          "left": 224
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1650,
+          "height": 36,
+          "top": 0,
+          "right": 1650,
+          "bottom": 36,
+          "left": 0
+        },
+        "menu": {
+          "x": 133.234375,
+          "y": 0,
+          "width": 193.71875,
+          "height": 35,
+          "top": 0,
+          "right": 326.953125,
+          "bottom": 35,
+          "left": 133.234375
+        }
+      },
+      {
+        "width": 1280,
+        "height": 720,
+        "scrollWidth": 1280,
+        "scrollHeight": 720,
+        "canvas": {
+          "x": 224,
+          "y": 187,
+          "width": 762,
+          "height": 354,
+          "top": 187,
+          "right": 986,
+          "bottom": 541,
+          "left": 224
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 36,
+          "top": 0,
+          "right": 1280,
+          "bottom": 36,
+          "left": 0
+        },
+        "menu": {
+          "x": 133.234375,
+          "y": 0,
+          "width": 193.71875,
+          "height": 35,
+          "top": 0,
+          "right": 326.953125,
+          "bottom": 35,
+          "left": 133.234375
+        }
+      },
+      {
+        "width": 800,
+        "height": 600,
+        "scrollWidth": 800,
+        "scrollHeight": 600,
+        "canvas": {
+          "x": 224,
+          "y": 172,
+          "width": 300,
+          "height": 249,
+          "top": 172,
+          "right": 524,
+          "bottom": 421,
+          "left": 224
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 800,
+          "height": 36,
+          "top": 0,
+          "right": 800,
+          "bottom": 36,
+          "left": 0
+        },
+        "menu": {
+          "x": 133.234375,
+          "y": 0,
+          "width": 193.71875,
+          "height": 35,
+          "top": 0,
+          "right": 326.953125,
+          "bottom": 35,
+          "left": 133.234375
+        }
+      }
+    ],
+    "zoom": [
+      {
+        "projection": "orthographic",
+        "pixel": [
+          0.6000177767127752,
+          0.3431854322552681
+        ],
+        "driftPixels": 0.21980628805668234
+      },
+      {
+        "projection": "perspective",
+        "pixel": [
+          0.600646926673495,
+          0.34219899727989844
+        ],
+        "driftPixels": 0.2555864022743682
+      }
+    ],
+    "horizontalOrbitReversed": true,
+    "allFiveDocks": true,
+    "dragDrop": true,
+    "keyboardResize": true,
+    "pointerResize": true,
+    "allPanelsClosedRecovery": true,
+    "closeReopen": true,
+    "persistReload": true,
+    "sameLiveInspectorAndCanvas": true,
+    "separateInspectorSelection": true,
+    "separateModelWithMainDrawing": true,
+    "childCloseReturnsPanel": true,
+    "popupBlockedPreservesPanel": true,
+    "separateModelWheel": true,
+    "documentUnchanged": true,
+    "errors": []
+  }
+}

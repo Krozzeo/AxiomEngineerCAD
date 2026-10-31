@@ -1,3 +1,11 @@
+# 0.1.1 — E1.M1 UX review revision
+
+- Compact one-line logo/menus with Panels, SVG icons, gray CAD view and no outer document scroll.
+- Adapt Game Engine five-zone docking, tab drag/reorder, resize, close/reopen/reset and live separate windows, with preserved MIT attribution.
+- Persist validated layout in a separate project sidecar; retain native revisions, identity, exact geometry and existing review/security guards.
+- Reverse horizontal orbit; wheel zoom anchors at cursor surface/plane in orthographic and perspective.
+- Add8 cases (123 total), real browser/GPU popup/docking/navigation proofs and installable0.1.1 delivery gates. E1.M2 remains later work.
+
 # 0.1.0 — E1.M1 model workbench (review candidate)
 
 - Record owner Go for the measured E0 foundation and start E1.M1.

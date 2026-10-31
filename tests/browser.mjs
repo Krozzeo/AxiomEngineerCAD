@@ -41,6 +41,7 @@ try {
   await direct.locator('#assembly-solve').click();await direct.locator('#assembly-status').filter({hasText:'UnderDefined · DOF 2'}).waitFor();
   await direct.locator('#assembly-move').click();await direct.locator('#assembly-status').filter({hasText:'drag accepted'}).waitFor();
   await direct.locator('#assembly-pose').filter({hasText:'35.000000'}).waitFor();
+  await direct.locator('#assembly-canvas').scrollIntoViewIfNeeded();
   const canvasBox=await direct.locator('#assembly-canvas').boundingBox();
   await direct.mouse.move(canvasBox.x+canvasBox.width/2,canvasBox.y+canvasBox.height/2);await direct.mouse.down();await direct.mouse.move(canvasBox.x+canvasBox.width/2,canvasBox.y+canvasBox.height/2-40);await direct.mouse.up();
   await direct.locator('#assembly-status').filter({hasText:'UnderDefined · DOF 2 · drag accepted'}).waitFor();

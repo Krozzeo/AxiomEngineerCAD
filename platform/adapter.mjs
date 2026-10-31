@@ -19,6 +19,7 @@ import {CommandSession} from '../src/commands/session.mjs';
 import {reviewDemo} from '../src/commands/demo.mjs';
 import {proofDemo} from '../src/proof/demo.mjs';
 import {ProofSession} from '../src/proof/session.mjs';
+import {readLayout,saveLayout} from '../src/workbench/layout.mjs';
 
 export class EngineerAdapter {
   constructor({start = startEditor} = {}) {
@@ -40,10 +41,10 @@ export class EngineerAdapter {
   async execute(method, params) {
     if(method.startsWith('proof.')){check(this.doc&&!this.ended,'cancelled','Open a live study first.');const name=method.slice(6);check(['catalog','status','result','build','cancel','pick','export','preflight'].includes(name),'unsupportedCapability','Unknown proof operation.');const reads=['catalog','status','result'];if(reads.includes(name))return this.doc.proof[name]();const id=params.operationId,key=JSON.stringify({method,params});check(typeof id==='string'&&/^[a-zA-Z0-9_-]{8,100}$/.test(id),'invalidRequest','Use a unique bounded operation identity.');const old=this.receipts.get(id);if(old){check(old.key===key,'invalidRequest','Operation identity reused.');if(old.error)fail(old.error.code,old.error.message);return structuredClone(old.result);}check(this.receipts.size<256,'projectBusy','Receipt budget reached.');try{const result=await this.doc.proof[name](params);this.receipts.set(id,{key,result:structuredClone(result)});return result;}catch(e){this.receipts.set(id,{key,error:{code:e.code??'operationFailed',message:e.message}});throw e;}}
     if(['cad.catalog','cad.context','cad.status','cad.invoke','cad.grant','cad.revoke','cad.cancel'].includes(method)){check(this.doc&&!this.ended,'cancelled','Open a live study first.');return this.handle(method,params);}
-    check(['initialize', ...manifest.capabilities, 'document.inspect', 'document.edit', 'document.buffer','lab.run','lab.inspect','lab.cancel','lab.apply','lab.fixture','native.inspect','native.convert','native.graph','native.snapshot','native.publish','native.restore','native.refresh','native.attach','native.adopt','native.recover','native.removeVersion'].includes(method),
+    check(['initialize', ...manifest.capabilities, 'document.inspect', 'document.edit', 'document.buffer','lab.run','lab.inspect','lab.cancel','lab.apply','lab.fixture','native.inspect','native.convert','native.graph','native.snapshot','native.publish','native.restore','native.refresh','native.attach','native.adopt','native.recover','native.removeVersion','ui.layout.get','ui.layout.save'].includes(method),
       'unsupportedCapability', 'This build does not implement that operation.');
     // Buffer reports have their own monotonic client sequence; typing must not exhaust mutation receipts.
-    const mutation = !['initialize','project.detect','project.status','document.inspect','document.buffer','lab.inspect','lab.fixture','native.inspect','native.refresh'].includes(method);
+    const mutation = !['initialize','project.detect','project.status','document.inspect','document.buffer','lab.inspect','lab.fixture','native.inspect','native.refresh','ui.layout.get'].includes(method);
     const key = JSON.stringify({method, params}), id = params.operationId;
     if (mutation) {
       check(typeof id === 'string' && /^[a-zA-Z0-9_-]{8,100}$/.test(id), 'invalidRequest', 'A unique operationId is required.');
@@ -120,6 +121,8 @@ export class EngineerAdapter {
       } catch (error) { await this.cleanup(); throw error; }
     }
     check(this.doc, 'invalidRequest', 'Open a document first.');
+    if(method==='ui.layout.get')return readLayout(this.doc);
+    if(method==='ui.layout.save')return saveLayout(this.doc,p);
     if (method === 'project.status') return {status:this.doc.status()};
     if (method === 'document.inspect') return this.doc.view();
     if (method === 'document.buffer') return this.doc.reportBuffer(p);
