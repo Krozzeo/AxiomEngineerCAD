@@ -3,7 +3,7 @@
   "protocolVersion": 1,
   "productId": "axiom.engineer-cad",
   "displayName": "Axiom Engineer CAD",
-  "productVersion": "0.0.7",
+  "productVersion": "0.1.0",
   "platformApiRange": ">=0.1.0 <0.2.0",
   "projectFormats": [
     {
@@ -51,6 +51,10 @@
     {
       "id": "e0-m7-integrated",
       "name": "E0.M7 Integrated Foundation Lab"
+    },
+    {
+      "id": "e1-m1-workbench",
+      "name": "E1.M1 Model Workbench"
     }
   ],
   "launch": {

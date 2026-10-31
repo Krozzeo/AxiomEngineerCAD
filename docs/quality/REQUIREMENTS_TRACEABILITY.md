@@ -59,3 +59,7 @@ References: [Master roadmap](../../MASTER_DESIGN.md#18-development-generations-a
 ## E0.M7 integrated candidate baseline
 
 [ADR012](../architecture/ADR-012-INTEGRATED-E0-GATE.md) and [corpus](E0_M7_ACCEPTANCE_CORPUS_V1.json) connect sketch/kernel/topology/mate/native closure/tool review/drawing/GPU/IP gates.15 new tests+85 retained; actual Hub human workflow, separately labeled physical GPU, independent current/historical PDF parsing/rendering, actual installed demo. The archived0.0.6 decoder refuses new profiles without writes. Final exact CI/public provenance belongs to delivery PR/release. Owner decision pending; E1 unstarted.
+
+## E0 Go and E1.M1 evidence update2026-10-31
+
+[E0 decision](../architecture/E0_OWNER_GO_2026_10_31.json) accepts the measured baseline for progression. E1.M1 [ADR016](../architecture/ADR-016-E1-WORKBENCH.md) adds UI/ReadOnly context, not native data mutation:15 workbench cases plus100 retained, actual default/empty/Hub UI, seven-class physical GPU picking and focused navigation, headless selection parity, unchanged-document/prior0.0.7 reader compatibility, current package/public install checks. Existing native0/1 schemas and E0 corpus inputs remain unchanged. General sketch/feature creation, arbitrary topology/drawings and full mature requirement acceptance remain at their scheduled gates.

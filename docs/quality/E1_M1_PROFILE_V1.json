@@ -1,0 +1,220 @@
+{
+  "profile": "E1.M1/1",
+  "status": "Review candidate; E0 Go approved, E1.M1 owner review pending",
+  "software": "0.1.0",
+  "platform": "0.1.12",
+  "platformCommit": "6d240845cd77eb1879738d32c9f2b8fcfd7297c5",
+  "runtime": {
+    "node": "v24.21.0",
+    "os": "win32",
+    "arch": "x64"
+  },
+  "hardware": {
+    "devices": [
+      {
+        "vendorId": 4318,
+        "deviceId": 8066,
+        "vendorString": "",
+        "deviceString": "NVIDIA GeForce GTX 1650",
+        "driverVendor": "NVIDIA",
+        "driverVersion": "32.0.16.1692"
+      },
+      {
+        "vendorId": 5140,
+        "deviceId": 140,
+        "vendorString": "",
+        "deviceString": "Microsoft Basic Render Driver",
+        "driverVendor": "",
+        "driverVersion": "10.0.19041.5794"
+      }
+    ],
+    "browser": "156.0.8078.74",
+    "flags": [],
+    "softwareForced": false
+  },
+  "actualAdapter": {
+    "state": "ready",
+    "vendor": "nvidia",
+    "architecture": "turing",
+    "device": "",
+    "description": "",
+    "isFallbackAdapter": false,
+    "classification": "hardware-adapter",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36"
+  },
+  "fixtures": {
+    "primary": {
+      "widthMm": 40,
+      "heightMm": 30,
+      "depthMm": 10,
+      "holeRadiusMm": 3,
+      "volumeMm3Oracle": "12000 - 90*pi",
+      "cornerCoordinatesMm": [
+        [
+          -20,
+          -15,
+          0
+        ],
+        [
+          -20,
+          -15,
+          10
+        ],
+        [
+          -20,
+          15,
+          0
+        ],
+        [
+          -20,
+          15,
+          10
+        ],
+        [
+          20,
+          -15,
+          0
+        ],
+        [
+          20,
+          -15,
+          10
+        ],
+        [
+          20,
+          15,
+          0
+        ],
+        [
+          20,
+          15,
+          10
+        ]
+      ]
+    },
+    "cap": {
+      "dimensionsMm": [
+        12,
+        12,
+        8
+      ],
+      "positionMm": [
+        -10,
+        0,
+        10
+      ],
+      "volumeMm3": 1152
+    },
+    "empty": {
+      "formatVersion": 0,
+      "revision": 0,
+      "noImplicitConversion": true
+    },
+    "datums": {
+      "planes": {
+        "xy": [
+          0,
+          0,
+          1
+        ],
+        "xz": [
+          0,
+          -1,
+          0
+        ],
+        "yz": [
+          1,
+          0,
+          0
+        ]
+      },
+      "axes": {
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "y": [
+          0,
+          1,
+          0
+        ],
+        "z": [
+          0,
+          0,
+          1
+        ]
+      },
+      "originMm": [
+        0,
+        0,
+        0
+      ]
+    },
+    "oldReaderSource": "6d799f1955854cdf2540cf8aad2af5ae773f823f"
+  },
+  "bounds": "Existing E0.M6/1 and E0.M7-acceptance/1 geometry/direct local scene bounds retained. Canonical frame wire extent is display only. No arbitrary vertex/curve/nested/external geometry claim.",
+  "selectionClasses": [
+    "vertex",
+    "edge",
+    "face",
+    "body",
+    "instance",
+    "feature",
+    "datum"
+  ],
+  "numeric": {
+    "lengthAbsoluteMm": 1e-06,
+    "volumeAbsoluteMm3": 1e-06,
+    "gpuReadbackRadiusPixels": 3.1
+  },
+  "measured": {
+    "buildMs": 497.87829999999997,
+    "workerResources": {
+      "peakRssBytes": 181862400,
+      "heapUsedBytes": 40360488,
+      "policy": "Isolated process, 192 MiB JS old-space, finite typed inputs, parent deadline; RSS postcondition is not an OS hard memory quota."
+    },
+    "resolution": [
+      1135,
+      595
+    ],
+    "gpuSubmitCompletionWallMs": {
+      "samples": 68,
+      "min": 2.330000162124634,
+      "p50": 3.510000228881836,
+      "p95": 7.700000047683716,
+      "max": 36.230000019073486
+    },
+    "gpuPickReadbackWallMs": {
+      "samples": 7,
+      "min": 2.575000047683716,
+      "p50": 3.4100000858306885,
+      "p95": 3.884999990463257,
+      "max": 3.884999990463257
+    },
+    "reopenedRenderTimesMs": [
+      35.09999990463257
+    ],
+    "scope": "Observed local harness values including queue/CPU overhead; no universal FPS/device promise"
+  },
+  "verification": {
+    "domainTests": 115,
+    "newWorkbenchTests": 15,
+    "retainedGeometry2D": 29,
+    "retainedSpatial": 28,
+    "physicalGpuSelectionClasses": 7,
+    "emptyHumanUI": true,
+    "headlessAgentParity": true,
+    "saveReopen": true,
+    "pageErrors": []
+  },
+  "unsupported": [
+    "general sketch creation (E1.M2)",
+    "actual entity/component drag edits",
+    "general/arbitrary topology naming",
+    "authored assembly drawing sheets",
+    "remote provider dispatch",
+    "durable per-user dock/layout preferences"
+  ]
+}

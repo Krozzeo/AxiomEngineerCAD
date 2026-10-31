@@ -1,3 +1,11 @@
+# 0.1.0 — E1.M1 model workbench (review candidate)
+
+- Record owner Go for the measured E0 foundation and start E1.M1.
+- Add default central CAD viewport, menus/status/history/component/mate tree, linked Inspector, canonical planes/axes and existing diagnostics drawer.
+- Add orthographic/perspective/normal-to/fit, view controls, adaptive resolution, keyboard/CAD/trackpad navigation and camera drag cancellation.
+- Extend exact semantic selection to vertices/bodies/features/datums; add two ReadOnly tools (21 total), stable headless query parity,15 tests (115 total), empty/old-reader/UI/hardware/package proofs.
+- Preserve native schemas/documents, all previous labs/reviews/history, dependency/source pins and Local-only exposure. Full sketch editing/extrusion remains E1.M2–M5.
+
 # 0.0.7 — E0.M7 integrated foundation (review candidate)
 
 - Connect persisted solved sketch, actual extrusion, face-dependent cut, measured plane mate and associative drawing in one portable study.

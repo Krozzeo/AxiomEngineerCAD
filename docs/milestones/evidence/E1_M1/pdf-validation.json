@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "profile": "E0.M6-independent-pdf/1",
+  "readers": {
+    "pypdf": "6.10.0",
+    "pdfplumber": "0.11.9",
+    "pypdfium2": "5.14.0"
+  },
+  "files": [
+    {
+      "file": "drawing-a4-40.pdf",
+      "sha256": "aa11510003b32be45658690c013363ed19f1ffcbcc8f59b77315ebbdebe3019f",
+      "pageMm": [
+        210,
+        297
+      ],
+      "widthMm": 40,
+      "depthMm": 10,
+      "rasterImages": 0,
+      "hiddenLines": 4,
+      "circleCubicSegments": 16,
+      "maxMeasuredCircleDeviationMm": 2.126368534582923e-07,
+      "rendered": "drawing-a4-40-rendered.png"
+    },
+    {
+      "file": "drawing-a4-60.pdf",
+      "sha256": "5dab86275ab3fb30e285e8f4b7b84a04dff4df7ab9a74dac8033925e7a216647",
+      "pageMm": [
+        210,
+        297
+      ],
+      "widthMm": 60,
+      "depthMm": 10,
+      "rasterImages": 0,
+      "hiddenLines": 4,
+      "circleCubicSegments": 16,
+      "maxMeasuredCircleDeviationMm": 2.126368534582923e-07,
+      "rendered": "drawing-a4-60-rendered.png"
+    }
+  ]
+}
