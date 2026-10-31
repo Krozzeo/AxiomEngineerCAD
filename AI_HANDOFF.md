@@ -1,8 +1,14 @@
+Platform popup isolation: ADR017 uses a panel-only authenticated frontend of the same live adapter/session under the actual Hub iframe, with source-bound ordered BroadcastChannel camera/selection sync. Standalone mode moves original nodes. Child preferences never overwrite the parent layout; no COOP/COEP weakening/new lease/domain schema. tests/browser-embedded-panels.mjs is a required regression.
+
+Current correction branch: engineer/e1-m1-docking-ux, based on delivered0.1.0 SHA652bd5fe3dc0c07b2d935b48b9da0ea490a54916;0.1.1 UX review, not E1.M2.
+
+> **0.1.1 UX revision:** compact CAD header/ribbon, Game Engine five-zone docking/Separate Windows and persistent layout, Panels reopen/reset, reversed horizontal orbit and cursor-centered wheel zoom. [Test guide](docs/milestones/E1_M1_UX_0_1_1.md), [ADR017](docs/architecture/ADR-017-CAD-DOCKING-UX.md). E1.M2 remains unstarted; exact-head CI and fresh public Platform install are delivery gates. Native schema/data and runtime pins unchanged.
+
 # Engineer handoff — E1.M1 /0.1.0
 
-Read AGENTS/full master, E1_M1_PLAN/REPORT, ADR016 and E0_OWNER_GO_2026_10_31.json. Owner explicitly requested E1/0.1.0 after delivered M7; Go accepted for measured E0 baseline with remaining risks. Branch engineer/e1-m1-workbench stacks on engineer/e0-m7-integrated-proof at6d799f1955854cdf2540cf8aad2af5ae773f823f. No main merge/full MVP acceptance. E1.M2–M5 not started.
+Read AGENTS/full master, E1_M1_PLAN/REPORT, ADR016 and E0_OWNER_GO_2026_10_31.json. Owner explicitly requested E1/0.1.0 after delivered M7; Go accepted for measured E0 baseline with remaining risks. Original0.1.0 branch engineer/e1-m1-workbench stacks on engineer/e0-m7-integrated-proof at6d799f1955854cdf2540cf8aad2af5ae773f823f. No main merge/full MVP acceptance. E1.M2–M5 not started.
 
-app/workbench.mjs/css compose the real default CAD view around existing proof/renderer; prior labs available under Tools/Diagnostics or ?workspace=labs. app.mjs preserves query while removing token. Legacy tests wait actual Editor idle. Frame display/selection/camera/nav/panels are transient, never native mutations. Empty native0 documents stay0 with canonical reference frames. Native0/1 old readers/history/proposals/WAL remain intact.
+app/workbench.mjs/css compose the real default CAD view around existing proof/renderer; prior labs available under Tools/Diagnostics or ?workspace=labs. app.mjs preserves query while removing token. Legacy tests wait actual Editor idle. Frame display/selection/camera/nav are transient; panel layout is persisted separately by ADR017, never a native mutation. Empty native0 documents stay0 with canonical reference frames. Native0/1 old readers/history/proposals/WAL remain intact.
 
 src/workbench/model returns paged source identities/topological order/canonical datums and shared exact scene selection.21 typed tools including workbench.inspect and selection.inspect (ReadOnly), latter actual headless worker with stable semantic target/source revision/hash/creator, no pixel identity requirement. Existing human proof manifests resolve seven classes; vertices are8 proven B-Rep box corners. Point pipeline writes depth to avoid rear-corner retargeting. No arbitrary topology acceptance.
 

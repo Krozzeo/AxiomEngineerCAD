@@ -1,3 +1,4 @@
+import {editorDocument as document} from './editor-document.mjs';
 const $=id=>document.getElementById(id);let view,active=null,activeCandidate=null,loading=false,graphPending=false,bufferSequence=0,graphBaseRevision=null,bufferChain=Promise.resolve();const clientId='native-'+crypto.randomUUID();
 const token=()=>sessionStorage.getItem('engineer-token')??new URLSearchParams(location.hash.slice(1)).get('token');
 async function api(path,data){const r=await fetch('/v1/'+path,{method:data?'POST':'GET',headers:{Authorization:'Bearer '+token(),...(data?{'Content-Type':'application/json'}:{})},body:data?JSON.stringify({...data,operationId:crypto.randomUUID()}):undefined});const v=await r.json();if(!r.ok)throw Error((v.code??'OperationFailed')+': '+v.message);return v;}

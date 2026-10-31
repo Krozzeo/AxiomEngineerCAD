@@ -1,3 +1,5 @@
+> Updated by [ADR017](ADR-017-CAD-DOCKING-UX.md) in0.1.1: persistent five-zone docking, live separate windows and cursor-centered wheel zoom replace the original transient panel arrangement. Horizontal orbit direction follows the owner correction.
+
 # ADR-016 — E1 workbench, reference frames and selection
 
 Status: **Review candidate for E1.M1**. Date:2026-10-31. Software0.1.0. E0 owner Go is recorded separately in [decision](E0_OWNER_GO_2026_10_31.json). Requirements CAD-R001/003/006/008/009/010/022/023; Master15/E1.M1. Approved MVP scope unchanged.
