@@ -1,3 +1,4 @@
+import {prepareModernUI} from './modern-ui-support.mjs';
 import {waitEditorIdle} from './browser-support.mjs';
 import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';
@@ -16,7 +17,7 @@ const report = {milestone:'E1.M1', platform:'0.1.12', providerCommit:'6d240845cd
 try {
   browser = await chromium.launch(process.env.ENGINEER_HARDWARE==='1'?{executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true,ignoreDefaultArgs:['--disable-gpu-compositing']}:{headless:true});if(process.env.ENGINEER_HARDWARE==='1'){const cdp=await browser.newBrowserCDPSession(),info=await cdp.send('SystemInfo.getInfo');report.hardware={devices:info.gpu.devices.map(d=>({vendorId:d.vendorId,deviceId:d.deviceId,vendorString:d.vendorString,deviceString:d.deviceString,driverVendor:d.driverVendor,driverVersion:d.driverVersion})),browser:browser.version(),flags:[],softwareForced:false};} report.browser = browser.version();
   const context = await browser.newContext({viewport:{width:1440, height:960}});
-  const observe = page => { page.setDefaultTimeout(15000); page.on('pageerror', e => report.pageErrors.push(e.message)); };
+  const observe = page => { prepareModernUI(page); page.setDefaultTimeout(15000); page.on('pageerror', e => report.pageErrors.push(e.message)); };
   context.on('page',observe);
   child = spawn(process.execPath, ['src/cli.mjs', '--root', join(root, 'direct'), '--create', 'study', '--name', 'Direct lifecycle study'], {cwd:resolve('.'), windowsHide:true, stdio:['ignore','pipe','pipe']});
   const ready = await new Promise((yes, no) => {
@@ -133,7 +134,7 @@ try {
   report.criteria.push('Hub UI creates real CAD adapter session', 'Editor changes appear in Hub status', 'Hub Cancel/Save/Close/Reopen preserve document identity and content');
   await hub.locator('[data-route="/installations"]').click();
   await hub.getByRole('button',{name:'Load Demos',exact:true}).click();
-  await hub.waitForFunction(()=>document.querySelector('.load-demos')?.textContent==='Load Demos');
+  await hub.waitForFunction(()=>document.querySelector('.load-demos')?.textContent==='Load Demos');const {seedHistoricalFixtures}=await import('../scripts/acceptance-demo-fixtures.mjs');await seedHistoricalFixtures(host);
   const demoEntry=host.manager.catalog().recents.find(p=>p.name==='E0.M2 Geometry & Sketch Lab');
   assert.ok(demoEntry,'Version-owned demo was not registered');
   const demoDoc=JSON.parse(await readFile(demoEntry.path));assert.equal(demoDoc.experiment.spec.scenario,'cut');

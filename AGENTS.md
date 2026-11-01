@@ -12,3 +12,5 @@
 10. **Owner delivery requirement:** whenever a new Engineer Milestone is completed for review, prepare and publish its compatible experimental installation so the owner can download, install and run it from Axiom Platform. A source branch/PR alone is not delivery. Require passing exact-commit CI, preserve immutable previous builds, publish the ZIP plus `axiom-release.json` with verified size/hash and PR/build provenance, and verify actual Platform discovery/install/launch. This instruction authorizes milestone experimental publication; it does not imply merge to main, stable release or milestone acceptance. Report the installable version/link and any actual delivery blocker.
 
 For architecture and third-party sources, follow the links in the master's **Axiom family and source references** section.
+
+11. **Owner demo requirement (0.1.2 onward):** advertise and load only demos associated with the current release/milestone. Never remove earlier user projects or edited demos. Historical regressions use explicit acceptance fixtures outside the production Load Demos catalog.

@@ -1,3 +1,11 @@
+# 0.1.2 — E1.M1 interaction and organization review
+
+- Deliver only the current-version workbench demo; preserve earlier user files. Historical inputs are explicit regression fixtures.
+- Auto Vertex/Edge/Face priority, depth-tested hover identity without domain requests, exact reference colors, thicker edge and filled point feedback.
+- Canonical Origin, Front/Top/Right labels, independent single-reference display, projected clickable triad, smooth orientations and F8/double-middle alignment.
+- Manager/icons/footer, selection-only Inspector/Details, central dockable Document properties, exclusive menus, favicon, dirty Save/quick-save and categorized operation tabs.
+-125 domain tests and real UI/GPU/current-demo/installation proofs; native formats and reviewed Apply guards retained. E1.M2 remains future work.
+
 # 0.1.1 — E1.M1 UX review revision
 
 - Compact one-line logo/menus with Panels, SVG icons, gray CAD view and no outer document scroll.

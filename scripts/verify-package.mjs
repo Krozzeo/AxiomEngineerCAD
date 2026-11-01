@@ -8,6 +8,8 @@ import {startHost} from '../node_modules/axiom-platform/services/local-host/serv
 import {verifyCommandInstallation} from './verify-command-installation.mjs';
 import {verifyProofInstallation} from './verify-proof-installation.mjs';
 import {verifyIntegrationInstallation} from './verify-integration-installation.mjs';
+import {seedHistoricalFixtures} from './acceptance-demo-fixtures.mjs';
+import {pathToFileURL} from 'node:url';
 import {verifyWorkbenchInstallation} from './verify-workbench-installation.mjs';
 
 const folder = resolve(process.argv[2] ?? '.axiom/release');
@@ -58,6 +60,7 @@ try {
   for(let i=0;i<120;i++){nativeProof=await (await fetch(nativeUrl.origin+'/v1/lab',{headers:{Origin:nativeUrl.origin,Authorization:'Bearer '+nativeToken}})).json();if(nativeProof.job.state!=='running')break;await new Promise(r=>setTimeout(r,250));}
   assert.equal(nativeProof.job.state,'completed',JSON.stringify(nativeProof.job));assert.equal(nativeProof.nativeVerification.result.valid,true);const version=await nativePost('native/snapshot',{expectedRevision:3});assert.match(version.versionId,/^sha256:/);await call({action:'save',sessionId:restored.sessionId,expectedRevision:4});
   await call({action:'close',sessionId:restored.sessionId,expectedRevision:4,decision:'save'});const nativeReopened=await call({action:'open',productId:manifest.productId,path:created.path});assert.equal(nativeReopened.status.revision,4);const nativeSaved=JSON.parse(await readFile(join(root,nativeReopened.path)));assert.equal(nativeSaved.formatVersion,1);assert.equal(nativeSaved.native.versions[0].id,version.versionId);assert.equal(nativeReopened.status.recovery.state,'Committed');
+  await seedHistoricalFixtures(host,pathToFileURL(installation+'/'));
   const semanticCommands=await verifyCommandInstallation(nativeReopened.editorUrl);await call({action:'close',sessionId:nativeReopened.sessionId,expectedRevision:semanticCommands.applyRevision,decision:'discard'});const reviewReopened=await call({action:'open',productId:manifest.productId,path:created.path});const appliedDoc=JSON.parse(await readFile(join(root,reviewReopened.path)));assert.equal(appliedDoc.experiment.spec.width,60);assert.equal(reviewReopened.status.revision,semanticCommands.applyRevision);assert.equal(reviewReopened.status.recovery.operationId,semanticCommands.applyOperationId);const drawingProof=await verifyProofInstallation(reviewReopened.editorUrl,semanticCommands.applyRevision);await call({action:'close',sessionId:reviewReopened.sessionId,expectedRevision:semanticCommands.applyRevision,decision:'discard'});
   const integratedProof=await verifyIntegrationInstallation(host);
   const workbenchProof=await verifyWorkbenchInstallation(host);

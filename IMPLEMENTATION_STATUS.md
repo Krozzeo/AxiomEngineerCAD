@@ -1,8 +1,10 @@
+> **0.1.2 interaction revision:** current-only demos; Auto/hover selection, canonical Origin and smooth reference navigation; Manager, selection-only Inspector, central Document properties, tabbed operations and dirty Save. [Guide](docs/milestones/E1_M1_UX_0_1_2.md), [ADR018](docs/architecture/ADR-018-INTERACTION-WORKBENCH.md). Native0/1 unchanged; E1.M2 unstarted. Final exact-head CI/public-install gates apply.
+
 > **0.1.1 UX revision:** compact CAD header/ribbon, Game Engine five-zone docking/Separate Windows and persistent layout, Panels reopen/reset, reversed horizontal orbit and cursor-centered wheel zoom. [Test guide](docs/milestones/E1_M1_UX_0_1_1.md), [ADR017](docs/architecture/ADR-017-CAD-DOCKING-UX.md). E1.M2 remains unstarted; exact-head CI and fresh public Platform install are delivery gates. Native schema/data and runtime pins unchanged.
 
 # Implementation status
 
-Date: 2026-10-31. Master: v0.2.0. Software: **0.1.1 experimental model workbench**.
+Date: 2026-10-31. Master: v0.2.0. Software: **0.1.2 experimental model workbench**.
 
 | Milestone | State | Evidence |
 | --- | --- | --- |
@@ -13,7 +15,7 @@ Date: 2026-10-31. Master: v0.2.0. Software: **0.1.1 experimental model workbench
 | E0.M5 | Published 0.0.5; owner authorized progression | [Report](docs/milestones/E0_M5_REPORT.md), [ADR-008](docs/architecture/ADR-008-SEMANTIC-REVIEW.md), [tool schemas](docs/contracts/SEMANTIC_TOOLS_V1.json) |
 | E0.M6 | Published0.0.6; owner validated and authorized M7 | [Report](docs/milestones/E0_M6_REPORT.md), ADR-009/010/011, [measured profile](docs/quality/E0_M6_PROFILE_V1.json) |
 | E0.M7 | Published0.0.7; owner Go to E1 recorded2026-10-31 | [Report](docs/milestones/E0_M7_REPORT.md), [ADR012](docs/architecture/ADR-012-INTEGRATED-E0-GATE.md), [corpus](docs/quality/E0_M7_ACCEPTANCE_CORPUS_V1.json) |
-| E1.M1 | Workbench review candidate0.1.1 (UX revision) | [Plan](docs/milestones/E1_M1_PLAN.md), [report](docs/milestones/E1_M1_REPORT.md), [ADR016](docs/architecture/ADR-016-E1-WORKBENCH.md) |
+| E1.M1 | Workbench review candidate0.1.2 (UX revision) | [Plan](docs/milestones/E1_M1_PLAN.md), [report](docs/milestones/E1_M1_REPORT.md), [ADR016](docs/architecture/ADR-016-E1-WORKBENCH.md) |
 | E1.M2–M5, E2–E6 | Planned; not started | Sketch creation/constraints/expressions/extrusion and broader workflows remain later milestones |
 
 Actual capabilities: Platform lifecycle and authenticated metadata editing; isolated exact OCCT extrusion/cut/revolution/union/intersection and STEP roundtrip probes; bounded producer/history reference diagnostics; PlaneGCS 2D DOF/conflict/redundancy/singularity/drag probes; editable lab with CPU tessellation preview and face inspection; version-owned Load Demos document; explicit keep/save/reopen of a bounded recipe.
