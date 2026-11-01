@@ -28,6 +28,8 @@ New profiles remain inside native format 1; older applications safely refuse the
 
 [ADR022](../architecture/ADR-022-PARAMETERS-AND-SKETCH-WORKBENCH.md), [parameter grammar](../contracts/PARAMETERS_E1_M4.md), [plan](E1_M4_PLAN.md).
 
-Local candidate evidence: 172/172 domain cases; relocated ZIP passed six corresponding-source archives, retained 29+28 numerical corpus, 44 semantic tools, native/review/drawing/history and M4 expression/geometry/rollback/Undo/Redo/save/reopen. [Measured hardware profile](../quality/E1_M4_PROFILE_V1.json). Final exact-commit CI/public-install evidence remains a separate delivery gate.
+Local candidate evidence: 173/173 domain cases; relocated ZIP passed six corresponding-source archives, retained 29+28 numerical corpus, 44 semantic tools, native/review/drawing/history and M4 expression/geometry/rollback/Undo/Redo/save/reopen. [Measured hardware profile](../quality/E1_M4_PROFILE_V1.json). Final exact-commit CI/public-install evidence remains a separate delivery gate.
 
 The complete local browser regression passed, including the actual Platform iframe with a separate authenticated Parameter Manager frontend. Hosted Model also passed F8 and double-middle reverse synchronization, child creation, parent numeric edits, save and return on the same project lease. Native detached windows include sketch/parameter styles. Final exact-head CI and fresh public-install identity remain external delivery gates.
+
+Additional browser-worker solve/drag checks cover nine relation families under the delivered CSP. The circumference-equality endpoint-drag regression keeps permanent auxiliary anchors while releasing temporary source anchors, with independently checked source DOF and circumference residual.

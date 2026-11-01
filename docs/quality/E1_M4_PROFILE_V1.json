@@ -4,8 +4,8 @@
   "date": "2026-11-01",
   "productVersion": "0.1.5",
   "domainTests": {
-    "passed": 172,
-    "total": 172
+    "passed": 173,
+    "total": 173
   },
   "hardware": {
     "device": "NVIDIA GeForce GTX 1650",

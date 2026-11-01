@@ -18,7 +18,7 @@ The pinned Emscripten binding lazily generates a method caller for some conflict
 
 A bounded, document-scoped child process reuses loaded exact kernel/solver runtime across mutually exclusive proof/command/diagnostic jobs. It recomputes actual source each time, caches no proof or B-Rep, validates request/reply identity, enforces deadlines/output bounds and terminates on abort/error/session close or idle expiry. Heap limit is a V8 limit, not an OS RSS quota; reported RSS is process lifetime peak. Credentials are scrubbed.
 
-The pinned GCS proportional constraint ignored the ratio in an isolated measured fixture. Equal line/circle circumference therefore uses exact auxiliary right-triangle equations (angle atan(2π)), with an independent circumference residual and source DOF cross-check. No dependency patch or visual substitute.
+The pinned GCS proportional constraint ignored the ratio in an isolated measured fixture. Equal line/circle circumference therefore uses exact auxiliary right-triangle equations (angle atan(2π)), with an independent circumference residual and source DOF cross-check. No dependency patch or visual substitute. Drag removes temporary source endpoint anchors only; permanent auxiliary fixed origins survive the source-DOF recheck. A browser-worker solve-and-drag fixture covers nine principal relation families under the shipped CSP.
 
 References, sketch feedback, dimensions and GPU uniforms use the same presented camera snapshot before command encoding. This also prevents replacing feedback buffers after encoding. Separate panels use independent camera ownership stamps and sketch-selection stamps, so delayed peers cannot interrupt local alignment. Explicit aligned normal requests reverse direction while preserving screen up.
 
