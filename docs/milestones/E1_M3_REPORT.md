@@ -36,3 +36,5 @@ Manual actions and headless tools share the same revision/dependency-checked, ca
 64 entities and 128 relations per sketch, at most 16 editable sketches, existing native/worker/closure bounds. Large pointer previews may be explicitly unavailable under the compact response budget; final commits still validate the full source. Feature deletion refuses unresolved dependents and retained E0 fixed-contract feature chains.
 
 Custom plane/axis authoring, arcs/extended sketch tools, expression parameters and arbitrary sketch-to-extrusion regeneration remain at E1.M4/M5 and E3. Editing a driving sketch dimension in this milestone does not claim that the retained E0 probe solid is generated from that arbitrary sketch. No remote model/provider quality or manufacturing acceptance is claimed.
+
+Opening a sketch waits for the current verified model to be presented before starting support-plane alignment. This prevents a late initial scene from canceling alignment. The fresh-project UI regression checks the presented camera normal before placing a point; detached selection clicks its actual rendered center after alignment.
