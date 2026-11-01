@@ -1,4 +1,5 @@
 import {geometryExperiment} from './kernel.mjs';
+import {solveParametric} from '../sketch/solver.mjs';
 import {runSuite} from './suite.mjs';
 import {solveSketch,sketchFixture} from './sketch.mjs';
 import {check,validate} from '../document.mjs';
@@ -16,6 +17,7 @@ process.once('message',async message=>{
     if(message.kind==='geometry')result=await geometryExperiment(message.payload.spec,{includeStep:!!message.payload.includeStep});
     else if(message.kind==='suite')result=await runSuite();
     else if(message.kind==='sketch')result=await solveSketch(message.payload.primitives??sketchFixture(message.payload.fixture),{drag:message.payload.drag});
+    else if(message.kind==='parametric-sketch')result=await solveParametric(message.payload.data,{drag:message.payload.drag});
     else if(message.kind==='assembly')result=solveAssembly(message.payload.assembly,{drag:message.payload.drag});
     else if(message.kind==='assembly-suite')result=assemblySuite();
     else if(message.kind==='native-verify')result=await verifyNative(message.payload.document);

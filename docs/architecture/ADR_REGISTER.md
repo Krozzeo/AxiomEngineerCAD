@@ -48,3 +48,5 @@ Current explicit product-owner decision and accepted contract > accepted ADR sco
 References: [Master §21](../../MASTER_DESIGN.md#21-risks-experiments-and-architecture-decision-gates), [Axiom Platform product contract](https://github.com/Krozzeo/AxiomPlatform/blob/main/docs/architecture/PRODUCT_CONTRACT.md), [Platform ownership](https://github.com/Krozzeo/AxiomPlatform/blob/main/docs/architecture/OWNERSHIP_MATRIX.md).
 
 [E0 owner Go](E0_OWNER_GO_2026_10_31.json) accepts the measured ADR001–012 baseline and authorizes E1; historical experiment records preserve their original candidate status/results. [ADR016](ADR-016-E1-WORKBENCH.md) is the E1.M1 workbench/navigation review candidate. ADR013/014 and full later capabilities remain pending.
+
+- [ADR021 — Parametric sketch relations, integrated editing and working Undo/Redo](ADR-021-PARAMETRIC-SKETCH-EDITING.md): E1.M3 implementation in progress under the owner request; evidence/review gates pending.

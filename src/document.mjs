@@ -64,10 +64,15 @@ export class Document {
   edit({metadata, expectedRevision}) {
     this.expect(expectedRevision); validateMetadata(metadata);
     check(this.value.revision < Number.MAX_SAFE_INTEGER, 'invalidRequest', 'Revision limit reached.');
-    this.value = {...this.value, revision:this.value.revision + 1, metadata:structuredClone(metadata)};
+    const next = {...this.value, revision:this.value.revision + 1, metadata:structuredClone(metadata)};
+    this.commands?.history.record(this.value,next);this.value=next;
     return this.view();
   }
   async save(expectedRevision,operationId=randomUUID()) {
+    this.expect(expectedRevision);
+    // Background sketch inspection/preview cannot change MAIN. Finish that read
+    // under the existing adapter queue, then repeat the causal revision check.
+    if(this.commands?.running&&['sketch-diagnostics','sketch-preview'].includes(this.commands.job.kind))await this.commands.job.promise;
     this.expect(expectedRevision);
     check(!this.pending(), 'projectBusy', 'Apply pending fields before saving, or explicitly discard on close.');
     check(!this.lab?.running&&!this.commands?.running&&!this.proof?.running, 'projectBusy', 'Wait for or cancel the lab/tool task before saving.');
