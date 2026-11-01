@@ -64,7 +64,8 @@ export class Document {
   edit({metadata, expectedRevision}) {
     this.expect(expectedRevision); validateMetadata(metadata);
     check(this.value.revision < Number.MAX_SAFE_INTEGER, 'invalidRequest', 'Revision limit reached.');
-    this.value = {...this.value, revision:this.value.revision + 1, metadata:structuredClone(metadata)};
+    const next = {...this.value, revision:this.value.revision + 1, metadata:structuredClone(metadata)};
+    this.commands?.history.record(this.value,next);this.value=next;
     return this.view();
   }
   async save(expectedRevision,operationId=randomUUID()) {
