@@ -22,8 +22,8 @@ import {ProofSession} from '../src/proof/session.mjs';
 import {readLayout,saveLayout} from '../src/workbench/layout.mjs';
 
 export class EngineerAdapter {
-  constructor({start = startEditor} = {}) {
-    this.start = start; this.receipts = new Map(); this.queue = Promise.resolve(); this.ended = false;
+  constructor({start = startEditor, demoCatalog = manifest.demos} = {}) {
+    this.start = start; this.demoCatalog = demoCatalog; this.receipts = new Map(); this.queue = Promise.resolve(); this.ended = false;
   }
   enqueue(action) { const result = this.queue.then(action); this.queue = result.catch(() => {}); return result; }
   request(message) { return this.enqueue(() => this.receive(message)); }
@@ -88,7 +88,7 @@ export class EngineerAdapter {
     check(this.root && !this.ended, 'cancelled', 'Initialize a live session first.');
     if (method === 'project.detect') return this.detect(p.path);
     if (method === 'project.demos') {
-      check(!this.doc&&Array.isArray(p.demoIds)&&p.demoIds.length>0&&p.demoIds.length<=manifest.demos.length&&new Set(p.demoIds).size===p.demoIds.length&&p.demoIds.every(id=>manifest.demos.some(d=>d.id===id)),'invalidRequest','Choose the declared version-owned demos.');
+      check(!this.doc&&Array.isArray(p.demoIds)&&p.demoIds.length>0&&p.demoIds.length<=this.demoCatalog.length&&new Set(p.demoIds).size===p.demoIds.length&&p.demoIds.every(id=>this.demoCatalog.some(d=>d.id===id)),'invalidRequest','Choose the declared version-owned demos.');
       const destination=await authorized(this.root,p.destination);
       check((await readdir(destination)).length===0,'projectBusy','Demos require a fresh empty destination.');
       const projects=[];let nativePaths;if(p.demoIds.some(id=>id.startsWith('e0-m4-')||id==='e0-m5-review')){const docs=await nativeDemo();nativePaths={};for(const [id,key,folderName]of [['e0-m4-source','source','E0-M4-Source'],['e0-m4-native','consumer','E0-M4-Native']]){const folder=join(destination,folderName);await mkdir(folder);const path=join(folder,FILENAME);await atomicJson(path,docs[key]);nativePaths[id]=path;}if(p.demoIds.includes('e0-m5-review')){const folder=join(destination,'E0-M5-Review');await mkdir(folder);const path=join(folder,FILENAME);await atomicJson(path,await reviewDemo(docs.consumer));nativePaths['e0-m5-review']=path;}}

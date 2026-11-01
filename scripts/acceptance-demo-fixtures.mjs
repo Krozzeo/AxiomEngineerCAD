@@ -1,0 +1,9 @@
+import {mkdir} from 'node:fs/promises';
+import {join} from 'node:path';
+import {pathToFileURL} from 'node:url';
+import {randomUUID} from 'node:crypto';
+export const historicalDemoCatalog=[{"id": "e0-m2-lab", "name": "E0.M2 Geometry & Sketch Lab"}, {"id": "e0-m3-mates", "name": "E0.M3 Spatial Mate Lab"}, {"id": "e0-m4-source", "name": "E0.M4 Source Plate"}, {"id": "e0-m4-native", "name": "E0.M4 Native Version Lab"}, {"id": "e0-m5-review", "name": "E0.M5 Review Lab"}, {"id": "e0-m6-drawing-gpu", "name": "E0.M6 Drawing & GPU Lab"}, {"id": "e0-m7-integrated", "name": "E0.M7 Integrated Foundation Lab"}];
+export async function seedHistoricalFixtures(host,productRoot=new URL('../',import.meta.url)){
+ const {EngineerAdapter}=await import(new URL('platform/adapter.mjs',productRoot));const adapter=new EngineerAdapter({demoCatalog:historicalDemoCatalog}),sessionId=randomUUID(),call=(method,params={})=>{const id=randomUUID();return adapter.request({protocolVersion:1,requestId:id,correlationId:id,sessionId,productId:'axiom.engineer-cad',actor:{kind:'human',id:'historical-regression-fixture'},method,params:{operationId:randomUUID(),...params}});};
+ try{const root=host.manager.root,folder=join(root,'historical-regression-fixtures');await mkdir(folder,{recursive:true});await call('initialize',{authorizedRoot:root,platformVersion:'0.1.12'});const result=await call('project.demos',{demoIds:historicalDemoCatalog.map(d=>d.id),destination:folder});for(const p of result.projects){const opened=await host.manager.execute({operationId:randomUUID(),action:'open',productId:'axiom.engineer-cad',path:p.path});await host.manager.execute({operationId:randomUUID(),action:'close',sessionId:opened.sessionId,expectedRevision:0,decision:'discard'});}}finally{await adapter.shutdown();}
+}

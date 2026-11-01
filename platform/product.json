@@ -3,7 +3,7 @@
   "protocolVersion": 1,
   "productId": "axiom.engineer-cad",
   "displayName": "Axiom Engineer CAD",
-  "productVersion": "0.1.1",
+  "productVersion": "0.1.2",
   "platformApiRange": ">=0.1.0 <0.2.0",
   "projectFormats": [
     {
@@ -24,34 +24,6 @@
     "project.demos"
   ],
   "demos": [
-    {
-      "id": "e0-m2-lab",
-      "name": "E0.M2 Geometry & Sketch Lab"
-    },
-    {
-      "id": "e0-m3-mates",
-      "name": "E0.M3 Spatial Mate Lab"
-    },
-    {
-      "id": "e0-m4-source",
-      "name": "E0.M4 Source Plate"
-    },
-    {
-      "id": "e0-m4-native",
-      "name": "E0.M4 Native Version Lab"
-    },
-    {
-      "id": "e0-m5-review",
-      "name": "E0.M5 Review Lab"
-    },
-    {
-      "id": "e0-m6-drawing-gpu",
-      "name": "E0.M6 Drawing & GPU Lab"
-    },
-    {
-      "id": "e0-m7-integrated",
-      "name": "E0.M7 Integrated Foundation Lab"
-    },
     {
       "id": "e1-m1-workbench",
       "name": "E1.M1 Model Workbench"
