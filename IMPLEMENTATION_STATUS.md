@@ -8,7 +8,7 @@ Earlier revision snapshots below describe their historical state.
 
 # Implementation status
 
-Date: 2026-10-31. Master: v0.2.0. Software: **0.1.3 experimental editable sketches**.
+Date: 2026-11-01. Master: v0.2.0. Software: **0.1.3 experimental editable sketches**.
 
 | Milestone | State | Evidence |
 | --- | --- | --- |

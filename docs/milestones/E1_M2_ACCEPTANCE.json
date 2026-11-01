@@ -21,7 +21,8 @@
     "legacyConversionOriginalBackup": true,
     "saveReloadStableIds": true,
     "emptySketchSelectionAndFit": true,
-    "immutableHistoryPreserved": true
+    "immutableHistoryPreserved": true,
+    "separatedSketchSameSessionCreateEditSelectionAndReturn": true
   },
   "physicalGPU": {
     "passed": true,
