@@ -27,3 +27,9 @@ Endpoint drag temporarily anchors the opposite endpoint at its source position w
 Hide/Reveal and canonical display-entry deletion persist in a bounded, document-bound `.engineer-visibility.json` sidecar with independent CAS revision, ordinary-file/link checks and human-only endpoints. Frontends broadcast only the updated preference revision and reload authoritative preferences; detached Model views follow Manager visibility actions. Native revisions and immutable content are unaffected.
 
 Save waits for an already-running sketch diagnostic/preview read under the existing adapter queue, then repeats the expected-revision check and all pending/Main-job/disk-CAS guards. Preview coordinates never enter the saved document. This removes an intermittent busy response when another frontend finishes refreshing Inspector.
+
+## Six planar supports in the current producer profile
+
+M3 sketches can attach to top/bottom/left/right/front/back of the bounded primary rectangular extrusion/cut producer. Side roles use an explicit outward normal, named extrusion boundary plane and unique actual OCCT planar face; ambiguous/missing candidates fail. Origins and right-handed UV frames are independently tested before/after upstream width edits. Existing M2 profiles retain their top/bottom support contract; new creation requests can explicitly choose M3. No transient face number, nearest-face fallback, general imported-surface claim or runtime pin change is introduced.
+
+The current demo includes a Right face sketch. Re-entering/exiting sketch mode reuses a verified current preview when possible and waits for the matching manifest, preventing a same-revision rebuild from making a following selection stale. Regeneration preserves the existing camera; initial load fits once, explicit Fit and alignment remain gradual.

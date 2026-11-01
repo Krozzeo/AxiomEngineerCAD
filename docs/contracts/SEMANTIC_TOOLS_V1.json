@@ -2014,7 +2014,11 @@
                   "xz",
                   "yz",
                   "top",
-                  "bottom"
+                  "bottom",
+                  "left",
+                  "right",
+                  "front",
+                  "back"
                 ]
               },
               "producerId": {
@@ -2028,6 +2032,12 @@
               "role"
             ],
             "additionalProperties": false
+          },
+          "profile": {
+            "type": "string",
+            "enum": [
+              "E1.M3-sketch/1"
+            ]
           }
         },
         "required": [
