@@ -1,0 +1,21 @@
+# E1.M2 — Editable sketch primitives (0.1.3)
+
+Review candidate authorized by the owner together with selection/origin/axis/favicon fixes. [Plan](E1_M2_PLAN.md), [sketch contract](../architecture/ADR-019-EDITABLE-SKETCH-PRIMITIVES.md), [rendering/presentation](../architecture/ADR-020-SELECTION-FRAMES-AND-TAB-PRESENTATION.md). E0 Go and earlier reviewed deliveries remain intact. E1.M3 is not started; this is not full constraint solving or general sketch extrusion.
+
+## Try the delivery
+
+1. Install/activate experimental CAD0.1.3 in Platform and choose **Load Demos → E1.M2 Editable Sketches**. Only this release's demo is offered; earlier user projects/demos remain on disk.
+2. In **Sketch**, choose **Layout sketch → Edit sketch**, or double-click it in Manager. The Model panel becomes the plane-local editor. Inspector lists the actual saved primitives. Choose Select and click a primitive, or use the list.
+3. Draw Point with one click; Line/Rectangle with two corners; Circle with center and radius point. Check Construction before drawing, or change it on a selected primitive and Update. Edit coordinates/radius in Inspector and Update. Delete removes that primitive. Escape/Cancel draft abandons an unfinished shape. Fit adjusts the sketch view.
+4. Exit sketch to see the current display curves in Model. **Support → Front/Top/Right → New sketch** creates on a canonical plane. A uniquely selected working primary top/bottom face can be used via Selected planar face. The demo includes **Top face sketch** as a persisted example.
+5. Save, close from Platform and reopen. IDs, coordinates and construction state persist; historical versions remain immutable. New legacy-format projects have an explicit **Convert legacy document** action in the Sketch ribbon before their first native sketch; Save keeps the original backup.
+6. In Model, select a feature/body/component and keep the pointer over it: selected blue wins over orange. Faces and dark blue edges remain distinguishable during orbit. Hover/select Origin for XYZ arrows; select an axis for the chain pattern. The corner triad can be clicked on its arrow shaft, including sign inversion after alignment.
+7. To show CAD's logo in the **containing browser tab**, replace Platform with its compatible experimental **0.1.13** package, then reopen CAD. [Platform package](https://github.com/Krozzeo/AxiomPlatform/releases/tag/experimental-pr-13-2f775b1cfff1a8fd749e6e30e2c33ca519209be1). Platform0.1.12 still runs the CAD operations but cannot change its shell favicon.
+
+## Scope and acceptance
+
+Primary-definition sketches, up to16 sketches/64 primitives each, canonical mm, bounded analytic geometry and supported exact primary top/bottom support faces. Constraint-solving, DOF, driving/reference dimension UI, expressions and constrained drag remain E1.M3/M4; new solid extrusion from these sketches remains E1.M5. Display circles use tessellation only for rendering, never persistent topology/measurement authority. The existing E0 drawing template still describes the proven primary plate.
+
+[Local acceptance record](E1_M2_ACCEPTANCE.json). Local acceptance:134/134 unit/security/domain tests passed, the complete browser suite passed, the physical NVIDIA suite passed without GPU validation errors, and focused physical browser creation/deletion on canonical and proven face supports passed. The actual0.1.2 reader refusal preserves original bytes. One fresh browser run hit a product timeout while registering temporary historical fixtures; a fresh run passed and no resultUnknown mutation was replayed. Exact-head CI remains required.
+
+Local real-domain and browser evidence includes primitive persistence/edit/delete/construction, numerical support frames, units and invalid data, immutable history, actual old-reader refusal, headless agent/manual parity and human-reviewed atomic Apply, stale/cancel safety, physical NVIDIA rendering and selection/reference corrections. Provider0.1.13 passed exact-head Windows/Linux contracts, real-product integration and actual downloaded-package branding. The final CAD exact-head Windows/Linux and fresh public discovery/install/launch results belong to the delivery PR and external delivery manifest; do not count this document as their success.

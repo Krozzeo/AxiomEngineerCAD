@@ -1,0 +1,62 @@
+{
+  "milestone": "E1.M2",
+  "version": "0.1.3",
+  "state": "implemented review candidate; final exact-head CI/public-install gates pending",
+  "localDomainTests": {
+    "total": 134,
+    "passed": 134,
+    "failed": 0
+  },
+  "localBrowser": {
+    "passed": true,
+    "primitives": [
+      "point",
+      "line",
+      "circle",
+      "rectangle"
+    ],
+    "newCanonicalAndProvenFaceSketches": true,
+    "constructionAndDeletion": true,
+    "staleInspectorRefused": true,
+    "legacyConversionOriginalBackup": true,
+    "saveReloadStableIds": true,
+    "emptySketchSelectionAndFit": true,
+    "immutableHistoryPreserved": true
+  },
+  "physicalGPU": {
+    "passed": true,
+    "browser": "Chrome156",
+    "vendor": "NVIDIA",
+    "architecture": "Turing",
+    "classification": "hardware-adapter",
+    "forcedSoftware": false,
+    "validationErrors": [],
+    "selectionPriorityAndRGBOrigin": true,
+    "axisShaftHitAndDashDot": true,
+    "selectedOrbitScreenshots": 5
+  },
+  "unsupportedBrowser": {
+    "browser": "Chromium141",
+    "passed": true,
+    "gpuAcceptanceClaimed": false
+  },
+  "preparedRelocatedPackage": {
+    "passed": true,
+    "version": "0.1.3",
+    "toolCount": 27,
+    "exactAnd2DCases": 29,
+    "spatialCases": 28,
+    "correspondingSourceArchives": 6,
+    "sketchNumericEditAndSaveReopen": true,
+    "WebGPUEvaluated": false
+  },
+  "platformPresentation": {
+    "version": "0.1.13",
+    "commit": "2f775b1cfff1a8fd749e6e30e2c33ca519209be1",
+    "exactPullRequestAcceptance": 41262013023,
+    "publicPreparedPackageBrandingPassed": true,
+    "sourceOriginChallengeAndInvalidImageRejection": true,
+    "connectionRecovery": true
+  },
+  "acceptance": "Owner review required; E1.M3 constraints/DOF and E1.M5 general extrusion are unstarted."
+}

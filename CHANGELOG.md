@@ -1,3 +1,11 @@
+# 0.1.3 — E1.M2 editable sketches and selection corrections
+
+- Actual point, line, circle and rectangle creation on canonical/support planes, numeric editing, construction state, stable-ID selection/deletion and native Save/reopen. Shared typed human/agent commands preserve isolated proposals and human-reviewed Apply.
+- Selected state overrides preselection; selected faces/edges use distinct blues. Solid feedback shares GPU world coordinates/matrix/depth and preserves pick IDs, removing displaced/occluded orbit contours.
+- RGB origin arrows, dash-dot axes, generous stable corner-triad hit targets and end-on labels without mouse focus rectangles.
+- Optional public logo/title bridge to the containing Platform0.1.13 editor tab, with source/origin/challenge and bounded PNG checks. CAD operations remain compatible with Platform0.1.12.
+- Only the current E1.M2 demo is advertised; earlier user data/versions remain. Constraints/DOF and general sketch extrusion are subsequent milestones, not claimed here.
+
 # 0.1.2 — E1.M1 interaction and organization review
 
 - Deliver only the current-version workbench demo; preserve earlier user files. Historical inputs are explicit regression fixtures.
