@@ -9,3 +9,5 @@
 .ribbon-tabs button{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}.ribbon-tabs button svg,.ribbon-tabs button img{width:14px;height:14px}
 
 .wb-tree-node[aria-pressed=true]:hover{color:#00aeff!important;border-color:#00aeff!important}#cad-triad [role=button]:focus{outline:none}
+
+.cad-workbench .cad-feature-menu{background:#142232;color:#edf4ff;border:1px solid #52667e;box-shadow:0 8px 26px #0008;color-scheme:dark}.cad-workbench .cad-feature-menu button{background:transparent;color:inherit}.cad-workbench .cad-feature-menu button:hover{background:#30465e}

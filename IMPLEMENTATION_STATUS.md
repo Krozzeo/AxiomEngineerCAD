@@ -1,3 +1,7 @@
+> **Current: 0.1.5 / E1.M4 review candidate.** Scoped unit-checked equations, Parameter Manager, physical dimensions, contextual Sketch Manager, principal line/point/circle relations, warm constrained drag and synchronized reference/camera feedback. [Review guide](docs/milestones/E1_M4_REPORT.md), [ADR022](docs/architecture/ADR-022-PARAMETERS-AND-SKETCH-WORKBENCH.md). Exact-head Windows/Linux CI, immutable experimental ZIP/manifest and fresh public Platform installation remain delivery gates. Owner acceptance is separate.
+
+Earlier dated snapshots below are historical.
+
 > **Current: 0.1.4 / E1.M3 review candidate.** Parametric relations and driving/reference dimensions, constrained drag, sketches in the Model viewport, one selection, Feature Manager actions, persisted synchronized visibility and working Undo/Redo. [Review guide](docs/milestones/E1_M3_REPORT.md), [ADR021](docs/architecture/ADR-021-PARAMETRIC-SKETCH-EDITING.md). Exact-head Windows/Linux CI and a fresh public Platform install remain delivery gates; owner acceptance is pending.
 
 Earlier delivery snapshots below are historical.
@@ -25,6 +29,7 @@ Date: 2026-11-01. Master: v0.2.0. Software: **0.1.4 parametric sketch review can
 | E0.M7 | Published0.0.7; owner Go to E1 recorded2026-10-31 | [Report](docs/milestones/E0_M7_REPORT.md), [ADR012](docs/architecture/ADR-012-INTEGRATED-E0-GATE.md), [corpus](docs/quality/E0_M7_ACCEPTANCE_CORPUS_V1.json) |
 | E1.M1 | Workbench review candidate0.1.2 (UX revision) | [Plan](docs/milestones/E1_M1_PLAN.md), [report](docs/milestones/E1_M1_REPORT.md), [ADR016](docs/architecture/ADR-016-E1-WORKBENCH.md) |
 | E1.M2 | Implemented review candidate0.1.3; delivery gates pending | [Report](docs/milestones/E1_M2_REPORT.md), [ADR019](docs/architecture/ADR-019-EDITABLE-SKETCH-PRIMITIVES.md) |
+| E1.M4 | 0.1.5 review candidate; exact CI/public-install gates pending | [Report](docs/milestones/E1_M4_REPORT.md), ADR022, typed expressions and physical sketch UX |
 | E1.M3 | Implemented review candidate 0.1.4; exact-head CI/public install gates pending | [Report](docs/milestones/E1_M3_REPORT.md), ADR021 |
 | E1.M4–M5, E2–E6 | Planned; not started | Expressions, arbitrary sketch extrusion and broader workflows remain later milestones |
 

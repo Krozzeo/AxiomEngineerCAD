@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {join} from 'node:path';
-import {sketchClick,sketchCommit} from './browser-sketch.mjs';
+import {sketchClick,sketchCommit,selectSketchComponent,clearSketchSelection} from './browser-sketch.mjs';
 import {waitEditorIdle} from './browser-support.mjs';
 export async function verifyParametricUI({page,evidence,report}){
  await page.locator('body[data-sketch-ready=true]').waitFor();await waitEditorIdle(page);
@@ -15,24 +15,23 @@ export async function verifyParametricUI({page,evidence,report}){
  assert.equal(await page.locator('[data-sketch-entity="layout-outline"] path').first().getAttribute('stroke'),'#000000');
  assert.equal(await page.locator('[data-sketch-entity="layout-circle"] path').first().getAttribute('stroke'),'#0000ff');
  await page.screenshot({path:join(evidence,'m3-in-model.png')});
- await page.locator('#edit-sketch-entities').selectOption('layout-circle');
+ await selectSketchComponent(page,'layout-circle');
  await page.locator('[data-constraint-id="layout-radius"]').click();
- assert.equal(await page.locator('[data-sketch-entity="layout-circle"] path').first().getAttribute('stroke'),'#0000ff');
+ assert.equal(await page.locator('[data-sketch-entity="layout-circle"] path').first().getAttribute('stroke'),'#7979ff');
  assert.equal(await page.locator('#edit-sketch-edit').isVisible(),false);
  await page.locator('#edit-sketch-constraint-delete').click();await page.waitForFunction(()=>!document.querySelector('#edit-sketch-editor').hasAttribute('aria-busy'));await waitEditorIdle(page);
  await page.waitForFunction(()=>!document.querySelector('[data-constraint-id="layout-radius"]'));
- await page.locator('#edit-sketch-entities').selectOption('layout-circle');
- await page.locator('#edit-sketch-constraint-type').selectOption('radius');await page.locator('#edit-sketch-constraint-value').fill('6');
- await page.locator('#edit-sketch-constraint-add').click();await waitEditorIdle(page);
- await page.waitForFunction(()=>document.querySelector('#edit-sketch-constraint-list')?.textContent.includes('6 mm'));
+ await selectSketchComponent(page,'layout-circle');
+ await page.locator('#sketch-dimension-tool').click();await page.locator('#sketch-dimension-input').fill('12');await sketchCommit(page,()=>page.locator('#sketch-dimension-input').press('Enter'));
+ await page.waitForFunction(()=>document.querySelector('#edit-sketch-constraint-list')?.textContent.includes('12 mm'));
  await page.waitForFunction(()=>!document.querySelector('#edit-sketch-editor').hasAttribute('aria-busy'));await waitEditorIdle(page);
  const source=()=>page.evaluate(async()=>{const r=await fetch('/v1/document',{headers:{Authorization:'Bearer '+sessionStorage.getItem('engineer-token')}});return (await r.json()).document;});
  const waitRevision=async revision=>{for(let i=0;i<200;i++){const d=await source();if(d.revision>=revision){await page.waitForFunction(()=>!document.querySelector('#edit-sketch-editor').hasAttribute('aria-busy'));await waitEditorIdle(page);return d;}await page.waitForTimeout(50);}throw Error('Pointer operation did not commit.');};
- await page.locator('#edit-sketch-entities').selectOption('');const center=await page.locator('#edit-sketch-canvas').evaluate(svg=>{const n=svg.querySelector('[data-sketch-point="layout-circle"][data-role=center]'),p=svg.createSVGPoint();p.x=Number(n.getAttribute('cx'));p.y=Number(n.getAttribute('cy'));const q=p.matrixTransform(n.getScreenCTM());return {x:q.x,y:q.y};});
+ await clearSketchSelection(page);const curve=await page.locator('[data-sketch-hit=layout-circle][data-role=entity]').evaluate(path=>{const svg=path.ownerSVGElement,p=path.getPointAtLength(path.getTotalLength()*.15),q=p.matrixTransform(path.getScreenCTM());return {x:q.x,y:q.y};});await page.mouse.move(curve.x,curve.y);const center=await page.locator('#edit-sketch-canvas').evaluate(svg=>{const n=svg.querySelector('[data-sketch-point="layout-circle"][data-role=center]'),p=svg.createSVGPoint();p.x=Number(n.getAttribute('cx'));p.y=Number(n.getAttribute('cy'));const q=p.matrixTransform(n.getScreenCTM());return {x:q.x,y:q.y};});
  await page.mouse.move(center.x,center.y);await page.waitForTimeout(80);assert.equal(await page.locator('[data-sketch-point="layout-circle"][data-role=center]').getAttribute('fill'),'#ff8000');
  const dragRevision=(await source()).revision;await page.mouse.down();await page.mouse.move(center.x+45,center.y-25,{steps:10});await page.mouse.up();const moved=await waitRevision(dragRevision+1),movedCircle=moved.native.graph.features.find(f=>f.id==='sketch-layout').data.entities.find(e=>e.id==='layout-circle');assert.ok(movedCircle.center[0]>12);assert.ok(Math.abs(movedCircle.radius-6)<1e-6);
  // An incompatible dimension is kept as a repairable relation, with the last-good model and exact source IDs.
- await page.locator('#edit-sketch-entities').selectOption('layout-outline');await page.locator('#edit-sketch-constraint-type').selectOption('length');await page.locator('#edit-sketch-constraint-value').fill('41');const conflictRevision=(await source()).revision;await page.locator('#edit-sketch-constraint-add').click();await waitRevision(conflictRevision+1);await page.locator('#edit-sketch-dof').filter({hasText:'Inconsistent'}).waitFor();assert.ok(await page.locator('.sketch-relation[data-state=conflict]').count()>0);await page.locator('#edit-sketch-constraint-delete').click();await waitRevision(conflictRevision+2);await page.locator('#edit-sketch-dof').filter({hasText:'UnderDefined'}).waitFor();
+ await selectSketchComponent(page,'layout-outline');await page.locator('#sketch-dimension-tool').click();await page.locator('#sketch-dimension-input').fill('41');const conflictRevision=(await source()).revision;await page.locator('#sketch-dimension-input').press('Enter');await waitRevision(conflictRevision+1);await page.locator('#edit-sketch-dof').filter({hasText:'Inconsistent'}).waitFor();assert.ok(await page.locator('.sketch-relation[data-state=conflict]').count()>0);await page.locator('#edit-sketch-constraint-delete').click();await waitRevision(conflictRevision+2);await page.locator('#edit-sketch-dof').filter({hasText:'UnderDefined'}).waitFor();
  const before=await page.evaluate(()=>window.engineerViewport.renderer.camera.yaw);
  const box=await page.locator('#proof-canvas').boundingBox();await page.mouse.move(box.x+box.width*.65,box.y+box.height*.7);await page.mouse.down({button:'middle'});await page.mouse.move(box.x+box.width*.65+60,box.y+box.height*.7+30,{steps:8});await page.mouse.up({button:'middle'});
  assert.notEqual(await page.evaluate(()=>window.engineerViewport.renderer.camera.yaw),before);

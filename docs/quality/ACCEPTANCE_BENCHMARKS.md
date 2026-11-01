@@ -1,3 +1,5 @@
+> E1.M4 implementation addendum (2026-11-01): [typed parameter/profile contract](../contracts/PARAMETERS_E1_M4.md), [ADR022](../architecture/ADR-022-PARAMETERS-AND-SKETCH-WORKBENCH.md) and [review evidence](../milestones/E1_M4_REPORT.md). Native format remains 1; new profiles are explicitly refused by older readers. Current reviewed scope does not complete E3 or general extrusion.
+
 # Acceptance Profiles, Benchmarks and Evidence
 
 **Baseline:** Master v0.2.0. **Status:** acceptance *schema* approved; E0.M6 candidate measured bounds are recorded in [profile v1](E0_M6_PROFILE_V1.json); integrated acceptance still requires E0.M7 owner signoff. Never present a proposed target as a measured result.

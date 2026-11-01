@@ -708,6 +708,9 @@ Do **not** begin the next dependent Milestone solely because code compiles. For 
 - **Depends:** E1.M2, E0.M2.
 
 #### E1.M4 — Parameter Manager v1 and expression engine
+
+Implementation note (2026-11-01): the owner also requested physical dimension placement/editing, contextual Sketch Manager/Inspector, Shift relation suggestions and faster solved drag with this delivery. [ADR022](docs/architecture/ADR-022-PARAMETERS-AND-SKETCH-WORKBENCH.md) records the bounded early line/point/circle subset of E3; remaining E3 and E1.M5 scope below stays planned. This note is traceability, not acceptance.
+
 - **Deliver:** global/component parameters, safe typed unit expressions, dependency graph, cycle/error handling and table-to-feature navigation; corresponding agent query/edit tools.
 - **Verify:** equation controls sketch geometry, changing one variable updates dependent dimensions, cycle/unit mismatch rejected atomically, persisted expressions survive reopen.
 - **Depends:** E1.M3.

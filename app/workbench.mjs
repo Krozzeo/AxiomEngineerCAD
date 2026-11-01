@@ -1,7 +1,7 @@
 import {icon as cadIcon} from './icons.mjs';
 import {editorDocument as document} from './editor-document.mjs';
 const $=id=>document.getElementById(id),viewport=window.engineerViewport,legacy=new URLSearchParams(location.search).get('workspace')==='labs';
-document.body.classList.add('cad-workbench');document.querySelector('.stage').textContent='0.1.4 · MODEL WORKBENCH';
+document.body.classList.add('cad-workbench');document.querySelector('.stage').textContent='0.1.5 · MODEL WORKBENCH';
 const workspace=document.querySelector('.workspace'),content=document.querySelector('.lab-content'),proof=document.querySelector('.proof-workbench'),inspector=document.querySelector('.inspector');
 const drawer=document.createElement('details');drawer.id='workbench-labs';drawer.open=legacy;const summary=document.createElement('summary');summary.textContent='Engineering diagnostics & earlier milestone labs';drawer.append(summary,content);workspace.append(drawer);for(const d of proof.querySelectorAll(':scope > details'))content.prepend(d);workspace.querySelector('.workspace-top').after(proof);workspace.querySelector('.workspace-top').firstElementChild.textContent='MODEL WORKSPACE';
 inspector.prepend(document.querySelector('.proof-inspector'));inspector.querySelector('.proof-inspector > .muted').textContent='Inspect geometry or a component. Choose a reference plane to orient the view.';const properties=document.createElement('details');properties.id='wb-properties';properties.open=legacy;const ps=document.createElement('summary');ps.textContent='Document properties';properties.append(ps,inspector.querySelector('.eyebrow'),$('metadata'),$('message'));inspector.append(properties);

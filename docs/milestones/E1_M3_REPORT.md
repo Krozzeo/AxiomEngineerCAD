@@ -1,6 +1,6 @@
 # E1.M3 — Parametric sketch editor, candidate 0.1.4
 
-**State: review candidate; final validation and delivery gates pending. Publication, exact-head CI and fresh public install are still required.** No owner acceptance is implied. Branch: `engineer/e1-m3-sketch-constraints`, based on delivered 0.1.3 / `12e15623b3b9474cdce6a6a95f13c1de06b867bc`.
+**Delivery record:** 0.1.4 experimental published at e0d05c2796f2bc1bb47d7af370688178246bcebc, PR12; exact pull-request Windows/Linux CI 41333287708 and publication 41334093170 passed. Actual public Platform0.1.13 discovery/install/launch, hardware UI and five independent vector PDFs passed. ZIP SHA256 866dd387bed63888512102d100ddb56e39d03a613ffffba8f657a97b6b513c43, 99,759,570 bytes. Owner requested E1.M4 changes after reviewing the demo; publication itself does not imply blanket formal acceptance. Earlier candidate wording below is historical.
 
 ## Owner review guide
 
