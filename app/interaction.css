@@ -7,3 +7,5 @@
 #wb-hint.cad-info-error{color:#ffb7a8;border-top:1px solid #a76c52}
 
 .ribbon-tabs button{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}.ribbon-tabs button svg,.ribbon-tabs button img{width:14px;height:14px}
+
+.wb-tree-node[aria-pressed=true]:hover{color:#00aeff!important;border-color:#00aeff!important}#cad-triad [role=button]:focus{outline:none}

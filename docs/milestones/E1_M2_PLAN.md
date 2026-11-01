@@ -1,0 +1,11 @@
+# E1.M2 — Sketch primitives and selected-state corrections
+
+Owner authorized the next milestone after0.1.2, together with the listed selection/origin/axis/favicon corrections. M1 progression is authorized; existing measured scope and native safety limits remain. Candidate software0.1.3, no main merge implied.
+
+Requirements CAD-R001/003/006/008/009/010/012/022/023. Deliver actual editable sketches on canonical reference planes and supported exact planar faces, point/line/circle/rectangle creation, numeric editing, selection/deletion/construction state, stable IDs and native save/reopen. Manual and agent operations share typed commands and the existing isolated proposal/review/Apply path. No constraint-solving/DOF or new solid-creation claim (E1.M3/M5).
+
+Persist a versioned typed sketch feature in native1 rather than a UI sidecar. Unknown/old feature decoders fail safely; existing documents/immutable versions remain unchanged. Reuse the measured E0 sketch coordinate bounds (+/-1000 mm, radius >0.01 mm, noncollapsed lines >1e-9 mm) and resource budgets. Validate degeneracy, unknown fields/IDs, units, stale edits, cancellation, missing/ambiguous face references and downstream deletion. Establish independent expected coordinates and source-reference frames before accepting the slice.
+
+Rendering corrections: selected state overrides hover, distinct dark selected edges, GPU-depth-tested solid feedback using the same submitted frame as the model, origin XYZ coordinate marker, dashed axis references, generous axis-arrow hit targets without mouse focus rectangles. Favicon propagation belongs to a narrow generic Platform shell presentation bridge, preserving origin/session checks and isolation; never bypass the shell by navigating it away.
+
+Acceptance: current-only M2 editable demo; real browser create/edit/delete/reopen and headless tool parity; no writes from navigation/hover; negative/old-reader/native-version tests; real physical GPU and separate unsupported-device behavior; retained numerical/review/vector-PDF flows; exact-head Windows/Linux CI and actual public compatible Platform install. Record the Platform presentation dependency explicitly. Publish compatible experimental artifacts for review, preserve prior releases and user files.

@@ -11,7 +11,7 @@ import {startHost} from '../node_modules/axiom-platform/services/local-host/serv
 const root = await mkdtemp(join(tmpdir(), 'engineer-browser-')), evidence = resolve(process.env.ENGINEER_EVIDENCE??'test-results');
 await mkdir(evidence, {recursive:true});
 let browser, child, host, direct;
-const report = {milestone:'E1.M1', platform:'0.1.12', providerCommit:'6d240845cd77eb1879738d32c9f2b8fcfd7297c5',
+const report = {milestone:'E1.M2', platform:'0.1.12', providerCommit:'6d240845cd77eb1879738d32c9f2b8fcfd7297c5',
   runtime:process.version, os:process.platform, architecture:process.arch, criteria:[], pageErrors:[],
   renderer:'Canvas CPU preview derived from actual OCCT tessellation; exact metrics from isolated CPU/Wasm; M6 WebGPU evidence is reported separately; no real AI model acceptance claimed'};
 try {
@@ -145,6 +145,7 @@ try {
   const demoPage=await context.newPage();observe(demoPage);await demoPage.goto((openedDemo.editorUrl).replace('/#','/?workspace=labs#'));await waitEditorIdle(demoPage);await demoPage.waitForFunction(()=>document.querySelector('#assembly-json').value.includes('E0.M3-datums-v0'));
   await demoPage.locator('#spatial-lab > summary').click();await demoPage.locator('#assembly-solve').click();await demoPage.locator('#assembly-status').filter({hasText:'UnderDefined · DOF 2'}).waitFor();await demoPage.screenshot({path:join(evidence,'spatial-demo.png'),fullPage:true});
   report.criteria.push('Actual Hub Load Demos registers both labs and opens/solves the native spatial demo in its installed product session');
+  const {verifySketchProjectUI}=await import('./browser-sketch.mjs');await verifySketchProjectUI({hub,context,host,evidence,observe,report});
   const {verifyNativeUI}=await import('./browser-native.mjs');await verifyNativeUI({hub,context,host,evidence,observe,report});
   const {verifyReviewUI}=await import('./browser-review.mjs');await verifyReviewUI({hub,context,host,evidence,observe,report});
   const {verifyProofUI}=await import('./browser-proof.mjs');await verifyProofUI({hub,context,host,evidence,observe,report});if(process.env.ENGINEER_HARDWARE==='1')assert.equal(report.proof.gpu.classification,'hardware-adapter');

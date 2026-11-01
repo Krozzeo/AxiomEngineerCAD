@@ -33,7 +33,7 @@ $('metadata').addEventListener('submit', event => {
   run(async () => {
     state = {...await request('edit', {metadata, expectedRevision:state.status.revision}), hosted:state.hosted};
     pending = $('name').value !== metadata.name || $('notes').value !== metadata.notes;
-    await report(pending); state = await request('document'); render(); message('Properties applied. Save to persist this revision.');
+    await report(pending); state = await request('document'); render();window.dispatchEvent(new CustomEvent('engineer-document-changed',{detail:state})); message('Properties applied. Save to persist this revision.');
   });
 });
 $('reset').addEventListener('click', () => run(async () => { await report(false); pending = false; state = await request('document'); render(true); message('Fields reset to the working revision.'); }));
@@ -55,7 +55,7 @@ setInterval(() => {
   if (closed) { polling = false; return; }
   try {
     const current = await request('document');
-    if (!pending) { const changed = current.status.revision !== state.status.revision; state = current; render(changed); }
+    if (!pending) { const changed = current.status.revision !== state.status.revision; state = current; render(changed);if(changed)window.dispatchEvent(new CustomEvent('engineer-document-changed',{detail:current})); }
     else if (current.status.revision !== state.status.revision) message('The document changed elsewhere. Reset fields to reload before applying.');
   } catch {
     if (closed) return;

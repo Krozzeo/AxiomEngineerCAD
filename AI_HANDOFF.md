@@ -1,3 +1,9 @@
+> **Current:0.1.3 / E1.M2 review candidate.** Real editable point/line/circle/rectangle sketches, construction state and native persistence, shared human/agent commands, selected-state/GPU-frame/origin/axis corrections and optional Platform0.1.13 tab branding. [Test guide](docs/milestones/E1_M2_REPORT.md), [ADR019](docs/architecture/ADR-019-EDITABLE-SKETCH-PRIMITIVES.md), [ADR020](docs/architecture/ADR-020-SELECTION-FRAMES-AND-TAB-PRESENTATION.md). Exact-head CI and public prepared install remain delivery gates. E1.M3 constraints are next and unstarted.
+
+Current branch `engineer/e1-m2-sketch-primitives` stacks on delivered0.1.2/c63983019b6292e0653b2557f4d3d9aec69e5ff9 (PR10). Native1 gains the strict sketch feature profile; actual0.1.2 refuses it without writes. SDK pin remains accepted Platform0.1.12; hosted tab branding requires independently published Platform0.1.13/2f775b1cfff1a8fd749e6e30e2c33ca519209be1 (PR13). Never claim0.1.12 changes its parent-tab icon. Current-only M2 demos; M1 joins historical test fixtures.
+
+Earlier revision snapshots below describe their historical state.
+
 > **0.1.2 interaction revision:** current-only demos; Auto/hover selection, canonical Origin and smooth reference navigation; Manager, selection-only Inspector, central Document properties, tabbed operations and dirty Save. [Guide](docs/milestones/E1_M1_UX_0_1_2.md), [ADR018](docs/architecture/ADR-018-INTERACTION-WORKBENCH.md). Native0/1 unchanged; E1.M2 unstarted. Final exact-head CI/public-install gates apply.
 
 Platform popup isolation: ADR017 uses a panel-only authenticated frontend of the same live adapter/session under the actual Hub iframe, with source-bound ordered BroadcastChannel camera/selection sync. Standalone mode moves original nodes. Child preferences never overwrite the parent layout; no COOP/COEP weakening/new lease/domain schema. tests/browser-embedded-panels.mjs is a required regression.

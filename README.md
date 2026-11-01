@@ -1,3 +1,7 @@
+> **Current:0.1.3 / E1.M2 review candidate.** Real editable point/line/circle/rectangle sketches, construction state and native persistence, shared human/agent commands, selected-state/GPU-frame/origin/axis corrections and optional Platform0.1.13 tab branding. [Test guide](docs/milestones/E1_M2_REPORT.md), [ADR019](docs/architecture/ADR-019-EDITABLE-SKETCH-PRIMITIVES.md), [ADR020](docs/architecture/ADR-020-SELECTION-FRAMES-AND-TAB-PRESENTATION.md). Exact-head CI and public prepared install remain delivery gates. E1.M3 constraints are next and unstarted.
+
+Earlier revision snapshots below describe their historical state.
+
 > **0.1.2 interaction revision:** current-only demos; Auto/hover selection, canonical Origin and smooth reference navigation; Manager, selection-only Inspector, central Document properties, tabbed operations and dirty Save. [Guide](docs/milestones/E1_M1_UX_0_1_2.md), [ADR018](docs/architecture/ADR-018-INTERACTION-WORKBENCH.md). Native0/1 unchanged; E1.M2 unstarted. Final exact-head CI/public-install gates apply.
 
 > **0.1.1 UX revision:** compact CAD header/ribbon, Game Engine five-zone docking/Separate Windows and persistent layout, Panels reopen/reset, reversed horizontal orbit and cursor-centered wheel zoom. [Test guide](docs/milestones/E1_M1_UX_0_1_1.md), [ADR017](docs/architecture/ADR-017-CAD-DOCKING-UX.md). E1.M2 remains unstarted; exact-head CI and fresh public Platform install are delivery gates. Native schema/data and runtime pins unchanged.
@@ -6,13 +10,13 @@
 
 Local-first, browser-operated parametric mechanical CAD and engineering-documentation product in the Axiom family, designed from the outset for both human users and AI agents.
 
-> **Status:**0.1.2 / E1.M1 model workbench review candidate. E0 owner Go recorded. Real central WebGPU view, source tree/Inspector, reference frames, CAD navigation and seven-class exact selection. Sketch creation/constraints/expressions/extrusion follow in E1.M2–M5; full MVP remains later.
+> **Status:**0.1.3 / E1.M2 editable sketches review candidate. E0 owner Go recorded. Real plane-local primitive editing and native persistence accompany the CAD workbench. Constraints, expressions and general sketch extrusion follow in E1.M3–M5; full MVP remains later.
 
 ## Install milestone builds from Platform
 
 Every completed review milestone is delivered as an experimental prepared installation. In Platform 0.1.12+, open **Installations → Add installation → Axiom Engineer CAD → Refresh**, select the published experimental build, download/install and activate. Then create an Engineer project. Source PRs and passing tests alone are not installable publications. See [milestone delivery](docs/MILESTONE_DELIVERY.md) for the publication and verification gate.
 
-**New workbench:** install/activate **0.1.2 → Load Demos → E1.M1 Model Workbench**. The model builds automatically. Use the tree or selection filter, middle drag to orbit, Shift+middle to pan, wheel zoom, F fit and the view cube. Projection and Normal to are in the view ribbon. A fresh project shows the canonical planes/axes without converting old files. Tools → Engineering diagnostics retains all earlier labs. [Full test guide](docs/milestones/E1_M1_REPORT.md), [navigation contract](docs/architecture/ADR-016-E1-WORKBENCH.md).
+**Current demo:** install/activate **0.1.3 → Load Demos → E1.M2 Editable Sketches**. Open the Sketch tab to edit the saved layout/top-face sketches. [Current guide](docs/milestones/E1_M2_REPORT.md). The model builds automatically. Use the tree or selection filter, middle drag to orbit, Shift+middle to pan, wheel zoom, F fit and the view cube. Projection and Normal to are in the view ribbon. A fresh project shows the canonical planes/axes without converting old files. Tools → Engineering diagnostics retains all earlier labs. [Full test guide](docs/milestones/E1_M1_REPORT.md), [navigation contract](docs/architecture/ADR-016-E1-WORKBENCH.md).
 
 **New integrated demo:** install0.0.7, choose **Load Demos → E0.M7 Integrated Foundation Lab → Build from model**. Change Thickness15, Apply driving dimension, Save and rebuild. Review/Apply a scripted width60 proposal, rebuild and inspect drawing. Source Retained1 previews original40/depth10 read-only; Working model remains current60/depth15 after reopen. [Test steps](docs/milestones/E0_M7_REPORT.md), [owner gate](docs/architecture/ADR-012-INTEGRATED-E0-GATE.md). New profiles require0.0.7; old documents remain readable unchanged.
 
