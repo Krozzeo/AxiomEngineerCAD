@@ -20,7 +20,7 @@ A bounded, document-scoped child process reuses loaded exact kernel/solver runti
 
 The pinned GCS proportional constraint ignored the ratio in an isolated measured fixture. Equal line/circle circumference therefore uses exact auxiliary right-triangle equations (angle atan(2π)), with an independent circumference residual and source DOF cross-check. No dependency patch or visual substitute. Drag removes temporary source endpoint anchors only; permanent auxiliary fixed origins survive the source-DOF recheck. A browser-worker solve-and-drag fixture covers nine principal relation families under the shipped CSP.
 
-References, sketch feedback, dimensions and GPU uniforms use the same presented camera snapshot before command encoding. This also prevents replacing feedback buffers after encoding. Separate panels use independent camera ownership stamps and sketch-selection stamps, so delayed peers cannot interrupt local alignment. Explicit aligned normal requests reverse direction while preserving screen up.
+References, sketch feedback, dimensions and GPU uniforms use the same presented camera snapshot before command encoding. This also prevents replacing feedback buffers after encoding. Separate panels use independent camera ownership stamps and sketch-selection stamps, so delayed peers cannot interrupt local alignment. Explicit aligned normal requests reverse direction while preserving screen up. Replacing a verified scene preserves an active camera animation; only initial automatic fitting without an active sketch or explicit user navigation cancels it. This prevents asynchronous builds from another frontend stopping alignment mid-flight. A deterministic browser regression refreshes the scene during a normal animation.
 
 ## Evidence and limits
 
