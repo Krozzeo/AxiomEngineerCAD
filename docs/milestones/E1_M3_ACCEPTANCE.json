@@ -9,8 +9,8 @@
     "commit": "6d240845cd77eb1879738d32c9f2b8fcfd7297c5"
   },
   "localEvidence": {
-    "domainTests": 150,
-    "parametricTests": 14,
+    "domainTests": 151,
+    "parametricTests": 15,
     "visibilityTests": 2,
     "numericRetainedCases": 57,
     "typedTools": 37,
@@ -22,7 +22,9 @@
     "bundledBrowserEmbeddedEditing": true,
     "physicalWorkbench1650x1050": true,
     "physicalWorkbench1440x960": true,
-    "relocatedPreparedPackage": true
+    "relocatedPreparedPackage": true,
+    "fullLocalPhysicalBrowser": true,
+    "saveReadRegression": "Save waits for sketch diagnostic/preview read, then repeats revision and all write guards"
   },
   "pending": [
     "final complete browser run",

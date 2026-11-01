@@ -70,6 +70,10 @@ export class Document {
   }
   async save(expectedRevision,operationId=randomUUID()) {
     this.expect(expectedRevision);
+    // Background sketch inspection/preview cannot change MAIN. Finish that read
+    // under the existing adapter queue, then repeat the causal revision check.
+    if(this.commands?.running&&['sketch-diagnostics','sketch-preview'].includes(this.commands.job.kind))await this.commands.job.promise;
+    this.expect(expectedRevision);
     check(!this.pending(), 'projectBusy', 'Apply pending fields before saving, or explicitly discard on close.');
     check(!this.lab?.running&&!this.commands?.running&&!this.proof?.running, 'projectBusy', 'Wait for or cancel the lab/tool task before saving.');
     await this.authorize(this.path);
