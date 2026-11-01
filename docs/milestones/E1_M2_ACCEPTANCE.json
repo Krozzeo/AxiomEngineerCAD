@@ -22,7 +22,8 @@
     "saveReloadStableIds": true,
     "emptySketchSelectionAndFit": true,
     "immutableHistoryPreserved": true,
-    "separatedSketchSameSessionCreateEditSelectionAndReturn": true
+    "separatedSketchSameSessionCreateEditSelectionAndReturn": true,
+    "lateBackgroundResponsePreservesTypedDraft": true
   },
   "physicalGPU": {
     "passed": true,
