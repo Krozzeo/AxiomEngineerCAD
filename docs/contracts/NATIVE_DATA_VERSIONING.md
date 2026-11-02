@@ -1,3 +1,5 @@
+> E1.M4 implementation addendum (2026-11-01): [typed parameter/profile contract](PARAMETERS_E1_M4.md), [ADR022](../architecture/ADR-022-PARAMETERS-AND-SKETCH-WORKBENCH.md) and [review evidence](../milestones/E1_M4_REPORT.md). Native format remains 1; new profiles are explicitly refused by older readers. Current reviewed scope does not complete E3 or general extrusion.
+
 # Native Data, Versions and References Contract
 
 **Baseline:** Master v0.2.0. **State:** measured native1 foundation accepted for E1 progression by the2026-10-31 E0 Go; broader version/publication capabilities remain at their scheduled gates. **First decisive gate:** E0.M4 after topology and 3D solver proofs.

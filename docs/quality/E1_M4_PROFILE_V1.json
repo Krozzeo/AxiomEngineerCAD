@@ -1,0 +1,87 @@
+{
+  "profile": "E1.M4/1",
+  "status": "Local candidate measurements; exact final CI and public-install identity attached externally to delivery PR",
+  "date": "2026-11-01",
+  "productVersion": "0.1.5",
+  "domainTests": {
+    "passed": 173,
+    "total": 173
+  },
+  "hardware": {
+    "device": "NVIDIA GeForce GTX 1650",
+    "driver": "32.0.16.1692",
+    "browser": "Chrome 156",
+    "softwareForced": false
+  },
+  "navigationAndDrag": {
+    "passed": true,
+    "completeAlignment": true,
+    "F8Reverse": true,
+    "screenUpPreserved": true,
+    "actualPointerDrag": true,
+    "releaseToRevisionMs": 299,
+    "previewTimings": [
+      17.454999923706055,
+      3.2049999237060547,
+      3.504999876022339,
+      3.934999942779541,
+      3.609999895095825,
+      3.125,
+      2.7750000953674316,
+      3.434999942779541,
+      2.5450000762939453,
+      2.2249999046325684,
+      3.515000104904175,
+      2.115000009536743,
+      2.245000123977661,
+      1.9249999523162842,
+      2.2249999046325684,
+      2.5399999618530273,
+      3.5,
+      2.1100001335144043,
+      1.869999885559082,
+      1.869999885559082
+    ],
+    "warmPreviewP95Ms": 3.934999942779541,
+    "hardwareRequiredForPerformanceAcceptance": true,
+    "referenceFrameAgreement": {
+      "count": 20,
+      "maxErrorPixels": 0
+    },
+    "visibleReferencePick": true,
+    "darkContextMenu": true
+  },
+  "ui": {
+    "physicalDimensionPlacement": true,
+    "quickDimensionEdit": true,
+    "annotationDrag": true,
+    "dimensionTargetEditing": true,
+    "managerTree": true,
+    "shiftRelations": true,
+    "deleteKey": true,
+    "separateParameterWindow": true,
+    "globalExpressions": true,
+    "dependentDimensions": true,
+    "cycleAndUnitRollback": true
+  },
+  "gpu": {
+    "info": {
+      "state": "ready",
+      "vendor": "nvidia",
+      "architecture": "turing",
+      "device": "",
+      "description": "",
+      "isFallbackAdapter": false,
+      "classification": "hardware-adapter",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36"
+    },
+    "errors": []
+  },
+  "pageErrors": [],
+  "limits": [
+    "Simple default fixture; warm solver timing excludes initialization",
+    "Release latency includes actual source verification; no large-sketch guarantee",
+    "GPU rendering only; CPU/Wasm numerical authority",
+    "Prepared public exact-head verification required before delivery"
+  ]
+}

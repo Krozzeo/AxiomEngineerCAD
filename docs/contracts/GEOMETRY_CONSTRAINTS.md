@@ -1,3 +1,5 @@
+> E1.M4 implementation addendum (2026-11-01): [typed parameter/profile contract](PARAMETERS_E1_M4.md), [ADR022](../architecture/ADR-022-PARAMETERS-AND-SKETCH-WORKBENCH.md) and [review evidence](../milestones/E1_M4_REPORT.md). Native format remains 1; new profiles are explicitly refused by older readers. Current reviewed scope does not complete E3 or general extrusion.
+
 # Geometry, Topology and Constraint Contracts
 
 **Baseline:** Master v0.2.0. **Status:** measured E0 profile choices accepted for E1 progression; broader behavior below remains at its scheduled milestones. Geometry is authoritative CPU/Wasm/native-worker B-Rep, not WebGPU triangles.

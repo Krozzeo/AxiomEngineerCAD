@@ -63,3 +63,7 @@ References: [Master roadmap](../../MASTER_DESIGN.md#18-development-generations-a
 ## E0 Go and E1.M1 evidence update2026-10-31
 
 [E0 decision](../architecture/E0_OWNER_GO_2026_10_31.json) accepts the measured baseline for progression. E1.M1 [ADR016](../architecture/ADR-016-E1-WORKBENCH.md) adds UI/ReadOnly context, not native data mutation:15 workbench cases plus100 retained, actual default/empty/Hub UI, seven-class physical GPU picking and focused navigation, headless selection parity, unchanged-document/prior0.0.7 reader compatibility, current package/public install checks. Existing native0/1 schemas and E0 corpus inputs remain unchanged. General sketch/feature creation, arbitrary topology/drawings and full mature requirement acceptance remain at their scheduled gates.
+
+## E1.M4 implementation update 2026-11-01
+
+[Report](../milestones/E1_M4_REPORT.md), [ADR022](../architecture/ADR-022-PARAMETERS-AND-SKETCH-WORKBENCH.md) and [typed contract](../contracts/PARAMETERS_E1_M4.md) map E1.M4 scopes/units/parser/DAG/bindings to actual solver and shared proposal tools. Owner-requested early E3 line/point/circle relations accompany physical dimensions, Sketch Manager/Inspector and warm drag. Tests cover independent geometry/DOF, immutable source, cycle/unit/stale/cancel rollback, old-reader refusal, actual UI/Separate Windows and prepared/public installation. Full E3 and general extrusion remain scheduled. Final commit/build evidence is in the delivery PR/public-install reports; owner acceptance is separate.

@@ -1,3 +1,7 @@
+> **Current: 0.1.5 / E1.M4 review candidate.** Scoped unit-checked equations, Parameter Manager, physical dimensions, contextual Sketch Manager, principal line/point/circle relations, warm constrained drag and synchronized reference/camera feedback. [Review guide](docs/milestones/E1_M4_REPORT.md), [ADR022](docs/architecture/ADR-022-PARAMETERS-AND-SKETCH-WORKBENCH.md). Exact-head Windows/Linux CI, immutable experimental ZIP/manifest and fresh public Platform installation remain delivery gates. Owner acceptance is separate.
+
+Earlier dated snapshots below are historical.
+
 > **Current: 0.1.4 / E1.M3 review candidate.** Parametric relations and driving/reference dimensions, constrained drag, sketches in the Model viewport, one selection, Feature Manager actions, persisted synchronized visibility and working Undo/Redo. [Review guide](docs/milestones/E1_M3_REPORT.md), [ADR021](docs/architecture/ADR-021-PARAMETRIC-SKETCH-EDITING.md). Exact-head Windows/Linux CI and a fresh public Platform install remain delivery gates; owner acceptance is pending.
 
 Earlier delivery snapshots below are historical.
@@ -20,7 +24,7 @@ Local-first, browser-operated parametric mechanical CAD and engineering-document
 
 Every completed review milestone is delivered as an experimental prepared installation. In Platform 0.1.12+, open **Installations → Add installation → Axiom Engineer CAD → Refresh**, select the published experimental build, download/install and activate. Then create an Engineer project. Source PRs and passing tests alone are not installable publications. See [milestone delivery](docs/MILESTONE_DELIVERY.md) for the publication and verification gate.
 
-**Current demo:** install/activate **0.1.4 → Load Demos → E1.M3 Parametric Sketches**. Right-click or double-click Layout sketch in Manager. The Sketch ribbon opens automatically; edit in Model, inspect relations, drag points and use File → Undo/Redo. [Current review guide](docs/milestones/E1_M3_REPORT.md). [Current guide](docs/milestones/E1_M2_REPORT.md). The model builds automatically. Use the tree or selection filter, middle drag to orbit, Shift+middle to pan, wheel zoom, F fit and the view cube. Projection and Normal to are in the view ribbon. A fresh project shows the canonical planes/axes without converting old files. Tools → Engineering diagnostics retains all earlier labs. [Full test guide](docs/milestones/E1_M1_REPORT.md), [navigation contract](docs/architecture/ADR-016-E1-WORKBENCH.md).
+**Current demo:** install/activate **0.1.5 → Load Demos → E1.M4 Equations & Sketch Workbench**. Double-click Layout sketch in Manager, edit dimensions in Model or use Tools → Parameter Manager. [Current test guide](docs/milestones/E1_M4_REPORT.md). Earlier user projects remain intact; historical demos are acceptance fixtures outside the production catalog.
 
 **New integrated demo:** install0.0.7, choose **Load Demos → E0.M7 Integrated Foundation Lab → Build from model**. Change Thickness15, Apply driving dimension, Save and rebuild. Review/Apply a scripted width60 proposal, rebuild and inspect drawing. Source Retained1 previews original40/depth10 read-only; Working model remains current60/depth15 after reopen. [Test steps](docs/milestones/E0_M7_REPORT.md), [owner gate](docs/architecture/ADR-012-INTEGRATED-E0-GATE.md). New profiles require0.0.7; old documents remain readable unchanged.
 

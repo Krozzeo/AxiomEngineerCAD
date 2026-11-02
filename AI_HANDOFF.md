@@ -1,3 +1,7 @@
+> **Current: 0.1.5 / E1.M4 review candidate.** Scoped unit-checked equations, Parameter Manager, physical dimensions, contextual Sketch Manager, principal line/point/circle relations, warm constrained drag and synchronized reference/camera feedback. [Review guide](docs/milestones/E1_M4_REPORT.md), [ADR022](docs/architecture/ADR-022-PARAMETERS-AND-SKETCH-WORKBENCH.md). Exact-head Windows/Linux CI, immutable experimental ZIP/manifest and fresh public Platform installation remain delivery gates. Owner acceptance is separate.
+
+Earlier dated snapshots below are historical.
+
 > **Current: 0.1.4 / E1.M3 review candidate.** Parametric relations and driving/reference dimensions, constrained drag, sketches in the Model viewport, one selection, Feature Manager actions, persisted synchronized visibility and working Undo/Redo. [Review guide](docs/milestones/E1_M3_REPORT.md), [ADR021](docs/architecture/ADR-021-PARAMETRIC-SKETCH-EDITING.md). Exact-head Windows/Linux CI and a fresh public Platform install remain delivery gates; owner acceptance is pending.
 
 Current branch: `engineer/e1-m3-sketch-constraints`, stacking on delivered PR11/12e15623b3b9474cdce6a6a95f13c1de06b867bc. Native envelope and SDK pins unchanged; strict E1.M3-sketch/1 profile safely refuses old readers and explicitly upgrades working M2 sketches. Canonical display deletion is reversible via View → Restore reference entries. Custom refs/arcs/expressions/general extrusion remain scheduled later, not claimed here. Undo retains immutable versions/publications and advances revision.

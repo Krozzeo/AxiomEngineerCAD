@@ -1,3 +1,4 @@
+import {validateParameter,evaluatedGraph} from '../parameters/profile.mjs';
 import {SKETCH_TYPE,validateSketch} from '../sketch/profile.mjs';
 import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
@@ -27,7 +28,7 @@ export function validateGraph(g,{documentId,versions=[],depth=0,ancestors=[]}={}
   const defs=new Map(g.definitions.map(d=>[d.id,d])),features=new Map(g.features.map(f=>[f.id,f])),params=new Map(g.parameters.map(p=>[p.id,p])),deps=new Map(g.dependencies.map(d=>[d.id,d]));
   check(defs.has(g.primaryDefinitionId),'LostReference','Missing primary definition.');
   for(const d of g.definitions){check(keys(d,['id','name','kind','datumRoles'])&&text(d.name)&&['part','assembly'].includes(d.kind)&&Array.isArray(d.datumRoles)&&d.datumRoles.length<=16&&new Set(d.datumRoles).size===d.datumRoles.length&&d.datumRoles.every(id),'InvalidNativeGraph','Invalid definition or datum roles.');}
-  for(const p of g.parameters){check(keys(p,['id','definitionId','name','unit','value','dependsOn'])&&defs.has(p.definitionId)&&text(p.name)&&['mm','rad','scalar'].includes(p.unit)&&Number.isFinite(p.value)&&Math.abs(p.value)<=1e6&&Array.isArray(p.dependsOn)&&p.dependsOn.length<=16&&p.dependsOn.every(x=>params.has(x)),'InvalidNativeGraph','Invalid literal parameter dependency. Expressions remain E1.');}
+  for(const p of g.parameters){if(p.profile){validateParameter(p,g);continue;}check(keys(p,['id','definitionId','name','unit','value','dependsOn'])&&defs.has(p.definitionId)&&text(p.name)&&['mm','rad','scalar'].includes(p.unit)&&Number.isFinite(p.value)&&Math.abs(p.value)<=1e6&&Array.isArray(p.dependsOn)&&p.dependsOn.length<=16&&p.dependsOn.every(x=>params.has(x)),'InvalidNativeGraph','Invalid literal parameter dependency. Expressions remain E1.');}
   acyclic(g.parameters,x=>params.get(x).dependsOn);
   for(const f of g.features){check(keys(f,['id','definitionId','type','dependsOn','parameterIds','data','selector'])&&defs.has(f.definitionId)&&['geometry-probe','spatial-probe','datum-reference',SKETCH_TYPE,...TYPES].includes(f.type)&&Array.isArray(f.dependsOn)&&f.dependsOn.length<=16&&f.dependsOn.every(x=>features.has(x)&&features.get(x).definitionId===f.definitionId)&&Array.isArray(f.parameterIds)&&f.parameterIds.every(x=>params.has(x)),'InvalidNativeGraph','Invalid typed feature graph.');
     if(f.type==='geometry-probe')geometry(f.data);if(f.type==='spatial-probe')assemblyRecipe(f.data);if(f.type==='datum-reference')check(f.selector&&!Object.hasOwn(f,'data'),'LostReference','A reference feature needs an explicit selector.');
@@ -48,7 +49,7 @@ export function validateGraph(g,{documentId,versions=[],depth=0,ancestors=[]}={}
   }
   for(const s of g.sources){check(keys(s,['id','filename','bytes','sha256','base64','translator','fidelity'])&&text(s.filename)&&!/[\\/:]/.test(s.filename)&&Number.isSafeInteger(s.bytes)&&s.bytes>=0&&s.bytes<=32768&&typeof s.base64==='string'&&s.base64.length<=44000&&keys(s.translator,['id','version'])&&text(s.translator.id)&&text(s.translator.version)&&text(s.fidelity,512),'InvalidNativeGraph','Invalid preserved source attachment.');const data=Buffer.from(s.base64,'base64');check(data.length===s.bytes&&data.toString('base64')===s.base64&&hash(data)===s.sha256,'IntegrityError','Source attachment checksum mismatch.');}
   check(g.features.filter(f=>f.type===SKETCH_TYPE).length<=16,'ResourceLimit','At most sixteen editable sketches.');for(const f of g.features)if(f.type===SKETCH_TYPE)validateSketch(f,g,ids);
-  validateIntegration(g);occurrencePaths(g);return g;
+  evaluatedGraph(g);validateIntegration(g);occurrencePaths(g);return g;
 }
 export function validateContent(c,{depth=0,ancestors=[]}={}){
   check(keys(c,['documentId','metadata','graph','experiment','assembly','provenance','localVersions','verification'])&&docId(c.documentId)&&compatible(c.provenance),'incompatibleVersion','Historical runtime/schema profile is unsupported. Original content preserved.');validateMetadata(c.metadata);

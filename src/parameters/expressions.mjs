@@ -1,0 +1,36 @@
+import {check} from '../errors.mjs';
+
+// Deliberately small quantity grammar. No JavaScript evaluation, property traversal or I/O.
+export const UNITS=Object.freeze({mm:[1,1,0],cm:[10,1,0],m:[1000,1,0],inch:[25.4,1,0],rad:[1,0,1],deg:[Math.PI/180,0,1]});
+const quantity=(value,length=0,angle=0)=>{check(Number.isFinite(value)&&Math.abs(value)<=1e12&&Number.isInteger(length)&&Number.isInteger(angle)&&Math.abs(length)<=4&&Math.abs(angle)<=4,'InvalidUnits','Expression exceeds its numeric or dimensional domain.');return {value,length,angle};};
+const same=(a,b)=>a.length===b.length&&a.angle===b.angle;
+export const unitQuantity=(value,unit)=>{check(['mm','rad','scalar'].includes(unit),'InvalidUnits','Unknown canonical parameter unit.');return unit==='scalar'?quantity(value):quantity(value,...({mm:[1,0],rad:[0,1]}[unit]));};
+export function expression(source,resolve){
+ check(typeof source==='string'&&source.length>0&&source.length<=512,'InvalidInput','An expression must contain 1–512 characters.');
+ const tokens=source.match(/(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?|[A-Za-z_][A-Za-z_0-9]*(?:\.[A-Za-z_][A-Za-z_0-9]*)?|[()+\-*/^,]|\S/g)??[];
+ check(tokens.length<=128,'ResourceLimit','Expression exceeds 128 tokens.');let at=0,depth=0;const refs=new Set(),peek=()=>tokens[at],take=()=>tokens[at++],expect=s=>check(take()===s,'InvalidInput','Expected '+s+' in expression.');
+ const add=(a,b,sign)=>{check(same(a,b),'InvalidUnits','Addition and subtraction require matching units.');return quantity(a.value+sign*b.value,a.length,a.angle);};
+ function atom(){check(++depth<=24,'ResourceLimit','Expression nesting exceeds 24.');let result;const token=take();
+  if(token==='+'||token==='-'){result=power();if(token==='-')result={...result,value:-result.value};}
+  else if(token==='('){result=sum();expect(')');}
+  else if(token&&/^(?:\d|\.)/.test(token)){const value=Number(token);if(Object.hasOwn(UNITS,peek())){const [factor,l,a]=UNITS[take()];result=quantity(value*factor,l,a);}else result=quantity(value);}
+  else if(token&&/^[A-Za-z_]/.test(token)){
+   if(peek()==='('){check(['abs','min','max','sqrt','sin','cos','tan'].includes(token),'InvalidInput','Unknown safe function: '+token);take();const args=[sum()];while(peek()===','){take();check(args.length<8,'ResourceLimit','At most eight function arguments.');args.push(sum());}expect(')');const a=args[0];
+    if(['min','max'].includes(token)){check(args.every(b=>same(a,b)),'InvalidUnits','Function arguments require matching units.');result=quantity(Math[token](...args.map(x=>x.value)),a.length,a.angle);}
+    else {check(args.length===1,'InvalidInput','Function requires one argument.');if(token==='abs')result=quantity(Math.abs(a.value),a.length,a.angle);else if(token==='sqrt'){check(a.value>=0&&a.length%2===0&&a.angle%2===0,'InvalidUnits','Square root requires a nonnegative quantity with even dimensions.');result=quantity(Math.sqrt(a.value),a.length/2,a.angle/2);}else {check(a.length===0&&a.angle===1,'InvalidUnits','Trigonometry requires an angle, for example 30 deg.');check(token!=='tan'||Math.abs(Math.cos(a.value))>1e-12,'InvalidInput','Tangent is undefined at this angle.');result=quantity(Math[token](a.value));}}
+   }else if(token==='pi')result=quantity(Math.PI);else {refs.add(token);check(refs.size<=16,'ResourceLimit','At most sixteen direct parameter dependencies.');result=resolve(token);check(result,'LostReference','Unknown parameter: '+token);}
+  }else check(false,'InvalidInput','Unexpected expression token.');depth--;return result;
+ }
+ function power(){let a=atom();if(peek()==='^'){take();let sign=1;if(peek()==='-'){take();sign=-1;}const exponent=sign*Number(take());check(Number.isInteger(exponent)&&Math.abs(exponent)<=4,'InvalidInput','Exponent must be an integer between -4 and 4.');check(a.value!==0||exponent>=0,'InvalidInput','Division by zero.');a=quantity(a.value**exponent,a.length*exponent,a.angle*exponent);}return a;}
+ function product(){let a=power();while(['*','/'].includes(peek())){const op=take(),b=power(),sign=op==='*'?1:-1;check(op!=='/'||b.value!==0,'InvalidInput','Division by zero.');a=quantity(op==='*'?a.value*b.value:a.value/b.value,a.length+sign*b.length,a.angle+sign*b.angle);}return a;}
+ function sum(){let a=product();while(['+','-'].includes(peek())){const op=take();a=add(a,product(),op==='+'?1:-1);}return a;}
+ const result=sum();check(at===tokens.length,'InvalidInput','Unexpected trailing expression input. Use explicit multiplication.');return {...result,symbols:[...refs]};
+}
+
+export function evaluateParameters(parameters,definitions){
+ check(parameters.length<=64,'ResourceLimit','At most 64 parameters.');const ids=new Map(parameters.map(p=>[p.id,p])),names=new Map(),done=new Map(),visiting=new Set();
+ for(const p of parameters){if(!/^[A-Za-z_][A-Za-z_0-9]{0,63}$/.test(p.name)){check(!p.profile,'InvalidInput','Use an identifier for a parameter name.');continue;}const key=JSON.stringify([p.definitionId,p.name]);if(names.has(key)){check(!p.profile&&!names.get(key)?.profile,'InvalidInput','Duplicate parameter name in the same scope.');names.set(key,null);}else names.set(key,p);}
+ function evaluate(p){if(done.has(p.id))return done.get(p.id);check(!visiting.has(p.id),'ConstraintConflict','Parameter dependency cycle.');visiting.add(p.id);let deps=[];const resolve=symbol=>{const parts=symbol.split('.');check(parts.length<=2,'InvalidInput','Use Name, doc.Name or local.Name.');let target;if(parts.length===1){const key=JSON.stringify([p.definitionId,symbol]);check(!names.has(key)||names.get(key),'AmbiguousReference','Parameter name is ambiguous in this component.');target=names.get(key)??names.get(JSON.stringify([null,symbol]));}else {check(['doc','local'].includes(parts[0]),'InvalidInput','Unknown parameter namespace.');target=names.get(JSON.stringify([parts[0]==='doc'?null:p.definitionId,parts[1]]));}check(target,'LostReference','Unknown parameter: '+symbol);deps.push(target.id);return evaluate(target).quantity;};
+  const q=p.profile?expression(p.expression,resolve):unitQuantity(p.value,p.unit),expected=unitQuantity(1,p.unit);check(same(q,expected),'InvalidUnits','Expression result does not match '+p.unit+'.');check(Math.abs(q.value)<=1e6,'InvalidInput','Evaluated parameter exceeds its bounded range.');const result={quantity:quantity(q.value,q.length,q.angle),value:q.value,dependsOn:[...new Set(deps)]};done.set(p.id,result);visiting.delete(p.id);return result;}
+ for(const p of parameters){check(p.definitionId===null||definitions.some(d=>d.id===p.definitionId),'LostReference','Parameter component scope is missing.');evaluate(p);}return new Map([...ids.keys()].map(id=>[id,done.get(id)]));
+}

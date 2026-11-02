@@ -3,7 +3,7 @@
   "protocolVersion": 1,
   "productId": "axiom.engineer-cad",
   "displayName": "Axiom Engineer CAD",
-  "productVersion": "0.1.4",
+  "productVersion": "0.1.5",
   "platformApiRange": ">=0.1.0 <0.2.0",
   "projectFormats": [
     {
@@ -25,8 +25,8 @@
   ],
   "demos": [
     {
-      "id": "e1-m3-sketch",
-      "name": "E1.M3 Parametric Sketches"
+      "id": "e1-m4-parameters",
+      "name": "E1.M4 Equations & Sketch Workbench"
     }
   ],
   "launch": {
