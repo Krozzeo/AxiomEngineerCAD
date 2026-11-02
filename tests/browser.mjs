@@ -17,7 +17,7 @@ const report = {milestone:'E1.M5', platform:'0.1.12', providerCommit:'6d240845cd
 try {
   browser = await chromium.launch(process.env.ENGINEER_HARDWARE==='1'?{executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true,ignoreDefaultArgs:['--disable-gpu-compositing']}:{headless:true});if(process.env.ENGINEER_HARDWARE==='1'){const cdp=await browser.newBrowserCDPSession(),info=await cdp.send('SystemInfo.getInfo');report.hardware={devices:info.gpu.devices.map(d=>({vendorId:d.vendorId,deviceId:d.deviceId,vendorString:d.vendorString,deviceString:d.deviceString,driverVendor:d.driverVendor,driverVersion:d.driverVersion})),browser:browser.version(),flags:[],softwareForced:false};} report.browser = browser.version();
   const context = await browser.newContext({viewport:{width:1440, height:960}});
-  const observe = page => { prepareModernUI(page); page.setDefaultTimeout(15000); page.on('pageerror', e => report.pageErrors.push(e.message)); };
+  const observe = page => { prepareModernUI(page); page.setDefaultTimeout(15000); page.on('pageerror', e => { report.pageErrors.push(e.message); console.error('EDITOR PAGE ERROR', new URL(page.url()).pathname, e.stack); }); };
   context.on('page',observe);
   child = spawn(process.execPath, ['src/cli.mjs', '--root', join(root, 'direct'), '--create', 'study', '--name', 'Direct lifecycle study'], {cwd:resolve('.'), windowsHide:true, stdio:['ignore','pipe','pipe']});
   const ready = await new Promise((yes, no) => {
@@ -27,6 +27,13 @@ try {
     child.once('exit', code => { clearTimeout(timer); no(Error('Direct process exited ' + code + ': ' + errors)); });
   });
   assert.equal(ready.ready, true);
+  // A failed startup catalog request must be handled even if context fails first.
+  const unavailable=await context.newPage();let failedContext=0;
+  await unavailable.route('**/v1/cad/context',route=>{failedContext++;return route.abort('failed');});
+  await unavailable.route('**/v1/cad/catalog',route=>route.abort('failed'));
+  await unavailable.goto(ready.editorUrl);await unavailable.locator('body[data-workbench-ready=true]').waitFor();
+  await unavailable.waitForTimeout(1000);assert.ok(failedContext>0);await unavailable.close();
+  report.criteria.push('Unavailable startup CAD context/catalog remains handled without unhandled promise rejection');
   direct = await context.newPage(); observe(direct); await direct.goto((ready.editorUrl).replace('/#','/?workspace=labs#'));await waitEditorIdle(direct);
   await direct.locator('#name:not([disabled])').waitFor();
   assert.equal(await direct.locator('#name').inputValue(), 'Direct lifecycle study');
