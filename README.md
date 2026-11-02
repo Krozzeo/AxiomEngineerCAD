@@ -1,3 +1,5 @@
+> **Current development: 0.1.6 / E1.M5.** Exact extrusion from closed sketches, additive history, continuous dimension tools, semantic Inspector and inline equation tables. [Current report and test flow](docs/milestones/E1_M5_REPORT.md). Local domain/browser/hardware/PDF and relocated-package proofs pass; experimental publication, exact-head CI and fresh Platform installation remain delivery gates. Previous0.1.5/8bb1cc7 was published and publicly installed successfully. Historical status snapshots follow below.
+
 > **Current: 0.1.5 / E1.M4 review candidate.** Scoped unit-checked equations, Parameter Manager, physical dimensions, contextual Sketch Manager, principal line/point/circle relations, warm constrained drag and synchronized reference/camera feedback. [Review guide](docs/milestones/E1_M4_REPORT.md), [ADR022](docs/architecture/ADR-022-PARAMETERS-AND-SKETCH-WORKBENCH.md). Exact-head Windows/Linux CI, immutable experimental ZIP/manifest and fresh public Platform installation remain delivery gates. Owner acceptance is separate.
 
 Earlier dated snapshots below are historical.

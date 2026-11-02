@@ -1,3 +1,4 @@
+import {verifyExtrusionInstallation} from './verify-extrusion-installation.mjs';
 import {verifyParameterInstallation} from './verify-parameter-installation.mjs';
 import {verifyParametricInstallation} from './verify-parametric-installation.mjs';
 import {verifySketchInstallation} from './verify-sketch-installation.mjs';
@@ -66,13 +67,13 @@ try {
   await seedHistoricalFixtures(host,pathToFileURL(installation+'/'));
   const semanticCommands=await verifyCommandInstallation(nativeReopened.editorUrl);await call({action:'close',sessionId:nativeReopened.sessionId,expectedRevision:semanticCommands.applyRevision,decision:'discard'});const reviewReopened=await call({action:'open',productId:manifest.productId,path:created.path});const appliedDoc=JSON.parse(await readFile(join(root,reviewReopened.path)));assert.equal(appliedDoc.experiment.spec.width,60);assert.equal(reviewReopened.status.revision,semanticCommands.applyRevision);assert.equal(reviewReopened.status.recovery.operationId,semanticCommands.applyOperationId);const drawingProof=await verifyProofInstallation(reviewReopened.editorUrl,semanticCommands.applyRevision);await call({action:'close',sessionId:reviewReopened.sessionId,expectedRevision:semanticCommands.applyRevision,decision:'discard'});
   const integratedProof=await verifyIntegrationInstallation(host);
-  const workbenchProof=await verifyWorkbenchInstallation(host);const sketchProof=await verifySketchInstallation(host);const parametricProof=await verifyParametricInstallation(host);const parameterProof=await verifyParameterInstallation(host);
+  const workbenchProof=await verifyWorkbenchInstallation(host);const sketchProof=await verifySketchInstallation(host);const parametricProof=await verifyParametricInstallation(host);const parameterProof=await verifyParameterInstallation(host);const extrusionProof=await verifyExtrusionInstallation(host);
   const report = {passed:true, productId:manifest.productId, version:manifest.version, build:manifest.build ?? null,
     sha256:artifact.sha256, bytes:artifact.bytes, runtime:process.version, os:process.platform,
     geometryCorpus,spatialCorpus:{passed:spatial.assemblySuite.passed,total:spatial.assemblySuite.total,resources:spatial.job.resources},spatialSaveReopen:true,
     correspondingSourceArchives:sourceManifest.archives.length,
     nativeStorage:{schemaVersion:1,versionId:version.versionId,convertVerifyVersionSaveReopen:true,resources:nativeProof.job.resources},
-    semanticCommands,drawingProof,integratedProof,workbenchProof,sketchProof,parametricProof,parameterProof,
+    semanticCommands,drawingProof,integratedProof,workbenchProof,sketchProof,parametricProof,parameterProof,extrusionProof,
     scope:'Relocated prepared ZIP, source hashes, real Platform lifecycle, 29 exact-kernel/2D and 28 spatial cases, spatial drag/keep/save/reopen and native conversion/validation/version/save/reopen; no user profile/provider, WebGPU or final CAD schema claims'};
   await writeFile(join(folder, 'package-validation.json'), JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report));

@@ -1,3 +1,4 @@
+import {regenerateExtrusions} from '../extrusion/kernel.mjs';
 import {geometryExperiment} from './kernel.mjs';
 import {solveParametric} from '../sketch/solver.mjs';
 import {runSuite} from './suite.mjs';
@@ -24,6 +25,7 @@ process.on('message',async message=>{
     else if(message.kind==='command-validate')result=await verifyCommand(message.payload);
     else if(message.kind==='drawing-proof')result=await buildProof(message.payload.document,{versionId:message.payload.versionId,viewportOnly:message.payload.viewportOnly});
     else if(message.kind==='selection-inspect'){validate(message.payload.document);const proof=message.payload.target.kind==='datum'?{scene:{models:[],occurrences:[],datums:baseDatums(message.payload.document)}}:await buildProof(message.payload.document,{viewportOnly:true});result={...resolveSceneSelection(proof.scene,message.payload.target),source:{documentId:message.payload.document.documentId,revision:message.payload.document.revision,contentHash:hash(message.payload.document),creator:PROVENANCE.creator},authority:message.payload.target.kind==='datum'?'canonical definition reference frame':'exact supported B-Rep role'};}
+    else if(message.kind==='extrusion-geometry'){result=await regenerateExtrusions(message.payload.document,{featureId:message.payload.featureId});check(!message.payload.requireFace||['ResolvedStable','ResolvedReidentified'].includes(result.reference.state),result.reference.state,'The extrusion end cap is not a uniquely surviving exact face.');}
     else if(message.kind==='integrated-geometry')result=(await regenerateIntegration(message.payload.document)).exact;
     else check(false,'UnsupportedCapability','Unknown lab task.');
     const maxRssBytes=process.resourceUsage().maxRSS*1024;
