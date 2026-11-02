@@ -11,3 +11,5 @@
 #sketch-overdefinition-dialog form{display:flex;gap:8px;flex-wrap:wrap}
 
 .feature-disabled{opacity:.55;text-decoration:line-through}
+
+.feature-bound-value{display:flex;align-items:center;gap:5px}.feature-bound-value input{flex:1;min-width:0;width:auto}.feature-preview-toggle{display:flex!important;align-items:center;gap:7px;margin:12px 0}.feature-preview-toggle input[type=checkbox]{width:auto!important;margin:0}

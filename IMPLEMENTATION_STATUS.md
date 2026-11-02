@@ -1,6 +1,6 @@
 # Engineer implementation status
 
-Current: **0.1.7 / E1.M5 editing recovery — validation in progress**. Branch `engineer/e1-m5-editing-recovery` stacks on delivered 0.1.6 / d6bab409a319d3fa9a65531bfb2dc74fd79e7bdc. No E2 progression, main merge, stable release or owner acceptance is claimed.
+Current: **0.1.7 / E1.M5 editing recovery — review candidate**. Branch `engineer/e1-m5-editing-recovery` stacks on delivered 0.1.6 / d6bab409a319d3fa9a65531bfb2dc74fd79e7bdc. No E2 progression, main merge, stable release or owner acceptance is claimed.
 
 ## Delivered baseline
 
@@ -31,7 +31,7 @@ Current: **0.1.7 / E1.M5 editing recovery — validation in progress**. Branch `
 
 ## Evidence state
 
-The latest full domain run passed 213 tests; the latest targeted recovery suite passed 12 tests, including the subsequently added consumed-sketch conflict guard. Previous full browser and targeted NVIDIA runs cover the original M5 slice and the new actual mouse/keyboard recovery cases. Final complete browser/domain/package/CI/public-install gates remain in progress. Local ignored artifacts are development evidence, not published acceptance archives. The exact 0.1.6 decoder accepts unchanged M5 data and safely refuses new suppression/unit/orientation fields without writes.
+214 domain tests passed the first PR numerical stage; the latest targeted recovery suite passed 12 tests, including the consumed-sketch conflict guard. Previous full browser and targeted NVIDIA runs cover the original M5 slice and the new actual mouse/keyboard recovery cases. The complete local NVIDIA browser corpus, five PDF checks and relocated package passed; focused actual Hub Save/Reopen and explicitly labeled unsupported-device recovery passed. Final exact-head Windows/Linux CI and public-install gates remain in progress. Local ignored artifacts are development evidence, not published acceptance archives. The exact 0.1.6 decoder accepts unchanged M5 data and safely refuses new suppression/unit/orientation fields without writes.
 
 ## Bounds and continuity
 
