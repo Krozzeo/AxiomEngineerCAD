@@ -1,6 +1,8 @@
+> E1.M4 implementation addendum (2026-11-01): [typed parameter/profile contract](../contracts/PARAMETERS_E1_M4.md), [ADR022](../architecture/ADR-022-PARAMETERS-AND-SKETCH-WORKBENCH.md) and [review evidence](../milestones/E1_M4_REPORT.md). Native format remains 1; new profiles are explicitly refused by older readers. Current reviewed scope does not complete E3 or general extrusion.
+
 # Acceptance Profiles, Benchmarks and Evidence
 
-**Baseline:** Master v0.2.0. **Status:** acceptance *schema* approved; numerical thresholds and supported hardware/complexity bounds **TBD pending E0.M6 measurements/E0.M7 owner signoff**. Never present a proposed target as a measured result.
+**Baseline:** Master v0.2.0. **Status:** acceptance *schema* approved; E0.M6 candidate measured bounds are recorded in [profile v1](E0_M6_PROFILE_V1.json); integrated acceptance still requires E0.M7 owner signoff. Never present a proposed target as a measured result.
 
 ## 1. Profile dimensions to freeze in E0
 
@@ -58,3 +60,11 @@ Moderate is **not** an acceptable sole criterion. Each project must specify actu
 Every milestone result records: requirement IDs; exact code commit and upstream/library versions; named profile/fixture hashes; positive/negative/lifecycle case IDs; commands; measured values and pass/fail; real hardware/provider vs simulator/mock labels; crash/recovery and security outcome; screenshots/PDF where meaningful; known unsupported cases; deviations/ADRs; owner acceptance status. CI pass cannot replace owner-visible milestone review. Never declare a milestone passed from stale SHAs, empty wrappers, synthetic counters or unaudited visual plausibility.
 
 References: [Master §§17–20](../../MASTER_DESIGN.md#17-nonfunctional-acceptance-contracts), [Requirements matrix](REQUIREMENTS_TRACEABILITY.md), [AI protocol](AI_EVALUATION.md).
+
+## E0.M7 integrated candidate baseline
+
+[ADR012](../architecture/ADR-012-INTEGRATED-E0-GATE.md) and [corpus](E0_M7_ACCEPTANCE_CORPUS_V1.json) connect sketch/kernel/topology/mate/native closure/tool review/drawing/GPU/IP gates.15 new tests+85 retained; actual Hub human workflow, separately labeled physical GPU, independent current/historical PDF parsing/rendering, actual installed demo. The archived0.0.6 decoder refuses new profiles without writes. Final exact CI/public provenance belongs to delivery PR/release. Owner decision pending; E1 unstarted.
+
+## E0 Go and E1.M1 evidence update2026-10-31
+
+[E0 decision](../architecture/E0_OWNER_GO_2026_10_31.json) accepts the measured baseline for progression. E1.M1 [ADR016](../architecture/ADR-016-E1-WORKBENCH.md) adds UI/ReadOnly context, not native data mutation:15 workbench cases plus100 retained, actual default/empty/Hub UI, seven-class physical GPU picking and focused navigation, headless selection parity, unchanged-document/prior0.0.7 reader compatibility, current package/public install checks. Existing native0/1 schemas and E0 corpus inputs remain unchanged. General sketch/feature creation, arbitrary topology/drawings and full mature requirement acceptance remain at their scheduled gates.

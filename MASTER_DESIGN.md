@@ -4,7 +4,7 @@
 **Date:** 2026-10-28  
 **Product:** Axiom Engineer CAD  
 **Repository:** https://github.com/Krozzeo/AxiomEngineerCAD  
-**Status:** Approved MVP functional scope, revised staged engineering contracts and risk gates; **implementation not started**  
+**Status:** Approved MVP functional scope, revised staged engineering contracts and risk gates; **E0 measured baseline accepted for E1 progression2026-10-31; E1.M1/0.1.0 workbench is a review candidate; broad CAD functionality remains in its scheduled milestones** (see IMPLEMENTATION_STATUS.md)
 **Audience:** Product owner, human contributors, coding agents, CAD/geometry specialists, test agents
 
 > **Authority and interpretation.** This is the canonical product-intent, architecture, MVP-scope and delivery-plan document for Axiom Engineer CAD. It consolidates owner-approved decisions. It is **not** evidence that features exist. An implementation, solver, data format, provider integration or hardware profile is accepted only after its milestone tests and owner review. Specific third-party technologies are candidates until their E0 gates pass. Do not infer missing product requirements from Axiom Game Engine implementation details.
@@ -708,6 +708,9 @@ Do **not** begin the next dependent Milestone solely because code compiles. For 
 - **Depends:** E1.M2, E0.M2.
 
 #### E1.M4 — Parameter Manager v1 and expression engine
+
+Implementation note (2026-11-01): the owner also requested physical dimension placement/editing, contextual Sketch Manager/Inspector, Shift relation suggestions and faster solved drag with this delivery. [ADR022](docs/architecture/ADR-022-PARAMETERS-AND-SKETCH-WORKBENCH.md) records the bounded early line/point/circle subset of E3; remaining E3 and E1.M5 scope below stays planned. This note is traceability, not acceptance.
+
 - **Deliver:** global/component parameters, safe typed unit expressions, dependency graph, cycle/error handling and table-to-feature navigation; corresponding agent query/edit tools.
 - **Verify:** equation controls sketch geometry, changing one variable updates dependent dimensions, cycle/unit mismatch rejected atomically, persisted expressions survive reopen.
 - **Depends:** E1.M3.
@@ -1042,3 +1045,7 @@ This is **master v0.2.0**, not a software release or milestone acceptance. Futur
 ---
 
 **Master-design closure note:** v0.2 retains the approved MVP and strengthens falsifiable architecture gates. CAD features, numeric results and provider capabilities remain planned until measured milestone evidence exists.
+
+Implementation evidence update2026-10-31: E0.M7 review candidate0.0.7 connects the bounded sketch/solid/face/mate/drawing/proposal/native chain. [Report](docs/milestones/E0_M7_REPORT.md), [ADR012](docs/architecture/ADR-012-INTEGRATED-E0-GATE.md). Implementation progress only; approved MVP unchanged, owner Go/Redesign/Stop and E1 authorization remain pending.
+
+Owner update2026-10-31: Go for E1/0.1.0 recorded in [decision](docs/architecture/E0_OWNER_GO_2026_10_31.json); measured E0 corpus is preserved. [E1.M1](docs/milestones/E1_M1_REPORT.md) implements the workbench foundation, with [ADR016](docs/architecture/ADR-016-E1-WORKBENCH.md). E1.M2–M5 and later generations remain planned. No MVP scope change.

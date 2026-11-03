@@ -1,0 +1,31 @@
+import {executionContent} from '../commands/execution.mjs';
+import {hasExtrusions} from '../extrusion/profile.mjs';
+import {regenerateExtrusions,verifyExtrusionReference} from '../extrusion/kernel.mjs';
+import {verifySketchSupport} from '../sketch/support.mjs';
+import {TOLERANCES} from '../lab/profile.mjs';
+import {PARAMETRIC_PROFILE,isParametric} from '../sketch/relations.mjs';
+import {solveParametric,mobility} from '../sketch/solver.mjs';
+import {SKETCH_TYPE,planeFrame} from '../sketch/profile.mjs';
+import {validate,check} from '../document.mjs';
+import {contentOf,hash} from './schema.mjs';
+import {geometryExperiment} from '../lab/kernel.mjs';
+import {solveAssembly} from '../assembly/solver.mjs';
+import {hasIntegration} from '../integration/profile.mjs';
+import {regenerateIntegration} from '../integration/engine.mjs';
+export async function verifyNative(value,{rollbackAt=null}={}){validate(value);check(value.formatVersion===1,'incompatibleVersion','Convert this document to native v1 first.');const body=contentOf(value),seen=new Set();let geometry=null,assembly=null,operations=0;const budget=()=>check(++operations<=32,'ResourceLimit','Native verification exceeds 32 geometry/solver operations.');
+  async function verify(c,working=false){const h=hash(c);if(seen.has(h))return;check(seen.size<32,'ResourceLimit','Native validation closure exceeds 32 contents.');seen.add(h);c=executionContent(c,{rollbackAt:working?rollbackAt:null});
+    for(const f of c.graph.features)if(f.selector)check(['ResolvedStable','ResolvedReidentified'].includes(f.selector.state),f.selector.state,'Repair unresolved feature selector before versioning.');
+    let g=null,a=null;const featureEvidence=[],integrated=hasIntegration(c);if(integrated){budget();budget();budget();budget();const r=await regenerateIntegration(c);g={volumeMm3:r.exact.volumeMm3,areaMm2:r.exact.areaMm2,reference:r.exact.reference.state};a={status:r.assembly.status,dof:r.assembly.remainingDOF};featureEvidence.push({id:'sketch-main',status:r.sketch.status,dof:r.sketch.remainingDOF},{id:'extrude-base',volumeMm3:r.trace.extrusion.volumeMm3},{id:'feature-geometry',reference:r.exact.reference.state},{id:'mate-binding',zMm:r.trace.mate.position[2],dof:r.assembly.remainingDOF},{id:'drawing-binding',widthMm:r.trace.drawing.widthMm});}
+    else if(hasExtrusions(c)){budget();const r=await regenerateExtrusions(c);g={volumeMm3:r.volumeMm3,areaMm2:r.areaMm2,reference:r.reference.state};featureEvidence.push(...r.featureEvidence);}
+    else if(c.experiment){budget();const result=await geometryExperiment(c.experiment.spec,{includeMesh:false});g={volumeMm3:result.volumeMm3,areaMm2:result.areaMm2,reference:result.reference.state};}
+    if(c.assembly&&!integrated){budget();const result=solveAssembly(c.assembly);check(result.applicable,'InvalidGeometry','Assembly must have a feasible nonsingular placement.');a={status:result.status,dof:result.remainingDOF};}
+    for(const f of c.graph.features){if(f.selector&&!integrated){const producer=c.graph.features.find(p=>p.id===f.selector.producerId);check(['geometry-probe','sketch-extrusion'].includes(producer?.type)&&f.selector.kind!=='datum','UnsupportedCapability','This bounded native resolver supports proven geometry-probe face/edge roles.');budget();const reference=producer.type==='sketch-extrusion'?await verifyExtrusionReference(c,f.selector):f.type===SKETCH_TYPE&&isParametric(f.data.profile)?await verifySketchSupport(f,c.graph):(await geometryExperiment({...producer.data.spec,selectorRole:f.selector.role,selectorKind:f.selector.kind},{includeMesh:false})).reference;check(['ResolvedStable','ResolvedReidentified'].includes(reference.state),reference.state,'Feature reference is no longer uniquely proven.');featureEvidence.push({id:f.id,reference:reference.state});}
+      if(f.definitionId!==c.graph.primaryDefinitionId&&f.type==='geometry-probe'){budget();const r=await geometryExperiment(f.data.spec,{includeMesh:false});featureEvidence.push({id:f.id,volumeMm3:r.volumeMm3,areaMm2:r.areaMm2});}
+      if(f.definitionId!==c.graph.primaryDefinitionId&&f.type==='spatial-probe'){budget();const r=solveAssembly(f.data);check(r.applicable,'InvalidGeometry','Nonprimary spatial feature is not feasible.');featureEvidence.push({id:f.id,status:r.status,dof:r.remainingDOF});}}
+    for(const f of c.graph.features)if(f.type===SKETCH_TYPE){if(f.selector){const producer=c.graph.features.find(p=>p.id===f.selector.producerId);budget();const reference=await verifySketchSupport(f,c.graph);check(['ResolvedStable','ResolvedReidentified'].includes(reference.state),reference.state,'Sketch support face is not uniquely proven.');}let diagnosis=null;if(isParametric(f.data.profile)){budget();diagnosis=await solveParametric(f.data);if(diagnosis.valid)check(mobility(f.data.entities,f.data.constraints).maxResidualMm<=TOLERANCES.solverResidualMm,'InvalidGeometry','Persisted sketch coordinates do not satisfy driving relations. Original source preserved.');}featureEvidence.push({id:f.id,profile:f.data.profile,primitiveCount:f.data.entities.length,contentHash:hash({data:f.data,frame:planeFrame(f,c.graph)}),...(diagnosis?{status:diagnosis.status,dof:diagnosis.remainingDOF??-1}: {})});}
+    if(c.verification){const old=c.verification,near=(x,y)=>Math.abs(x-y)<=Math.max(1e-6,Math.abs(x)*1e-8),oldFeatures=old.featureEvidence??[];const featuresMatch=oldFeatures.length===featureEvidence.length&&featureEvidence.every((f,i)=>Object.keys(f).every(k=>typeof f[k]==='number'?near(f[k],oldFeatures[i][k]):f[k]===oldFeatures[i][k]));check((!g&&!old.geometry||g&&old.geometry&&near(g.volumeMm3,old.geometry.volumeMm3)&&near(g.areaMm2,old.geometry.areaMm2)&&g.reference===old.geometry.reference)&&JSON.stringify(old.assembly)===JSON.stringify(a)&&featuresMatch,'incompatibleVersion','Historical geometry/solver evidence differs under this runtime. Source preserved.');}
+    for(const d of c.graph.dependencies)await verify(d.snapshot);for(const v of c.localVersions)await verify(v.content);
+    return {geometry:g,assembly:a,featureEvidence};
+  }
+  const result=await verify(body,true);({geometry,assembly}=result);return {valid:true,inputHash:hash(body),geometry,assembly,featureEvidence:result.featureEvidence,contentsChecked:seen.size};
+}

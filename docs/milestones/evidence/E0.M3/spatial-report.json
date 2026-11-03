@@ -1,0 +1,2104 @@
+{
+  "runtime": "v24.21.0",
+  "os": "win32",
+  "arch": "x64",
+  "cpu": "AMD Ryzen 5 3600 6-Core Processor              ",
+  "memoryBytes": 25718345728,
+  "result": {
+    "schema": "E0.M3-evidence-v0",
+    "solver": "Engineer-rigid-LM/0.0.1",
+    "numeric": {
+      "lengthMm": 0.000001,
+      "angleRad": 1e-7,
+      "rankThreshold": 0.000001,
+      "differenceStep": 0.000001,
+      "maxIterations": 100
+    },
+    "cases": [
+      {
+        "id": "SOLVER3D-free",
+        "inputHash": "6e83e88816c4833287a968430f414cd7ebe0f3e90b709d6cef3e884affd5aaa3",
+        "expected": {
+          "status": "UnderDefined",
+          "dof": 6
+        },
+        "passed": true,
+        "actual": {
+          "status": "UnderDefined",
+          "dof": 6,
+          "rank": 0,
+          "conflicts": [],
+          "redundant": [],
+          "poses": [
+            {
+              "bodyId": "shaft",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "bodyId": "collar",
+              "position": [
+                6,
+                4,
+                15
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            }
+          ],
+          "drag": null,
+          "residuals": {
+            "rows": [],
+            "maxLengthResidualMm": 0,
+            "maxAngularResidualRad": 0,
+            "method": "Central-difference world tangent Jacobian; pivoted local rank; no global uniqueness claim."
+          },
+          "applicable": true
+        },
+        "elapsedMs": 3.8965999999999923
+      },
+      {
+        "id": "SOLVER3D-coaxial",
+        "inputHash": "1597df278f2fccb7b840b7f4bc5226863a8491f63a7f9b157500ad8b6f122ea0",
+        "expected": {
+          "status": "UnderDefined",
+          "dof": 2
+        },
+        "passed": true,
+        "actual": {
+          "status": "UnderDefined",
+          "dof": 2,
+          "rank": 4,
+          "conflicts": [],
+          "redundant": [],
+          "poses": [
+            {
+              "bodyId": "shaft",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "bodyId": "collar",
+              "position": [
+                9.362709684008333e-11,
+                6.241806456005555e-11,
+                15
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            }
+          ],
+          "drag": null,
+          "residuals": {
+            "rows": [
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 6.241806456005555e-11,
+                "unit": "mm"
+              },
+              {
+                "id": "coaxial",
+                "value": -9.362709684008333e-11,
+                "unit": "mm"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "mm"
+              }
+            ],
+            "maxLengthResidualMm": 9.362709684008333e-11,
+            "maxAngularResidualRad": 0,
+            "method": "Central-difference world tangent Jacobian; pivoted local rank; no global uniqueness claim."
+          },
+          "applicable": true
+        },
+        "elapsedMs": 6.249300000000005
+      },
+      {
+        "id": "SOLVER3D-three-body",
+        "inputHash": "7b44a24ee964c6e10b74407472d05009fd14cc5d29635275780c6b34c5f269b9",
+        "expected": {
+          "status": "UnderDefined",
+          "dof": 3
+        },
+        "passed": true,
+        "actual": {
+          "status": "UnderDefined",
+          "dof": 3,
+          "rank": 9,
+          "conflicts": [],
+          "redundant": [],
+          "poses": [
+            {
+              "bodyId": "shaft",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "bodyId": "collar",
+              "position": [
+                8.82255544567189e-11,
+                6.30182300316006e-11,
+                15.499999994120426
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "bodyId": "cap",
+              "position": [
+                -4.1412006036888995e-11,
+                7.742241522873615e-11,
+                27.50000000442847
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            }
+          ],
+          "drag": null,
+          "residuals": {
+            "rows": [
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 6.30182300316006e-11,
+                "unit": "mm"
+              },
+              {
+                "id": "coaxial",
+                "value": -8.82255544567189e-11,
+                "unit": "mm"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "mm"
+              },
+              {
+                "id": "cap-coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "cap-coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "cap-coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "cap-coaxial",
+                "value": 7.742241522873615e-11,
+                "unit": "mm"
+              },
+              {
+                "id": "cap-coaxial",
+                "value": 4.1412006036888995e-11,
+                "unit": "mm"
+              },
+              {
+                "id": "cap-coaxial",
+                "value": 0,
+                "unit": "mm"
+              },
+              {
+                "id": "collar-cap-spacing",
+                "value": 1.0308042419637786e-8,
+                "unit": "mm"
+              }
+            ],
+            "maxLengthResidualMm": 1.0308042419637786e-8,
+            "maxAngularResidualRad": 0,
+            "method": "Central-difference world tangent Jacobian; pivoted local rank; no global uniqueness claim."
+          },
+          "applicable": true
+        },
+        "elapsedMs": 15.54549999999999
+      },
+      {
+        "id": "SOLVER3D-point",
+        "inputHash": "6937a5a494004497bf75b1722c272e06612eab07e9c38708a493596365f26286",
+        "expected": {
+          "status": "UnderDefined",
+          "dof": 3
+        },
+        "passed": true,
+        "actual": {
+          "status": "UnderDefined",
+          "dof": 3,
+          "rank": 3,
+          "conflicts": [],
+          "redundant": [],
+          "poses": [
+            {
+              "bodyId": "shaft",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "bodyId": "collar",
+              "position": [
+                9.362709684008333e-11,
+                6.241806456005555e-11,
+                2.3406753380993616e-10
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            }
+          ],
+          "drag": null,
+          "residuals": {
+            "rows": [
+              {
+                "id": "point",
+                "value": 9.362709684008333e-11,
+                "unit": "mm"
+              },
+              {
+                "id": "point",
+                "value": 6.241806456005555e-11,
+                "unit": "mm"
+              },
+              {
+                "id": "point",
+                "value": 2.3406753380993616e-10,
+                "unit": "mm"
+              }
+            ],
+            "maxLengthResidualMm": 2.3406753380993616e-10,
+            "maxAngularResidualRad": 0,
+            "method": "Central-difference world tangent Jacobian; pivoted local rank; no global uniqueness claim."
+          },
+          "applicable": true
+        },
+        "elapsedMs": 4.843199999999996
+      },
+      {
+        "id": "SOLVER3D-planes",
+        "inputHash": "2e20b74e92c995c3edecbb5c4ae8c3ae8efe11822cdb01037a285d9ea1654328",
+        "expected": {
+          "status": "UnderDefined",
+          "dof": 3
+        },
+        "passed": true,
+        "actual": {
+          "status": "UnderDefined",
+          "dof": 3,
+          "rank": 3,
+          "conflicts": [],
+          "redundant": [],
+          "poses": [
+            {
+              "bodyId": "shaft",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "bodyId": "collar",
+              "position": [
+                6,
+                4,
+                2.3406753380993616e-10
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            }
+          ],
+          "drag": null,
+          "residuals": {
+            "rows": [
+              {
+                "id": "planes",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "planes",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "planes",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "planes",
+                "value": 2.3406753380993616e-10,
+                "unit": "mm"
+              }
+            ],
+            "maxLengthResidualMm": 2.3406753380993616e-10,
+            "maxAngularResidualRad": 0,
+            "method": "Central-difference world tangent Jacobian; pivoted local rank; no global uniqueness claim."
+          },
+          "applicable": true
+        },
+        "elapsedMs": 4.407899999999998
+      },
+      {
+        "id": "SOLVER3D-distance",
+        "inputHash": "7ab75eaa54a25850a2070553090772e618db68d315c79951eba34850ca8501a2",
+        "expected": {
+          "status": "UnderDefined",
+          "dof": 5
+        },
+        "passed": true,
+        "actual": {
+          "status": "UnderDefined",
+          "dof": 5,
+          "rank": 1,
+          "conflicts": [],
+          "redundant": [],
+          "poses": [
+            {
+              "bodyId": "shaft",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "bodyId": "collar",
+              "position": [
+                7.210100921002817,
+                4.806733949322817,
+                18.02525228462547
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            }
+          ],
+          "drag": null,
+          "residuals": {
+            "rows": [
+              {
+                "id": "distance",
+                "value": -8.381246701105738e-7,
+                "unit": "mm"
+              }
+            ],
+            "maxLengthResidualMm": 8.381246701105738e-7,
+            "maxAngularResidualRad": 0,
+            "method": "Central-difference world tangent Jacobian; pivoted local rank; no global uniqueness claim."
+          },
+          "applicable": true
+        },
+        "elapsedMs": 3.364699999999999
+      },
+      {
+        "id": "SOLVER3D-angle",
+        "inputHash": "f199ef785fe79d3f572bd9be84d3b1362786a05c3dc8b2f7085b6b599b8ffb25",
+        "expected": {
+          "status": "UnderDefined",
+          "dof": 5
+        },
+        "passed": true,
+        "actual": {
+          "status": "UnderDefined",
+          "dof": 5,
+          "rank": 1,
+          "conflicts": [],
+          "redundant": [],
+          "poses": [
+            {
+              "bodyId": "shaft",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "bodyId": "collar",
+              "position": [
+                6,
+                4,
+                15
+              ],
+              "quaternion": [
+                0.49999999999562683,
+                0,
+                0,
+                0.8660254037869632
+              ]
+            }
+          ],
+          "drag": null,
+          "residuals": {
+            "rows": [
+              {
+                "id": "angle",
+                "value": -1.0099476810410124e-11,
+                "unit": "rad"
+              }
+            ],
+            "maxLengthResidualMm": 0,
+            "maxAngularResidualRad": 1.0099476810410124e-11,
+            "method": "Central-difference world tangent Jacobian; pivoted local rank; no global uniqueness claim."
+          },
+          "applicable": true
+        },
+        "elapsedMs": 4.332700000000003
+      },
+      {
+        "id": "SOLVER3D-parallel",
+        "inputHash": "d072974fb262101c57f2d164327ccf40617978487dd6d893a8a3530de744bbdc",
+        "expected": {
+          "status": "UnderDefined",
+          "dof": 4
+        },
+        "passed": true,
+        "actual": {
+          "status": "UnderDefined",
+          "dof": 4,
+          "rank": 2,
+          "conflicts": [],
+          "redundant": [],
+          "poses": [
+            {
+              "bodyId": "shaft",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "bodyId": "collar",
+              "position": [
+                6,
+                4,
+                15
+              ],
+              "quaternion": [
+                7.678221224826318e-11,
+                3.8391103674389884e-11,
+                0.05082798979619145,
+                0.9987074223481461
+              ]
+            }
+          ],
+          "drag": null,
+          "residuals": {
+            "rows": [
+              {
+                "id": "parallel",
+                "value": 1.494632453016495e-10,
+                "unit": "direction"
+              },
+              {
+                "id": "parallel",
+                "value": 8.448833138486818e-11,
+                "unit": "direction"
+              },
+              {
+                "id": "parallel",
+                "value": 0,
+                "unit": "direction"
+              }
+            ],
+            "maxLengthResidualMm": 0,
+            "maxAngularResidualRad": 1.494632453016495e-10,
+            "method": "Central-difference world tangent Jacobian; pivoted local rank; no global uniqueness claim."
+          },
+          "applicable": true
+        },
+        "elapsedMs": 4.437200000000004
+      },
+      {
+        "id": "SOLVER3D-perpendicular",
+        "inputHash": "c977111f02ba11a3fd2d05004cde9ef82ed1291efbe6e32e2725525f685389bc",
+        "expected": {
+          "status": "UnderDefined",
+          "dof": 5
+        },
+        "passed": true,
+        "actual": {
+          "status": "UnderDefined",
+          "dof": 5,
+          "rank": 1,
+          "conflicts": [],
+          "redundant": [],
+          "poses": [
+            {
+              "bodyId": "shaft",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "bodyId": "collar",
+              "position": [
+                6,
+                4,
+                15
+              ],
+              "quaternion": [
+                0.6324555318241514,
+                0.31622776640078215,
+                0.03594081659098023,
+                0.7061927907625337
+              ]
+            }
+          ],
+          "drag": null,
+          "residuals": {
+            "rows": [
+              {
+                "id": "perpendicular",
+                "value": 4.440448009290776e-11,
+                "unit": "direction"
+              }
+            ],
+            "maxLengthResidualMm": 0,
+            "maxAngularResidualRad": 4.440448009290776e-11,
+            "method": "Central-difference world tangent Jacobian; pivoted local rank; no global uniqueness claim."
+          },
+          "applicable": true
+        },
+        "elapsedMs": 6.296600000000012
+      },
+      {
+        "id": "SOLVER3D-locked",
+        "inputHash": "638a10d0794590d638a0c618b260c07156abcabc0d26f9d6d21d456418838dec",
+        "expected": {
+          "status": "FullyDefined",
+          "dof": 0
+        },
+        "passed": true,
+        "actual": {
+          "status": "FullyDefined",
+          "dof": 0,
+          "rank": 6,
+          "conflicts": [],
+          "redundant": [],
+          "poses": [
+            {
+              "bodyId": "shaft",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "bodyId": "collar",
+              "position": [
+                9.362709684008333e-11,
+                6.241806456005555e-11,
+                2.3406753380993616e-10
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            }
+          ],
+          "drag": null,
+          "residuals": {
+            "rows": [
+              {
+                "id": "lock",
+                "value": 9.362709684008333e-11,
+                "unit": "mm"
+              },
+              {
+                "id": "lock",
+                "value": 6.241806456005555e-11,
+                "unit": "mm"
+              },
+              {
+                "id": "lock",
+                "value": 2.3406753380993616e-10,
+                "unit": "mm"
+              },
+              {
+                "id": "lock",
+                "value": 0,
+                "unit": "rad"
+              },
+              {
+                "id": "lock",
+                "value": 0,
+                "unit": "rad"
+              },
+              {
+                "id": "lock",
+                "value": 0,
+                "unit": "rad"
+              }
+            ],
+            "maxLengthResidualMm": 2.3406753380993616e-10,
+            "maxAngularResidualRad": 0,
+            "method": "Central-difference world tangent Jacobian; pivoted local rank; no global uniqueness claim."
+          },
+          "applicable": true
+        },
+        "elapsedMs": 4.536299999999983
+      },
+      {
+        "id": "SOLVER3D-redundant",
+        "inputHash": "46cd8b3ab46d8ae915961a6b6736931c180cc07e678f2ce31a9f8fb76fc6f5c5",
+        "expected": {
+          "status": "RedundantConsistent",
+          "dof": 2
+        },
+        "passed": true,
+        "actual": {
+          "status": "RedundantConsistent",
+          "dof": 2,
+          "rank": 4,
+          "conflicts": [],
+          "redundant": [
+            "duplicate-axis"
+          ],
+          "poses": [
+            {
+              "bodyId": "shaft",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "bodyId": "collar",
+              "position": [
+                3.747658530455118e-7,
+                2.4984390203063034e-7,
+                15
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            }
+          ],
+          "drag": null,
+          "residuals": {
+            "rows": [
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 2.4984390203063034e-7,
+                "unit": "mm"
+              },
+              {
+                "id": "coaxial",
+                "value": -3.747658530455118e-7,
+                "unit": "mm"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "mm"
+              },
+              {
+                "id": "duplicate-axis",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "duplicate-axis",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "duplicate-axis",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "duplicate-axis",
+                "value": 2.4984390203063034e-7,
+                "unit": "mm"
+              },
+              {
+                "id": "duplicate-axis",
+                "value": -3.747658530455118e-7,
+                "unit": "mm"
+              },
+              {
+                "id": "duplicate-axis",
+                "value": 0,
+                "unit": "mm"
+              }
+            ],
+            "maxLengthResidualMm": 3.747658530455118e-7,
+            "maxAngularResidualRad": 0,
+            "method": "Central-difference world tangent Jacobian; pivoted local rank; no global uniqueness claim."
+          },
+          "applicable": true
+        },
+        "elapsedMs": 4.0464999999999804
+      },
+      {
+        "id": "SOLVER3D-conflict-distance",
+        "inputHash": "5008d5e01fff146743718f6f52aaa4d5a856b54ab7c2a0743886184b6d984dd9",
+        "expected": {
+          "status": "Inconsistent",
+          "dof": null
+        },
+        "passed": true,
+        "actual": {
+          "status": "Inconsistent",
+          "dof": null,
+          "rank": 5,
+          "conflicts": [
+            "distance",
+            "distance-conflict"
+          ],
+          "redundant": [
+            "distance-conflict"
+          ],
+          "poses": [
+            {
+              "bodyId": "shaft",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "bodyId": "collar",
+              "position": [
+                9.362710212239255e-11,
+                6.241806427714655e-11,
+                15.000000006453286
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            }
+          ],
+          "drag": null,
+          "residuals": {
+            "rows": [
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 6.241806427714655e-11,
+                "unit": "mm"
+              },
+              {
+                "id": "coaxial",
+                "value": -9.362710212239255e-11,
+                "unit": "mm"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "mm"
+              },
+              {
+                "id": "distance",
+                "value": 5.000000006453286,
+                "unit": "mm"
+              },
+              {
+                "id": "distance-conflict",
+                "value": -4.999999993546714,
+                "unit": "mm"
+              }
+            ],
+            "maxLengthResidualMm": 5.000000006453286,
+            "maxAngularResidualRad": 0,
+            "method": "Central-difference world tangent Jacobian; pivoted local rank; no global uniqueness claim."
+          },
+          "applicable": false
+        },
+        "elapsedMs": 24.739499999999992
+      },
+      {
+        "id": "SOLVER3D-conflict-angle",
+        "inputHash": "e4877811d52e9865fc6a59a2d2305d72a341088ebf92e8ce7d6884ab61c0f016",
+        "expected": {
+          "status": "Inconsistent",
+          "dof": null
+        },
+        "passed": true,
+        "actual": {
+          "status": "Inconsistent",
+          "dof": null,
+          "rank": 1,
+          "conflicts": [
+            "angle",
+            "angle-conflict"
+          ],
+          "redundant": [
+            "angle-conflict"
+          ],
+          "poses": [
+            {
+              "bodyId": "shaft",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "bodyId": "collar",
+              "position": [
+                6,
+                4,
+                15
+              ],
+              "quaternion": [
+                0.6087614290080167,
+                0,
+                0,
+                0.7933533402917753
+              ]
+            }
+          ],
+          "drag": null,
+          "residuals": {
+            "rows": [
+              {
+                "id": "angle",
+                "value": 0.26179938779737477,
+                "unit": "rad"
+              },
+              {
+                "id": "angle-conflict",
+                "value": -0.26179938780092415,
+                "unit": "rad"
+              }
+            ],
+            "maxLengthResidualMm": 0,
+            "maxAngularResidualRad": 0.26179938780092415,
+            "method": "Central-difference world tangent Jacobian; pivoted local rank; no global uniqueness claim."
+          },
+          "applicable": false
+        },
+        "elapsedMs": 8.948499999999996
+      },
+      {
+        "id": "SOLVER3D-singular-distance",
+        "inputHash": "444525623f5dca5b5529bafc42824e27804449eee698657b159f1d5a4d310de5",
+        "expected": {
+          "status": "SingularOrIndeterminate",
+          "dof": null
+        },
+        "passed": true,
+        "actual": {
+          "status": "SingularOrIndeterminate",
+          "dof": null,
+          "rank": 4,
+          "conflicts": [],
+          "redundant": [
+            "distance"
+          ],
+          "poses": [
+            {
+              "bodyId": "shaft",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "bodyId": "collar",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            }
+          ],
+          "drag": null,
+          "residuals": {
+            "rows": [
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "mm"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "mm"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "mm"
+              },
+              {
+                "id": "distance",
+                "value": 0,
+                "unit": "mm"
+              }
+            ],
+            "maxLengthResidualMm": 0,
+            "maxAngularResidualRad": 0,
+            "method": "Central-difference world tangent Jacobian; pivoted local rank; no global uniqueness claim."
+          },
+          "applicable": false
+        },
+        "elapsedMs": 1.7657999999999845
+      },
+      {
+        "id": "SOLVER3D-singular-angle",
+        "inputHash": "b97c94737934054d2de9d5839fb1e445ae34d2f96b744602f506db197c4d856d",
+        "expected": {
+          "status": "SingularOrIndeterminate",
+          "dof": null
+        },
+        "passed": true,
+        "actual": {
+          "status": "SingularOrIndeterminate",
+          "dof": null,
+          "rank": 0,
+          "conflicts": [],
+          "redundant": [
+            "angle"
+          ],
+          "poses": [
+            {
+              "bodyId": "shaft",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "bodyId": "collar",
+              "position": [
+                0,
+                0,
+                15
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            }
+          ],
+          "drag": null,
+          "residuals": {
+            "rows": [
+              {
+                "id": "angle",
+                "value": 0,
+                "unit": "rad"
+              }
+            ],
+            "maxLengthResidualMm": 0,
+            "maxAngularResidualRad": 0,
+            "method": "Central-difference world tangent Jacobian; pivoted local rank; no global uniqueness claim."
+          },
+          "applicable": false
+        },
+        "elapsedMs": 1.7745000000000175
+      },
+      {
+        "id": "SOLVER3D-missing",
+        "inputHash": "fb3775ea9d9fe70f31bb98738b661d5968deb91636ac55c98a3c34d6f289a837",
+        "expected": {
+          "code": "LostReference"
+        },
+        "passed": true,
+        "actual": {
+          "code": "LostReference",
+          "message": "Missing datum: collar/deleted-axis"
+        },
+        "elapsedMs": 0.16089999999999804
+      },
+      {
+        "id": "SOLVER3D-ambiguous",
+        "inputHash": "d799e040822107302037c5ebe2fa14e1dfd541bab73ed1eb551290f915d76a41",
+        "expected": {
+          "code": "AmbiguousReference"
+        },
+        "passed": true,
+        "actual": {
+          "code": "AmbiguousReference",
+          "message": "Repair the datum reference before solving. No substitute was selected."
+        },
+        "elapsedMs": 0.051400000000001
+      },
+      {
+        "id": "SOLVER3D-tangent",
+        "inputHash": "a42c477c2cddedf3fd785c46e6e8d8354eacddf69be03895cf0ded9d320354c6",
+        "expected": {
+          "code": "UnsupportedCapability"
+        },
+        "passed": true,
+        "actual": {
+          "code": "UnsupportedCapability",
+          "message": "Tangent/width and arbitrary surface mates are unsupported in E0.M3; use analytic datums."
+        },
+        "elapsedMs": 0.03839999999999577
+      },
+      {
+        "id": "SOLVER3D-width",
+        "inputHash": "e72e53fceeda98c4aca68ffa9af6794028fbb23ffbaa72872b1a96f8d2602730",
+        "expected": {
+          "code": "UnsupportedCapability"
+        },
+        "passed": true,
+        "actual": {
+          "code": "UnsupportedCapability",
+          "message": "Tangent/width and arbitrary surface mates are unsupported in E0.M3; use analytic datums."
+        },
+        "elapsedMs": 0.05020000000001801
+      },
+      {
+        "id": "ORACLE-AXIS",
+        "inputHash": "1597df278f2fccb7b840b7f4bc5226863a8491f63a7f9b157500ad8b6f122ea0",
+        "expected": {
+          "xy": [
+            0,
+            0
+          ],
+          "z": 15,
+          "axis": [
+            0,
+            0,
+            1
+          ]
+        },
+        "passed": true,
+        "actual": {
+          "status": "UnderDefined",
+          "dof": 2,
+          "rank": 4,
+          "conflicts": [],
+          "redundant": [],
+          "poses": [
+            {
+              "bodyId": "shaft",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "bodyId": "collar",
+              "position": [
+                9.362709684008333e-11,
+                6.241806456005555e-11,
+                15
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            }
+          ],
+          "drag": null,
+          "residuals": {
+            "rows": [
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 6.241806456005555e-11,
+                "unit": "mm"
+              },
+              {
+                "id": "coaxial",
+                "value": -9.362709684008333e-11,
+                "unit": "mm"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "mm"
+              }
+            ],
+            "maxLengthResidualMm": 9.362709684008333e-11,
+            "maxAngularResidualRad": 0,
+            "method": "Central-difference world tangent Jacobian; pivoted local rank; no global uniqueness claim."
+          },
+          "applicable": true
+        },
+        "elapsedMs": 4.09820000000002
+      },
+      {
+        "id": "ORACLE-THREE",
+        "inputHash": "7b44a24ee964c6e10b74407472d05009fd14cc5d29635275780c6b34c5f269b9",
+        "expected": {
+          "spacingMm": 12,
+          "ground": [
+            0,
+            0,
+            0
+          ]
+        },
+        "passed": true,
+        "actual": {
+          "status": "UnderDefined",
+          "dof": 3,
+          "rank": 9,
+          "conflicts": [],
+          "redundant": [],
+          "poses": [
+            {
+              "bodyId": "shaft",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "bodyId": "collar",
+              "position": [
+                8.82255544567189e-11,
+                6.30182300316006e-11,
+                15.499999994120426
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "bodyId": "cap",
+              "position": [
+                -4.1412006036888995e-11,
+                7.742241522873615e-11,
+                27.50000000442847
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            }
+          ],
+          "drag": null,
+          "residuals": {
+            "rows": [
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 6.30182300316006e-11,
+                "unit": "mm"
+              },
+              {
+                "id": "coaxial",
+                "value": -8.82255544567189e-11,
+                "unit": "mm"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "mm"
+              },
+              {
+                "id": "cap-coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "cap-coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "cap-coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "cap-coaxial",
+                "value": 7.742241522873615e-11,
+                "unit": "mm"
+              },
+              {
+                "id": "cap-coaxial",
+                "value": 4.1412006036888995e-11,
+                "unit": "mm"
+              },
+              {
+                "id": "cap-coaxial",
+                "value": 0,
+                "unit": "mm"
+              },
+              {
+                "id": "collar-cap-spacing",
+                "value": 1.0308042419637786e-8,
+                "unit": "mm"
+              }
+            ],
+            "maxLengthResidualMm": 1.0308042419637786e-8,
+            "maxAngularResidualRad": 0,
+            "method": "Central-difference world tangent Jacobian; pivoted local rank; no global uniqueness claim."
+          },
+          "applicable": true
+        },
+        "elapsedMs": 12.89500000000001
+      },
+      {
+        "id": "ORACLE-ANGLE",
+        "inputHash": "f199ef785fe79d3f572bd9be84d3b1362786a05c3dc8b2f7085b6b599b8ffb25",
+        "expected": {
+          "angleRad": 1.0471975511965976
+        },
+        "passed": true,
+        "actual": {
+          "status": "UnderDefined",
+          "dof": 5,
+          "rank": 1,
+          "conflicts": [],
+          "redundant": [],
+          "poses": [
+            {
+              "bodyId": "shaft",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "bodyId": "collar",
+              "position": [
+                6,
+                4,
+                15
+              ],
+              "quaternion": [
+                0.49999999999562683,
+                0,
+                0,
+                0.8660254037869632
+              ]
+            }
+          ],
+          "drag": null,
+          "residuals": {
+            "rows": [
+              {
+                "id": "angle",
+                "value": -1.0099476810410124e-11,
+                "unit": "rad"
+              }
+            ],
+            "maxLengthResidualMm": 0,
+            "maxAngularResidualRad": 1.0099476810410124e-11,
+            "method": "Central-difference world tangent Jacobian; pivoted local rank; no global uniqueness claim."
+          },
+          "applicable": true
+        },
+        "elapsedMs": 4.166600000000017
+      },
+      {
+        "id": "SOLVER3D-DRAG",
+        "inputHash": "c74504f67c903d6d47038784670a928d79945941d16f000e2ed489aaf307714a",
+        "expected": {
+          "z": 40,
+          "dof": 2
+        },
+        "passed": true,
+        "actual": {
+          "status": "UnderDefined",
+          "dof": 2,
+          "rank": 4,
+          "conflicts": [],
+          "redundant": [],
+          "poses": [
+            {
+              "bodyId": "shaft",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "bodyId": "collar",
+              "position": [
+                1.8274548180200807e-22,
+                1.218303212013387e-22,
+                39.999999999609905
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            }
+          ],
+          "drag": {
+            "accepted": true,
+            "target": {
+              "bodyId": "collar",
+              "position": [
+                0,
+                0,
+                40
+              ]
+            },
+            "reason": "Temporary target satisfied; permanent mate rank measured after removal.",
+            "iterations": 3
+          },
+          "residuals": {
+            "rows": [
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 1.218303212013387e-22,
+                "unit": "mm"
+              },
+              {
+                "id": "coaxial",
+                "value": -1.8274548180200807e-22,
+                "unit": "mm"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "mm"
+              }
+            ],
+            "maxLengthResidualMm": 1.8274548180200807e-22,
+            "maxAngularResidualRad": 0,
+            "method": "Central-difference world tangent Jacobian; pivoted local rank; no global uniqueness claim."
+          },
+          "applicable": true
+        },
+        "elapsedMs": 7.666699999999992
+      },
+      {
+        "id": "SOLVER3D-SPIN",
+        "inputHash": "d8af2633bec15e0df308fed041425c5eaad36d1ca5a99b15ca46a69f4554ca6e",
+        "expected": {
+          "z": 20,
+          "spinRad": 0.7
+        },
+        "passed": true,
+        "actual": {
+          "status": "UnderDefined",
+          "dof": 2,
+          "rank": 4,
+          "conflicts": [],
+          "redundant": [],
+          "poses": [
+            {
+              "bodyId": "shaft",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "bodyId": "collar",
+              "position": [
+                1.8274548180200807e-22,
+                1.218303212013387e-22,
+                19.999999999921975
+              ],
+              "quaternion": [
+                0,
+                0,
+                0.3428978074503209,
+                0.9393727128492516
+              ]
+            }
+          ],
+          "drag": {
+            "accepted": true,
+            "target": {
+              "bodyId": "collar",
+              "position": [
+                0,
+                0,
+                20
+              ],
+              "quaternion": [
+                0,
+                0,
+                0.34289780745545134,
+                0.9393727128473789
+              ]
+            },
+            "reason": "Temporary target satisfied; permanent mate rank measured after removal.",
+            "iterations": 3
+          },
+          "residuals": {
+            "rows": [
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 1.218303212013387e-22,
+                "unit": "mm"
+              },
+              {
+                "id": "coaxial",
+                "value": -1.8274548180200807e-22,
+                "unit": "mm"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "mm"
+              }
+            ],
+            "maxLengthResidualMm": 1.8274548180200807e-22,
+            "maxAngularResidualRad": 0,
+            "method": "Central-difference world tangent Jacobian; pivoted local rank; no global uniqueness claim."
+          },
+          "applicable": true
+        },
+        "elapsedMs": 8.284199999999998
+      },
+      {
+        "id": "SOLVER3D-OFF-AXIS",
+        "inputHash": "52e6af0e43dada405e0e85021691efabc2dfc00aa4c1fe1f2acc047523c0db9c",
+        "expected": {
+          "accepted": false,
+          "previousZ": 15
+        },
+        "passed": true,
+        "actual": {
+          "status": "UnderDefined",
+          "dof": 2,
+          "rank": 4,
+          "conflicts": [],
+          "redundant": [],
+          "poses": [
+            {
+              "bodyId": "shaft",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "bodyId": "collar",
+              "position": [
+                9.362709684008333e-11,
+                6.241806456005555e-11,
+                15
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            }
+          ],
+          "drag": {
+            "accepted": false,
+            "target": {
+              "bodyId": "collar",
+              "position": [
+                10,
+                0,
+                40
+              ]
+            },
+            "reason": "Infeasible target; previous feasible poses preserved.",
+            "iterations": 11
+          },
+          "residuals": {
+            "rows": [
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 6.241806456005555e-11,
+                "unit": "mm"
+              },
+              {
+                "id": "coaxial",
+                "value": -9.362709684008333e-11,
+                "unit": "mm"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "mm"
+              }
+            ],
+            "maxLengthResidualMm": 9.362709684008333e-11,
+            "maxAngularResidualRad": 0,
+            "method": "Central-difference world tangent Jacobian; pivoted local rank; no global uniqueness claim."
+          },
+          "applicable": false
+        },
+        "elapsedMs": 14.609200000000016
+      },
+      {
+        "id": "SOLVER3D-FIXED-DRAG",
+        "inputHash": "9b74c7039e3924a0deab7a3df0cd12ac13f5cc532c1015fc45baff6639101011",
+        "expected": {
+          "accepted": false,
+          "dof": 0
+        },
+        "passed": true,
+        "actual": {
+          "status": "FullyDefined",
+          "dof": 0,
+          "rank": 6,
+          "conflicts": [],
+          "redundant": [],
+          "poses": [
+            {
+              "bodyId": "shaft",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "bodyId": "collar",
+              "position": [
+                9.362709684008333e-11,
+                6.241806456005555e-11,
+                2.3406753380993616e-10
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            }
+          ],
+          "drag": {
+            "accepted": false,
+            "target": {
+              "bodyId": "collar",
+              "position": [
+                0,
+                0,
+                40
+              ]
+            },
+            "reason": "Infeasible target; previous feasible poses preserved.",
+            "iterations": 10
+          },
+          "residuals": {
+            "rows": [
+              {
+                "id": "lock",
+                "value": 9.362709684008333e-11,
+                "unit": "mm"
+              },
+              {
+                "id": "lock",
+                "value": 6.241806456005555e-11,
+                "unit": "mm"
+              },
+              {
+                "id": "lock",
+                "value": 2.3406753380993616e-10,
+                "unit": "mm"
+              },
+              {
+                "id": "lock",
+                "value": 0,
+                "unit": "rad"
+              },
+              {
+                "id": "lock",
+                "value": 0,
+                "unit": "rad"
+              },
+              {
+                "id": "lock",
+                "value": 0,
+                "unit": "rad"
+              }
+            ],
+            "maxLengthResidualMm": 2.3406753380993616e-10,
+            "maxAngularResidualRad": 0,
+            "method": "Central-difference world tangent Jacobian; pivoted local rank; no global uniqueness claim."
+          },
+          "applicable": false
+        },
+        "elapsedMs": 13.625100000000003
+      },
+      {
+        "id": "SOLVER3D-GROUND-DRAG",
+        "inputHash": "bbfc8ebc517ec73a80556d2ab0b9b60358e03b0c8dc066a5a4de7e8a663c68c0",
+        "expected": {
+          "accepted": false,
+          "groundUnchanged": true
+        },
+        "passed": true,
+        "actual": {
+          "status": "UnderDefined",
+          "dof": 2,
+          "rank": 4,
+          "conflicts": [],
+          "redundant": [],
+          "poses": [
+            {
+              "bodyId": "shaft",
+              "position": [
+                0,
+                0,
+                0
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            },
+            {
+              "bodyId": "collar",
+              "position": [
+                9.362709684008333e-11,
+                6.241806456005555e-11,
+                15
+              ],
+              "quaternion": [
+                0,
+                0,
+                0,
+                1
+              ]
+            }
+          ],
+          "drag": {
+            "accepted": false,
+            "target": {
+              "bodyId": "shaft",
+              "position": [
+                0,
+                0,
+                5
+              ]
+            },
+            "reason": "Infeasible target; previous feasible poses preserved.",
+            "iterations": 6
+          },
+          "residuals": {
+            "rows": [
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "direction"
+              },
+              {
+                "id": "coaxial",
+                "value": 6.241806456005555e-11,
+                "unit": "mm"
+              },
+              {
+                "id": "coaxial",
+                "value": -9.362709684008333e-11,
+                "unit": "mm"
+              },
+              {
+                "id": "coaxial",
+                "value": 0,
+                "unit": "mm"
+              }
+            ],
+            "maxLengthResidualMm": 9.362709684008333e-11,
+            "maxAngularResidualRad": 0,
+            "method": "Central-difference world tangent Jacobian; pivoted local rank; no global uniqueness claim."
+          },
+          "applicable": false
+        },
+        "elapsedMs": 9.899100000000004
+      },
+      {
+        "id": "SOLVER3D-MOTION-PATH",
+        "inputHash": "105d897f7c8c4a272f9317fca72bf072c8aaf8538c95542e5cd648c230f3e313",
+        "passed": true,
+        "expected": {
+          "samples": 21,
+          "rangeMm": [
+            0,
+            40
+          ],
+          "dof": 2
+        },
+        "actual": {
+          "samples": 21,
+          "allAccepted": true,
+          "maxLengthResidualMm": 1.8274548180200807e-22,
+          "maxSampleMs": 7.629500000000007,
+          "meanSampleMs": 4.178161904761902
+        }
+      }
+    ],
+    "total": 28,
+    "passed": 28,
+    "failed": 0,
+    "elapsedMs": 264.7641,
+    "limits": [
+      "Local 2–4 body analytic-datum experiment",
+      "No smooth-motion/GPU/dynamics/large-assembly guarantee",
+      "Inconsistent requires a proven contradictory bound; other nonconvergence is Unsolved"
+    ]
+  },
+  "resources": {
+    "peakRssBytes": 60653568,
+    "heapUsedBytes": 13774368,
+    "policy": "Isolated process, 192 MiB JS old-space, finite typed inputs, parent deadline; RSS postcondition is not an OS hard memory quota."
+  }
+}

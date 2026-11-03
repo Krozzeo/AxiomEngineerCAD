@@ -1,0 +1,56 @@
+{
+  "passed": true,
+  "profile": "E0.M7-independent-pdf/1",
+  "readers": {
+    "pypdf": "6.10.0",
+    "pdfplumber": "0.11.9",
+    "pypdfium2": "5.14.0"
+  },
+  "files": [
+    {
+      "file": "integrated-a4-40.pdf",
+      "sha256": "c484dacca397c00d9116548828e543b04505c7f1cb45d5e2cac301ac68631640",
+      "pageMm": [
+        210,
+        297
+      ],
+      "widthMm": 40,
+      "depthMm": 10,
+      "rasterImages": 0,
+      "hiddenLines": 4,
+      "circleCubicSegments": 16,
+      "maxMeasuredCircleDeviationMm": 2.126368534582923e-07,
+      "rendered": "integrated-a4-40-rendered.png"
+    },
+    {
+      "file": "integrated-a4-60.pdf",
+      "sha256": "a969fbd5d1412bdd2e6e709d808bf08f14070562ae1a470fdc0ba7b437f96448",
+      "pageMm": [
+        210,
+        297
+      ],
+      "widthMm": 60,
+      "depthMm": 15,
+      "rasterImages": 0,
+      "hiddenLines": 4,
+      "circleCubicSegments": 16,
+      "maxMeasuredCircleDeviationMm": 2.126368534582923e-07,
+      "rendered": "integrated-a4-60-rendered.png"
+    },
+    {
+      "file": "integrated-a4-historical.pdf",
+      "sha256": "08830f64f5b2da3a887e4728942bd89ba42f4251876c108cd0db6ba877e9e750",
+      "pageMm": [
+        210,
+        297
+      ],
+      "widthMm": 40,
+      "depthMm": 10,
+      "rasterImages": 0,
+      "hiddenLines": 4,
+      "circleCubicSegments": 16,
+      "maxMeasuredCircleDeviationMm": 2.126368534582923e-07,
+      "rendered": "integrated-a4-historical-rendered.png"
+    }
+  ]
+}

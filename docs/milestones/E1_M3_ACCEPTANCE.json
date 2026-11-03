@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "milestone": "E1.M3",
+  "version": "0.1.4",
+  "state": "review candidate; exact-head CI and public installation pending",
+  "baseCommit": "12e15623b3b9474cdce6a6a95f13c1de06b867bc",
+  "platformSdk": {
+    "version": "0.1.12",
+    "commit": "6d240845cd77eb1879738d32c9f2b8fcfd7297c5"
+  },
+  "localEvidence": {
+    "domainTests": 152,
+    "parametricTests": 16,
+    "visibilityTests": 2,
+    "numericRetainedCases": 57,
+    "typedTools": 37,
+    "sourceArchives": 6,
+    "physicalGpu": "NVIDIA Turing / GTX 1650; Chrome 156; no forced software flags",
+    "focusedM3Ui": true,
+    "historicalM2UpgradeCrudReopen": true,
+    "embeddedModelInspectorEditing": true,
+    "bundledBrowserEmbeddedEditing": true,
+    "physicalWorkbench1650x1050": true,
+    "physicalWorkbench1440x960": true,
+    "relocatedPreparedPackage": true,
+    "fullLocalPhysicalBrowser": true,
+    "saveReadRegression": "Save waits for sketch diagnostic/preview read, then repeats revision and all write guards",
+    "sixPlanarSupports": "Actual B-Rep verification, independent UV/world frames, upstream resizing, right-face UI creation"
+  },
+  "pending": [
+    "final complete browser run",
+    "exact-head Windows/Linux acceptance CI",
+    "experimental immutable ZIP and manifest publication",
+    "fresh public Platform discovery/download/hash/install/launch",
+    "owner review"
+  ],
+  "scopeLimits": [
+    "Custom reference authoring deferred as allowed by owner",
+    "Arcs and extended constraints remain E3.M1",
+    "Expressions E1.M4; arbitrary sketch extrusion E1.M5",
+    "Undo/redo bounded to working-session history; immutable versions/publications retained",
+    "Large compact pointer previews explicitly unavailable above the response budget; full commit still validates"
+  ]
+}

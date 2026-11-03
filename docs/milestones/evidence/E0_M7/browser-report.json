@@ -1,0 +1,251 @@
+{
+  "milestone": "E0.M7",
+  "platform": "0.1.12",
+  "providerCommit": "6d240845cd77eb1879738d32c9f2b8fcfd7297c5",
+  "runtime": "v24.21.0",
+  "os": "win32",
+  "architecture": "x64",
+  "criteria": [
+    "Direct CLI launches an authenticated browser editor; pending fields block save; applied properties persist",
+    "Spatial UI solves six-DOF poses, moves and pointer-drags within coaxial freedom, saves recipe, executes 28 cases, rejects conflicts and fully locked movement",
+    "Real kernel preview changes volume with width; recipe persists; invalid result retains last good preview; 29-case corpus and constrained circle drag pass",
+    "Visible depth-buffer face picking resolves the proven producer role",
+    "Direct Cancel retains session; Save and close releases the running editor",
+    "Hub UI creates real CAD adapter session",
+    "Editor changes appear in Hub status",
+    "Hub Cancel/Save/Close/Reopen preserve document identity and content",
+    "Actual Hub Load Demos registers both labs and opens/solves the native spatial demo in its installed product session",
+    "Actual native source/consumer demos: version, publish, restore, source dimension update, explicit verified candidate adoption, unchanged historical closure, normal reopen and corrupt-byte recovery with original backup",
+    "Real local scripted agent prepares isolated width change; full SDK review/human Apply saves exact geometry; forged authority, stale Apply and revoked grant are denied; manual shared command and saved reopen agree",
+    "E0.M6 exact A4 vector PDF/HLR and source-linked width regenerate 40→60, stale export refuses, save/reopen reproduces drawing; actual GPU picks are separately labeled; unavailable/lost GPU and denied/offline exposure preserve MAIN",
+    "E0.M7 one persisted sketch → actual extrusion → face-dependent cut → measured spatial mate → associative vector drawing; manual thickness and human-reviewed proposal width regenerate; retained version stays read-only; save/reopen preserves exact chain"
+  ],
+  "pageErrors": [],
+  "renderer": "Canvas CPU preview derived from actual OCCT tessellation; exact metrics from isolated CPU/Wasm; M6 WebGPU evidence is reported separately; no real AI model acceptance claimed",
+  "browser": "141.0.7390.37",
+  "native": {
+    "passed": true,
+    "schemaVersion": 1,
+    "creator": {
+      "version": "0.0.7",
+      "commit": null,
+      "channel": "development"
+    },
+    "sourceVolumeBefore": 12000,
+    "sourceVolumeAfter": 18000,
+    "retainedVersions": 2,
+    "recoveredOriginalBytes": true
+  },
+  "review": {
+    "passed": true,
+    "scriptedOnly": true,
+    "realProviderEvaluated": false,
+    "mainWidthAfterApply": 60,
+    "manualWidthAfterSaveReopen": 70,
+    "agentMainDenied": true,
+    "staleApplyDenied": true,
+    "retainedVersions": 1,
+    "creator": {
+      "version": "0.0.7",
+      "commit": null,
+      "channel": "development"
+    }
+  },
+  "proof": {
+    "passed": true,
+    "creator": {
+      "version": "0.0.7",
+      "commit": null,
+      "channel": "development"
+    },
+    "drawing": {
+      "sheet": "A4",
+      "widthBeforeMm": 40,
+      "widthAfterMm": 60,
+      "hiddenFront": 2,
+      "hiddenRight": 2,
+      "staleExportDenied": true,
+      "saveReopen": true
+    },
+    "gpu": {
+      "state": "unsupported",
+      "message": "No WebGPU adapter available.",
+      "picks": [],
+      "deviceLoss": false,
+      "metrics": {
+        "drawCount": 0,
+        "renderTimes": [],
+        "buildMs": 452.57809999999995,
+        "resources": {
+          "peakRssBytes": 173850624,
+          "heapUsedBytes": 38163808,
+          "policy": "Isolated process, 192 MiB JS old-space, finite typed inputs, parent deadline; RSS postcondition is not an OS hard memory quota."
+        },
+        "pickReadbacks": []
+      }
+    },
+    "offlineNoGPU": true,
+    "remoteTransmission": false
+  },
+  "integration": {
+    "passed": true,
+    "creator": {
+      "version": "0.0.7",
+      "commit": null,
+      "channel": "development"
+    },
+    "initial": {
+      "profile": "E0.M7-chain/1",
+      "sketch": {
+        "id": "sketch-main",
+        "status": "FullyDefined",
+        "dof": 0,
+        "maxResidualMm": 0,
+        "widthMm": 40,
+        "heightMm": 30
+      },
+      "extrusion": {
+        "id": "extrude-base",
+        "sourceSketchId": "sketch-main",
+        "volumeMm3": 12000,
+        "topFaceZmm": 10
+      },
+      "dependent": {
+        "id": "feature-geometry",
+        "producerId": "extrude-base",
+        "role": "top",
+        "state": "ResolvedReidentified",
+        "volumeMm3": 11717.256661176916,
+        "areaMm2": 3931.9468914507706
+      },
+      "mate": {
+        "id": "mate-on-top",
+        "instanceId": "instance-cap",
+        "status": "UnderDefined",
+        "dof": 3,
+        "position": [
+          -10,
+          0,
+          10.000000749060682
+        ],
+        "sourceFaceZmm": 10,
+        "childBottomZmm": 0,
+        "maxResidualMm": 7.490606819260393e-7
+      },
+      "drawing": {
+        "id": "drawing-binding",
+        "producerId": "feature-geometry",
+        "parameterId": "parameter-width",
+        "widthMm": 40,
+        "template": "A4-third-angle/1"
+      }
+    },
+    "current": {
+      "profile": "E0.M7-chain/1",
+      "sketch": {
+        "id": "sketch-main",
+        "status": "FullyDefined",
+        "dof": 0,
+        "maxResidualMm": 0,
+        "widthMm": 60,
+        "heightMm": 30
+      },
+      "extrusion": {
+        "id": "extrude-base",
+        "sourceSketchId": "sketch-main",
+        "volumeMm3": 27000,
+        "topFaceZmm": 15
+      },
+      "dependent": {
+        "id": "feature-geometry",
+        "producerId": "extrude-base",
+        "role": "top",
+        "state": "ResolvedReidentified",
+        "volumeMm3": 26575.88499176538,
+        "areaMm2": 6526.194671058466
+      },
+      "mate": {
+        "id": "mate-on-top",
+        "instanceId": "instance-cap",
+        "status": "UnderDefined",
+        "dof": 3,
+        "position": [
+          -15,
+          0,
+          15.00000074906201
+        ],
+        "sourceFaceZmm": 15,
+        "childBottomZmm": 0,
+        "maxResidualMm": 7.490620106409551e-7
+      },
+      "drawing": {
+        "id": "drawing-binding",
+        "producerId": "feature-geometry",
+        "parameterId": "parameter-width",
+        "widthMm": 60,
+        "template": "A4-third-angle/1"
+      }
+    },
+    "historical": {
+      "profile": "E0.M7-chain/1",
+      "sketch": {
+        "id": "sketch-main",
+        "status": "FullyDefined",
+        "dof": 0,
+        "maxResidualMm": 0,
+        "widthMm": 40,
+        "heightMm": 30
+      },
+      "extrusion": {
+        "id": "extrude-base",
+        "sourceSketchId": "sketch-main",
+        "volumeMm3": 12000,
+        "topFaceZmm": 10
+      },
+      "dependent": {
+        "id": "feature-geometry",
+        "producerId": "extrude-base",
+        "role": "top",
+        "state": "ResolvedReidentified",
+        "volumeMm3": 11717.256661176916,
+        "areaMm2": 3931.9468914507706
+      },
+      "mate": {
+        "id": "mate-on-top",
+        "instanceId": "instance-cap",
+        "status": "UnderDefined",
+        "dof": 3,
+        "position": [
+          -10,
+          0,
+          10.000000749060682
+        ],
+        "sourceFaceZmm": 10,
+        "childBottomZmm": 0,
+        "maxResidualMm": 7.490606819260393e-7
+      },
+      "drawing": {
+        "id": "drawing-binding",
+        "producerId": "feature-geometry",
+        "parameterId": "parameter-width",
+        "widthMm": 40,
+        "template": "A4-third-angle/1"
+      }
+    },
+    "retainedVersion": "sha256:c456de43cab6d3f6eb74f12f9672e43edf01773f8c4ee606fc62333da2324b75",
+    "initialVolumeMm3": 11717.256661176916,
+    "currentVolumeMm3": 26575.88499176538,
+    "manualThicknessMm": 15,
+    "reviewedWidthMm": 60,
+    "saveReopen": true,
+    "historicalReadOnly": true,
+    "gpu": {
+      "state": "unsupported",
+      "message": "No WebGPU adapter available."
+    },
+    "picks": [],
+    "ownerDecision": "Pending Go / Redesign / Stop",
+    "e1Started": false
+  },
+  "passed": true
+}

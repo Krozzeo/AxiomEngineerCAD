@@ -1,0 +1,245 @@
+{
+  "profile": "E1.M1-interaction/1",
+  "software": "0.1.2",
+  "platform": "0.1.12",
+  "tests": 125,
+  "hardware": {
+    "devices": [
+      {
+        "vendorId": 4318,
+        "deviceId": 8066,
+        "vendorString": "",
+        "deviceString": "NVIDIA GeForce GTX 1650",
+        "driverVendor": "NVIDIA",
+        "driverVersion": "32.0.16.1692"
+      },
+      {
+        "vendorId": 5140,
+        "deviceId": 140,
+        "vendorString": "",
+        "deviceString": "Microsoft Basic Render Driver",
+        "driverVendor": "",
+        "driverVersion": "10.0.19041.5794"
+      }
+    ],
+    "browser": "156.0.8078.74",
+    "flags": [],
+    "softwareForced": false
+  },
+  "interaction": {
+    "passed": true,
+    "colors": {
+      "selected": "#00aeff",
+      "hover": "#ff8000"
+    },
+    "autoPriority": [
+      "vertex",
+      "edge",
+      "face"
+    ],
+    "hoverNoDomainRequests": true,
+    "isolatedProperties": true,
+    "exclusiveMenus": true,
+    "origin": true,
+    "datumVisibilityIndependent": true,
+    "smoothAxisInversion": true,
+    "F8": true,
+    "doubleMiddle": true,
+    "dirtySaveAndReset": true,
+    "nativeUnchanged": true
+  },
+  "docking": {
+    "passed": true,
+    "fit": [
+      {
+        "width": 1650,
+        "height": 1050,
+        "scrollWidth": 1650,
+        "scrollHeight": 1050,
+        "canvas": {
+          "x": 224,
+          "y": 174,
+          "width": 1132,
+          "height": 697,
+          "top": 174,
+          "right": 1356,
+          "bottom": 871,
+          "left": 224
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1650,
+          "height": 36,
+          "top": 0,
+          "right": 1650,
+          "bottom": 36,
+          "left": 0
+        },
+        "menu": {
+          "x": 169.234375,
+          "y": 0,
+          "width": 193.71875,
+          "height": 35,
+          "top": 0,
+          "right": 362.953125,
+          "bottom": 35,
+          "left": 169.234375
+        }
+      },
+      {
+        "width": 3840,
+        "height": 2160,
+        "scrollWidth": 3840,
+        "scrollHeight": 2160,
+        "canvas": {
+          "x": 224,
+          "y": 174,
+          "width": 3322,
+          "height": 1807,
+          "top": 174,
+          "right": 3546,
+          "bottom": 1981,
+          "left": 224
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 3840,
+          "height": 36,
+          "top": 0,
+          "right": 3840,
+          "bottom": 36,
+          "left": 0
+        },
+        "menu": {
+          "x": 169.234375,
+          "y": 0,
+          "width": 193.71875,
+          "height": 35,
+          "top": 0,
+          "right": 362.953125,
+          "bottom": 35,
+          "left": 169.234375
+        }
+      },
+      {
+        "width": 1280,
+        "height": 720,
+        "scrollWidth": 1280,
+        "scrollHeight": 720,
+        "canvas": {
+          "x": 224,
+          "y": 174,
+          "width": 762,
+          "height": 367,
+          "top": 174,
+          "right": 986,
+          "bottom": 541,
+          "left": 224
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 36,
+          "top": 0,
+          "right": 1280,
+          "bottom": 36,
+          "left": 0
+        },
+        "menu": {
+          "x": 169.234375,
+          "y": 0,
+          "width": 193.71875,
+          "height": 35,
+          "top": 0,
+          "right": 362.953125,
+          "bottom": 35,
+          "left": 169.234375
+        }
+      },
+      {
+        "width": 800,
+        "height": 600,
+        "scrollWidth": 800,
+        "scrollHeight": 600,
+        "canvas": {
+          "x": 224,
+          "y": 174,
+          "width": 300,
+          "height": 247,
+          "top": 174,
+          "right": 524,
+          "bottom": 421,
+          "left": 224
+        },
+        "header": {
+          "x": 0,
+          "y": 0,
+          "width": 800,
+          "height": 36,
+          "top": 0,
+          "right": 800,
+          "bottom": 36,
+          "left": 0
+        },
+        "menu": {
+          "x": 169.234375,
+          "y": 0,
+          "width": 193.71875,
+          "height": 35,
+          "top": 0,
+          "right": 362.953125,
+          "bottom": 35,
+          "left": 169.234375
+        }
+      }
+    ],
+    "zoom": [
+      {
+        "projection": "orthographic",
+        "pixel": [
+          0.5965545512735844,
+          0.3431854322552681
+        ],
+        "driftPixels": 0.09778234384585105
+      },
+      {
+        "projection": "perspective",
+        "pixel": [
+          0.597140768087833,
+          0.34223335668958627
+        ],
+        "driftPixels": 0.30142957444303736
+      }
+    ],
+    "horizontalOrbitReversed": true,
+    "allFiveDocks": true,
+    "dragDrop": true,
+    "keyboardResize": true,
+    "pointerResize": true,
+    "allPanelsClosedRecovery": true,
+    "closeReopen": true,
+    "persistReload": true,
+    "sameLiveInspectorAndCanvas": true,
+    "separateInspectorSelection": true,
+    "separateModelWithMainDrawing": true,
+    "childCloseReturnsPanel": true,
+    "popupBlockedPreservesPanel": true,
+    "separateModelWheel": true,
+    "documentUnchanged": true,
+    "errors": []
+  },
+  "embedded": {
+    "passed": true,
+    "inspectorSelectionSync": true,
+    "modelCameraSync": true,
+    "returnAndNativeClose": true,
+    "sameAdapterSession": true,
+    "reusesVerifiedProof": true,
+    "nativeUnchanged": true
+  },
+  "pageErrors": [],
+  "scope": "Source-local physical NVIDIA acceptance; final exact public commit/asset install is independently recorded in delivery artifacts."
+}

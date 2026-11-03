@@ -1,0 +1,3 @@
+import {dimensions} from '../sketch/relation-kinds.mjs';
+export function dimensionSources(graph){return graph.features.filter(f=>f.type==='sketch-primitives').flatMap(f=>(f.data.constraints??[]).filter(c=>c.driving&&dimensions.includes(c.type)&&/^[A-Za-z_][A-Za-z_0-9]{0,63}$/.test(c.name??'')).map(c=>({sketchId:f.id,constraintId:c.id,name:c.name,definitionId:f.definitionId,unit:c.type==='angle'?'rad':'mm',value:c.value,driverIds:graph.parameters.filter(p=>p.targets?.some(t=>t.kind==='dimension'&&t.sketchId===f.id&&t.constraintId===c.id)).map(p=>p.id)})));}
+export const dimensionIdentity=d=>'dimension:'+d.sketchId+':'+d.constraintId;

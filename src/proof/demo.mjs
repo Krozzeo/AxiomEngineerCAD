@@ -1,0 +1,4 @@
+import {blank,validate} from '../document.mjs';
+import {upgrade} from '../native/schema.mjs';
+import {recipe,KERNEL} from '../lab/profile.mjs';
+export function proofDemo(){const v=upgrade({...blank('E0.M6 Drawing & GPU Lab'),provisional:'E0.M2',experiment:{profile:'E0.M2-probe-v0',kernel:KERNEL,spec:recipe({scenario:'cut',count:1})}}),g=v.native.graph;g.definitions[0].kind='assembly';g.definitions.push({id:'definition-peer',name:'Repeated block',kind:'part',datumRoles:['origin','axis-z','plane-xy']});g.features.push({id:'feature-peer',definitionId:'definition-peer',type:'geometry-probe',dependsOn:[],parameterIds:[],data:{profile:'E0.M2-probe-v0',kernel:KERNEL,spec:recipe({scenario:'extrude',width:20,height:20,depth:15})}});for(const [id,x]of [['instance-a',60],['instance-b',100]])g.instances.push({id,ownerDefinitionId:g.primaryDefinitionId,definitionId:'definition-peer',transform:{position:[x,0,0],quaternion:[0,0,0,1]}});validate(v);return v;}

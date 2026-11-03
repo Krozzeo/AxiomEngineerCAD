@@ -1,6 +1,8 @@
+> E1.M4 implementation addendum (2026-11-01): [typed parameter/profile contract](PARAMETERS_E1_M4.md), [ADR022](../architecture/ADR-022-PARAMETERS-AND-SKETCH-WORKBENCH.md) and [review evidence](../milestones/E1_M4_REPORT.md). Native format remains 1; new profiles are explicitly refused by older readers. Current reviewed scope does not complete E3 or general extrusion.
+
 # Native Data, Versions and References Contract
 
-**Baseline:** Master v0.2.0. **State:** architecture specification; physical schema/encoding/version not yet accepted. **First decisive gate:** E0.M4 after topology and 3D solver proofs.
+**Baseline:** Master v0.2.0. **State:** measured native1 foundation accepted for E1 progression by the2026-10-31 E0 Go; broader version/publication capabilities remain at their scheduled gates. **First decisive gate:** E0.M4 after topology and 3D solver proofs.
 
 ## 1. Logical user artifact vs physical storage
 
@@ -73,3 +75,7 @@ Caches (meshes, thumbnails, derived vector projections) are non-authoritative an
 **Acceptance:** E0.M4 proves graph identity, local snapshots, missing-source behavior, transactional storage and format mobility; E4.M4 proves full Latest/Pinned publication semantics; E6 retests migration/rollback and broad assembly/drawing compatibility. No implementation is claimed yet.
 
 References: [Master §§5–6](../../MASTER_DESIGN.md#5-unified-engineering-document), [Geometry contract](GEOMETRY_CONSTRAINTS.md), [ADR register](../architecture/ADR_REGISTER.md).
+
+## E0 Go and E1.M1 evidence update2026-10-31
+
+[E0 decision](../architecture/E0_OWNER_GO_2026_10_31.json) accepts the measured baseline for progression. E1.M1 [ADR016](../architecture/ADR-016-E1-WORKBENCH.md) adds UI/ReadOnly context, not native data mutation:15 workbench cases plus100 retained, actual default/empty/Hub UI, seven-class physical GPU picking and focused navigation, headless selection parity, unchanged-document/prior0.0.7 reader compatibility, current package/public install checks. Existing native0/1 schemas and E0 corpus inputs remain unchanged. General sketch/feature creation, arbitrary topology/drawings and full mature requirement acceptance remain at their scheduled gates.

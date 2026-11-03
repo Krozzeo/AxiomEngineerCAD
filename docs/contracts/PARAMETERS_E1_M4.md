@@ -1,0 +1,13 @@
+# E1.M4 typed parameter and expression contract
+
+Native row profile: `E1.M4-parameter/1` with exactly id, profile, definitionId (null=document), name, unit, expression, value, dependsOn, targets. Unit is mm/rad/scalar; canonical values/dependency IDs are derived and checked, never trusted stored results. Names are scoped identifiers, case sensitive; `doc.Name` selects global and `local.Name` selects current component. Bare names prefer local then document. Reserved function/namespace names cannot be parameters. Old literal rows remain readable and cannot be silently converted.
+
+Grammar: finite numeric literals (optional mm/cm/m/inch/rad/deg), identifiers, parentheses, unary +/−, + − * / and integer powers −4…4. Functions abs, min, max, sqrt, sin, cos, tan; pi is scalar. Addition/comparison-like functions require matching dimensions, multiplication/division track exponents, trig takes an angle and yields scalar, sqrt needs even exponents and nonnegative value. No JS evaluation/property traversal, strings, assignment, network or arbitrary function calls. Exponent binds before unary minus. Cycles, missing/ambiguous references, invalid units/domain, nonfinite/zero division and overflow refuse atomically.
+
+Bounds: 64 parameters, 16 direct dependencies/targets each, 512 characters/128 tokens/24 nesting levels per expression, canonical absolute result ≤1e6, bounded intermediates/exponents. Sketch dimensions retain their own geometry/resource/solver bounds.
+
+Targets are strict dimension {kind,sketchId,constraintId} or feature {kind,featureId,parameter}; one owner per semantic target. Only driving dimensions and supported primary bounded probe fields are bindable. Component rows cannot drive a different component; global rows may. Explicit target replacement is allowed, contradictory literal value/type edits while bound are refused. Delete a referenced parameter only after unbinding dependencies/targets. Deleting a dimension/sketch removes its bindings without deleting named parameters. Reference dimensions remain measured read-only.
+
+Tools: cad.parameter.inspect/set/delete/bind.v1; paged parameters/dimensions/features with scopes/dependencies/source links, no whole graph or file paths. Mutations use the same revision/authority/dependency/lease/review/history/persistence pipeline as other CAD tools. Agent grants permit LocalProposal, never direct human MAIN or Apply. No external exposure enabled.
+
+Sketch profile `E1.M4-sketch/1` extends M3 with bounded typed relations/dimensions and optional UV placement. General sketch extrusion and arbitrary probe graphs remain unsupported. See ADR022 and semantic schema for exact tool/role fields.

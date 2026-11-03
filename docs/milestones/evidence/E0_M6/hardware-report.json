@@ -1,0 +1,137 @@
+{
+  "milestone": "E0.M6",
+  "platform": "0.1.12",
+  "runtime": "v24.21.0",
+  "os": "win32",
+  "architecture": "x64",
+  "criteria": [
+    "E0.M6 exact A4 vector PDF/HLR and source-linked width regenerate 40→60, stale export refuses, save/reopen reproduces drawing; actual GPU picks are separately labeled; unavailable/lost GPU and denied/offline exposure preserve MAIN"
+  ],
+  "pageErrors": [],
+  "hardware": {
+    "devices": [
+      {
+        "vendorId": 4318,
+        "deviceId": 8066,
+        "vendorString": "",
+        "deviceString": "NVIDIA GeForce GTX 1650",
+        "driverVendor": "NVIDIA",
+        "driverVersion": "32.0.16.1692"
+      },
+      {
+        "vendorId": 5140,
+        "deviceId": 140,
+        "vendorString": "",
+        "deviceString": "Microsoft Basic Render Driver",
+        "driverVendor": "",
+        "driverVersion": "10.0.19041.5794"
+      }
+    ],
+    "browser": "156.0.8078.74",
+    "flags": [
+      "--enable-unsafe-webgpu"
+    ],
+    "softwareForced": false
+  },
+  "proof": {
+    "passed": true,
+    "creator": {
+      "version": "0.0.6",
+      "commit": null,
+      "channel": "development"
+    },
+    "drawing": {
+      "sheet": "A4",
+      "widthBeforeMm": 40,
+      "widthAfterMm": 60,
+      "hiddenFront": 2,
+      "hiddenRight": 2,
+      "staleExportDenied": true,
+      "saveReopen": true
+    },
+    "gpu": {
+      "state": "ready",
+      "vendor": "nvidia",
+      "architecture": "turing",
+      "device": "",
+      "description": "",
+      "isFallbackAdapter": false,
+      "classification": "hardware-adapter",
+      "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+      "picks": [
+        {
+          "case": "top face occludes bottom",
+          "role": "top",
+          "kind": "face"
+        },
+        {
+          "case": "top/front edge",
+          "role": "front+top",
+          "kind": "edge"
+        },
+        {
+          "case": "repeated component",
+          "path": [
+            "definition-main",
+            "instance-a"
+          ],
+          "kind": "instance"
+        },
+        {
+          "case": "repeated component",
+          "path": [
+            "definition-main",
+            "instance-b"
+          ],
+          "kind": "instance"
+        },
+        {
+          "case": "front face occludes back",
+          "role": "front",
+          "kind": "face"
+        }
+      ],
+      "deviceLoss": true,
+      "metrics": {
+        "drawCount": 18,
+        "renderTimes": [
+          51.325000047683716,
+          3.7849998474121094,
+          3.9700000286102295,
+          3.4600000381469727,
+          3.620000123977661,
+          0.7899999618530273,
+          2.9800000190734863,
+          3.5950000286102295,
+          3.1399998664855957,
+          2.9200000762939453,
+          1.5750000476837158,
+          1.0950000286102295,
+          1.3650000095367432,
+          1.5349998474121094,
+          2.870000123977661,
+          3,
+          4.490000009536743,
+          3.125
+        ],
+        "errors": [],
+        "buildMs": 418.58410000000003,
+        "resources": {
+          "peakRssBytes": 172892160,
+          "heapUsedBytes": 37860208,
+          "policy": "Isolated process, 192 MiB JS old-space, finite typed inputs, parent deadline; RSS postcondition is not an OS hard memory quota."
+        },
+        "pickReadbacks": [
+          4.559999942779541,
+          3.1449999809265137,
+          2.7699999809265137,
+          3.370000123977661,
+          2.8450000286102295
+        ]
+      }
+    },
+    "offlineNoGPU": true,
+    "remoteTransmission": false
+  },
+  "passed": true
+}

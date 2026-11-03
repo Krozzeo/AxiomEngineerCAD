@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "canonical": {
+    "path": "MASTER_DESIGN.md",
+    "version": "0.2",
+    "normalization": "utf8-lf",
+    "sha256": "9c2f3857a4a7f1156b1c10b82d2e76680604393b7f5799081f6fd22694502de6"
+  },
+  "milestone": {
+    "current": "E1.M5",
+    "status": "delivered for owner review",
+    "ownerAcceptance": "pending",
+    "next": "Owner-selected CAD change; do not infer E2 approval from delivery."
+  },
+  "lastDelivered": {
+    "version": "0.1.8",
+    "commit": "4f38a0e6ccc2f4e1dfd331beaa2d20b4352501d5",
+    "pullRequest": 16,
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-16-4f38a0e6ccc2f4e1dfd331beaa2d20b4352501d5",
+    "acceptanceRun": 41691910072,
+    "publicationRun": 41693731899,
+    "artifactSha256": "cc752dce7e2a693ec311795136946e386aee2f03b63690c6ee7996e05144505a",
+    "verification": "Windows/Linux: 225 tests each; public Platform 0.1.13 install/activate/launch, Chrome/NVIDIA, save/reopen and five independent PDFs; zero page errors."
+  },
+  "constraints": [
+    "MASTER_DESIGN is intent; implementation requires code and matching evidence.",
+    "Preserve source identities, native versions, revision checks and human-reviewed AI Apply.",
+    "Experimental installation delivery is required for completed CAD milestones; owner acceptance is separate.",
+    "Kernel, solver and accepted Platform SDK pins must not drift silently."
+  ],
+  "navigation": {
+    "process": "docs/DEVELOPMENT_WORKFLOW.md",
+    "implementation": "IMPLEMENTATION_STATUS.md",
+    "handoff": "AI_HANDOFF.md",
+    "architecture": "docs/architecture/ADR_REGISTER.md",
+    "currentCadScope": "docs/milestones/E1_M5_UX_0_1_8.md",
+    "deliveryGate": "docs/MILESTONE_DELIVERY.md"
+  }
+}

@@ -1,0 +1,86 @@
+# 0.1.3 — E1.M2 editable sketches and selection corrections
+
+- Actual point, line, circle and rectangle creation on canonical/support planes, numeric editing, construction state, stable-ID selection/deletion and native Save/reopen. Shared typed human/agent commands preserve isolated proposals and human-reviewed Apply.
+- Selected state overrides preselection; selected faces/edges use distinct blues. Solid feedback shares GPU world coordinates/matrix/depth and preserves pick IDs, removing displaced/occluded orbit contours.
+- RGB origin arrows, dash-dot axes, generous stable corner-triad hit targets and end-on labels without mouse focus rectangles.
+- Optional public logo/title bridge to the containing Platform0.1.13 editor tab, with source/origin/challenge and bounded PNG checks. CAD operations remain compatible with Platform0.1.12.
+- Only the current E1.M2 demo is advertised; earlier user data/versions remain. Constraints/DOF and general sketch extrusion are subsequent milestones, not claimed here.
+
+# 0.1.2 — E1.M1 interaction and organization review
+
+- Deliver only the current-version workbench demo; preserve earlier user files. Historical inputs are explicit regression fixtures.
+- Auto Vertex/Edge/Face priority, depth-tested hover identity without domain requests, exact reference colors, thicker edge and filled point feedback.
+- Canonical Origin, Front/Top/Right labels, independent single-reference display, projected clickable triad, smooth orientations and F8/double-middle alignment.
+- Manager/icons/footer, selection-only Inspector/Details, central dockable Document properties, exclusive menus, favicon, dirty Save/quick-save and categorized operation tabs.
+-125 domain tests and real UI/GPU/current-demo/installation proofs; native formats and reviewed Apply guards retained. E1.M2 remains future work.
+
+# 0.1.1 — E1.M1 UX review revision
+
+- Compact one-line logo/menus with Panels, SVG icons, gray CAD view and no outer document scroll.
+- Adapt Game Engine five-zone docking, tab drag/reorder, resize, close/reopen/reset and live separate windows, with preserved MIT attribution.
+- Persist validated layout in a separate project sidecar; retain native revisions, identity, exact geometry and existing review/security guards.
+- Reverse horizontal orbit; wheel zoom anchors at cursor surface/plane in orthographic and perspective.
+- Add8 cases (123 total), real browser/GPU popup/docking/navigation proofs and installable0.1.1 delivery gates. E1.M2 remains later work.
+
+# 0.1.0 — E1.M1 model workbench (review candidate)
+
+- Record owner Go for the measured E0 foundation and start E1.M1.
+- Add default central CAD viewport, menus/status/history/component/mate tree, linked Inspector, canonical planes/axes and existing diagnostics drawer.
+- Add orthographic/perspective/normal-to/fit, view controls, adaptive resolution, keyboard/CAD/trackpad navigation and camera drag cancellation.
+- Extend exact semantic selection to vertices/bodies/features/datums; add two ReadOnly tools (21 total), stable headless query parity,15 tests (115 total), empty/old-reader/UI/hardware/package proofs.
+- Preserve native schemas/documents, all previous labs/reviews/history, dependency/source pins and Local-only exposure. Full sketch editing/extrusion remains E1.M2–M5.
+
+# 0.0.7 — E0.M7 integrated foundation (review candidate)
+
+- Connect persisted solved sketch, actual extrusion, face-dependent cut, measured plane mate and associative drawing in one portable study.
+- Shared driving dimensions, actual proposal/full human review, retained read-only historical model/PDF and saved reopen.
+- Four versioned feature decoders (new-study reader0.0.7), two read tools,15 tests (100 total), actual Hub/hardware/PDF/relocated installation proof.
+- ADR012/risk ledger/quantitative corpus. Owner Go/Redesign/Stop pending; E1 unstarted. Prior native documents/releases/runtime/source pins and authority/recovery guards preserved.
+
+# 0.0.6 — E0.M6 exact drawing, GPU picking and security (review candidate)
+
+- Add exact OCCT HLR top/front/right A4 vector PDF/SVG, source-linked width and stale-export refusal; independent PDF readers/rendered QA.
+- Add original WebGPU color/depth/ID renderer, exact server-resolved face/edge/occurrence selection, explicit camera modes and real NVIDIA hardware proof.
+- Add Drawing & GPU Lab, human-only local download, minimized denied sharing preview, redacted audit and offline/lost/unavailable-GPU behavior.
+- Add 14 domain tests (85 total), actual Hub/drawing/selection/reopen regressions and installed-package proof. Retain native format1, all runtime/source pins, prior documents/labs and review guards.
+- General authored drawings, arbitrary/external/nested viewport scenes, real-model AI and remote dispatch remain future gates; no manufacturing or integrated E0 acceptance.
+
+# 0.0.5 — E0.M5 semantic commands and human review (review candidate)
+
+- Add 17 versioned typed tools using Platform registry/schema, paging, diff/review and task journal primitives, with shared manual/proposal domain and exact numerical validation.
+- Add isolated proposals, server-bound revocable agent grants, complete human review and atomic revision/dependency/source-bound Apply & Save; Local-only exposure denies remote transport.
+- Add durable operation reconciliation, cancellation/staleness/permission safeguards, native Review Lab demo and actual installed command/review/reopen proof.
+- Add 17 semantic tests (71 total); retain all native storage, 29 geometry/2D and 28 spatial cases. No model/provider quality or drawing/GPU acceptance claim.
+
+# 0.0.4 — E0.M4 native graph, version closure and recovery (review candidate)
+
+- Add validated native format1, typed stable graph/occurrence identities and explicit legacy conversion with original-byte backup.
+- Add immutable content hashes, local publications, explicit Latest/Pinned dependency candidates, verified offline effective snapshots and independent drawing source/revision bindings.
+- Add durable base/next journal and save receipt, real process-termination checks, explicit original-preserving recovery and unknown-schema/runtime refusal.
+- Add native source/consumer demos, current/candidate worker verification, captured graph drafts and actual Hub source-update/history/reopen/recovery flows.
+- Preserve earlier labs and all versioned source/license pins. Full assembly auto-follow, drawing renderers, schema/container acceptance and hardware power-loss guarantees are separate gates.
+
+# 0.0.3 — E0.M3 spatial mate lab (review candidate)
+
+- Record owner validation of E0.M2; add original MIT six-DOF rigid-component solver experiment with analytic semantic datums and grounding.
+- Add coincident/concentric/distance/angle/parallel/perpendicular/fixed probes; local rank, redundancy, conflict and singularity diagnostics, constrained translation/spin and safe rejected drag.
+- Add 28 spatial fixtures and a 21-sample motion path, editable native demo, CPU datum diagram, numeric/pointer movement and explicit keep/save/reopen. Preserve M1/M2 documents and geometry.
+- Verify cancellation, stale results, invalid references, last-good recovery and relocated packaged corpora; retain final-schema and full-assembly gates.
+
+# 0.0.2 — E0.M2 geometry and sketch lab (review candidate)
+
+- Add actual isolated OCCT extrusion, cuts, revolution, booleans, STEP roundtrip and analytic validity probes; conservative topology/history diagnostics.
+- Add PlaneGCS 2D constraints, independent residual/rank checks, conflicts, redundancy, singularity and drag fixtures; 29-case corpus.
+- Add editable CPU preview with depth-buffer face inspection, explicit recipe keep/save/reopen and the Platform Load Demos lab.
+- Preserve last good state on invalid, cancelled or stale jobs. Keep schema provisional and foundational ADRs experimental.
+- Include locked dependency licenses, corresponding source archives and rebuild material in installable packages; verify relocated packaged corpus.
+
+# 0.0.1 — E0.M1 lifecycle foundation (review candidate)
+
+- Deliver review milestones as Platform-installable experimental ZIP/manifest publications, gated on exact CI and relocated-package verification. Keep build and trusted publication permissions separate.
+
+- Add the real Engineer descriptor and official-local adapter for Platform API 0.1 / IPC 1.
+- Pin published Platform 0.1.12 by HTTPS commit archive and SHA512 integrity.
+- Add direct CLI and authenticated browser metadata editor, shared serialized commands, provisional format-0 document, revision checks, exclusive lease and safe lifecycle.
+- Add headless, actual host/subprocess and browser conformance with CI on Windows and Linux.
+- No CAD geometry, renderer, solver, AI or final document schema is included; owner acceptance is pending.

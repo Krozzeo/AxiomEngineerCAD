@@ -1,0 +1,23 @@
+import {createHash} from 'node:crypto';
+import {assemblyFixture} from './fixtures.mjs';
+import {solveAssembly} from './solver.mjs';
+import {SPATIAL,NUMERIC} from './profile.mjs';
+import {rotate,dot,exp} from './math.mjs';
+export function assemblySuite(){const cases=[],start=performance.now();
+  const run=(id,fixture,options,expected,verify)=>{const input=assemblyFixture(fixture),begin=performance.now(),inputHash=createHash('sha256').update(JSON.stringify({input,options})).digest('hex');try{const r=solveAssembly(input,options);cases.push({id,inputHash,expected,passed:verify(r),actual:{status:r.status,dof:r.remainingDOF,rank:r.rank,conflicts:r.conflicts,redundant:r.redundant,poses:r.poses,drag:r.drag,residuals:r.evidence,applicable:r.applicable},elapsedMs:performance.now()-begin});}catch(e){cases.push({id,inputHash,expected,passed:e.code===expected.code,actual:{code:e.code,message:e.message},elapsedMs:performance.now()-begin});}};
+  const pose=(r,id='collar')=>r.poses.find(p=>p.bodyId===id),near=(a,b,t=1e-5)=>Math.abs(a-b)<t;
+  const definitions=[['free','UnderDefined',6],['coaxial','UnderDefined',2],['three-body','UnderDefined',3],['point','UnderDefined',3],['planes','UnderDefined',3],['distance','UnderDefined',5],['angle','UnderDefined',5],['parallel','UnderDefined',4],['perpendicular','UnderDefined',5],['locked','FullyDefined',0],['redundant','RedundantConsistent',2],['conflict-distance','Inconsistent',null],['conflict-angle','Inconsistent',null],['singular-distance','SingularOrIndeterminate',null],['singular-angle','SingularOrIndeterminate',null]];
+  for(const [fixture,status,dof]of definitions)run('SOLVER3D-'+fixture,fixture,{}, {status,dof},r=>r.status===status&&r.remainingDOF===dof);
+  for(const [fixture,code]of [['missing','LostReference'],['ambiguous','AmbiguousReference'],['tangent','UnsupportedCapability'],['width','UnsupportedCapability']])run('SOLVER3D-'+fixture,fixture,{}, {code},()=>false);
+  run('ORACLE-AXIS','coaxial',{}, {xy:[0,0],z:15,axis:[0,0,1]},r=>near(pose(r).position[0],0)&&near(pose(r).position[1],0)&&near(pose(r).position[2],15)&&near(rotate(pose(r).quaternion,[0,0,1])[2],1));
+  run('ORACLE-THREE','three-body',{}, {spacingMm:12,ground:[0,0,0]},r=>near(Math.abs(pose(r,'cap').position[2]-pose(r).position[2]),12)&&r.poses[0].position.every(x=>x===0)&&r.poses.slice(1).every(p=>near(p.position[0],0)&&near(p.position[1],0)));
+  run('ORACLE-ANGLE','angle',{}, {angleRad:Math.PI/3},r=>near(dot(rotate(pose(r).quaternion,[0,0,1]),[0,0,1]),.5,1e-7));
+  run('SOLVER3D-DRAG','coaxial',{drag:{bodyId:'collar',position:[0,0,40]}},{z:40,dof:2},r=>r.drag.accepted&&r.remainingDOF===2&&near(pose(r).position[2],40));
+  run('SOLVER3D-SPIN','coaxial',{drag:{bodyId:'collar',position:[0,0,20],quaternion:exp([0,0,.7])}},{z:20,spinRad:.7},r=>r.drag.accepted&&near(pose(r).quaternion[2],Math.sin(.35)));
+  run('SOLVER3D-OFF-AXIS','coaxial',{drag:{bodyId:'collar',position:[10,0,40]}},{accepted:false,previousZ:15},r=>!r.drag.accepted&&!r.applicable&&near(pose(r).position[0],0)&&near(pose(r).position[2],15));
+  run('SOLVER3D-FIXED-DRAG','locked',{drag:{bodyId:'collar',position:[0,0,40]}},{accepted:false,dof:0},r=>!r.drag.accepted&&r.remainingDOF===0&&near(pose(r).position[2],0));
+  run('SOLVER3D-GROUND-DRAG','coaxial',{drag:{bodyId:'shaft',position:[0,0,5]}},{accepted:false,groundUnchanged:true},r=>!r.drag.accepted&&r.poses[0].position.every(x=>x===0));
+  let input=assemblyFixture('coaxial'),frames=[],maxLength=0,elapsed=[];for(let i=0;i<21;i++){const r=solveAssembly(input,{drag:{bodyId:'collar',position:[0,0,i*2]}});frames.push(r.drag.accepted&&r.remainingDOF===2&&Math.abs(r.poses[1].position[2]-i*2)<1e-5);maxLength=Math.max(maxLength,r.evidence.maxLengthResidualMm);elapsed.push(r.elapsedMs);input=r.solvedRecipe??input;}
+  cases.push({id:'SOLVER3D-MOTION-PATH',inputHash:createHash('sha256').update(JSON.stringify({recipe:assemblyFixture('coaxial'),path:Array.from({length:21},(_,i)=>i*2)})).digest('hex'),passed:frames.every(Boolean),expected:{samples:21,rangeMm:[0,40],dof:2},actual:{samples:frames.length,allAccepted:frames.every(Boolean),maxLengthResidualMm:maxLength,maxSampleMs:Math.max(...elapsed),meanSampleMs:elapsed.reduce((a,b)=>a+b)/elapsed.length}});
+  return {schema:'E0.M3-evidence-v0',solver:SPATIAL,numeric:NUMERIC,cases,total:cases.length,passed:cases.filter(c=>c.passed).length,failed:cases.filter(c=>!c.passed).length,elapsedMs:performance.now()-start,limits:['Local 2–4 body analytic-datum experiment','No smooth-motion/GPU/dynamics/large-assembly guarantee','Inconsistent requires a proven contradictory bound; other nonconvergence is Unsolved']};
+}

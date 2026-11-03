@@ -1,0 +1,398 @@
+{
+  "passed": true,
+  "metrics": {
+    "initialBuildMs": 497.87829999999997,
+    "initialResources": {
+      "peakRssBytes": 181862400,
+      "heapUsedBytes": 40360488,
+      "policy": "Isolated process, 192 MiB JS old-space, finite typed inputs, parent deadline; RSS postcondition is not an OS hard memory quota."
+    },
+    "pickReadbacksMs": [
+      3.884999990463257,
+      3.4600000381469727,
+      3.494999885559082,
+      2.6499998569488525,
+      3.4100000858306885,
+      2.575000047683716,
+      3.1449999809265137
+    ],
+    "resolution": [
+      1135,
+      595
+    ],
+    "renderTimes": [
+      36.230000019073486,
+      4.3999998569488525,
+      2.5250000953674316,
+      3.7350001335144043,
+      2.9800000190734863,
+      24.43499994277954,
+      2.7899999618530273,
+      3.6750001907348633,
+      3.9100000858306885,
+      3.2100000381469727,
+      3.575000047683716,
+      4.134999990463257,
+      3.7749998569488525,
+      3.1649999618530273,
+      3.4700000286102295,
+      3.7149999141693115,
+      4.109999895095825,
+      4.045000076293945,
+      3.930000066757202,
+      3.880000114440918,
+      4.639999866485596,
+      3.9649999141693115,
+      3.734999895095825,
+      3.5749998092651367,
+      3.5950000286102295,
+      2.9749999046325684,
+      2.9799997806549072,
+      2.330000162124634,
+      7.700000047683716,
+      2.9750001430511475,
+      3,
+      4.894999980926514,
+      3.555000066757202,
+      4.419999837875366,
+      3.509999990463257,
+      3.4649999141693115,
+      2.990000009536743,
+      3.115000009536743,
+      2.7699999809265137,
+      2.9800000190734863,
+      3.549999952316284,
+      3.265000104904175,
+      3.049999952316284,
+      3.674999952316284,
+      3.4749999046325684,
+      2.994999885559082,
+      3.684999942779541,
+      2.93999981880188,
+      2.990000009536743,
+      3.3500001430511475,
+      2.805000066757202,
+      3.134999990463257,
+      3.080000162124634,
+      2.9800000190734863,
+      2.990000009536743,
+      3.075000047683716,
+      3.5799999237060547,
+      2.6649999618530273,
+      3.0850000381469727,
+      3.06499981880188,
+      4.069999933242798,
+      3.049999952316284,
+      9.505000114440918,
+      3.565000057220459,
+      4.865000009536743,
+      3.510000228881836,
+      5.380000114440918,
+      5.325000047683716
+    ],
+    "reopenedRenderTimes": [
+      35.09999990463257
+    ]
+  },
+  "creator": {
+    "version": "0.1.0",
+    "commit": null,
+    "channel": "development"
+  },
+  "profile": "E1.M1-workbench/1",
+  "emptyProjectReferenceUI": true,
+  "gpu": {
+    "state": "ready",
+    "vendor": "nvidia",
+    "architecture": "turing",
+    "device": "",
+    "description": "",
+    "isFallbackAdapter": false,
+    "classification": "hardware-adapter",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36"
+  },
+  "picks": [
+    {
+      "kind": "vertex",
+      "role": "back+right+top",
+      "pointMm": [
+        20,
+        15,
+        10
+      ],
+      "occurrencePath": [
+        "definition-main"
+      ],
+      "definitionId": "definition-main",
+      "producerId": "feature-geometry",
+      "source": {
+        "documentId": "engineer-document://25bb3f7f-d11a-42af-8107-4a0bd7a389a6",
+        "revision": 0,
+        "contentHash": "sha256:b0b6972f508a4904c601db5c404bd134f2b03810b50f0ac0d47d4ec8921988bf",
+        "versionId": null,
+        "readOnly": false
+      },
+      "canonicalUnit": "mm",
+      "frame": "definition-local",
+      "occurrenceTransform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "resolution": "ResolvedStable",
+      "authority": "exact supported producer role; GPU ID is transient"
+    },
+    {
+      "kind": "edge",
+      "role": "front+top",
+      "lengthMm": 40,
+      "occurrencePath": [
+        "definition-main"
+      ],
+      "definitionId": "definition-main",
+      "producerId": "feature-geometry",
+      "source": {
+        "documentId": "engineer-document://25bb3f7f-d11a-42af-8107-4a0bd7a389a6",
+        "revision": 0,
+        "contentHash": "sha256:b0b6972f508a4904c601db5c404bd134f2b03810b50f0ac0d47d4ec8921988bf",
+        "versionId": null,
+        "readOnly": false
+      },
+      "canonicalUnit": "mm",
+      "frame": "definition-local",
+      "occurrenceTransform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "resolution": "ResolvedStable",
+      "authority": "exact supported producer role; GPU ID is transient"
+    },
+    {
+      "kind": "face",
+      "role": "top",
+      "areaMm2": 1171.7256661176916,
+      "centerOfAreaMm": [
+        1.1102230246251565e-15,
+        -4.280347578419995e-17,
+        10
+      ],
+      "planeNormal": [
+        0,
+        0,
+        1
+      ],
+      "occurrencePath": [
+        "definition-main"
+      ],
+      "definitionId": "definition-main",
+      "producerId": "feature-geometry",
+      "source": {
+        "documentId": "engineer-document://25bb3f7f-d11a-42af-8107-4a0bd7a389a6",
+        "revision": 0,
+        "contentHash": "sha256:b0b6972f508a4904c601db5c404bd134f2b03810b50f0ac0d47d4ec8921988bf",
+        "versionId": null,
+        "readOnly": false
+      },
+      "canonicalUnit": "mm",
+      "frame": "definition-local",
+      "occurrenceTransform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "resolution": "ResolvedStable",
+      "authority": "exact supported producer role; GPU ID is transient"
+    },
+    {
+      "occurrencePath": [
+        "definition-main"
+      ],
+      "definitionId": "definition-main",
+      "producerId": "feature-geometry",
+      "kind": "body",
+      "role": "solid",
+      "volumeMm3": 11717.256661176918,
+      "areaMm2": 3931.9468914507706,
+      "source": {
+        "documentId": "engineer-document://25bb3f7f-d11a-42af-8107-4a0bd7a389a6",
+        "revision": 0,
+        "contentHash": "sha256:b0b6972f508a4904c601db5c404bd134f2b03810b50f0ac0d47d4ec8921988bf",
+        "versionId": null,
+        "readOnly": false
+      },
+      "canonicalUnit": "mm",
+      "frame": "definition-local",
+      "occurrenceTransform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "resolution": "ResolvedStable",
+      "authority": "exact supported producer role; GPU ID is transient"
+    },
+    {
+      "occurrencePath": [
+        "definition-main"
+      ],
+      "definitionId": "definition-main",
+      "producerId": "feature-geometry",
+      "kind": "feature",
+      "role": "result",
+      "source": {
+        "documentId": "engineer-document://25bb3f7f-d11a-42af-8107-4a0bd7a389a6",
+        "revision": 0,
+        "contentHash": "sha256:b0b6972f508a4904c601db5c404bd134f2b03810b50f0ac0d47d4ec8921988bf",
+        "versionId": null,
+        "readOnly": false
+      },
+      "canonicalUnit": "mm",
+      "frame": "definition-local",
+      "occurrenceTransform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "resolution": "ResolvedStable",
+      "authority": "exact supported producer role; GPU ID is transient"
+    },
+    {
+      "occurrencePath": [
+        "definition-main",
+        "instance-cap"
+      ],
+      "definitionId": "definition-cap",
+      "producerId": "feature-cap",
+      "kind": "instance",
+      "role": "occurrence",
+      "source": {
+        "documentId": "engineer-document://25bb3f7f-d11a-42af-8107-4a0bd7a389a6",
+        "revision": 0,
+        "contentHash": "sha256:b0b6972f508a4904c601db5c404bd134f2b03810b50f0ac0d47d4ec8921988bf",
+        "versionId": null,
+        "readOnly": false
+      },
+      "canonicalUnit": "mm",
+      "frame": "definition-local",
+      "occurrenceTransform": {
+        "position": [
+          -10,
+          0,
+          10
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "resolution": "ResolvedStable",
+      "authority": "exact supported producer role; GPU ID is transient"
+    },
+    {
+      "id": "datum-xy",
+      "kind": "datum",
+      "datumType": "plane",
+      "role": "xy",
+      "name": "XY plane",
+      "originMm": [
+        0,
+        0,
+        0
+      ],
+      "normal": [
+        0,
+        0,
+        1
+      ],
+      "definitionId": "definition-main",
+      "producerId": "reference-frame",
+      "occurrencePath": [
+        "definition-main"
+      ],
+      "selectionId": 62,
+      "source": {
+        "documentId": "engineer-document://25bb3f7f-d11a-42af-8107-4a0bd7a389a6",
+        "revision": 0,
+        "contentHash": "sha256:b0b6972f508a4904c601db5c404bd134f2b03810b50f0ac0d47d4ec8921988bf",
+        "versionId": null,
+        "readOnly": false
+      },
+      "canonicalUnit": "mm",
+      "frame": "definition-local",
+      "occurrenceTransform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "quaternion": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "resolution": "ResolvedStable",
+      "authority": "exact supported producer role; GPU ID is transient"
+    }
+  ],
+  "semanticToolAgentParity": true,
+  "keyboard": true,
+  "navigation": [
+    "select drag unchanged",
+    "middle orbit",
+    "shift middle pan",
+    "Escape rollback",
+    "trackpad preset",
+    "keyboard",
+    "orthographic/perspective",
+    "normal-to",
+    "fit"
+  ],
+  "sourceHighlight": true,
+  "documentUnchangedByNavigation": true,
+  "saveReopen": true,
+  "errors": []
+}

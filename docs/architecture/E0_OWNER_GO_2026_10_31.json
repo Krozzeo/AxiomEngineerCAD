@@ -1,0 +1,14 @@
+{
+  "decision": "Go",
+  "date": "2026-10-31",
+  "ownerInstruction": "Genial, comienza con la siguiente E, la 0.1.0",
+  "interpretation": "Owner accepted progression from the delivered E0.M7 review dossier to E1. This approves the measured E0 foundation and its documented remaining bounds; it is not full MVP acceptance.",
+  "acceptedSourceCommit": "6d799f1955854cdf2540cf8aad2af5ae773f823f",
+  "release": "experimental-pr-7-6d799f1955854cdf2540cf8aad2af5ae773f823f",
+  "corpus": "docs/quality/E0_M7_ACCEPTANCE_CORPUS_V1.json",
+  "corpusCanonicalSha256": "8fb20c3a77574abc2f3710347f572eaaabb61a1dd3283f209a13fbb8c1215058",
+  "scope": "ADR001–012 evidence within their tested profiles; risk ledger remains binding. No broad topology/STEP/assembly/drawing/model-AI acceptance.",
+  "authorizedNext": "E1.M1 /0.1.0",
+  "mainMergeAuthorized": false,
+  "corpusDigestEncoding": "UTF-8 compact JSON with sorted keys, ensure_ascii=False (Python json.dumps separators comma/colon)."
+}

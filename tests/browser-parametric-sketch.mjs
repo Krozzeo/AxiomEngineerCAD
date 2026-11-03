@@ -1,0 +1,55 @@
+import {createSketchFromSupport} from './browser-sketch.mjs';
+import assert from 'node:assert/strict';
+import {join} from 'node:path';
+import {sketchClick,sketchCommit,selectSketchComponent,clearSketchSelection,deleteCurrentSketch} from './browser-sketch.mjs';
+import {waitEditorIdle} from './browser-support.mjs';
+export async function verifyParametricUI({page,evidence,report}){
+ await page.locator('body[data-sketch-ready=true]').waitFor();await waitEditorIdle(page);
+ assert.equal(await page.locator('#edit-sketch-list').count(),0);
+ await page.locator('[data-source-id="sketch-layout"]').dblclick();
+ await page.locator('#edit-sketch-editor:not([hidden])').waitFor();
+ await page.waitForFunction(()=>document.querySelector('#sketch-model-status')?.textContent.includes('DOF'));
+ await waitEditorIdle(page);await page.waitForTimeout(450);
+ assert.equal(await page.locator('#proof-canvas').isVisible(),true);
+ assert.equal(await page.locator('[data-operations=Sketch]').isVisible(),true);const initialBox=await page.locator('#proof-canvas').boundingBox();await page.mouse.move(initialBox.x+initialBox.width*.8,initialBox.y+initialBox.height*.15);
+ assert.match(await page.locator('#edit-sketch-support').textContent(),/Front \(XY\)/);
+ assert.equal(await page.locator('[data-sketch-entity="layout-outline"] path').first().getAttribute('stroke'),'#000000');
+ assert.equal(await page.locator('[data-sketch-entity="layout-circle"] path').first().getAttribute('stroke'),'#0000ff');
+ await page.screenshot({path:join(evidence,'m3-in-model.png')});
+ await selectSketchComponent(page,'layout-circle');
+ await page.locator('[data-constraint-id="layout-radius"]').click();
+ assert.equal(await page.locator('[data-sketch-entity="layout-circle"] path').first().getAttribute('stroke'),'#7979ff');
+ assert.equal(await page.locator('#edit-sketch-edit').isVisible(),true);
+ await page.locator('#edit-sketch-constraint-delete').click();await page.waitForFunction(()=>!document.querySelector('#edit-sketch-editor').hasAttribute('aria-busy'));await waitEditorIdle(page);
+ await page.waitForFunction(()=>!document.querySelector('[data-constraint-id="layout-radius"]'));
+ await selectSketchComponent(page,'layout-circle');
+ await page.locator('#sketch-dimension-tool').click();await selectSketchComponent(page,'layout-circle');await page.locator('#sketch-dimension-input').fill('12');await sketchCommit(page,()=>page.locator('#sketch-dimension-input').press('Enter'));
+ await page.waitForFunction(()=>document.querySelector('#edit-sketch-constraint-list')?.textContent.includes('12 mm'));
+ await page.waitForFunction(()=>!document.querySelector('#edit-sketch-editor').hasAttribute('aria-busy'));await waitEditorIdle(page);
+ await page.locator('#sketch-dimension-tool').click();
+ const source=()=>page.evaluate(async()=>{const r=await fetch('/v1/document',{headers:{Authorization:'Bearer '+sessionStorage.getItem('engineer-token')}});return (await r.json()).document;});
+ const waitRevision=async revision=>{for(let i=0;i<200;i++){const d=await source();if(d.revision>=revision){await page.waitForFunction(()=>!document.querySelector('#edit-sketch-editor').hasAttribute('aria-busy'));await waitEditorIdle(page);return d;}await page.waitForTimeout(50);}throw Error('Pointer operation did not commit.');};
+ await clearSketchSelection(page);const curve=await page.locator('[data-sketch-hit=layout-circle][data-role=entity]').evaluate(path=>{const svg=path.ownerSVGElement,p=path.getPointAtLength(path.getTotalLength()*.15),q=p.matrixTransform(path.getScreenCTM());return {x:q.x,y:q.y};});await page.mouse.move(curve.x,curve.y);const center=await page.locator('#edit-sketch-canvas').evaluate(svg=>{const n=svg.querySelector('[data-sketch-point="layout-circle"][data-role=center]'),p=svg.createSVGPoint();p.x=Number(n.getAttribute('cx'));p.y=Number(n.getAttribute('cy'));const q=p.matrixTransform(n.getScreenCTM());return {x:q.x,y:q.y};});
+ await page.mouse.move(center.x,center.y);await page.waitForTimeout(80);assert.equal(await page.locator('[data-sketch-point="layout-circle"][data-role=center]').getAttribute('fill'),'#ff8000');
+ const dragRevision=(await source()).revision;await page.mouse.down();await page.mouse.move(center.x+45,center.y-25,{steps:10});await page.mouse.up();const moved=await waitRevision(dragRevision+1),movedCircle=moved.native.graph.features.find(f=>f.id==='sketch-layout').data.entities.find(e=>e.id==='layout-circle');assert.ok(movedCircle.center[0]>12);assert.ok(Math.abs(movedCircle.radius-6)<1e-6);
+ // M5 refuses a second driving dimension before persistence, preserving the last valid source.
+ const stable=await source();await page.locator('#sketch-dimension-tool').click();await selectSketchComponent(page,'layout-outline');await page.locator('#sketch-dimension-input').fill('41');await page.locator('#sketch-dimension-input').press('Enter');await page.locator('#sketch-overdefinition-dialog').waitFor();await page.locator('#sketch-overdefinition-dialog').getByRole('button',{name:'Cancel',exact:true}).click();assert.deepEqual(await source(),stable);await page.locator('#sketch-dimension-tool').click();
+
+ const before=await page.evaluate(()=>window.engineerViewport.renderer.camera.yaw);
+ const box=await page.locator('#proof-canvas').boundingBox();await page.mouse.move(box.x+box.width*.65,box.y+box.height*.7);await page.mouse.down({button:'middle'});await page.mouse.move(box.x+box.width*.65+60,box.y+box.height*.7+30,{steps:8});await page.mouse.up({button:'middle'});
+ assert.notEqual(await page.evaluate(()=>window.engineerViewport.renderer.camera.yaw),before);
+ await page.locator('#proof-canvas').focus();await page.keyboard.press('F8');await page.waitForTimeout(450);
+ assert.ok(Math.abs(await page.evaluate(()=>window.engineerViewport.renderer.camera.pitch)-Math.PI/2)<1e-5);
+ await page.screenshot({path:join(evidence,'m3-relations.png')});
+ await page.locator('#edit-sketch-exit').click();await waitEditorIdle(page);
+ await page.locator('[data-source-id="sketch-on-top"]').click({button:'right'});await page.getByRole('menuitem',{name:'Hide',exact:true}).click();
+ await page.waitForFunction(()=>window.engineerVisibility('sketch-on-top')==='hide');
+ await page.locator('[data-source-id="sketch-on-top"]').click({button:'right'});await page.getByRole('menuitem',{name:'Reveal',exact:true}).click();
+ await page.waitForFunction(()=>window.engineerVisibility('sketch-on-top')==='reveal');
+ await page.locator('[data-source-id="sketch-on-top"]').click({button:'right'});await page.getByRole('menuitem',{name:'Edit',exact:true}).click();await page.locator('#edit-sketch-support').filter({hasText:'top planar face'}).waitFor();await page.waitForFunction(()=>!document.querySelector('#edit-sketch-editor').hasAttribute('aria-busy'));await waitEditorIdle(page);assert.deepEqual(await page.evaluate(()=>window.engineerSketch.frame.origin),[0,0,10]);assert.equal(await page.locator('#proof-canvas').isVisible(),true);await page.screenshot({path:join(evidence,'m3-face-supported-sketch.png')});await page.locator('#edit-sketch-exit').click();await waitEditorIdle(page);
+ await page.getByRole('tab',{name:'View',exact:true}).click();await page.locator('#proof-filter').selectOption('face');await page.locator('#proof-canvas').press('3');await page.waitForFunction(()=>!window.engineerViewport.renderer.animating);await page.evaluate(()=>window.engineerViewport.renderer.serial);const side=await page.evaluate(()=>{const r=window.engineerViewport.renderer,p=r.point([20,10,5]),b=r.canvas.getBoundingClientRect();return {x:b.x+p[0]*b.width/r.canvas.width,y:b.y+p[1]*b.height/r.canvas.height};});if(await page.evaluate(()=>window.engineerViewport.renderer.info.state==='ready'))await page.mouse.click(side.x,side.y);else{await page.locator('#panels-menu > summary').click();await page.locator('[data-open-panel=diagnostics]').click();const option=await page.locator('#wb-selection-list option').evaluateAll(options=>options.find(o=>o.textContent.endsWith(' / right'))?.value);assert.ok(option);await page.locator('#wb-selection-list').selectOption(option);}await page.waitForFunction(()=>window.engineerViewport.selection?.role==='right');await page.getByRole('tab',{name:'Sketch',exact:true}).click();await createSketchFromSupport(page,'selection');await page.locator('#edit-sketch-support').filter({hasText:'right planar face'}).waitFor();try{await page.waitForFunction(()=>!document.querySelector('#edit-sketch-editor').hasAttribute('aria-busy'),null,{timeout:35000});await waitEditorIdle(page);const readiness=await page.evaluate(async()=>{const headers={Authorization:'Bearer '+sessionStorage.getItem('engineer-token')},d=await(await fetch('/v1/document',{headers})).json(),p=await(await fetch('/v1/proof/status',{headers})).json();return {revision:d.status.revision,proofRevision:window.engineerViewport.proof?.revision,current:p.current,job:p.job?.state};});assert.equal(readiness.current,true,JSON.stringify(readiness));assert.equal(readiness.proofRevision,readiness.revision,JSON.stringify(readiness));}catch(error){const state=await page.evaluate(async()=>{const headers={Authorization:'Bearer '+sessionStorage.getItem('engineer-token')},d=await(await fetch('/v1/document',{headers})).json(),p=await(await fetch('/v1/proof/status',{headers})).json(),c=await(await fetch('/v1/cad/status',{headers})).json();return {document:d.status,proof:p,command:c.job,sketch:document.querySelector('#edit-sketch-status').textContent,model:document.querySelector('#proof-status').textContent};});throw Error('Right-face sketch readiness: '+JSON.stringify(state),{cause:error});}await page.waitForTimeout(350);assert.deepEqual(await page.evaluate(()=>window.engineerSketch.frame.origin),[20,0,0]);await page.locator('[data-sketch-tool=point]').click();await sketchCommit(page,()=>sketchClick(page,2,3));await page.screenshot({path:join(evidence,'m3-right-face-sketch.png')});await sketchCommit(page,()=>deleteCurrentSketch(page));
+ await page.locator('[data-source-id="feature-geometry"]').dblclick();await page.locator('#feature-operation-editor:not([hidden])').waitFor();await page.locator('#feature-operation-fields [data-parameter=width]').fill('45');const featureRevision=(await source()).revision;await page.locator('#feature-operation-form button[type=submit]').click();for(let i=0;i<200&&(await source()).revision===featureRevision;i++)await page.waitForTimeout(50);assert.equal((await source()).experiment.spec.width,45);await waitEditorIdle(page);await page.locator('#feature-operation-done').click();
+ await page.locator('#cad-undo').click();await waitEditorIdle(page);
+ await page.locator('#proof-canvas').focus();await page.keyboard.press('Control+y');await waitEditorIdle(page);
+ assert.deepEqual(report.pageErrors,[]);report.parametricSketch={inModel:true,solverColors:true,relatedConstraints:true,referencePlane:true,cameraNavigation:true,F8:true,contextVisibility:true,undoRedo:true,actualPointerDrag:true,overdimensionRefused:true,faceSupportedEditing:true,sideFaceCreation:true,operationEdit:true};
+}

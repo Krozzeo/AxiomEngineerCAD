@@ -1,0 +1,52 @@
+{
+  "passed": true,
+  "productId": "axiom.engineer-cad",
+  "version": "0.0.5",
+  "build": null,
+  "sha256": "53f9c9eded61fd06837b137382811e874bd0bd22f4012a304595e2dc84bb460b",
+  "bytes": 99034304,
+  "runtime": "v24.21.0",
+  "os": "win32",
+  "geometryCorpus": {
+    "passed": 29,
+    "total": 29,
+    "resources": {
+      "peakRssBytes": 466288640,
+      "heapUsedBytes": 30505984,
+      "policy": "Isolated process, 192 MiB JS old-space, finite typed inputs, parent deadline; RSS postcondition is not an OS hard memory quota."
+    }
+  },
+  "spatialCorpus": {
+    "passed": 28,
+    "total": 28,
+    "resources": {
+      "peakRssBytes": 64802816,
+      "heapUsedBytes": 13996016,
+      "policy": "Isolated process, 192 MiB JS old-space, finite typed inputs, parent deadline; RSS postcondition is not an OS hard memory quota."
+    }
+  },
+  "spatialSaveReopen": true,
+  "correspondingSourceArchives": 6,
+  "nativeStorage": {
+    "schemaVersion": 1,
+    "versionId": "sha256:ba3bc58c9a079db0173abc449cac205047f07829d4e9ae1886fc1ed115696ccd",
+    "convertVerifyVersionSaveReopen": true,
+    "resources": {
+      "peakRssBytes": 56926208,
+      "heapUsedBytes": 9739968,
+      "policy": "Isolated process, 192 MiB JS old-space, finite typed inputs, parent deadline; RSS postcondition is not an OS hard memory quota."
+    }
+  },
+  "semanticCommands": {
+    "passed": true,
+    "catalogTools": 17,
+    "scriptedOnly": true,
+    "realProviderEvaluated": false,
+    "volumeBeforeMm3": 12000,
+    "volumeAfterMm3": 18000,
+    "applyRevision": 6,
+    "applyOperationId": "0405356e-394b-474d-89a0-8dc1b61c0f6c",
+    "agentApplyDenied": true
+  },
+  "scope": "Relocated prepared ZIP, source hashes, real Platform lifecycle, 29 exact-kernel/2D and 28 spatial cases, spatial drag/keep/save/reopen and native conversion/validation/version/save/reopen; no user profile/provider, WebGPU or final CAD schema claims"
+}

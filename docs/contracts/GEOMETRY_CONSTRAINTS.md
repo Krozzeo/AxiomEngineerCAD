@@ -1,6 +1,8 @@
+> E1.M4 implementation addendum (2026-11-01): [typed parameter/profile contract](PARAMETERS_E1_M4.md), [ADR022](../architecture/ADR-022-PARAMETERS-AND-SKETCH-WORKBENCH.md) and [review evidence](../milestones/E1_M4_REPORT.md). Native format remains 1; new profiles are explicitly refused by older readers. Current reviewed scope does not complete E3 or general extrusion.
+
 # Geometry, Topology and Constraint Contracts
 
-**Baseline:** Master v0.2.0. **Status:** behavioral specification with measured implementation choices pending E0.M2/M3. Geometry is authoritative CPU/Wasm/native-worker B-Rep, not WebGPU triangles.
+**Baseline:** Master v0.2.0. **Status:** measured E0 profile choices accepted for E1 progression; broader behavior below remains at its scheduled milestones. Geometry is authoritative CPU/Wasm/native-worker B-Rep, not WebGPU triangles.
 
 ## 1. Exact geometry and regeneration
 
@@ -55,3 +57,7 @@ OCCT with an appropriate maintained bridge/native worker and PlaneGCS or alterna
 Sketch constrained geometry → exact feature → semantic face/edge selection → dependent feature → driving parameter edit → regeneration → verified selectors or typed lost/ambiguous → native save/reopen → associated vector drawing → assembly mate → independent semantic query/tool modification. Test every transition for cancellation, stale revision, near-degeneracy and recovery, not only final viewport appearance.
 
 References: [Master §7](../../MASTER_DESIGN.md#7-geometry-numerical-foundations-and-topology), [Native data](NATIVE_DATA_VERSIONING.md), [Benchmark profiles](../quality/ACCEPTANCE_BENCHMARKS.md).
+
+## E0 Go and E1.M1 evidence update2026-10-31
+
+[E0 decision](../architecture/E0_OWNER_GO_2026_10_31.json) accepts the measured baseline for progression. E1.M1 [ADR016](../architecture/ADR-016-E1-WORKBENCH.md) adds UI/ReadOnly context, not native data mutation:15 workbench cases plus100 retained, actual default/empty/Hub UI, seven-class physical GPU picking and focused navigation, headless selection parity, unchanged-document/prior0.0.7 reader compatibility, current package/public install checks. Existing native0/1 schemas and E0 corpus inputs remain unchanged. General sketch/feature creation, arbitrary topology/drawings and full mature requirement acceptance remain at their scheduled gates.

@@ -2,7 +2,58 @@
 
 Local-first, browser-operated parametric mechanical CAD and engineering-documentation product in the Axiom family, designed from the outset for both human users and AI agents.
 
-> **Status:** Foundational design approved; implementation has not started. No functional CAD capabilities are claimed yet.
+> **Current work: 0.1.8 / E1.M5 sketch interactions.** Owner-requested changes passed local domain, full browser and independent PDF validation. [Scope and test flow](docs/milestones/E1_M5_UX_0_1_8.md), [ADR025](docs/architecture/ADR-025-SKETCH-INTERACTION-AND-PLANAR-SUPPORT.md). Exact-head CI, immutable publication and actual public installation remain delivery gates; owner acceptance is separate.
+
+Start development with `npm run context` and [the compact context](docs/PROJECT_CONTEXT.md). The [workflow](docs/DEVELOPMENT_WORKFLOW.md) selects focused checks during implementation, then complete exact-head acceptance and real installation proof for delivery.
+
+## Install milestone builds from Platform
+
+Every completed review milestone is delivered as an experimental prepared installation. In Platform 0.1.12+, open **Installations → Add installation → Axiom Engineer CAD → Refresh**, select the published experimental build, download/install and activate. Then create an Engineer project. Source PRs and passing tests alone are not installable publications. See [milestone delivery](docs/MILESTONE_DELIVERY.md) for the publication and verification gate.
+
+**Current demo:** **E1.M5 Extrusion & Sketch Workbench**. Install/activate the selected version and use **Load Demos**. The preceding verified public delivery is [0.1.7 / PR15](https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-15-e887a1338c4326603e360b435703ca6ab4d8717a). The 0.1.8 review candidate adds the owner-requested sketch interactions described in [the review guide](docs/milestones/E1_M5_UX_0_1_8.md). Current exact-head CI and compatible experimental installation evidence are maintained on [PR16](https://github.com/Krozzeo/AxiomEngineerCAD/pull/16); match the build provenance before installing. The production catalog advertises only its current M5 demo and preserves earlier user projects. Historical labs remain explicit acceptance fixtures.
+
+The 0.1.8 workbench adds live primitive previews, persistent Snap (hold Ctrl to bypass), atomic relation cleanup, all geometric constraints in Parameter Manager, searchable binding/value controls, repairable conflict/missing-reference lists, intuitive signed dimensions and planar-face sketch supports. New Sketch previews normal/right orientation; Exit Sketch returns selection to its source. Conservative planar geometry witnesses require explicit repair when the supporting face changes. [Technical decisions and compatibility](docs/architecture/ADR-025-SKETCH-INTERACTION-AND-PLANAR-SUPPORT.md).
+
+Legacy projects stay unchanged until **Convert to native v1 → Save document**, which keeps their original bytes in a backup. The historical basename remains for Platform compatibility; formatVersion1 is the decoder discriminator. Keep project files, recovery journals and original backups when copying a study. Native snapshots carry the verified dependency closure for offline reopening. See [native storage ADR](docs/architecture/ADR-006-NATIVE-STORAGE.md) and [version resolver ADR](docs/architecture/ADR-007-NATIVE-VERSION-RESOLVER.md) for exact tested bounds.
+
+## Run the model workbench
+
+Requires Node.js 24+. Install the integrity-locked Platform SDK:
+
+```sh
+npm ci --ignore-scripts
+npm start -- --root .local/projects --create first-study --name "First engineering study"
+```
+
+Open the authenticated editor URL printed in the terminal. Edit Name/Notes, choose **Apply properties**, then **Save document**. Pending fields must be applied or reset before saving. Direct sessions provide Save/Discard/Cancel on close. To reopen:
+
+```sh
+npm start -- --root .local/projects --open first-study
+```
+
+The saved file is `project.engineer-provisional.json`, reserved format ID `axiom.engineer-document`, legacy version **0** (markers E0.M1–M3) until explicitly converted to native version **1**. It is not the final CAD schema or `.axcad` package. Keep existing documents; incompatible formats are refused without modification.
+
+### Through Axiom Platform 0.1.12
+
+Add this prepared source installation's `platform/product.json` through **Installations → Add installation → local folder**, activate Engineer CAD, then create an Engineer project. Dependencies must already be installed. Alternatively, launch the pinned provider directly with disposable paths:
+
+```sh
+node node_modules/axiom-platform/services/local-host/cli.mjs --product platform/product.json --projects-root .local/hub-projects --settings-root .local/hub-profile --port 0 --open
+```
+
+Host and direct modes use the same document commands and exclusive lease. Hosted close is managed by the Hub. No account is required. The CLI above enables Platform's ordinary public release discovery; the product itself makes no external requests.
+
+### Verify
+
+```sh
+npm run check
+npx playwright install chromium --only-shell
+npm run test:browser
+```
+
+Tests use temporary projects and a disposable Platform profile, never your saved accounts. Browser artifacts are written to `test-results/`. They check lifecycle/UI behavior and the bounded exact-kernel/solver corpus, with separately labeled M6 hardware/PDF evidence; no general CAD acceptance. [Current implementation](IMPLEMENTATION_STATUS.md), [handoff](AI_HANDOFF.md), [milestone plan](docs/milestones/E0_M6_PLAN.md), [evidence](docs/milestones/E0_M6_REPORT.md), [third-party notices](THIRD_PARTY_NOTICES.md).
+
+After abrupt termination, inspect identity/revision and the lease owner before recovery. This build never automatically deletes Platform stale leases. Once ownership is available, its verified journal offers explicit original-preserving checkpoint recovery. Unknown schema/runtime is refused. Do not blindly repeat an operation whose result is unknown.
 
 ## Start here
 
@@ -19,7 +70,7 @@ Coding agents: read [AGENTS.md](AGENTS.md) and the full master before modifying 
 
 ## Architecture and implementation contracts
 
-The v0.2 design review moved the highest-risk feasibility questions into Generation **E0.M1–E0.M7** before freezing native schema and building broad CAD features. The functional MVP remains unchanged. These are specifications and test plans, **not implemented functionality**.
+The v0.2 design review moved the highest-risk feasibility questions into Generation **E0.M1–E0.M7** before freezing native schema and building broad CAD features. The functional MVP remains unchanged. These contracts specify future CAD behavior; consult IMPLEMENTATION_STATUS.md for actual evidence.
 
 - [ADRs and architecture gates](docs/architecture/ADR_REGISTER.md)
 - [Native engineering documents, external references and versioning](docs/contracts/NATIVE_DATA_VERSIONING.md)

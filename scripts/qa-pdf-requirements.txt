@@ -1,0 +1,6 @@
+# External QA readers/renderers only; never included as product dependencies.
+pypdf==6.10.0
+pdfplumber==0.11.9
+pdfminer.six==20251230
+pypdfium2==5.14.0
+Pillow==13.0.0
