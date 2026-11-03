@@ -1,6 +1,6 @@
 # Engineer handoff — E1.M5 sketch interactions /0.1.8
 
-Read AGENTS.md, full MASTER_DESIGN.md and relevant contracts. Branch `engineer/e1-m5-sketch-interactions` stacks on delivered 0.1.7 e887a1338c4326603e360b435703ca6ab4d8717a/PR15. This correction is not E2 progression or owner acceptance. AGENTS10 authorizes compatible experimental publication after exact-head CI and actual public Platform verification; preserve earlier releases and user projects.
+Start with `npm run context`, AGENTS.md and `docs/PROJECT_CONTEXT.md`. Reuse the reviewed Master baseline only when its hash matches; follow AGENTS1 on mismatch or foundational decisions. `docs/PROJECT_STATE.json` indexes the last delivered CAD build (0.1.8 / PR16), owner acceptance and authoritative evidence. The current process work changes development instructions/CI, not CAD behavior or version. See `docs/DEVELOPMENT_WORKFLOW.md`. Preserve previous immutable builds and all user files; delivery does not approve E2, main merge or stable publication.
 
 ## Source and authority
 

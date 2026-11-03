@@ -1,6 +1,8 @@
 # Engineer implementation status
 
-Current: **0.1.8 / E1.M5 sketch interactions — review candidate**. Branch `engineer/e1-m5-sketch-interactions` stacks on delivered 0.1.7 / e887a1338c4326603e360b435703ca6ab4d8717a (PR15). No E2 progression, main merge, stable release or owner acceptance is claimed.
+Current CAD: **0.1.8 / E1.M5 sketch interactions — delivered for owner review**, source `4f38a0e6ccc2f4e1dfd331beaa2d20b4352501d5` / PR16. Exact Windows/Linux acceptance, immutable experimental publication and actual public Platform installation passed. Owner acceptance remains pending. `docs/PROJECT_STATE.json` is the compact delivery/evidence index; no E2 progression, main merge or stable release is claimed.
+
+Development process: compact verified context, focused diagnosis and non-duplicated exact-head PR/main CI are prepared on `engineer/development-efficiency`. This is a process-only change with no CAD version bump. See `docs/DEVELOPMENT_WORKFLOW.md`.
 
 ## Delivered baseline
 
@@ -13,7 +15,7 @@ Current: **0.1.8 / E1.M5 sketch interactions — review candidate**. Branch `eng
 | E1.M2 | Editable primitives delivered 0.1.3 |
 | E1.M3 | Parametric sketch editing delivered 0.1.4 |
 | E1.M4 | Parameters/expressions delivered 0.1.5 |
-| E1.M5 | Exact extrusion 0.1.6 and editing recovery 0.1.7 delivered;0.1.8 interaction review in progress |
+| E1.M5 | Exact extrusion 0.1.6 and editing recovery 0.1.7 delivered;0.1.8 delivered for owner review |
 | E2–E6 | Planned; not completed |
 
 ## Current changes and evidence

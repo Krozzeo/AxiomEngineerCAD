@@ -4,6 +4,8 @@ Local-first, browser-operated parametric mechanical CAD and engineering-document
 
 > **Current work: 0.1.8 / E1.M5 sketch interactions.** Owner-requested changes passed local domain, full browser and independent PDF validation. [Scope and test flow](docs/milestones/E1_M5_UX_0_1_8.md), [ADR025](docs/architecture/ADR-025-SKETCH-INTERACTION-AND-PLANAR-SUPPORT.md). Exact-head CI, immutable publication and actual public installation remain delivery gates; owner acceptance is separate.
 
+Start development with `npm run context` and [the compact context](docs/PROJECT_CONTEXT.md). The [workflow](docs/DEVELOPMENT_WORKFLOW.md) selects focused checks during implementation, then complete exact-head acceptance and real installation proof for delivery.
+
 ## Install milestone builds from Platform
 
 Every completed review milestone is delivered as an experimental prepared installation. In Platform 0.1.12+, open **Installations → Add installation → Axiom Engineer CAD → Refresh**, select the published experimental build, download/install and activate. Then create an Engineer project. Source PRs and passing tests alone are not installable publications. See [milestone delivery](docs/MILESTONE_DELIVERY.md) for the publication and verification gate.

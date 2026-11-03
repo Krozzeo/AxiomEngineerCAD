@@ -8,6 +8,8 @@
     "node": ">=24"
   },
   "scripts": {
+    "context": "node scripts/project-context.mjs",
+    "context:check": "node scripts/project-context.mjs --check",
     "start": "node src/cli.mjs",
     "check": "node --test --test-timeout=30000 tests/*.test.mjs",
     "test": "node --test --test-timeout=30000 tests/*.test.mjs",
