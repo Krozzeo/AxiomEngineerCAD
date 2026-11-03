@@ -2,7 +2,7 @@
 
 Local-first, browser-operated parametric mechanical CAD and engineering-documentation product in the Axiom family, designed from the outset for both human users and AI agents.
 
-> **Current work: 0.1.8 / E1.M5 editing recovery.** Owner-requested corrections are implemented and being validated. [Scope and test flow](docs/milestones/E1_M5_UX_0_1_7.md), [ADR024](docs/architecture/ADR-024-SKETCH-EDIT-ROLLBACK-AND-RECOVERY.md). Exact-head CI, immutable publication and actual public installation remain delivery gates; owner acceptance is separate.
+> **Current work: 0.1.8 / E1.M5 sketch interactions.** Owner-requested changes passed local domain, full browser and independent PDF validation. [Scope and test flow](docs/milestones/E1_M5_UX_0_1_8.md), [ADR025](docs/architecture/ADR-025-SKETCH-INTERACTION-AND-PLANAR-SUPPORT.md). Exact-head CI, immutable publication and actual public installation remain delivery gates; owner acceptance is separate.
 
 ## Install milestone builds from Platform
 
