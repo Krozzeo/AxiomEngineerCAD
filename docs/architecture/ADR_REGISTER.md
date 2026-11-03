@@ -54,3 +54,5 @@ References: [Master §21](../../MASTER_DESIGN.md#21-risks-experiments-and-archit
 - [ADR022 — Scoped equations and responsive sketch workbench](ADR-022-PARAMETERS-AND-SKETCH-WORKBENCH.md): E1.M4 implementation under the owner request; numerical, UI, hardware and exact install gates, owner acceptance separate.
 
 - [ADR024 — Sketch edit rollback and recovery](ADR-024-SKETCH-EDIT-ROLLBACK-AND-RECOVERY.md): owner-requested E1.M5/0.1.7 corrections, implementation in progress.
+
+- [ADR025 — Sketch interaction, repair and planar support](ADR-025-SKETCH-INTERACTION-AND-PLANAR-SUPPORT.md): owner-requested 0.1.8 work; exact geometry witnesses, atomic Snap and diagnostic/parameter UX; implementation and delivery gates pending.
