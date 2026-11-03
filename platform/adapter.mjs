@@ -44,7 +44,7 @@ export class EngineerAdapter {
     return this.execute(m.method, m.params);
   }
   async execute(method, params) {
-    if(method.startsWith('proof.')){check(this.doc&&!this.ended,'cancelled','Open a live study first.');const name=method.slice(6);check(['catalog','status','result','build','cancel','pick','export','preflight'].includes(name),'unsupportedCapability','Unknown proof operation.');const reads=['catalog','status','result'];if(reads.includes(name))return this.doc.proof[name]();const id=params.operationId,key=JSON.stringify({method,params});check(typeof id==='string'&&/^[a-zA-Z0-9_-]{8,100}$/.test(id),'invalidRequest','Use a unique bounded operation identity.');const old=this.receipts.get(id);if(old){check(old.key===key,'invalidRequest','Operation identity reused.');if(old.error)fail(old.error.code,old.error.message);return structuredClone(old.result);}check(this.receipts.size<256,'projectBusy','Receipt budget reached.');try{const result=await this.doc.proof[name](params);this.receipts.set(id,{key,result:structuredClone(result)});return result;}catch(e){this.receipts.set(id,{key,error:{code:e.code??'operationFailed',message:e.message}});throw e;}}
+    if(method.startsWith('proof.')){check(this.doc&&!this.ended,'cancelled','Open a live study first.');const name=method.slice(6);check(['catalog','status','result','build','cancel','pick','export','preflight'].includes(name),'unsupportedCapability','Unknown proof operation.');const reads=['catalog','status','result'];if(reads.includes(name))return this.doc.proof[name]();const id=params.operationId,key=JSON.stringify({method,params});check(typeof id==='string'&&/^[a-zA-Z0-9_-]{8,100}$/.test(id),'invalidRequest','Use a unique bounded operation identity.');const old=this.receipts.get(id);if(old){check(old.key===key,'invalidRequest','Operation identity reused.');if(old.error)fail(old.error.code,old.error.message);return structuredClone(old.result);}try{const result=await this.doc.proof[name](params);this.receipts.set(id,{key,result:structuredClone(result)});return result;}catch(e){this.receipts.set(id,{key,error:{code:e.code??'operationFailed',message:e.message}});throw e;}}
     if(['cad.catalog','cad.context','cad.status','cad.invoke','cad.grant','cad.revoke','cad.cancel'].includes(method)){check(this.doc&&!this.ended,'cancelled','Open a live study first.');return this.handle(method,params);}
     check(['initialize', ...manifest.capabilities, 'document.inspect', 'document.edit', 'document.buffer','lab.run','lab.inspect','lab.cancel','lab.apply','lab.fixture','native.inspect','native.convert','native.graph','native.snapshot','native.publish','native.restore','native.refresh','native.attach','native.adopt','native.recover','native.removeVersion','ui.layout.get','ui.layout.save','ui.visibility.get','ui.visibility.save'].includes(method),
       'unsupportedCapability', 'This build does not implement that operation.');
@@ -59,7 +59,7 @@ export class EngineerAdapter {
         if (previous.error) fail(previous.error.code, previous.error.message);
         return structuredClone(previous.result);
       }
-      check(this.receipts.size < 256, 'projectBusy', 'Session operation limit reached. Close and reopen.');
+
     }
     try {
       const result = await this.handle(method, params);

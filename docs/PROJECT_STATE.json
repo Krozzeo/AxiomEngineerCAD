@@ -8,7 +8,7 @@
   },
   "milestone": {
     "current": "E1.M5",
-    "status": "delivered for owner review",
+    "status": "0.1.9 implementation; acceptance and installation delivery pending",
     "ownerAcceptance": "pending",
     "next": "Owner-selected CAD change; do not infer E2 approval from delivery."
   },
@@ -33,7 +33,12 @@
     "implementation": "IMPLEMENTATION_STATUS.md",
     "handoff": "AI_HANDOFF.md",
     "architecture": "docs/architecture/ADR_REGISTER.md",
-    "currentCadScope": "docs/milestones/E1_M5_UX_0_1_8.md",
+    "currentCadScope": "docs/milestones/E1_M5_UX_0_1_9.md",
     "deliveryGate": "docs/MILESTONE_DELIVERY.md"
+  },
+  "candidate": {
+    "version": "0.1.9",
+    "branch": "engineer/sketch-navigation-0.1.9",
+    "status": "implemented; full exact-head acceptance and publication pending"
   }
 }
