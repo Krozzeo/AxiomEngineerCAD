@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "status": "E1.M5 editing recovery 0.1.7 in progress; exact-head validation and public installation required",
-  "productVersion": "0.1.7",
+  "status": "E1.M5 sketch interactions 0.1.8 review candidate; exact-head validation and public installation required",
+  "productVersion": "0.1.8",
   "envelope": {
     "type": "object",
     "properties": {
@@ -1100,7 +1100,8 @@
             "enum": [
               "parameters",
               "dimensions",
-              "features"
+              "features",
+              "constraints"
             ]
           },
           "scope": {
@@ -1855,6 +1856,13 @@
                   "minLength": 1,
                   "maxLength": 96
                 },
+                "direction": {
+                  "type": "integer",
+                  "enum": [
+                    -1,
+                    1
+                  ]
+                },
                 "name": {
                   "type": "string",
                   "minLength": 1,
@@ -1880,6 +1888,7 @@
                     "coradial",
                     "tangent",
                     "point-on-line",
+                    "point-on-circle",
                     "midpoint",
                     "horizontal-points",
                     "vertical-points",
@@ -2388,7 +2397,7 @@
         ],
         "additionalProperties": false
       },
-      "description": "Delete selected source entities atomically, preserving lost relation references for explicit repair.",
+      "description": "Delete selected source entities and their associated relations/bindings atomically; preserve unrelated orphan relations for repair.",
       "units": {
         "length": [
           "mm",
@@ -2770,6 +2779,13 @@
                 "minLength": 1,
                 "maxLength": 96
               },
+              "direction": {
+                "type": "integer",
+                "enum": [
+                  -1,
+                  1
+                ]
+              },
               "name": {
                 "type": "string",
                 "minLength": 1,
@@ -2795,6 +2811,7 @@
                   "coradial",
                   "tangent",
                   "point-on-line",
+                  "point-on-circle",
                   "midpoint",
                   "horizontal-points",
                   "vertical-points",
@@ -2883,6 +2900,9 @@
             "additionalProperties": false
           },
           "allowOverdefined": {
+            "type": "boolean"
+          },
+          "unbind": {
             "type": "boolean"
           }
         },
@@ -3040,6 +3060,13 @@
                 "minLength": 1,
                 "maxLength": 96
               },
+              "direction": {
+                "type": "integer",
+                "enum": [
+                  -1,
+                  1
+                ]
+              },
               "name": {
                 "type": "string",
                 "minLength": 1,
@@ -3065,6 +3092,7 @@
                   "coradial",
                   "tangent",
                   "point-on-line",
+                  "point-on-circle",
                   "midpoint",
                   "horizontal-points",
                   "vertical-points",
@@ -3153,6 +3181,9 @@
             "additionalProperties": false
           },
           "allowOverdefined": {
+            "type": "boolean"
+          },
+          "unbind": {
             "type": "boolean"
           }
         },
@@ -3489,6 +3520,32 @@
               "minimum": -1000000,
               "maximum": 1000000
             }
+          },
+          "snapTarget": {
+            "type": "object",
+            "properties": {
+              "entityId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "entity",
+                  "point",
+                  "a",
+                  "b",
+                  "midpoint",
+                  "center"
+                ]
+              }
+            },
+            "required": [
+              "entityId",
+              "role"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
@@ -4452,22 +4509,65 @@
               },
               "role": {
                 "type": "string",
-                "enum": [
-                  "xy",
-                  "xz",
-                  "yz",
-                  "top",
-                  "bottom",
-                  "left",
-                  "right",
-                  "front",
-                  "back"
-                ]
+                "minLength": 1,
+                "maxLength": 96
               },
               "producerId": {
                 "type": "string",
                 "minLength": 1,
                 "maxLength": 96
+              },
+              "frame": {
+                "type": "object",
+                "properties": {
+                  "origin": {
+                    "type": "array",
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "items": {
+                      "type": "number",
+                      "minimum": -10000,
+                      "maximum": 10000
+                    }
+                  },
+                  "u": {
+                    "type": "array",
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "items": {
+                      "type": "number",
+                      "minimum": -10000,
+                      "maximum": 10000
+                    }
+                  },
+                  "v": {
+                    "type": "array",
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "items": {
+                      "type": "number",
+                      "minimum": -10000,
+                      "maximum": 10000
+                    }
+                  },
+                  "normal": {
+                    "type": "array",
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "items": {
+                      "type": "number",
+                      "minimum": -10000,
+                      "maximum": 10000
+                    }
+                  }
+                },
+                "required": [
+                  "origin",
+                  "u",
+                  "v",
+                  "normal"
+                ],
+                "additionalProperties": false
               },
               "orientation": {
                 "type": "object",
@@ -4764,6 +4864,56 @@
               "m",
               "inch"
             ]
+          },
+          "snaps": {
+            "type": "array",
+            "maxItems": 2,
+            "items": {
+              "type": "object",
+              "properties": {
+                "fromRole": {
+                  "type": "string",
+                  "enum": [
+                    "point",
+                    "a",
+                    "b",
+                    "center",
+                    "circumference"
+                  ]
+                },
+                "to": {
+                  "type": "object",
+                  "properties": {
+                    "entityId": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 96
+                    },
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "entity",
+                        "point",
+                        "a",
+                        "b",
+                        "midpoint",
+                        "center"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "entityId",
+                    "role"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "fromRole",
+                "to"
+              ],
+              "additionalProperties": false
+            }
           }
         },
         "required": [
