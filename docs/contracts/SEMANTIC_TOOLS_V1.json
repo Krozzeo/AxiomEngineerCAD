@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "status": "E1.M5 sketch interactions 0.1.8 review candidate; exact-head validation and public installation required",
+  "status": "E1.M5 sketch interactions 0.1.8 review candidate; match experimental build provenance and PR16 validation; owner acceptance separate",
   "productVersion": "0.1.8",
   "envelope": {
     "type": "object",
