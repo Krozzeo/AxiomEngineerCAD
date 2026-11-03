@@ -52,3 +52,5 @@ References: [Master §21](../../MASTER_DESIGN.md#21-risks-experiments-and-archit
 - [ADR021 — Parametric sketch relations, integrated editing and working Undo/Redo](ADR-021-PARAMETRIC-SKETCH-EDITING.md): E1.M3 implementation in progress under the owner request; evidence/review gates pending.
 
 - [ADR022 — Scoped equations and responsive sketch workbench](ADR-022-PARAMETERS-AND-SKETCH-WORKBENCH.md): E1.M4 implementation under the owner request; numerical, UI, hardware and exact install gates, owner acceptance separate.
+
+- [ADR024 — Sketch edit rollback and recovery](ADR-024-SKETCH-EDIT-ROLLBACK-AND-RECOVERY.md): owner-requested E1.M5/0.1.7 corrections, implementation in progress.

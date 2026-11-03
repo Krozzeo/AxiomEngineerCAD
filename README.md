@@ -1,42 +1,16 @@
-> **Current development: 0.1.6 / E1.M5.** Exact extrusion from closed sketches, additive history, continuous dimension tools, semantic Inspector and inline equation tables. [Current report and test flow](docs/milestones/E1_M5_REPORT.md). Local domain/browser/hardware/PDF and relocated-package proofs pass; experimental publication, exact-head CI and fresh Platform installation remain delivery gates. Previous0.1.5/8bb1cc7 was published and publicly installed successfully. Historical status snapshots follow below.
-
-> **Current: 0.1.5 / E1.M4 review candidate.** Scoped unit-checked equations, Parameter Manager, physical dimensions, contextual Sketch Manager, principal line/point/circle relations, warm constrained drag and synchronized reference/camera feedback. [Review guide](docs/milestones/E1_M4_REPORT.md), [ADR022](docs/architecture/ADR-022-PARAMETERS-AND-SKETCH-WORKBENCH.md). Exact-head Windows/Linux CI, immutable experimental ZIP/manifest and fresh public Platform installation remain delivery gates. Owner acceptance is separate.
-
-Earlier dated snapshots below are historical.
-
-> **Current: 0.1.4 / E1.M3 review candidate.** Parametric relations and driving/reference dimensions, constrained drag, sketches in the Model viewport, one selection, Feature Manager actions, persisted synchronized visibility and working Undo/Redo. [Review guide](docs/milestones/E1_M3_REPORT.md), [ADR021](docs/architecture/ADR-021-PARAMETRIC-SKETCH-EDITING.md). Exact-head Windows/Linux CI and a fresh public Platform install remain delivery gates; owner acceptance is pending.
-
-Earlier delivery snapshots below are historical.
-
-> **Current:0.1.3 / E1.M2 review candidate.** Real editable point/line/circle/rectangle sketches, construction state and native persistence, shared human/agent commands, selected-state/GPU-frame/origin/axis corrections and optional Platform0.1.13 tab branding. [Test guide](docs/milestones/E1_M2_REPORT.md), [ADR019](docs/architecture/ADR-019-EDITABLE-SKETCH-PRIMITIVES.md), [ADR020](docs/architecture/ADR-020-SELECTION-FRAMES-AND-TAB-PRESENTATION.md). Exact-head CI and public prepared install remain delivery gates. E1.M3 constraints are next and unstarted.
-
-Earlier revision snapshots below describe their historical state.
-
-> **0.1.2 interaction revision:** current-only demos; Auto/hover selection, canonical Origin and smooth reference navigation; Manager, selection-only Inspector, central Document properties, tabbed operations and dirty Save. [Guide](docs/milestones/E1_M1_UX_0_1_2.md), [ADR018](docs/architecture/ADR-018-INTERACTION-WORKBENCH.md). Native0/1 unchanged; E1.M2 unstarted. Final exact-head CI/public-install gates apply.
-
-> **0.1.1 UX revision:** compact CAD header/ribbon, Game Engine five-zone docking/Separate Windows and persistent layout, Panels reopen/reset, reversed horizontal orbit and cursor-centered wheel zoom. [Test guide](docs/milestones/E1_M1_UX_0_1_1.md), [ADR017](docs/architecture/ADR-017-CAD-DOCKING-UX.md). E1.M2 remains unstarted; exact-head CI and fresh public Platform install are delivery gates. Native schema/data and runtime pins unchanged.
-
 # Axiom Engineer CAD
 
 Local-first, browser-operated parametric mechanical CAD and engineering-documentation product in the Axiom family, designed from the outset for both human users and AI agents.
 
-> **Status:**0.1.3 / E1.M2 editable sketches review candidate. E0 owner Go recorded. Real plane-local primitive editing and native persistence accompany the CAD workbench. Constraints, expressions and general sketch extrusion follow in E1.M3–M5; full MVP remains later.
+> **Current work: 0.1.7 / E1.M5 editing recovery.** Owner-requested corrections are implemented and being validated. [Scope and test flow](docs/milestones/E1_M5_UX_0_1_7.md), [ADR024](docs/architecture/ADR-024-SKETCH-EDIT-ROLLBACK-AND-RECOVERY.md). Exact-head CI, immutable publication and actual public installation remain delivery gates; owner acceptance is separate.
 
 ## Install milestone builds from Platform
 
 Every completed review milestone is delivered as an experimental prepared installation. In Platform 0.1.12+, open **Installations → Add installation → Axiom Engineer CAD → Refresh**, select the published experimental build, download/install and activate. Then create an Engineer project. Source PRs and passing tests alone are not installable publications. See [milestone delivery](docs/MILESTONE_DELIVERY.md) for the publication and verification gate.
 
-**Current demo:** install/activate **0.1.5 → Load Demos → E1.M4 Equations & Sketch Workbench**. Double-click Layout sketch in Manager, edit dimensions in Model or use Tools → Parameter Manager. [Current test guide](docs/milestones/E1_M4_REPORT.md). Earlier user projects remain intact; historical demos are acceptance fixtures outside the production catalog.
+**Current demo:** **E1.M5 Extrusion & Sketch Workbench**. Install/activate the selected version and use **Load Demos**. The last verified public delivery is [0.1.6 / PR14](https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-14-d6bab409a319d3fa9a65531bfb2dc74fd79e7bdc); its reported editing defects are corrected in the 0.1.7 candidate. The current production catalog advertises only its M5 demo and preserves earlier user projects. Historical labs are explicit acceptance fixtures; see their milestone reports for dated evidence.
 
-**New integrated demo:** install0.0.7, choose **Load Demos → E0.M7 Integrated Foundation Lab → Build from model**. Change Thickness15, Apply driving dimension, Save and rebuild. Review/Apply a scripted width60 proposal, rebuild and inspect drawing. Source Retained1 previews original40/depth10 read-only; Working model remains current60/depth15 after reopen. [Test steps](docs/milestones/E0_M7_REPORT.md), [owner gate](docs/architecture/ADR-012-INTEGRATED-E0-GATE.md). New profiles require0.0.7; old documents remain readable unchanged.
-
-For the earlier drawing/GPU demo install **0.0.7**, choose **Load Demos → E0.M6 Drawing & GPU Lab → Build from model**. Select Faces/Edges/Components and standard views; choose **Drawing → Download vector PDF**. Change width through the expandable reviewed-command panel, rebuild and compare the source-linked dimension. Unsupported/software GPUs are labeled; CPU drawing works without GPU. [M6 report](docs/milestones/E0_M6_REPORT.md), [measured profile](docs/quality/E0_M6_PROFILE_V1.json).
-
-For the earlier review demo choose **Load Demos** on installation **0.0.7**, open **E0.M5 Review Lab**, choose **Run local scripted proposal → Validate proposal → Review changes**, inspect the changes, confirm and **Apply & Save**. The scripted agent uses actual scoped local tools; it is not a real AI model. Manual dimension changes use the same command and require Save. See [E0.M5 evidence](docs/milestones/E0_M5_REPORT.md) and [tool catalog](docs/contracts/SEMANTIC_TOOLS_V1.json).
-
-For a guided native-data test choose **Load Demos** on installation **0.0.7**, then open **E0.M4 Native Version Lab**. Edit Notes → Apply properties, **Validate current content → Create immutable version → Save document**. Select an older version and **Restore as new revision**; history stays intact.
-
-The companion **E0.M4 Source Plate** demonstrates a real external definition. Change width in its geometry lab, build/keep, then validate/create version/publish/save. In the consumer choose **Check source updates → Validate candidate → Adopt validated candidate → Save**. Missing sources preserve the embedded effective snapshot; Pinned never auto-follows. The earlier spatial/geometry demos remain in expandable panels.
+The 0.1.7 flow edits a sketch with downstream history temporarily rolled back, then validates/rebuilds on Exit. Disable/Enable retains source identities. New Sketch chooses a support and normal/right orientation. Dimension tools offer stepwise Back, numeric entry, edit/reposition and explicit overdefinition choices. Parameter Manager accepts Automatic units and token-only completions. Extrusion editing has source-linked locked depth and optional exact preview with Apply/Cancel. [Detailed review guide](docs/milestones/E1_M5_UX_0_1_7.md).
 
 Legacy projects stay unchanged until **Convert to native v1 → Save document**, which keeps their original bytes in a backup. The historical basename remains for Platform compatibility; formatVersion1 is the decoder discriminator. Keep project files, recovery journals and original backups when copying a study. Native snapshots carry the verified dependency closure for offline reopening. See [native storage ADR](docs/architecture/ADR-006-NATIVE-STORAGE.md) and [version resolver ADR](docs/architecture/ADR-007-NATIVE-VERSION-RESOLVER.md) for exact tested bounds.
 

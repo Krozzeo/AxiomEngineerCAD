@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "status": "E1.M4 review candidate; exact-head CI and public prepared install required",
-  "productVersion": "0.1.5",
+  "status": "E1.M5 editing recovery 0.1.7 in progress; exact-head validation and public installation required",
+  "productVersion": "0.1.7",
   "envelope": {
     "type": "object",
     "properties": {
@@ -156,6 +156,934 @@
     "additionalProperties": false
   },
   "tools": [
+    {
+      "name": "cad.sketch.edit.begin.v1",
+      "version": "1",
+      "schemaVersion": 1,
+      "capability": "cad.sketch.edit.begin",
+      "effects": [
+        "MainMutation"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sketchId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 96
+          }
+        },
+        "required": [
+          "sketchId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "receipt": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "type": "integer",
+                "const": 1
+              },
+              "operationId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 96
+              },
+              "traceId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 96
+              },
+              "actor": {
+                "type": "object"
+              },
+              "scope": {
+                "type": "object"
+              },
+              "toolName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96
+              },
+              "toolVersion": {
+                "type": "string",
+                "const": "1"
+              },
+              "effectClass": {
+                "type": "string",
+                "enum": [
+                  "ReadOnly",
+                  "LocalProposal",
+                  "MainMutation"
+                ]
+              },
+              "baseRevision": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "outcome": {
+                "type": "string",
+                "enum": [
+                  "accepted",
+                  "completed",
+                  "rejected",
+                  "failed",
+                  "cancelled"
+                ]
+              },
+              "result": {
+                "type": "object"
+              },
+              "error": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "message": {
+                    "type": "string",
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "code",
+                  "message"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "operationId",
+              "traceId",
+              "outcome"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "receipt"
+        ],
+        "additionalProperties": false
+      },
+      "description": "Roll back execution after the selected sketch while retaining the complete authoritative source.",
+      "units": {
+        "length": [
+          "mm",
+          "cm",
+          "m",
+          "inch"
+        ],
+        "count": "scalar",
+        "volume": "mm3",
+        "area": "mm2",
+        "angle": "rad"
+      },
+      "preconditions": [
+        "server-issued actor/session authority",
+        "expected document/dependency revisions",
+        "native v1 for model mutations"
+      ],
+      "recovery": "Inspect operation receipt; never blindly replay unknown effects.",
+      "limits": {
+        "maxInputBytes": 16384,
+        "maxOutputBytes": 16384
+      }
+    },
+    {
+      "name": "cad.sketch.edit.finish.v1",
+      "version": "1",
+      "schemaVersion": 1,
+      "capability": "cad.sketch.edit.finish",
+      "effects": [
+        "MainMutation"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sketchId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 96
+          }
+        },
+        "required": [
+          "sketchId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "receipt": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "type": "integer",
+                "const": 1
+              },
+              "operationId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 96
+              },
+              "traceId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 96
+              },
+              "actor": {
+                "type": "object"
+              },
+              "scope": {
+                "type": "object"
+              },
+              "toolName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96
+              },
+              "toolVersion": {
+                "type": "string",
+                "const": "1"
+              },
+              "effectClass": {
+                "type": "string",
+                "enum": [
+                  "ReadOnly",
+                  "LocalProposal",
+                  "MainMutation"
+                ]
+              },
+              "baseRevision": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "outcome": {
+                "type": "string",
+                "enum": [
+                  "accepted",
+                  "completed",
+                  "rejected",
+                  "failed",
+                  "cancelled"
+                ]
+              },
+              "result": {
+                "type": "object"
+              },
+              "error": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "message": {
+                    "type": "string",
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "code",
+                  "message"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "operationId",
+              "traceId",
+              "outcome"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "receipt"
+        ],
+        "additionalProperties": false
+      },
+      "description": "Validate and rebuild the enabled downstream history. Failure retains the editable source and rollback.",
+      "units": {
+        "length": [
+          "mm",
+          "cm",
+          "m",
+          "inch"
+        ],
+        "count": "scalar",
+        "volume": "mm3",
+        "area": "mm2",
+        "angle": "rad"
+      },
+      "preconditions": [
+        "server-issued actor/session authority",
+        "expected document/dependency revisions",
+        "native v1 for model mutations"
+      ],
+      "recovery": "Inspect operation receipt; never blindly replay unknown effects.",
+      "limits": {
+        "maxInputBytes": 16384,
+        "maxOutputBytes": 16384
+      }
+    },
+    {
+      "name": "cad.sketch.edit.cancel.v1",
+      "version": "1",
+      "schemaVersion": 1,
+      "capability": "cad.sketch.edit.cancel",
+      "effects": [
+        "MainMutation"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sketchId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 96
+          }
+        },
+        "required": [
+          "sketchId"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "receipt": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "type": "integer",
+                "const": 1
+              },
+              "operationId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 96
+              },
+              "traceId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 96
+              },
+              "actor": {
+                "type": "object"
+              },
+              "scope": {
+                "type": "object"
+              },
+              "toolName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96
+              },
+              "toolVersion": {
+                "type": "string",
+                "const": "1"
+              },
+              "effectClass": {
+                "type": "string",
+                "enum": [
+                  "ReadOnly",
+                  "LocalProposal",
+                  "MainMutation"
+                ]
+              },
+              "baseRevision": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "outcome": {
+                "type": "string",
+                "enum": [
+                  "accepted",
+                  "completed",
+                  "rejected",
+                  "failed",
+                  "cancelled"
+                ]
+              },
+              "result": {
+                "type": "object"
+              },
+              "error": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "message": {
+                    "type": "string",
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "code",
+                  "message"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "operationId",
+              "traceId",
+              "outcome"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "receipt"
+        ],
+        "additionalProperties": false
+      },
+      "description": "Restore the source captured on entry as a new working revision.",
+      "units": {
+        "length": [
+          "mm",
+          "cm",
+          "m",
+          "inch"
+        ],
+        "count": "scalar",
+        "volume": "mm3",
+        "area": "mm2",
+        "angle": "rad"
+      },
+      "preconditions": [
+        "server-issued actor/session authority",
+        "expected document/dependency revisions",
+        "native v1 for model mutations"
+      ],
+      "recovery": "Inspect operation receipt; never blindly replay unknown effects.",
+      "limits": {
+        "maxInputBytes": 16384,
+        "maxOutputBytes": 16384
+      }
+    },
+    {
+      "name": "cad.feature.enable.v1",
+      "version": "1",
+      "schemaVersion": 1,
+      "capability": "cad.feature.enable",
+      "effects": [
+        "MainMutation",
+        "LocalProposal"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "featureId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 96
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "featureId",
+          "enabled"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "receipt": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "type": "integer",
+                "const": 1
+              },
+              "operationId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 96
+              },
+              "traceId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 96
+              },
+              "actor": {
+                "type": "object"
+              },
+              "scope": {
+                "type": "object"
+              },
+              "toolName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96
+              },
+              "toolVersion": {
+                "type": "string",
+                "const": "1"
+              },
+              "effectClass": {
+                "type": "string",
+                "enum": [
+                  "ReadOnly",
+                  "LocalProposal",
+                  "MainMutation"
+                ]
+              },
+              "baseRevision": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "outcome": {
+                "type": "string",
+                "enum": [
+                  "accepted",
+                  "completed",
+                  "rejected",
+                  "failed",
+                  "cancelled"
+                ]
+              },
+              "result": {
+                "type": "object"
+              },
+              "error": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "message": {
+                    "type": "string",
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "code",
+                  "message"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "operationId",
+              "traceId",
+              "outcome"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "receipt"
+        ],
+        "additionalProperties": false
+      },
+      "description": "Enable/disable a source feature with dependency-aware effective suppression.",
+      "units": {
+        "length": [
+          "mm",
+          "cm",
+          "m",
+          "inch"
+        ],
+        "count": "scalar",
+        "volume": "mm3",
+        "area": "mm2",
+        "angle": "rad"
+      },
+      "preconditions": [
+        "server-issued actor/session authority",
+        "expected document/dependency revisions",
+        "native v1 for model mutations"
+      ],
+      "recovery": "Inspect operation receipt; never blindly replay unknown effects.",
+      "limits": {
+        "maxInputBytes": 16384,
+        "maxOutputBytes": 16384
+      }
+    },
+    {
+      "name": "cad.extrusion.create.v1",
+      "version": "1",
+      "schemaVersion": 1,
+      "capability": "cad.extrusion.create",
+      "effects": [
+        "MainMutation",
+        "LocalProposal"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "featureId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 96
+          },
+          "sketchId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 96
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "depthMm": {
+            "type": "number",
+            "minimum": 0.001,
+            "maximum": 10000
+          },
+          "reverse": {
+            "type": "boolean"
+          },
+          "operation": {
+            "type": "string",
+            "enum": [
+              "new-body",
+              "add"
+            ]
+          },
+          "baseFeatureId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 96
+          }
+        },
+        "required": [
+          "featureId",
+          "sketchId",
+          "name",
+          "depthMm",
+          "reverse",
+          "operation"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "receipt": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "type": "integer",
+                "const": 1
+              },
+              "operationId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 96
+              },
+              "traceId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 96
+              },
+              "actor": {
+                "type": "object"
+              },
+              "scope": {
+                "type": "object"
+              },
+              "toolName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96
+              },
+              "toolVersion": {
+                "type": "string",
+                "const": "1"
+              },
+              "effectClass": {
+                "type": "string",
+                "enum": [
+                  "ReadOnly",
+                  "LocalProposal",
+                  "MainMutation"
+                ]
+              },
+              "baseRevision": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "outcome": {
+                "type": "string",
+                "enum": [
+                  "accepted",
+                  "completed",
+                  "rejected",
+                  "failed",
+                  "cancelled"
+                ]
+              },
+              "result": {
+                "type": "object"
+              },
+              "error": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "message": {
+                    "type": "string",
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "code",
+                  "message"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "operationId",
+              "traceId",
+              "outcome"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "receipt"
+        ],
+        "additionalProperties": false
+      },
+      "description": "Extrude an actual closed M5 sketch into one exact connected solid, optionally adding to the current extrusion tip.",
+      "units": {
+        "length": [
+          "mm",
+          "cm",
+          "m",
+          "inch"
+        ],
+        "count": "scalar",
+        "volume": "mm3",
+        "area": "mm2",
+        "angle": "rad"
+      },
+      "preconditions": [
+        "server-issued actor/session authority",
+        "expected document/dependency revisions",
+        "native v1 for model mutations"
+      ],
+      "recovery": "Inspect operation receipt; never blindly replay unknown effects.",
+      "limits": {
+        "maxInputBytes": 16384,
+        "maxOutputBytes": 16384
+      }
+    },
+    {
+      "name": "cad.extrusion.update.v1",
+      "version": "1",
+      "schemaVersion": 1,
+      "capability": "cad.extrusion.update",
+      "effects": [
+        "MainMutation",
+        "LocalProposal"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "featureId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 96
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "depthMm": {
+            "type": "number",
+            "minimum": 0.001,
+            "maximum": 10000
+          },
+          "reverse": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "featureId",
+          "name",
+          "depthMm",
+          "reverse"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "receipt": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "type": "integer",
+                "const": 1
+              },
+              "operationId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 96
+              },
+              "traceId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 96
+              },
+              "actor": {
+                "type": "object"
+              },
+              "scope": {
+                "type": "object"
+              },
+              "toolName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96
+              },
+              "toolVersion": {
+                "type": "string",
+                "const": "1"
+              },
+              "effectClass": {
+                "type": "string",
+                "enum": [
+                  "ReadOnly",
+                  "LocalProposal",
+                  "MainMutation"
+                ]
+              },
+              "baseRevision": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "outcome": {
+                "type": "string",
+                "enum": [
+                  "accepted",
+                  "completed",
+                  "rejected",
+                  "failed",
+                  "cancelled"
+                ]
+              },
+              "result": {
+                "type": "object"
+              },
+              "error": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "message": {
+                    "type": "string",
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "code",
+                  "message"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "operationId",
+              "traceId",
+              "outcome"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "receipt"
+        ],
+        "additionalProperties": false
+      },
+      "description": "Edit a sketch extrusion depth/direction and regenerate exact downstream features atomically.",
+      "units": {
+        "length": [
+          "mm",
+          "cm",
+          "m",
+          "inch"
+        ],
+        "count": "scalar",
+        "volume": "mm3",
+        "area": "mm2",
+        "angle": "rad"
+      },
+      "preconditions": [
+        "server-issued actor/session authority",
+        "expected document/dependency revisions",
+        "native v1 for model mutations"
+      ],
+      "recovery": "Inspect operation receipt; never blindly replay unknown effects.",
+      "limits": {
+        "maxInputBytes": 16384,
+        "maxOutputBytes": 16384
+      }
+    },
     {
       "name": "cad.parameter.inspect.v1",
       "version": "1",
@@ -360,6 +1288,7 @@
               "unit": {
                 "type": "string",
                 "enum": [
+                  "auto",
                   "mm",
                   "rad",
                   "scalar"
@@ -368,6 +1297,10 @@
               "expression": {
                 "type": "string",
                 "minLength": 1,
+                "maxLength": 512
+              },
+              "description": {
+                "type": "string",
                 "maxLength": 512
               }
             },
@@ -715,6 +1648,52 @@
           },
           "enabled": {
             "type": "boolean"
+          },
+          "previousTarget": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "dimension",
+                  "feature"
+                ]
+              },
+              "sketchId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96
+              },
+              "constraintId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96
+              },
+              "featureId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96
+              },
+              "parameter": {
+                "type": "string",
+                "enum": [
+                  "width",
+                  "height",
+                  "depth",
+                  "radius",
+                  "count"
+                ]
+              }
+            },
+            "required": [
+              "kind"
+            ],
+            "additionalProperties": false
+          },
+          "previousParameterId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 96
           }
         },
         "required": [
@@ -876,6 +1855,11 @@
                   "minLength": 1,
                   "maxLength": 96
                 },
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                },
                 "type": {
                   "type": "string",
                   "enum": [
@@ -903,7 +1887,8 @@
                     "distance",
                     "distance-x",
                     "distance-y",
-                    "angle"
+                    "angle",
+                    "line-distance"
                   ]
                 },
                 "refs": {
@@ -1428,6 +2413,185 @@
       }
     },
     {
+      "name": "cad.sketch.reference.rename.v1",
+      "version": "1",
+      "schemaVersion": 1,
+      "capability": "cad.sketch.reference.rename",
+      "effects": [
+        "MainMutation",
+        "LocalProposal"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sketchId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 96
+          },
+          "ref": {
+            "type": "object",
+            "properties": {
+              "entityId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "entity",
+                  "point",
+                  "a",
+                  "b",
+                  "midpoint",
+                  "center"
+                ]
+              }
+            },
+            "required": [
+              "entityId",
+              "role"
+            ],
+            "additionalProperties": false
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "sketchId",
+          "ref",
+          "name"
+        ],
+        "additionalProperties": false
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "receipt": {
+            "type": "object",
+            "properties": {
+              "schemaVersion": {
+                "type": "integer",
+                "const": 1
+              },
+              "operationId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 96
+              },
+              "traceId": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "maxLength": 96
+              },
+              "actor": {
+                "type": "object"
+              },
+              "scope": {
+                "type": "object"
+              },
+              "toolName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 96
+              },
+              "toolVersion": {
+                "type": "string",
+                "const": "1"
+              },
+              "effectClass": {
+                "type": "string",
+                "enum": [
+                  "ReadOnly",
+                  "LocalProposal",
+                  "MainMutation"
+                ]
+              },
+              "baseRevision": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "outcome": {
+                "type": "string",
+                "enum": [
+                  "accepted",
+                  "completed",
+                  "rejected",
+                  "failed",
+                  "cancelled"
+                ]
+              },
+              "result": {
+                "type": "object"
+              },
+              "error": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 96
+                  },
+                  "message": {
+                    "type": "string",
+                    "maxLength": 1024
+                  }
+                },
+                "required": [
+                  "code",
+                  "message"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "schemaVersion",
+              "operationId",
+              "traceId",
+              "outcome"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "receipt"
+        ],
+        "additionalProperties": false
+      },
+      "description": "Rename a stable entity or semantic child point without replacing identity or constraints.",
+      "units": {
+        "length": [
+          "mm",
+          "cm",
+          "m",
+          "inch"
+        ],
+        "count": "scalar",
+        "volume": "mm3",
+        "area": "mm2",
+        "angle": "rad"
+      },
+      "preconditions": [
+        "server-issued actor/session authority",
+        "expected document/dependency revisions",
+        "native v1 for model mutations"
+      ],
+      "recovery": "Inspect operation receipt; never blindly replay unknown effects.",
+      "limits": {
+        "maxInputBytes": 16384,
+        "maxOutputBytes": 16384
+      }
+    },
+    {
       "name": "cad.sketch.upgrade.v1",
       "version": "1",
       "schemaVersion": 1,
@@ -1448,7 +2612,8 @@
             "type": "string",
             "enum": [
               "E1.M3-sketch/1",
-              "E1.M4-sketch/1"
+              "E1.M4-sketch/1",
+              "E1.M5-sketch/1"
             ]
           }
         },
@@ -1605,6 +2770,11 @@
                 "minLength": 1,
                 "maxLength": 96
               },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
               "type": {
                 "type": "string",
                 "enum": [
@@ -1632,7 +2802,8 @@
                   "distance",
                   "distance-x",
                   "distance-y",
-                  "angle"
+                  "angle",
+                  "line-distance"
                 ]
               },
               "refs": {
@@ -1710,6 +2881,9 @@
               "value"
             ],
             "additionalProperties": false
+          },
+          "allowOverdefined": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -1866,6 +3040,11 @@
                 "minLength": 1,
                 "maxLength": 96
               },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
               "type": {
                 "type": "string",
                 "enum": [
@@ -1893,7 +3072,8 @@
                   "distance",
                   "distance-x",
                   "distance-y",
-                  "angle"
+                  "angle",
+                  "line-distance"
                 ]
               },
               "refs": {
@@ -1971,6 +3151,9 @@
               "value"
             ],
             "additionalProperties": false
+          },
+          "allowOverdefined": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -3285,6 +4468,24 @@
                 "type": "string",
                 "minLength": 1,
                 "maxLength": 96
+              },
+              "orientation": {
+                "type": "object",
+                "properties": {
+                  "reverseNormal": {
+                    "type": "boolean"
+                  },
+                  "rightQuarterTurns": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 3
+                  }
+                },
+                "required": [
+                  "reverseNormal",
+                  "rightQuarterTurns"
+                ],
+                "additionalProperties": false
               }
             },
             "required": [
@@ -3297,7 +4498,8 @@
             "type": "string",
             "enum": [
               "E1.M3-sketch/1",
-              "E1.M4-sketch/1"
+              "E1.M4-sketch/1",
+              "E1.M5-sketch/1"
             ]
           }
         },
@@ -3468,6 +4670,38 @@
               },
               "construction": {
                 "type": "boolean"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "pointNames": {
+                "type": "object",
+                "properties": {
+                  "a": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "b": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "center": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "midpoint": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
               },
               "point": {
                 "type": "array",
@@ -3698,6 +4932,38 @@
               },
               "construction": {
                 "type": "boolean"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 128
+              },
+              "pointNames": {
+                "type": "object",
+                "properties": {
+                  "a": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "b": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "center": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  },
+                  "midpoint": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 128
+                  }
+                },
+                "required": [],
+                "additionalProperties": false
               },
               "point": {
                 "type": "array",
@@ -5266,7 +6532,7 @@
         ],
         "additionalProperties": false
       },
-      "description": "Typed dimensions for one exact geometry-probe feature.",
+      "description": "Typed source dimensions for an exact geometry-probe or M5 sketch-extrusion feature.",
       "units": {
         "length": [
           "mm",
@@ -7662,7 +8928,7 @@
     }
   ],
   "unsupported": [
-    "general sketch extrusion (E1.M5); arcs/trim/patterns and remaining constraints (E3.M1)",
+    "multi-body/general extrusion breadth, arcs/trim/patterns and remaining constraints (E3.M1)",
     "arbitrary feature graphs",
     "drawing/vector export",
     "arbitrary B-Rep mates",

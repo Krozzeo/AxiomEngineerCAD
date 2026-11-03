@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "introducedIn": "0.0.6",
-  "status": "E0 baseline Go approved; E1.M1 additive viewportOnly/selection filters in review",
+  "status": "E1.M5 exact isolated operation preview and sketch execution rollback in review",
   "profile": "E0.M6-proof/1",
   "prefix": "/v1/proof/",
   "authority": "human bearer + server-issued document/session + expected revision and proof manifest",
@@ -26,6 +26,26 @@
         },
         "viewportOnly": {
           "type": "boolean"
+        },
+        "previewOperation": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "enum": [
+                "cad.extrusion.create.v1",
+                "cad.extrusion.update.v1"
+              ]
+            },
+            "inputs": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "name",
+            "inputs"
+          ],
+          "additionalProperties": false
         },
         "versionId": {
           "type": "string",

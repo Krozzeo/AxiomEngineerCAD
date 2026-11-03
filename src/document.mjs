@@ -76,6 +76,7 @@ export class Document {
     this.expect(expectedRevision);
     check(!this.pending(), 'projectBusy', 'Apply pending fields before saving, or explicitly discard on close.');
     check(!this.lab?.running&&!this.commands?.running&&!this.proof?.running, 'projectBusy', 'Wait for or cancel the lab/tool task before saving.');
+    await this.commands?.finishEditing({keepEditing:true});
     await this.authorize(this.path);
     const disk = await readDocument(this.path);
     check(JSON.stringify(disk) === JSON.stringify(this.saved), 'revisionConflict', 'Saved document changed externally. Original file was preserved.');
