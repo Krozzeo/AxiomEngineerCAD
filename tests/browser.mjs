@@ -27,13 +27,15 @@ try {
     child.once('exit', code => { clearTimeout(timer); no(Error('Direct process exited ' + code + ': ' + errors)); });
   });
   assert.equal(ready.ready, true);
-  // A failed startup catalog request must be handled even if context fails first.
-  const unavailable=await context.newPage();let failedContext=0;
-  await unavailable.route('**/v1/cad/context',route=>{failedContext++;return route.abort('failed');});
-  await unavailable.route('**/v1/cad/catalog',route=>route.abort('failed'));
-  await unavailable.goto(ready.editorUrl);await unavailable.locator('body[data-workbench-ready=true]').waitFor();
-  await unavailable.waitForTimeout(1000);assert.ok(failedContext>0);await unavailable.close();
-  report.criteria.push('Unavailable startup CAD context/catalog remains handled without unhandled promise rejection');
+  // Fail each authenticated startup service explicitly; module initialization must
+  // report disconnection rather than leave rejected promises in dependent modules.
+  for(const paths of [['cad/context','cad/catalog'],['document'],['cad/status']]){
+    const unavailable=await context.newPage();let failures=0;
+    for(const path of paths)await unavailable.route('**/v1/'+path,route=>{failures++;return route.abort('failed');});
+    await unavailable.goto(ready.editorUrl);await unavailable.locator('body[data-workbench-ready=true][data-sketch-ready=true]').waitFor();
+    await unavailable.waitForTimeout(1000);assert.ok(failures>0);await unavailable.close();
+  }
+  report.criteria.push('Unavailable startup context/catalog/document/history services report disconnection without unhandled promise rejection');
   direct = await context.newPage(); observe(direct); await direct.goto((ready.editorUrl).replace('/#','/?workspace=labs#'));await waitEditorIdle(direct);
   await direct.locator('#name:not([disabled])').waitFor();
   assert.equal(await direct.locator('#name').inputValue(), 'Direct lifecycle study');
