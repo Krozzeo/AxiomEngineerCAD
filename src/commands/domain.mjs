@@ -2,7 +2,7 @@ import {dimensionSources,dimensionIdentity} from '../parameters/dimension-source
 import {renamedDimensionExpressions} from '../parameters/expressions.mjs';
 import {extrusionCommand,EXTRUSION_TYPE} from '../extrusion/profile.mjs';
 import {parameterCommand,applyParameters,parameterTarget} from '../parameters/profile.mjs';
-import {sketchCommand} from '../sketch/profile.mjs';
+import {sketchCommand,pruneImplicitReferences} from '../sketch/profile.mjs';
 import {check,validate,validateMetadata} from '../document.mjs';
 import {recipe,UNITS,KERNEL} from '../lab/profile.mjs';
 import {syncBindings,canonical} from '../native/schema.mjs';
@@ -24,6 +24,6 @@ export function command(value,name,input){check(value.formatVersion===1,'Incompa
   }else if(name==='cad.feature.extrude.v1'){check(next.native.graph.primaryDefinitionId===input.definitionId,'LostReference','Choose the existing primary definition.');check(!next.experiment&&!next.native.graph.features.some(f=>f.id===input.featureId),'InvalidInput','Create extrusion only in an empty primary geometry slot.');
     next.experiment={profile:'E0.M2-probe-v0',kernel:KERNEL,spec:recipe({scenario:'extrude',width:length(input.width,'mm'),height:length(input.height,'mm'),depth:length(input.depth,'mm')})};syncBindings(next);next.native.graph.features.find(f=>f.type==='geometry-probe'&&f.definitionId===input.definitionId).id=input.featureId;
   }else check(false,'UnsupportedCapability','No registered shared mutation handler.');
-  for(const f of next.native?.graph.features??[])if(f.type==='sketch-primitives'){const old=value.native?.graph.features.find(x=>x.id===f.id),removed=(old?.data.entities??[]).filter(e=>e.external).map(e=>e.external.producerId);f.dependsOn=f.dependsOn.filter(id=>!removed.includes(id)||id===f.data.plane.producerId||f.data.entities.some(e=>e.external?.producerId===id));}applyParameters(next);syncBindings(next);validate(next);return next;
+  pruneImplicitReferences(next);for(const f of next.native?.graph.features??[])if(f.type==='sketch-primitives'){const old=value.native?.graph.features.find(x=>x.id===f.id),removed=(old?.data.entities??[]).filter(e=>e.external).map(e=>e.external.producerId);f.dependsOn=f.dependsOn.filter(id=>!removed.includes(id)||id===f.data.plane.producerId||f.data.entities.some(e=>e.external?.producerId===id));}applyParameters(next);syncBindings(next);validate(next);return next;
 }
 export function featureContext(value,id){const extrusion=value.native.graph.features.find(f=>f.id===id&&f.type===EXTRUSION_TYPE);if(extrusion)return {id,definitionId:extrusion.definitionId,type:extrusion.type,name:extrusion.data.name,sketchId:extrusion.data.sketchId,operation:extrusion.data.operation,reverse:extrusion.data.reverse,dimensions:{depth:{value:extrusion.data.depthMm,unit:'mm'}},selectors:['top','bottom'].map(role=>({producerId:id,role,kind:'face',kernel:KERNEL})),kernel:KERNEL};const f=featureOf(value,id),s=recipe(f.data.spec);return {id:f.id,definitionId:f.definitionId,type:f.type,scenario:s.scenario,dimensions:Object.fromEntries(['width','height','depth','radius','count'].map(k=>[k,{value:s[k],unit:k==='count'?'scalar':s.unit}])),selectors:['top','bottom'].map(role=>({producerId:f.id,role,kind:'face',kernel:KERNEL})),...(hasIntegration(value)?{drivingParameters:dimensions(value.native.graph),profile:'E0.M7-chain/1'}:{}),kernel:KERNEL};}

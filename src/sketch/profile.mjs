@@ -1,3 +1,4 @@
+import {referenceAnchors} from './reference-anchors.mjs';
 import {validateSupportFrame} from '../extrusion/planar.mjs';
 import {capFrame} from '../extrusion/frame.mjs';
 import {dimensions} from './relation-kinds.mjs';
@@ -43,6 +44,12 @@ function attachSnap(feature,from,to){
 }
 export function sketchCommand(next,name,input){const g=next.native.graph;
  if(name==='cad.sketch.create.v1'){check(g.definitions.some(d=>d.id===input.definitionId),'LostReference','Sketch definition is missing.');check(g.features.filter(f=>f.type===SKETCH_TYPE).length<16,'ResourceLimit','At most sixteen editable sketches.');const p=structuredClone(input.plane),face=p.kind==='face';g.features.push({id:input.sketchId,definitionId:input.definitionId,type:SKETCH_TYPE,dependsOn:face?[p.producerId]:[],parameterIds:[],data:{profile:input.profile??SKETCH_PROFILE,name:input.name,plane:p,entities:[],...(isParametric(input.profile)?{constraints:[]}: {})},...(face?{selector:{producerId:p.producerId,role:p.role,kind:'face',kernel:KERNEL,state:'ResolvedStable'}}:{})});return;}
+ if(input.externalEntities?.length){
+  check(['cad.sketch.constraint.add.v1','cad.sketch.constraint.update.v1','cad.sketch.constraints.add.v1','cad.sketch.entity.add.v1','cad.sketch.drag.v1'].includes(name),'InvalidInput','External references accompany a sketch edit.');
+  const refs=[...(input.constraint?.refs??[]),...(input.constraints??[]).flatMap(c=>c.refs),...(input.snaps??[]).map(s=>s.to),...(input.snapTarget?[input.snapTarget]:[])];
+  check(new Set(input.externalEntities.map(e=>e.id)).size===input.externalEntities.length,'InvalidInput','Repeated implicit reference.');
+  for(const entity of input.externalEntities){check(entity.referenceOnly===true&&entity.external&&refs.some(r=>r.entityId===entity.id),'InvalidInput','Only used implicit source references may be materialized.');sketchCommand(next,'cad.sketch.entity.add.v1',{sketchId:input.sketchId,entity,unit:'mm'});}
+ }
  if(name==='cad.sketch.constraints.add.v1'){check(Array.isArray(input.constraints)&&input.constraints.length<=32&&input.constraints.length>0,'InvalidInput','Provide 1–32 relations.');for(const constraint of input.constraints)sketchCommand(next,'cad.sketch.constraint.add.v1',{sketchId:input.sketchId,constraint});return;}
  if(name==='cad.sketch.constraints.delete.v1'){check(new Set(input.constraintIds).size===input.constraintIds.length&&input.constraintIds.length>0,'InvalidInput','Provide unique relation IDs.');for(const constraintId of input.constraintIds)sketchCommand(next,'cad.sketch.constraint.delete.v1',{sketchId:input.sketchId,constraintId});return;}
  if(name==='cad.sketch.entities.delete.v1'){check(new Set(input.entityIds).size===input.entityIds.length&&input.entityIds.length>0,'InvalidInput','Provide unique entity IDs.');for(const entityId of input.entityIds)sketchCommand(next,'cad.sketch.entity.delete.v1',{sketchId:input.sketchId,entityId});return;}
@@ -52,5 +59,22 @@ export function sketchCommand(next,name,input){const g=next.native.graph;
  if(name==='cad.sketch.drag.v1'){check(isParametric(f.data.profile),'UnsupportedCapability','Upgrade the sketch before constrained drag.');if(input.snapTarget){const e=f.data.entities.find(e=>e.id===input.ref.entityId),from=input.ref.role==='entity'&&e?.type==='circle'?{entityId:e.id,role:'center'}:input.ref;attachSnap(f,from,input.snapTarget);}return;}
  const entities=f.data.entities,index=entities.findIndex(e=>e.id===(input.entityId??input.entity?.id));if(name==='cad.sketch.entity.delete.v1'){check(index>=0,'LostReference','Sketch primitive is missing.');entities.splice(index,1);if(f.data.constraints)f.data.constraints=f.data.constraints.filter(c=>!c.refs.some(r=>r.entityId===input.entityId));return;}
  check(Object.hasOwn(UNITS,input.unit),'InvalidUnits','Choose mm, cm, m or inch.');const e=structuredClone(input.entity),factor=UNITS[input.unit];for(const k of ['point','a','b','center'])if(e[k])e[k]=e[k].map(x=>x*factor);if(e.radius!==undefined)e.radius*=factor;validateEntity(e);
- if(name==='cad.sketch.entity.add.v1'){check(index<0,'InvalidInput','Primitive ID already exists.');if(isParametric(f.data.profile)&&e.type==='rectangle')expandRectangle(f.data,e,f.id);else entities.push(e);if(e.external){if(e.external.kind!=='datum'&&!f.dependsOn.includes(e.external.producerId))f.dependsOn.push(e.external.producerId);const roles=e.type==='line'?['a','b']:e.type==='circle'?['center']:['point'];for(const role of roles)f.data.constraints.push({id:derivedId(f.id,e.id,'external-fixed',role),type:'fixed',refs:[{entityId:e.id,role}],driving:true,value:[...e[role]]});if(e.type==='circle')f.data.constraints.push({id:derivedId(f.id,e.id,'external-radius'),type:'radius',refs:[{entityId:e.id,role:'entity'}],driving:true,value:e.radius});}for(const snap of input.snaps??[]){check(e.type!=='rectangle'||['a','b'].includes(snap.fromRole),'InvalidInput','Rectangle snaps identify its two chosen opposite corners.');const from=e.type==='rectangle'?(snap.fromRole==='b'?{entityId:derivedId(f.id,e.id,'edge',2),role:'a'}:{entityId:e.id,role:'a'}):{entityId:e.id,role:snap.fromRole};attachSnap(f,from,snap.to);}if(input.alignment){check(e.type==='line'&&f.data.profile===M5_PROFILE,'InvalidInput','Alignment requires a current straight line.');f.data.constraints.push({id:derivedId(f.id,e.id,input.alignment),type:input.alignment,refs:[{entityId:e.id,role:'entity'}],driving:true,value:null});}}else{check(name==='cad.sketch.entity.update.v1'&&index>=0,'LostReference','Sketch primitive is missing.');check(entities[index].type===e.type,'InvalidInput','Update preserves primitive identity and type.');entities[index]={...entities[index],...e};}
+ if(name==='cad.sketch.entity.add.v1'){check(index<0,'InvalidInput','Primitive ID already exists.');if(isParametric(f.data.profile)&&e.type==='rectangle')expandRectangle(f.data,e,f.id);else entities.push(e);if(e.external){if(e.external.kind!=='datum'&&!f.dependsOn.includes(e.external.producerId))f.dependsOn.push(e.external.producerId);f.data.constraints.push(...referenceAnchors(f.id,e,derivedId));}for(const snap of input.snaps??[]){check(e.type!=='rectangle'||['a','b'].includes(snap.fromRole),'InvalidInput','Rectangle snaps identify its two chosen opposite corners.');const from=e.type==='rectangle'?(snap.fromRole==='b'?{entityId:derivedId(f.id,e.id,'edge',2),role:'a'}:{entityId:e.id,role:'a'}):{entityId:e.id,role:snap.fromRole};attachSnap(f,from,snap.to);}if(input.alignment){check(e.type==='line'&&f.data.profile===M5_PROFILE,'InvalidInput','Alignment requires a current straight line.');f.data.constraints.push({id:derivedId(f.id,e.id,input.alignment),type:input.alignment,refs:[{entityId:e.id,role:'entity'}],driving:true,value:null});}}else{check(name==='cad.sketch.entity.update.v1'&&index>=0,'LostReference','Sketch primitive is missing.');check(entities[index].type===e.type,'InvalidInput','Update preserves primitive identity and type.');entities[index]={...entities[index],...e};}
+}
+
+export function pruneImplicitReferences(value){
+ const g=value.native.graph;
+ for(const f of g.features.filter(f=>f.type===SKETCH_TYPE)){
+  const removed=new Set(),constraints=new Set();
+  for(const e of f.data.entities.filter(e=>e.referenceOnly)){
+   const anchors=new Set(referenceAnchors(f.id,e,derivedId).map(c=>c.id));
+   if(f.data.constraints.some(c=>!anchors.has(c.id)&&c.refs.some(r=>r.entityId===e.id)))continue;
+   removed.add(e.id);for(const id of anchors)constraints.add(id);
+  }
+  if(!removed.size)continue;
+  const producers=f.data.entities.filter(e=>removed.has(e.id)).map(e=>e.external.producerId);
+  f.data.entities=f.data.entities.filter(e=>!removed.has(e.id));f.data.constraints=f.data.constraints.filter(c=>!constraints.has(c.id));
+  f.dependsOn=f.dependsOn.filter(id=>id===f.data.plane.producerId||!producers.includes(id)||f.data.entities.some(e=>e.external?.producerId===id));
+  for(const p of g.parameters)if(p.targets)p.targets=p.targets.filter(t=>t.kind!=='dimension'||t.sketchId!==f.id||!constraints.has(t.constraintId));
+ }
 }

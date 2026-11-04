@@ -1,6 +1,6 @@
-# Engineer handoff — E1.M5 sketch navigation /0.1.9 candidate
+# Engineer handoff — E1.M5 sketch navigation /0.1.10 candidate
 
-Start with `npm run context`, AGENTS.md and `docs/PROJECT_CONTEXT.md`. Reuse the reviewed Master baseline only when its hash matches; follow AGENTS1 on mismatch or foundational decisions. `docs/PROJECT_STATE.json` indexes the last delivered CAD build (0.1.8 / PR16), owner acceptance and authoritative evidence. PR17 is integrated in main at 60a5ceb with owner authorization. Current CAD 0.1.9 implements sketch/navigation/reference refinements; full acceptance, publication and actual installed validation are pending. Read docs/milestones/E1_M5_UX_0_1_9.md. See `docs/DEVELOPMENT_WORKFLOW.md`. Preserve previous immutable builds and all user files; delivery does not approve E2, main merge or stable publication.
+Start with `npm run context`, AGENTS.md and `docs/PROJECT_CONTEXT.md`. Reuse the reviewed Master baseline only when its hash matches; follow AGENTS1 on mismatch or foundational decisions. `docs/PROJECT_STATE.json` indexes the last delivered CAD build (0.1.9 / PR18, focused installed verification), owner acceptance and authoritative evidence. PR17 is integrated in main at 60a5ceb with owner authorization. Current CAD 0.1.10 adds direct model/datum references without a projection operation; full acceptance, publication and actual installed validation are pending. Read docs/milestones/E1_M5_UX_0_1_10.md. See `docs/DEVELOPMENT_WORKFLOW.md`. Preserve previous immutable builds and all user files; delivery does not approve E2, main merge or stable publication.
 
 ## Source and authority
 

@@ -8,19 +8,19 @@
   },
   "milestone": {
     "current": "E1.M5",
-    "status": "0.1.9 implementation; acceptance and installation delivery pending",
+    "status": "0.1.10 direct-reference implementation; exact-head acceptance and installation delivery pending",
     "ownerAcceptance": "pending",
     "next": "Owner-selected CAD change; do not infer E2 approval from delivery."
   },
   "lastDelivered": {
-    "version": "0.1.8",
-    "commit": "4f38a0e6ccc2f4e1dfd331beaa2d20b4352501d5",
-    "pullRequest": 16,
-    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-16-4f38a0e6ccc2f4e1dfd331beaa2d20b4352501d5",
-    "acceptanceRun": 41691910072,
-    "publicationRun": 41693731899,
-    "artifactSha256": "cc752dce7e2a693ec311795136946e386aee2f03b63690c6ee7996e05144505a",
-    "verification": "Windows/Linux: 225 tests each; public Platform 0.1.13 install/activate/launch, Chrome/NVIDIA, save/reopen and five independent PDFs; zero page errors."
+    "version": "0.1.9",
+    "commit": "51f2922aa576a33b736c568afb57ddb2d0ab6ce3",
+    "pullRequest": 18,
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-18-51f2922aa576a33b736c568afb57ddb2d0ab6ce3",
+    "acceptanceRun": 41745814572,
+    "publicationRun": 41747175501,
+    "artifactSha256": "031eb7725bdab240899daaaecbdbc4476de08d0099d8ef9be54958e8f968e5c5",
+    "verification": "Windows/Linux: 232 tests each, browser and independent PDF acceptance. Public Platform 0.1.13 install/activate/launch and focused Chrome/NVIDIA sketch/save/reopen passed; broader public legacy/PDF run stopped on a harness precondition and is not claimed passed."
   },
   "constraints": [
     "MASTER_DESIGN is intent; implementation requires code and matching evidence.",
@@ -33,12 +33,22 @@
     "implementation": "IMPLEMENTATION_STATUS.md",
     "handoff": "AI_HANDOFF.md",
     "architecture": "docs/architecture/ADR_REGISTER.md",
-    "currentCadScope": "docs/milestones/E1_M5_UX_0_1_9.md",
+    "currentCadScope": "docs/milestones/E1_M5_UX_0_1_10.md",
     "deliveryGate": "docs/MILESTONE_DELIVERY.md"
   },
   "candidate": {
-    "version": "0.1.9",
+    "version": "0.1.10",
     "branch": "engineer/sketch-navigation-0.1.9",
     "status": "implemented; full exact-head acceptance and publication pending"
+  },
+  "previousDelivered": {
+    "version": "0.1.8",
+    "commit": "4f38a0e6ccc2f4e1dfd331beaa2d20b4352501d5",
+    "pullRequest": 16,
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-16-4f38a0e6ccc2f4e1dfd331beaa2d20b4352501d5",
+    "acceptanceRun": 41691910072,
+    "publicationRun": 41693731899,
+    "artifactSha256": "cc752dce7e2a693ec311795136946e386aee2f03b63690c6ee7996e05144505a",
+    "verification": "Windows/Linux: 225 tests each; public Platform 0.1.13 install/activate/launch, Chrome/NVIDIA, save/reopen and five independent PDFs; zero page errors."
   }
 }
