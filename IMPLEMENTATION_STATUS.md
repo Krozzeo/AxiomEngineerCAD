@@ -1,6 +1,6 @@
 # Engineer implementation status
 
-Current candidate: **0.1.9 / E1.M5 sketch navigation and references � implemented, acceptance and public delivery pending**. See [current scope and demo](docs/milestones/E1_M5_UX_0_1_9.md). Last delivered CAD remains 0.1.8; candidate status is not owner acceptance.
+Current candidate: **0.1.9 / E1.M5 sketch navigation and references — implemented, acceptance and public delivery pending**. See [current scope and demo](docs/milestones/E1_M5_UX_0_1_9.md). Last delivered CAD remains 0.1.8; candidate status is not owner acceptance.
 
 Current CAD: **0.1.8 / E1.M5 sketch interactions — delivered for owner review**, source `4f38a0e6ccc2f4e1dfd331beaa2d20b4352501d5` / PR16. Exact Windows/Linux acceptance, immutable experimental publication and actual public Platform installation passed. Owner acceptance remains pending. `docs/PROJECT_STATE.json` is the compact delivery/evidence index; no E2 progression, main merge or stable release is claimed.
 
