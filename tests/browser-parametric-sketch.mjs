@@ -19,7 +19,7 @@ export async function verifyParametricUI({page,evidence,report}){
  await selectSketchComponent(page,'layout-circle');
  await page.locator('[data-constraint-id="layout-radius"]').click();
  assert.equal(await page.locator('[data-sketch-entity="layout-circle"] path').first().getAttribute('stroke'),'#7979ff');
- assert.equal(await page.locator('#edit-sketch-edit').isVisible(),true);
+ assert.equal(await page.locator('#edit-sketch-edit').isVisible(),false);assert.equal(await page.locator('#edit-sketch-dimension-value').isVisible(),true);
  await page.locator('#edit-sketch-constraint-delete').click();await page.waitForFunction(()=>!document.querySelector('#edit-sketch-editor').hasAttribute('aria-busy'));await waitEditorIdle(page);
  await page.waitForFunction(()=>!document.querySelector('[data-constraint-id="layout-radius"]'));
  await selectSketchComponent(page,'layout-circle');
