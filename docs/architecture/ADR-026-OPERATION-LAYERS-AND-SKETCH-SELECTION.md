@@ -12,4 +12,6 @@ Ordinary picking prioritizes Origin, then local sketch geometry, then external g
 
 Endpoint holds are convenience gestures, not saved constraints. They may not suppress permitted motion in a connected constraint network. Pointer offsets and final release goals are preserved. Snap must not target coincident aliases or geometry moved by the same gesture. Pinned numerical solving and independent verification continue to control committed coordinates.
 
+External-reference verification receives the complete canonical content, including parameter bindings in later or suppressed sketches. Execution rollback still bounds the regenerated upstream geometry; its truncated feature graph is not a complete source document for reference validation. Finishing an earlier sketch must preserve valid downstream bindings and continue rejecting missing targets.
+
 See [0.1.11 scope and validation](../milestones/E1_M5_UX_0_1_11.md).
