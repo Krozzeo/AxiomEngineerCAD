@@ -2,7 +2,7 @@
 
 Local-first, browser-operated parametric mechanical CAD and engineering-documentation product in the Axiom family, designed from the outset for both human users and AI agents.
 
-> **Current candidate: 0.1.11 / E1.M5 preview, motion and selection.** See [scope and owner test flow](docs/milestones/E1_M5_UX_0_1_11.md). Full exact-head acceptance, immutable publication and actual Platform installation remain delivery gates; owner acceptance is separate.
+> **Current candidate: 0.1.12 / E1.M5 consolidation.** See [scope and owner test flow](docs/milestones/E1_M5_CONSOLIDATION_0_1_12.md). Full exact-head acceptance, immutable publication and actual Platform installation remain delivery gates; owner acceptance is separate.
 
 Start development with `npm run context` and [the compact context](docs/PROJECT_CONTEXT.md). The [workflow](docs/DEVELOPMENT_WORKFLOW.md) selects focused checks during implementation, then complete exact-head acceptance and real installation proof for delivery.
 
@@ -10,7 +10,7 @@ Start development with `npm run context` and [the compact context](docs/PROJECT_
 
 Every completed review milestone is delivered as an experimental prepared installation. In Platform 0.1.12+, open **Installations → Add installation → Axiom Engineer CAD → Refresh**, select the published experimental build, download/install and activate. Then create an Engineer project. Source PRs and passing tests alone are not installable publications. See [milestone delivery](docs/MILESTONE_DELIVERY.md) for the publication and verification gate.
 
-**Current demo:** **E1.M5 Extrusion & Sketch Workbench**. Install/activate the selected version and use **Load Demos**. Last verified delivery: [0.1.10 / PR18](https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-18-449ee84e432795bfbd3d771bf602799f70f6891c), including actual installed references/save/reopen and five independent PDFs. The [0.1.11 guide](docs/milestones/E1_M5_UX_0_1_11.md) covers the current candidate; match immutable build provenance before installing. Only the current M5 demo is advertised; earlier user projects remain intact.
+**Current demo:** **E1.M5 Extrusion & Sketch Workbench**. Install/activate the selected version and use **Load Demos**. Last verified delivery: [0.1.11 / PR18](https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-18-bd32e873bb2f69314cf3354465648dcd8b572c98), including actual installed references/save/reopen and five independent PDFs. The [0.1.12 guide](docs/milestones/E1_M5_CONSOLIDATION_0_1_12.md) covers the current candidate; match immutable build provenance before installing. Only the current M5 demo is advertised; earlier user projects remain intact.
 
 The 0.1.8 workbench adds live primitive previews, persistent Snap (hold Ctrl to bypass), atomic relation cleanup, all geometric constraints in Parameter Manager, searchable binding/value controls, repairable conflict/missing-reference lists, intuitive signed dimensions and planar-face sketch supports. New Sketch previews normal/right orientation; Exit Sketch returns selection to its source. Conservative planar geometry witnesses require explicit repair when the supporting face changes. [Technical decisions and compatibility](docs/architecture/ADR-025-SKETCH-INTERACTION-AND-PLANAR-SUPPORT.md).
 

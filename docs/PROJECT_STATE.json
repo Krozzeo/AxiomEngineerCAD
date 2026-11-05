@@ -8,19 +8,19 @@
   },
   "milestone": {
     "current": "E1.M5",
-    "status": "0.1.11 implementation; focused verification passed; exact-head acceptance/public installation pending",
+    "status": "0.1.12 consolidation candidate; owner review remains separate",
     "ownerAcceptance": "pending",
     "next": "Owner-selected CAD change; do not infer E2 approval from delivery."
   },
   "lastDelivered": {
-    "version": "0.1.10",
-    "commit": "449ee84e432795bfbd3d771bf602799f70f6891c",
+    "version": "0.1.11",
+    "commit": "bd32e873bb2f69314cf3354465648dcd8b572c98",
     "pullRequest": 18,
-    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-18-449ee84e432795bfbd3d771bf602799f70f6891c",
-    "acceptanceRun": 41833162863,
-    "publicationRun": 41834510306,
-    "artifactSha256": "349bf31a4275b3e791d413c46124ad87c1e917428519d8943221132ba2742f02",
-    "verification": "Windows/Linux: 234 tests each, complete browser/independent PDF checks. Actual public Platform 0.1.13 install, Chrome/NVIDIA direct references, atomic Undo/Redo and Save/Close/Reopen passed. Remaining installed regressions and five independent PDFs passed separately after a bounded external QA correction for a detached SVG hover node; failed broad attempt preserved."
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-18-bd32e873bb2f69314cf3354465648dcd8b572c98",
+    "acceptanceRun": 42074607557,
+    "publicationRun": 42076641622,
+    "artifactSha256": "6ac49b94b09b66de80a6dfc74206ab5c69571af987dbe67242bbf803fff01495",
+    "verification": "Windows/Linux 245 tests per OS, browser and independent PDF acceptance. Public Platform 0.1.13 discovery, download, hash, install, activate and launch; Chrome/NVIDIA complete installed UI, save/reopen and five independent PDFs passed; zero page errors."
   },
   "constraints": [
     "MASTER_DESIGN is intent; implementation requires code and matching evidence.",
@@ -33,23 +33,23 @@
     "implementation": "IMPLEMENTATION_STATUS.md",
     "handoff": "AI_HANDOFF.md",
     "architecture": "docs/architecture/ADR_REGISTER.md",
-    "currentCadScope": "docs/milestones/E1_M5_UX_0_1_11.md",
+    "currentCadScope": "docs/milestones/E1_M5_CONSOLIDATION_0_1_12.md",
     "deliveryGate": "docs/MILESTONE_DELIVERY.md"
   },
   "candidate": {
-    "version": "0.1.11",
+    "version": "0.1.12",
     "branch": "engineer/sketch-navigation-0.1.9",
-    "status": "implemented; full exact-head acceptance and publication pending"
+    "status": "E1.M5 consolidation candidate; exact-head and installed acceptance pending"
   },
   "previousDelivered": {
-    "version": "0.1.9",
-    "commit": "51f2922aa576a33b736c568afb57ddb2d0ab6ce3",
+    "version": "0.1.10",
+    "commit": "449ee84e432795bfbd3d771bf602799f70f6891c",
     "pullRequest": 18,
-    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-18-51f2922aa576a33b736c568afb57ddb2d0ab6ce3",
-    "acceptanceRun": 41745814572,
-    "publicationRun": 41747175501,
-    "artifactSha256": "031eb7725bdab240899daaaecbdbc4476de08d0099d8ef9be54958e8f968e5c5",
-    "verification": "Windows/Linux: 232 tests each, browser and independent PDF acceptance. Public Platform 0.1.13 install/activate/launch and focused Chrome/NVIDIA sketch/save/reopen passed; broader public legacy/PDF run stopped on a harness precondition and is not claimed passed."
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-18-449ee84e432795bfbd3d771bf602799f70f6891c",
+    "acceptanceRun": 41833162863,
+    "publicationRun": 41834510306,
+    "artifactSha256": "349bf31a4275b3e791d413c46124ad87c1e917428519d8943221132ba2742f02",
+    "verification": "Windows/Linux: 234 tests each, complete browser/independent PDF checks. Actual public Platform 0.1.13 install, Chrome/NVIDIA direct references, atomic Undo/Redo and Save/Close/Reopen passed. Remaining installed regressions and five independent PDFs passed separately after a bounded external QA correction for a detached SVG hover node; failed broad attempt preserved."
   },
   "earlierDelivered": {
     "version": "0.1.8",
@@ -60,5 +60,15 @@
     "publicationRun": 41693731899,
     "artifactSha256": "cc752dce7e2a693ec311795136946e386aee2f03b63690c6ee7996e05144505a",
     "verification": "Windows/Linux: 225 tests each; public Platform 0.1.13 install/activate/launch, Chrome/NVIDIA, save/reopen and five independent PDFs; zero page errors."
+  },
+  "olderDelivered": {
+    "version": "0.1.9",
+    "commit": "51f2922aa576a33b736c568afb57ddb2d0ab6ce3",
+    "pullRequest": 18,
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-18-51f2922aa576a33b736c568afb57ddb2d0ab6ce3",
+    "acceptanceRun": 41745814572,
+    "publicationRun": 41747175501,
+    "artifactSha256": "031eb7725bdab240899daaaecbdbc4476de08d0099d8ef9be54958e8f968e5c5",
+    "verification": "Windows/Linux: 232 tests each, browser and independent PDF acceptance. Public Platform 0.1.13 install/activate/launch and focused Chrome/NVIDIA sketch/save/reopen passed; broader public legacy/PDF run stopped on a harness precondition and is not claimed passed."
   }
 }

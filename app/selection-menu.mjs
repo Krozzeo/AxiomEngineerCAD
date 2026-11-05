@@ -12,7 +12,7 @@ export function createSelectionMenu({canvas,menu,candidates,select,hover,status,
   if(!enabled())return;event.preventDefault();event.stopPropagation();close();const current=epoch;menu.replaceChildren();const another=document.createElement('button');another.type='button';another.textContent='Select another...';another.setAttribute('role','menuitem');another.onclick=()=>showChoices(event);menu.append(another);locate(menu,event);menu.hidden=false;
   try{const begin=await newSketch(event);if(current!==epoch||!begin)return;const button=document.createElement('button');button.type='button';button.textContent='New Sketch';button.setAttribute('role','menuitem');button.onclick=()=>{close();begin().catch(error=>status(error.message));};menu.prepend(button);}catch{}
  });
- document.addEventListener('pointerdown',event=>{if((!menu.hidden||table)&&!menu.contains(event.target)&&!table?.contains(event.target))close();});
+ document.addEventListener('pointerdown',event=>{if((!menu.hidden||table)&&!menu.contains(event.target)&&!table?.contains(event.target))close();},true);
  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&(table||!menu.hidden)){event.preventDefault();event.stopPropagation();close();}});
  return {close};
 }

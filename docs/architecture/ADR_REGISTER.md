@@ -58,3 +58,5 @@ References: [Master §21](../../MASTER_DESIGN.md#21-risks-experiments-and-archit
 - [ADR025 — Sketch interaction, repair and planar support](ADR-025-SKETCH-INTERACTION-AND-PLANAR-SUPPORT.md): owner-requested 0.1.8 work; exact geometry witnesses, atomic Snap and diagnostic/parameter UX; implementation and delivery gates pending.
 
 - [ADR026 - Operation layers and sketch selection](ADR-026-OPERATION-LAYERS-AND-SKETCH-SELECTION.md): owner-requested 0.1.11 refinement, focused numerical/human UI verification; exact delivery and owner acceptance are separate.
+
+- [ADR027 - Extrusion refinement and sketch references](ADR-027-EXTRUSION-REFINEMENT-AND-SKETCH-REFERENCES.md): E1.M5 consolidation, preserving legacy source identities and atomically binding operation depth.

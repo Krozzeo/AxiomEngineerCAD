@@ -16,7 +16,7 @@ export function modelCandidates(renderer,x,y,{all=false,specialOnly=false}={}){
 
  for(const o of scene.occurrences){const mesh=scene.models.find(m=>m.definitionId===o.definitionId)?.mesh;if(!mesh)continue;
   if(!specialOnly&&allowed('vertex'))for(const v of mesh.exactVertices??[]){const q=point(world(v.pointMm,o)),d=Math.hypot(x-q[0],y-q[1]);if(d<=radius&&q[2]>=0&&q[2]<=1)add(o.vertexSelectionIds[v.role],'vertex',v.role,d,q[2],{label:'Vertex ('+coordinates(world(v.pointMm,o))+')'});}
-  for(const edge of mesh.edges){if(!allowed('edge')&&!allowed('vertex'))continue;const ps=specialOnly?[]:edge.points.map(q=>point(world(q,o))),distance=specialOnly?Infinity:Math.min(...ps.slice(1).map((q,i)=>segmentDistance(p,ps[i],q)));
+  for(const edge of mesh.edges.filter(e=>!e.displayHidden)){if(!allowed('edge')&&!allowed('vertex'))continue;const ps=specialOnly?[]:edge.points.map(q=>point(world(q,o))),distance=specialOnly?Infinity:Math.min(...ps.slice(1).map((q,i)=>segmentDistance(p,ps[i],q)));
    if(allowed('edge')&&distance<=radius)add(o.edgeSelectionIds[edge.role],'edge',edge.role,distance,Math.min(...ps.map(q=>q[2])),{label:edge.curve?'Circle R'+Number(edge.curve.radiusMm.toFixed(3))+' ('+coordinates(world(edge.curve.centerMm,o))+')':'Edge ('+coordinates(world(edge.points[0],o))+') - ('+coordinates(world(edge.points.at(-1),o))+')'});
    if(edge.curve?.type==='circle'&&edge.curve.full!==false&&edge.resolution!=='TransientDisplayOnly'){const q=point(world(edge.curve.centerMm,o)),d=Math.hypot(x-q[0],y-q[1]);if(d<=radius&&q[2]>=0&&q[2]<=1&&visibleCenter(world(edge.curve.centerMm,o)))add(o.edgeSelectionIds[edge.role],'edge',edge.role,d,q[2],{componentRole:'center',label:'Circle center ('+coordinates(world(edge.curve.centerMm,o))+')'});}
   }

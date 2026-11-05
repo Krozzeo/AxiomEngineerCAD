@@ -46,7 +46,7 @@ let document=await sketchDocument(p);
 assert.ok(document.native.graph.parameters.find(p=>p.id===parameter.id).targets.some(t=>t.constraintId===dimension.id));
 await p.locator('[data-dimension-id="'+dimension.id+'"] text').filter({hasText:'InteractionValue:5'}).waitFor();
 assert.equal(await p.locator('#sketch-edit-expression').textContent(),'');
-assert.equal(await p.locator('#sketch-edit-expression').isVisible(),false);
+assert.equal(await p.locator('#sketch-edit-expression').isVisible(),true);
 await p.locator('#panels-menu > summary').click();
 await p.locator('[data-open-panel=model]').click();
 await value.fill('8');

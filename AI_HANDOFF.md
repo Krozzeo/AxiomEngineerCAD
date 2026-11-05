@@ -1,6 +1,6 @@
-# Engineer handoff — E1.M5 sketch navigation /0.1.11 candidate
+# Engineer handoff - E1.M5 consolidation / 0.1.12 candidate
 
-Start with `npm run context`, AGENTS.md and `docs/PROJECT_CONTEXT.md`. Reuse the reviewed Master baseline only when its hash matches; follow AGENTS1 on mismatch or foundational decisions. `docs/PROJECT_STATE.json` indexes the last delivered CAD build (0.1.10 / PR18, evidence in PROJECT_STATE), owner acceptance and authoritative evidence. PR17 is integrated in main at 60a5ceb with owner authorization. Current CAD 0.1.11 refines operation preview layers, circle references, conversion, motion, picking and the Inspector; full acceptance, publication and actual installed validation are pending. Read docs/milestones/E1_M5_UX_0_1_11.md. See `docs/DEVELOPMENT_WORKFLOW.md`. Preserve previous immutable builds and all user files; delivery does not approve E2, main merge or stable publication.
+Start with `npm run context`, AGENTS.md and `docs/PROJECT_CONTEXT.md`. Reuse the reviewed Master baseline per AGENTS1. `docs/PROJECT_STATE.json` records the verified 0.1.11 installation and current candidate. Read [docs/milestones/E1_M5_CONSOLIDATION_0_1_12.md](docs/milestones/E1_M5_CONSOLIDATION_0_1_12.md) and [ADR027](docs/architecture/ADR-027-EXTRUSION-REFINEMENT-AND-SKETCH-REFERENCES.md). Preserve previous builds and user projects; delivery does not approve E2, main merge or stable publication.
 
 ## Source and authority
 
