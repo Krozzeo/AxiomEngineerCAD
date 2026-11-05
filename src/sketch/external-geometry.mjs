@@ -14,7 +14,7 @@ export function externalGeometry(scene,target,frame){
   const mesh=scene.models.find(m=>m.definitionId===target.definitionId)?.mesh;
   const hits=(target.kind==='vertex'?mesh?.exactVertices:target.kind==='edge'?mesh?.edges:target.kind==='face'?mesh?.faces:[])?.filter(e=>e.role===target.role)??[];
   if(hits.length!==1||['TransientDisplayOnly','AmbiguousReference','LostReference'].includes(hits[0].resolution)||target.role.startsWith('transient-'))fail('Choose a uniquely proven exact vertex, edge or planar face.');
-  item=hits[0];name=target.kind+' '+target.role;
+  item=hits[0];name=target.kind==='edge'?(item.curve?.type==='circle'?'Circle R'+Number(item.curve.radiusMm.toFixed(3)):'Edge'):target.kind==='vertex'?'Vertex ('+item.pointMm.map(n=>Number(n.toFixed(3))).join(', ')+')':'Planar face';
  }
  if(target.kind==='vertex'||item.datumType==='point')return {type:'point',point:project(item.pointMm??item.originMm),construction:true,name:'External '+name};
  if(target.kind==='edge')points=item.points;

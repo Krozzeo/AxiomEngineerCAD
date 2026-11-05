@@ -15,7 +15,7 @@ sourceSketch.dependsOn=sourceSketch.data.plane.kind==='face'?[sourceSketch.data.
 for(const p of referenceDocument.native.graph.parameters)if(p.targets)p.targets=p.targets.filter(t=>t.sketchId!==f.id);
 const proof=await buildProof(referenceDocument,{viewportOnly:true,rollbackAt:f.id}),frame=planeFrame(f,c.graph);
 for(const e of f.data.entities.filter(e=>e.external)){const expected=externalGeometry(proof.scene,e.external,frame);
-check(e.type===expected.type&&e.construction,'LostReference','External reference type changed.');
+check(e.type===expected.type&&(e.construction||e.converted),'LostReference','External reference type changed.');
 for(const key of ['point','a','b','center','radius'])if(expected[key]!==undefined){const a=Array.isArray(expected[key])?expected[key]:[expected[key]],b=Array.isArray(e[key])?e[key]:[e[key]];
 check(a.every((x,i)=>Math.abs(x-b[i])<1e-6),'LostReference','External geometry changed; remove and reselect its reference before rebuilding.');
 }const roles=e.type==='line'?['a','b']:e.type==='circle'?['center']:['point'];

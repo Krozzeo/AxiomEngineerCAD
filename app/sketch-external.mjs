@@ -6,11 +6,11 @@ const identity=target=>JSON.stringify(fields.map(k=>target[k]));
 export function sketchExternalReferences({getState,getScene,onCandidate}){
  let owner=null;const pending=new Map();
  function sync(){const state=getState();if(owner!==state?.id){pending.clear();owner=state?.id;}if(state)for(const [key,item]of pending)if(item.revision!==state.revision||state.items.some(e=>e.id===item.entity.id))pending.delete(key);return state;}
- function resolve(target){
+ function resolve(target,componentRole){
   const state=sync();if(!state)return null;
   const clean=Object.fromEntries(fields.map(k=>[k,target[k]])),key=identity(clean);
   const existing=state.items.find(e=>e.referenceOnly&&identity(e.external)===key);
-  if(existing)return {kind:'component',entityId:existing.id,role:existing.type==='point'?'point':'entity'};
+  if(existing)return {kind:'component',entityId:existing.id,role:componentRole??(existing.type==='point'?'point':'entity')};
   let item=pending.get(key);
   if(!item){
    const geometry=externalGeometry(getScene(),clean,state.frame);
@@ -18,10 +18,10 @@ export function sketchExternalReferences({getState,getScene,onCandidate}){
    // explicit projection tool, never inferred from selecting the whole plane.
    if(geometry.type==='point'&&(clean.kind==='face'||clean.kind==='datum'&&['xy','xz','yz'].includes(clean.role)))return null;
    const entity={id:'reference-'+crypto.randomUUID(),...geometry,external:clean,referenceOnly:true};
-   entity.name=geometry.name.replace(/^External /,clean.kind==='datum'?'':'Model ');
+   entity.name=geometry.name.replace(/^External /,clean.kind==='datum'?'':'Model ').replace(/ projection$/,'');
    item={entity,revision:state.revision};pending.set(key,item);onCandidate(entity);
   }
-  return {kind:'component',entityId:item.entity.id,role:item.entity.type==='point'?'point':'entity'};
+  return {kind:'component',entityId:item.entity.id,role:componentRole??(item.entity.type==='point'?'point':'entity')};
  }
  return {
   resolve,
