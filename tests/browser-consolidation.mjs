@@ -51,5 +51,18 @@ export async function verifyConsolidationProjectUI({context,host,evidence,observ
  await openParameters(p);const expr=p.locator('#parameter-table [data-row-id="'+driver.id+'"] [data-field=expression]');await expr.fill('11 mm');await sketchCommit(p,()=>expr.press('Enter'));const updated=await sketchDocument(p);assert.equal(updated.native.graph.features.find(f=>f.id===pad.id).data.depthMm,11);assert.equal(updated.native.graph.features.find(f=>f.id==='extrusion-plate').data.depthMm,10);
  stage('save and reopen the refined body and existing supports');
  const save=p.waitForResponse(r=>r.url().endsWith('/v1/save'));await p.locator('#save').click();const saved=await save;assert.equal(saved.status(),200,await saved.text());const source=await sketchDocument(p);p.on('dialog',d=>d.accept());await p.close();await host.manager.execute({operationId:crypto.randomUUID(),action:'close',sessionId:session.sessionId,expectedRevision:source.revision,decision:'discard'});session=await open();p=await context.newPage();observe(p);await p.goto(session.editorUrl);await p.locator('body[data-sketch-ready=true]').waitFor();await p.waitForFunction(id=>window.engineerViewport.proof?.scene?.occurrences[0]?.featureId===id,pad.id);assert.deepEqual(await sketchDocument(p),source);assert.equal(await p.evaluate(()=>window.engineerViewport.proof.exact.validity.solids),1);
+ stage('earlier operation edit rolls back later geometry with and without preview');
+ await p.locator('[data-source-id=extrusion-plate]').dblclick();
+ const rolledBack=preview=>p.waitForFunction(({padSketchId,preview})=>{
+  const proof=window.engineerViewport.proof;
+  return proof?.operationEditId==='extrusion-plate'&&proof.preview===preview&&
+   proof.scene.occurrences[0]?.featureId==='extrusion-plate'&&!proof.scene.sketches.some(s=>s.id===padSketchId);
+ },{padSketchId,preview});
+ await rolledBack(true);
+ await p.locator('#feature-operation-preview').uncheck();
+ await rolledBack(false);
+ await p.locator('#feature-operation-done').click();
+ await p.waitForFunction(id=>window.engineerViewport.proof?.scene.occurrences[0]?.featureId===id,pad.id);
+ assert.deepEqual(await sketchDocument(p),source);
  p.on('dialog',d=>d.accept());await p.close();await host.manager.execute({operationId:crypto.randomUUID(),action:'close',sessionId:session.sessionId,expectedRevision:source.revision,decision:'discard'});report.consolidation={passed:true,physicalExternalSnap:gpu,physicalExternalSelection:gpu,menuDismiss:true,radialDrag:true,sourceNavigation:true,depthDraftAndBinding:true,oneSolid:true,undoRedo:true,saveReopen:true};
 }

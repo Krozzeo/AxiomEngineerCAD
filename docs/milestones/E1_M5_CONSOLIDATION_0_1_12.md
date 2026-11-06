@@ -17,3 +17,9 @@ Owner-requested consolidation before E2. Only **E1.M5 Extrusion & Sketch Workben
 Verify a flush-sided pad, a cylindrical hole, both external Snap clicks and Ctrl bypass, an inherited sketch support, a fixed-center circle, both Value source destinations, numeric/parameter Depth preview, Apply, Undo/Redo, parameter regeneration and Save/Close/Reopen. Use the current demo or a test copy; do not overwrite earlier user projects.
 
 Focused domain and human UI checks precede exact-head Windows/Linux browser/domain/PDF acceptance, immutable ZIP/manifest publication and actual public Platform discovery, install, activate, launch, GPU and independent PDF verification. Final evidence is recorded on PR18 and in delivery artifacts. Owner acceptance and E2 progression are separate.
+
+## 0.1.13 follow-up
+
+- Extrude an overlapping profile into the plate. The concave intersection edge and its real endpoints are visible and pickable on the resulting solid.
+- Preselect and select the cylindrical hole wall. Its analytic seam and artificial endpoint stay out of the viewport highlights and pick list.
+- Edit an earlier extrusion with preview enabled and disabled. Later features and sketches are absent during the edit and return when it ends. Cancel preserves the original operation.

@@ -11,9 +11,9 @@ async function extrusion(document,operation){
  const result=await regenerateExtrusions(document,{featureId:operation.inputs.featureId,includeToolMesh:true});
  return [{id:operation.inputs.featureId,kind:'addition',mesh:result.toolMesh,position:[0,0,0],quaternion:[0,0,0,1]}];
 }
-export async function buildOperationPreview({document,sourceDocument,previewOperation}){
+export async function buildOperationPreview({document,sourceDocument,previewOperation,rollbackAt=null}){
  const produce=producers.get(previewOperation.name);
  check(produce,'UnsupportedCapability','This operation has no exact preview producer.');
- const candidate=await buildProof(document,{viewportOnly:true}),base=await buildProof(sourceDocument,{viewportOnly:true});
+ const candidate=await buildProof(document,{viewportOnly:true,rollbackAt}),base=await buildProof(sourceDocument,{viewportOnly:true,rollbackAt});
  return {...candidate,scene:{...base.scene,previewLayers:await produce(document,previewOperation)}};
 }

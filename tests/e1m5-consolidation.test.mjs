@@ -8,6 +8,7 @@ import {solveParametric} from '../src/sketch/solver.mjs';
 import {externalGeometry} from '../src/sketch/external-geometry.mjs';
 import {planeFrame} from '../src/sketch/profile.mjs';
 import {buildProof} from '../src/proof/kernel.mjs';
+import {buildOperationPreview} from '../src/proof/operation-preview.mjs';
 
 const apply=(doc,name,input)=>command(doc,'cad.'+name+'.v1',input);
 const makeSketch=(doc,id,plane={kind:'datum',role:'xy'})=>apply(doc,'sketch.create',{sketchId:id,definitionId:'definition-main',name:id,profile:'E1.M5-sketch/1',plane});
@@ -50,4 +51,35 @@ test('dragging a fixed-center circle changes only free radius',async()=>{
  const c={id:'circle',type:'circle',center:[3,4],radius:2,construction:false},center={id:'center',type:'fixed',refs:[{entityId:c.id,role:'center'}],driving:true,value:[3,4]},radius={id:'r',type:'radius',refs:[{entityId:c.id,role:'entity'}],driving:true,value:2},data={profile:'E1.M5-sketch/1',entities:[c],constraints:[center]},drag={ref:{entityId:c.id,role:'circumference'},target:[3,11]};
  const resized=await solveParametric(data,{drag});assert.equal(resized.valid,true);assert.deepEqual(resized.entities[0].center,c.center);close(resized.entities[0].radius,7);
  const locked=await solveParametric({...data,constraints:[center,radius]},{drag});assert.equal(locked.valid,true);close(locked.entities[0].radius,2);
+});
+
+test('an overlapping extrusion retains the intersection edge and its generated vertices',async()=>{
+ const source=makeSketch(await extrusionDemo(),'pad-sketch');
+ const sketch=apply(source,'sketch.entity.add',{sketchId:'pad-sketch',entity:{id:'overlapping-outline',type:'rectangle',a:[30,5],b:[46,14],construction:false},unit:'mm'});
+ const result=await buildProof(apply(sketch,'extrusion.create',{...padInput,depthMm:17}),{viewportOnly:true});
+ const mesh=result.scene.models[0].mesh;
+ const at=(p,q)=>Math.hypot(...p.map((n,i)=>n-q[i]))<1e-6;
+ const start=[30,5,10],end=[40,5,10];
+ const edge=mesh.edges.find(e=>e.points.some(p=>at(p,start))&&e.points.some(p=>at(p,end)));
+ assert.ok(edge&&!edge.displayHidden,'The concave intersection must remain a visible exact edge');
+ for(const target of [start,end])assert.ok(mesh.exactVertices.some(v=>at(v.pointMm,target)&&!v.displayHidden));
+});
+
+test('updating an earlier extrusion previews only history through that operation',async()=>{
+ const source=await padSketch(),pad=apply(source,'extrusion.create',padInput);
+ const downstream=makeSketch(pad,'later-sketch',{kind:'face',producerId:'pad',role:'top'});
+ const edited=apply(downstream,'extrusion.update',{featureId:'pad',name:'Pad',depthMm:8,reverse:false});
+ const preview=await buildOperationPreview({document:edited,sourceDocument:downstream,rollbackAt:'pad',previewOperation:{name:'cad.extrusion.update.v1',inputs:{featureId:'pad'}}});
+ assert.ok(!preview.scene.sketches.some(s=>s.id==='later-sketch'));
+ assert.ok((await buildProof(edited,{viewportOnly:true})).scene.sketches.some(s=>s.id==='later-sketch'));
+});
+
+test('cylinder seam endpoints retain witnesses but are hidden as vertices',async()=>{
+ const result=await buildProof(await extrusionDemo(),{viewportOnly:true});
+ const mesh=result.scene.models[0].mesh;
+ assert.ok(mesh.exactVertices.some(v=>v.displayHidden));
+ assert.ok(mesh.exactVertices.some(v=>!v.displayHidden));
+ for(const seam of mesh.edges.filter(e=>e.displayHidden))for(const endpoint of seam.points){
+  assert.ok(mesh.exactVertices.some(v=>v.displayHidden&&Math.hypot(...v.pointMm.map((n,i)=>n-endpoint[i]))<1e-6));
+ }
 });
