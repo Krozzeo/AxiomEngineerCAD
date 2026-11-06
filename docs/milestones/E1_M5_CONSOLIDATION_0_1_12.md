@@ -18,7 +18,7 @@ Verify a flush-sided pad, a cylindrical hole, both external Snap clicks and Ctrl
 
 Focused domain and human UI checks precede exact-head Windows/Linux browser/domain/PDF acceptance, immutable ZIP/manifest publication and actual public Platform discovery, install, activate, launch, GPU and independent PDF verification. Final evidence is recorded on PR18 and in delivery artifacts. Owner acceptance and E2 progression are separate.
 
-## 0.1.13 follow-up
+## 0.1.14 follow-up
 
 - Extrude an overlapping profile into the plate. The concave intersection edge and its real endpoints are visible and pickable on the resulting solid.
 - Preselect and select the cylindrical hole wall. Its analytic seam and artificial endpoint stay out of the viewport highlights and pick list.

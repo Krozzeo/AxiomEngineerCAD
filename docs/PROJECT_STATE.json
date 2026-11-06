@@ -8,7 +8,7 @@
   },
   "milestone": {
     "current": "E1.M5",
-    "status": "0.1.13 intersection and extrusion edit candidate; owner review remains separate",
+    "status": "0.1.14 intersection and extrusion edit candidate; owner review remains separate",
     "ownerAcceptance": "pending",
     "next": "Owner-selected CAD change; do not infer E2 approval from delivery."
   },
@@ -37,7 +37,7 @@
     "deliveryGate": "docs/MILESTONE_DELIVERY.md"
   },
   "candidate": {
-    "version": "0.1.13",
+    "version": "0.1.14",
     "branch": "engineer/sketch-navigation-0.1.9",
     "status": "Exact-head and installed acceptance pending"
   },

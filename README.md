@@ -2,7 +2,7 @@
 
 Local-first, browser-operated parametric mechanical CAD and engineering-documentation product in the Axiom family, designed from the outset for both human users and AI agents.
 
-> **Current candidate: 0.1.13 / E1.M5 extrusion and viewport corrections.** See [scope and owner test flow](docs/milestones/E1_M5_CONSOLIDATION_0_1_12.md). Full exact-head acceptance, immutable publication and actual Platform installation remain delivery gates; owner acceptance is separate.
+> **Current candidate: 0.1.14 / E1.M5 extrusion and viewport corrections.** See [scope and owner test flow](docs/milestones/E1_M5_CONSOLIDATION_0_1_12.md). Full exact-head acceptance, immutable publication and actual Platform installation remain delivery gates; owner acceptance is separate.
 
 Start development with `npm run context` and [the compact context](docs/PROJECT_CONTEXT.md). The [workflow](docs/DEVELOPMENT_WORKFLOW.md) selects focused checks during implementation, then complete exact-head acceptance and real installation proof for delivery.
 

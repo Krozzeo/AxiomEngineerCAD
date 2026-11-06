@@ -68,9 +68,18 @@ function schedulePreview(){
   previewRequestsInFlight.run(()=>{
    const task=previewChain.then(async()=>{
     if(!active())return;
-    await retirePreview();if(!active())return;
-    if(!$('feature-operation-preview').checked){await v.build({operationEditId:owner.item?.id});return;}
-    await v.build({previewOperation:{name:owner.create?'cad.extrusion.create.v1':'cad.extrusion.update.v1',inputs:operationInput()}});
+    const options=$('feature-operation-preview').checked
+      ?{previewOperation:{name:owner.create?'cad.extrusion.create.v1':'cad.extrusion.update.v1',inputs:operationInput()}}
+      :{operationEditId:owner.item?.id};
+    for(let attempt=0;active();attempt++){
+     await retirePreview();if(!active())return;
+     try{await v.build(options);return;}
+     catch(error){
+      if(!error.message.startsWith('projectBusy:')||attempt===9)throw error;
+      // A competing model build can start after the status read.
+      await new Promise(resolve=>setTimeout(resolve,100));
+     }
+    }
    });
    previewChain=task.catch(error=>{if(active())notify('Preview: '+error.message);});return previewChain;
   });
