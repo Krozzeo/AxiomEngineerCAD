@@ -6,7 +6,7 @@ import {createSketchFromSupport,selectSketchComponent,sketchCommit,sketchDocumen
 import {openParameters,addInlineParameter} from './browser-parameters.mjs';
 
 export async function verifyConsolidationProjectUI({context,host,evidence,observe,report}){
- const demo=host.manager.catalog().recents.find(p=>p.name==='E1.M5 Extrusion & Sketch Workbench'),fixture=JSON.parse(await readFile(demo.path,'utf8'));
+ const demo=host.manager.catalog().recents.find(p=>p.name==='E2.M1 Semantic Geometry & Evidence'),fixture=JSON.parse(await readFile(demo.path,'utf8'));
  fixture.documentId='engineer-document://'+crypto.randomUUID();fixture.native.versions=[];fixture.native.publications=[];fixture.metadata.name='E1.M5 Consolidation Acceptance';
  const folder=await mkdtemp(join(host.manager.root,'consolidation-')),path=join(folder,'project.engineer-provisional.json');await writeFile(path,JSON.stringify(fixture));
  const open=()=>host.manager.execute({operationId:crypto.randomUUID(),action:'open',productId:demo.productId,path});
@@ -51,6 +51,30 @@ export async function verifyConsolidationProjectUI({context,host,evidence,observ
  await openParameters(p);const expr=p.locator('#parameter-table [data-row-id="'+driver.id+'"] [data-field=expression]');await expr.fill('11 mm');await sketchCommit(p,()=>expr.press('Enter'));const updated=await sketchDocument(p);assert.equal(updated.native.graph.features.find(f=>f.id===pad.id).data.depthMm,11);assert.equal(updated.native.graph.features.find(f=>f.id==='extrusion-plate').data.depthMm,10);
  stage('save and reopen the refined body and existing supports');
  const save=p.waitForResponse(r=>r.url().endsWith('/v1/save'));await p.locator('#save').click();const saved=await save;assert.equal(saved.status(),200,await saved.text());const source=await sketchDocument(p);p.on('dialog',d=>d.accept());await p.close();await host.manager.execute({operationId:crypto.randomUUID(),action:'close',sessionId:session.sessionId,expectedRevision:source.revision,decision:'discard'});session=await open();p=await context.newPage();observe(p);await p.goto(session.editorUrl);await p.locator('body[data-sketch-ready=true]').waitFor();await p.waitForFunction(id=>window.engineerViewport.proof?.scene?.occurrences[0]?.featureId===id,pad.id);assert.deepEqual(await sketchDocument(p),source);assert.equal(await p.evaluate(()=>window.engineerViewport.proof.exact.validity.solids),1);
+ stage('download semantic evidence and hide a reference from Model');
+ await p.evaluate(async()=>{
+  const viewport=window.engineerViewport,face=viewport.entities().find(e=>e.kind==='face'&&e.role==='top');
+  await viewport.selectId(face.id,face.kind);
+ });
+ const download=p.waitForEvent('download');await p.locator('#wb-capture').click();
+ const image=await download;assert.match(image.suggestedFilename(),/^cad-face-revision-\d+\.svg$/);
+ await image.saveAs(join(evidence,'e2-m1-face.svg'));
+ if(gpu){
+  await tab('View');await p.locator('#wb-datums').check();
+  const point=await p.evaluate(()=>{
+   const r=window.engineerViewport.renderer,{matrix}=r.presentedFrame,rect=r.canvas.getBoundingClientRect();
+   return {x:rect.left+(matrix[12]/matrix[15]+1)*rect.width/2,y:rect.top+(1-matrix[13]/matrix[15])*rect.height/2};
+  });
+  await p.mouse.click(point.x,point.y,{button:'right'});
+  await p.locator('#model-context-menu').getByRole('menuitem',{name:'Hide',exact:true}).click();
+  await p.waitForFunction(()=>window.engineerVisibility('datum-origin')==='hide');
+ }
+ const downstream=p.locator('[data-source-id="'+pad.id+'"]'),downstreamSketch=p.locator('[data-source-id="'+padSketchId+'"]');
+ stage('sketch edit disables downstream rows in the feature tree');
+ await p.locator('[data-source-id=sketch-profile]').dblclick();
+ await p.waitForFunction(ids=>ids.every(id=>document.querySelector('[data-source-id="'+id+'"]')?.getAttribute('aria-disabled')==='true'),[pad.id,padSketchId]);
+ await exit();
+ await p.waitForFunction(id=>document.querySelector('[data-source-id="'+id+'"]')?.getAttribute('aria-disabled')===null,pad.id);
  stage('earlier operation edit rolls back later geometry with and without preview');
  let rejectedPreview=false;
  const busyOnFirstEdit=async route=>{
@@ -69,6 +93,10 @@ export async function verifyConsolidationProjectUI({context,host,evidence,observ
    proof.scene.occurrences[0]?.featureId==='extrusion-plate'&&!proof.scene.sketches.some(s=>s.id===padSketchId);
  },{padSketchId,preview});
  await rolledBack(true);
+ assert.equal(await downstream.getAttribute('aria-disabled'),'true');
+ assert.equal(await downstreamSketch.getAttribute('aria-disabled'),'true');
+ await downstream.click({button:'right',force:true});
+ assert.equal(await p.getByRole('menuitem',{name:/^(Enable|Disable)$/}).count(),0);
  assert.equal(rejectedPreview,true);
  await p.unroute('**/v1/proof/build',busyOnFirstEdit);
  await p.locator('#feature-operation-preview').uncheck();
@@ -76,5 +104,6 @@ export async function verifyConsolidationProjectUI({context,host,evidence,observ
  await p.locator('#feature-operation-done').click();
  await p.waitForFunction(id=>window.engineerViewport.proof?.scene.occurrences[0]?.featureId===id,pad.id);
  assert.deepEqual(await sketchDocument(p),source);
+ assert.equal(await downstream.getAttribute('aria-disabled'),null);
  p.on('dialog',d=>d.accept());await p.close();await host.manager.execute({operationId:crypto.randomUUID(),action:'close',sessionId:session.sessionId,expectedRevision:source.revision,decision:'discard'});report.consolidation={passed:true,physicalExternalSnap:gpu,physicalExternalSelection:gpu,menuDismiss:true,radialDrag:true,sourceNavigation:true,depthDraftAndBinding:true,oneSolid:true,undoRedo:true,saveReopen:true};
 }

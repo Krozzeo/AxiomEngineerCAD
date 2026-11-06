@@ -243,6 +243,13 @@ createSelectionMenu({canvas,menu:modelMenu,status,enabled:()=>!busy&&!dimensionU
  const ref=source?externalRefs.resolve(source.target,item.pick.componentRole):null;
  if(ref){choose(ref);return;}
  choose(null,{clearModel:false});await v.selectId(item.pick.selectionId,item.pick.kind,item.pick);inspector.hidden=true;document.querySelector('.proof-inspector').hidden=false;
+},hideSource:event=>{
+ const [x,y]=pointerPosition(event);
+ const hit=r.referenceCandidates?.(x,y,{all:true})?.[0];
+ const scene=r.scene;
+ const source=scene?.datums.find(item=>item.selectionId===hit?.selectionId)
+   ??scene?.sketches.find(item=>item.selectionId===hit?.selectionId);
+ if(source&&window.engineerVisibility?.(source.id)!=='hide')return ()=>window.engineerHideModelSource(source.id);
 },newSketch:async event=>{lastContextPosition=[event.clientX,event.clientY];if(current)return null;const pick=await r.pick(...pointerPosition(event)),kind=r.kind(pick.selectionId);if(!['face','datum'].includes(kind))return null;const target=await api('proof/pick',{operationId:crypto.randomUUID(),manifestId:v.proof.manifestId,expectedRevision:v.proof.revision,selectionId:pick.selectionId,kind});return supportOf(target)?()=>requestNewSketch(target):null;}});
 let lastContextPosition=[0,0];
 

@@ -1,6 +1,6 @@
-# Engineer handoff - E1.M5 extrusion and viewport corrections / 0.1.14 candidate
+# Engineer handoff - E2.M1 semantic geometry and visual evidence / 0.2.0 candidate
 
-Start with `npm run context`, AGENTS.md and `docs/PROJECT_CONTEXT.md`. Reuse the reviewed Master baseline per AGENTS1. `docs/PROJECT_STATE.json` records the verified 0.1.11 installation and current candidate. Read [docs/milestones/E1_M5_CONSOLIDATION_0_1_12.md](docs/milestones/E1_M5_CONSOLIDATION_0_1_12.md) and [ADR027](docs/architecture/ADR-027-EXTRUSION-REFINEMENT-AND-SKETCH-REFERENCES.md). Preserve previous builds and user projects; delivery does not approve E2, main merge or stable publication.
+Start with `npm run context`, AGENTS.md, [compact context](docs/PROJECT_CONTEXT.md) and the [E2.M1 report](docs/milestones/E2_M1_SEMANTIC_EVIDENCE.md). Owner authorized E2.M1. See PROJECT_STATE for prior delivery and retain prior source/version semantics.
 
 ## Source and authority
 
