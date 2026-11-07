@@ -1,3 +1,4 @@
+import {waitEditorIdle} from './browser-support.mjs';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {join} from 'node:path';
@@ -9,6 +10,7 @@ export async function verifyReconstructionUI({context,host,evidence,observe,repo
  const open=()=>host.manager.execute({operationId:crypto.randomUUID(),action:'open',productId:demo.productId,path:demo.path});
  let session=await open(),page=await context.newPage();observe(page);await page.goto(session.editorUrl);
  await page.locator('body[data-sketch-ready=true]').waitFor();
+ await waitEditorIdle(page);
  const source=await readFile(demo.path);
  await page.locator('.wb-menubar').getByText('Tools',{exact:true}).click();
  await page.locator('[data-wb-action=review]').click();
@@ -20,7 +22,7 @@ export async function verifyReconstructionUI({context,host,evidence,observe,repo
  assert.deepEqual(await readFile(demo.path),source);
  await input.setInputFiles({name:'plate.svg',mimeType:'image/svg+xml',buffer:Buffer.from(sample)});
  await page.locator('#review-reconstruct').click();
- await status.filter({hasText:'Isolated proposal prepared'}).waitFor();
+ await status.filter({hasText:'Isolated proposal prepared'}).waitFor().catch(async error=>{console.error('Reconstruction status:',await status.textContent());throw error;});
  assert.equal((await sketchDocument(page)).native.graph.features.length,0);
  await page.locator('#review-validate').click();
  await status.filter({hasText:'Proposal validated'}).waitFor();

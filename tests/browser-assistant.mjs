@@ -1,3 +1,4 @@
+import {waitEditorIdle} from './browser-support.mjs';
 import assert from 'node:assert/strict';
 import {mkdtemp,readFile,writeFile} from 'node:fs/promises';
 import {join} from 'node:path';
@@ -22,12 +23,14 @@ export async function verifyAssistantUI({context,host,observe}){
   const folder=await mkdtemp(join(host.manager.root,'assistant-demo-')),path=join(folder,'project.engineer-provisional.json');
   const sampleProject=JSON.parse(await readFile(entry.path,'utf8'));
   sampleProject.documentId='engineer-document://'+crypto.randomUUID();
+  sampleProject.metadata.name='Assistant browser acceptance fixture';
   await writeFile(path,JSON.stringify(sampleProject));
   const session=await host.manager.execute({operationId:crypto.randomUUID(),action:'open',productId:entry.productId,path});
   const page=await context.newPage();observe(page);
   try{
     await page.goto(session.editorUrl);
     await page.locator('body[data-dock-ready=true]').waitFor();
+    await waitEditorIdle(page);
     await page.locator('#panels-menu summary').click();
     await page.locator('[data-open-panel=api]').click();
     await page.getByRole('searchbox',{name:'Search API'}).fill('drawing.reconstruct');
