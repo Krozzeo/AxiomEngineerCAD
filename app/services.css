@@ -1,30 +1,146 @@
-.cad-api,.cad-assistant{height:100%;min-height:0;display:flex;flex-direction:column}
+/* Game Engine editor styles ported from fc26132 (MIT).
+   Keep selectors scoped where the CAD workbench uses different base styles. */
+.ai-indicator{display:inline-flex;align-items:center;gap:5px;color:#64b5ff;background:transparent;border:0;padding:3px 4px;white-space:nowrap;font-size:12px;}
+.ai-indicator img{width:20px;height:20px;}
+.ai-indicator.disconnected{color:#8191a4;}
+#ai-config-dialog{background:#101c2d;color:#dce7f7;border:1px solid #425c77;border-radius:7px;width:min(620px,calc(100vw - 36px));max-width:none;max-height:calc(100dvh - 40px);padding:0;box-sizing:border-box;overflow:auto;}
+#ai-config-dialog::backdrop{background:rgb(0 0 0 / .5);}
+#ai-config-dialog h2{font-size:16px;margin:0;}
+.ai-config-body{padding:16px 18px;}
+.ai-config-body textarea{display:block;width:100%;box-sizing:border-box;background:#091320;color:#dce7f7;border:1px solid #314660;padding:8px;}
+#ai-config-form{display:flex;flex-direction:column;gap:8px;}
+#ai-config-form > p{max-width:none;}
+#ai-config-form .actions > button{width:auto;border:1px solid #38516b;background:#1b2b3e;padding:6px 9px;border-radius:4px;}
+.ai-model-picker{display:flex;gap:6px;min-width:0;}
+.ai-model-picker select{width:240px;max-width:100%;}
+.ai-model-picker button{flex:none;}
+.ai-limit-grid{display:grid;grid-template-columns:1fr;gap:7px;}
+.ai-limit-row{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.ai-limit-value{display:flex;align-items:center;gap:12px;}
+#ai-config-form .ai-limit-value input[type=checkbox]{min-width:0;width:16px;}
+.ai-chat{height:100%;display:flex;flex-direction:column;padding:12px;gap:9px;box-sizing:border-box;}
+.ai-chat-notice{flex:1;margin:0;color:#91a6bb;font-size:12px;}
+.ai-message{margin:8px 0;padding:10px 12px;border:1px solid #304354;border-radius:6px;}
+.ai-message.user{background:#172a40;}
+.ai-message.assistant{background:#101d2c;}
+.ai-message p{white-space:pre-wrap;overflow-wrap:anywhere;margin:6px 0 0;}
+#ai-chat-form{display:flex;flex-direction:column;gap:5px;}
+#ai-chat-input{width:100%;box-sizing:border-box;background:#091320;color:#dce7f7;border:1px solid #314660;border-radius:4px;padding:8px;font-family:inherit;}
+#ai-chat-input{line-height:20px;resize:none;min-height:38px;max-height:218px;overflow-y:hidden;}
+#ai-chat-form .actions{align-items:center;flex-wrap:wrap;}
+#ai-chat-form .actions{margin-left:0;margin-right:0;}
+#ai-chat-error{margin:0;color:#ffac9e;}
+.ai-chat-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;position:relative;}
+.ai-task-details{flex:none;overflow:visible;max-height:none;font-size:12px;color:#a8bdd0;}
+.ai-task-details summary{cursor:pointer;white-space:nowrap;}
+.ai-task-details>summary{border:1px solid #4a7194;border-radius:4px;background:#1d3550;color:#d1e9ff;padding:5px 9px;font-weight:600;}
+.ai-task-popover{position:absolute;right:0;top:100%;z-index:15;width:min(450px,100%);max-height:min(350px,50vh);overflow:auto;background:#17263a;border:1px solid #425c77;border-radius:5px;padding:12px;box-sizing:border-box;box-shadow:0 8px 20px #0008;}
+.ai-typing{display:flex;gap:5px;padding:14px 10px;}
+.ai-typing span{width:6px;height:6px;border-radius:50%;background:#9ecaff;animation:ai-dot 1.2s infinite;}
+.ai-typing span:nth-child(2){animation-delay:.2s;}
+.ai-typing span:nth-child(3){animation-delay:.4s;}
+.ai-token-meter{flex:none;position:relative;width:105px;height:22px;background:#0b1727;border:1px solid #416286;border-radius:4px;overflow:hidden;align-self:center;}
+.ai-token-meter>span{position:absolute;inset:0 auto 0 0;background:#2279d2;}
+.ai-token-meter>strong{position:relative;display:block;text-align:center;line-height:22px;color:#e7f2ff;font-size:12px;}
+.chat-attachments{display:flex;gap:6px;flex-wrap:wrap;font-size:12px}
+.chat-attachments>span{display:inline-flex;align-items:center;background:#172a40;border:1px solid #314660;border-radius:4px;padding:2px 5px}
+.chat-attachments img{width:14px;height:14px}
+.chat-markdown{overflow-wrap:anywhere;white-space:normal}
+.chat-markdown li{margin:3px 0}
+.chat-markdown pre{white-space:pre;overflow:auto;background:#091320;border:1px solid #314660;padding:10px;border-radius:4px}
+.chat-markdown code{font-family:monospace;color:#b9dcff}
+.chat-markdown :not(pre)>code{background:#091320;padding:1px 4px;border-radius:3px}
+.chat-markdown blockquote{white-space:pre-wrap;margin:6px 0}
+.chat-markdown blockquote{border-left:3px solid #527ea8;padding-left:10px;color:#a8bdd0}
+.chat-markdown a{color:#81bfff}
+.chat-markdown hr{border:0;border-top:1px solid #314660}
+.github-indicator{position:relative;display:inline-flex;align-items:center;gap:4px;padding:5px 8px}
+.github-indicator img{width:20px;height:20px;}
+.github-indicator.disconnected{filter:grayscale(1);opacity:.55}
+.github-indicator.disconnected::after{content:'';position:absolute;left:4px;right:4px;top:50%;height:2px;background:#aab5c7;transform:rotate(-45deg)}
+.topbar #github-pending{width:7px;height:7px;border-radius:50%;background:#ed7070;}
+#github-pending[data-state=linked]{background:#63cf91;}
+.github-dialog{width:min(740px,90vw);max-width:none;max-height:88vh;overflow:auto;background:#171f2c;color:#dce4ef;border:1px solid #526177;border-radius:8px;padding:20px}
+.github-dialog::backdrop{background:#060a12aa}
+.github-dialog>.actions{position:sticky;top:-20px;background:#171f2c;z-index:1;padding:8px 0}
+.github-dialog section{border-top:1px solid #39475b;padding:10px 0}
+.github-dialog label{display:block;margin:9px 0}
+.github-dialog h2{flex:1}
+.github-dialog [hidden]{display:none!important;}
+.github-dialog .gh-heading h2{font-size:22px;letter-spacing:.035em;}
+.github-dialog .icon-button img{width:18px;height:18px;}
+.github-dialog fieldset{border:0;padding:0;margin:0;min-width:0;}
+.github-dialog .gh-mode{display:flex;gap:8px;}
+.gh-mode button{flex:1;}
+.gh-mode [aria-pressed=true]{background:#214e70;border-color:#71bfff;}
+.github-dialog .gh-heading{align-items:center;}
+.gh-repository-row{display:flex;align-items:center;gap:8px;}
+.gh-repository-row select{flex:1;min-width:0;}
+@keyframes ai-dot{0%,80%,100%{opacity:.3;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+@media(prefers-reduced-motion:reduce){.ai-typing span{animation:none}}
+.cad-api,.cad-assistant{height:100%;min-height:0;display:flex;flex-direction:column;overflow:hidden}
 .cad-api-toolbar{display:flex;align-items:center;gap:.75rem;padding:.55rem;border-bottom:1px solid #30435c}
 .cad-api-toolbar input{flex:1;min-width:0}
-.cad-api-layout{display:grid;grid-template-columns:minmax(110px,28%) 1fr;min-height:0;flex:1}
-.cad-api-layout nav,.cad-api-layout article{overflow:auto;padding:.65rem;min-width:0}
-.cad-api-layout nav{display:block;border-right:1px solid #30435c}
-.cad-api-layout nav button{display:block;width:100%;text-align:left;overflow-wrap:anywhere}
-.cad-api-layout nav .selected{background:#214267;border-color:#6cacf1}
+.cad-api-layout{display:grid;grid-template-columns:minmax(110px,28%) minmax(0,1fr);grid-template-rows:minmax(0,1fr);min-height:0;flex:1}
+.cad-api-index,.cad-api-layout article{overflow:auto;padding:.65rem;min-width:0;min-height:0}
+.cad-api-index{background:#141d2a;border-right:1px solid #30435c}
+.cad-api-index button{display:block;width:100%;text-align:left;overflow-wrap:anywhere}
+.cad-api-index .selected{background:#214267;border-color:#6cacf1}
 .cad-api-layout pre{white-space:pre-wrap;overflow-wrap:anywhere}
-.cad-service-dialog{width:min(620px,94vw);max-height:88vh;overflow:auto;color:#dce8f6;background:#142232;border:1px solid #476482}
-.cad-service-dialog header,.cad-service-actions{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
-.cad-service-dialog header h2{flex:1}
-.cad-service-dialog fieldset{display:grid;gap:.45rem;margin:.6rem 0;border-color:#30435c}
-.cad-service-dialog label{display:flex;align-items:center;justify-content:space-between;gap:.75rem}
-.cad-service-dialog input:not([type=checkbox]),.cad-service-dialog textarea,.cad-service-dialog select{min-width:12rem}
-.cad-service-indicator{position:relative;color:#96a9bc}
-.cad-service-indicator img{width:18px;height:18px}
-.cad-service-indicator[data-connection=disconnected]{opacity:.62}
-.cad-service-indicator[data-connection=linked]{color:#65d29b}
-.cad-service-indicator[data-connection=unlinked]{color:#f6bf67}
-.cad-service-indicator[data-connection=linked]::after,.cad-service-indicator[data-connection=unlinked]::after{content:"";position:absolute;right:2px;bottom:2px;width:6px;height:6px;border-radius:50%;background:currentColor}
-.cad-assistant-log{flex:1;overflow:auto;min-height:3rem;padding:.5rem}
-.cad-assistant-log p{white-space:pre-wrap;overflow-wrap:anywhere}
-.cad-assistant-log p[data-role=user]{color:#acd5ff}
-.cad-assistant form{display:grid;gap:.4rem;padding:.5rem;border-top:1px solid #30435c}
-.cad-assistant textarea{width:100%;resize:vertical}
-.cad-assistant input[type=file]{width:100%}
-.cad-assistant-status{margin:.35rem;overflow-wrap:anywhere}
-.cad-branch-toolbar{display:flex;align-items:center;gap:.2rem}
+#ai-config-dialog,.github-dialog,.cad-assistant{font:14px/1.4 system-ui,sans-serif}
+#ai-config-dialog button,.github-dialog button,.cad-assistant button,.topbar .github-indicator{
+  color:inherit;background:#1b2738;border:1px solid #30435c;border-radius:5px;padding:5px 9px
+}
+#ai-config-dialog button:hover,.github-dialog button:hover,.cad-assistant button:hover,.topbar .github-indicator:hover{background:#273951}
+#ai-config-dialog button:disabled,.github-dialog button:disabled,.cad-assistant button:disabled{opacity:.45;cursor:default}
+#ai-config-dialog :is(input,select),.github-dialog :is(input,select){
+  min-width:0;background:#09101a;color:#dce7f7;border:1px solid #30435c;border-radius:4px;padding:6px
+}
+#ai-config-dialog a,.github-dialog a{color:#a3a3ff;text-decoration:underline;cursor:pointer}
+#ai-config-dialog .service-heading{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid #314660}
+.service-heading h2{padding:0;color:#9fb3ce;letter-spacing:.08em;text-transform:uppercase}
+.github-dialog .service-heading h2{margin:12px 0;padding:0 0 0 20px}
+#ai-config-dialog .icon-button,.github-dialog .icon-button,.cad-assistant .icon-button{display:inline-grid;place-items:center;padding:4px;flex:none}
+#ai-config-dialog .icon-button img,.github-dialog .icon-button img,.cad-assistant .icon-button img{width:18px;height:18px}
+#ai-config-dialog label,.cad-assistant label{margin:0;font-size:inherit}
+#ai-config-form .ai-config-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ai-config-row>[name=reasoning]{width:84%}
+.ai-limit-value input[type=number]{width:7ch}
+.ai-limit-value input[name*=Tokens]{width:11ch}
+#ai-config-dialog input[type=checkbox],.github-dialog input[type=checkbox],.cad-assistant input[type=checkbox]{width:auto;margin:0;accent-color:#9ecaff}
+.round-check{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+#ai-config-form .round-check input[type=checkbox]{appearance:none;width:16px;height:16px;padding:0;border-radius:50%;border-color:#8197af}
+#ai-config-form .round-check input[type=checkbox]:checked{background:#72b3e8;box-shadow:inset 0 0 0 2px #112033}
+#ai-config-form .ai-token-meter{margin:12px 0;width:100%}
+#ai-config-dialog :is([data-status],[data-usage]),.github-dialog [data-error]{overflow-wrap:anywhere}
+#ai-config-dialog .actions,.github-dialog .actions,.cad-assistant .actions{display:flex;gap:5px;align-items:center}
+#ai-config-dialog .actions,.cad-assistant .actions{flex-wrap:wrap}
+.github-dialog [data-error]{color:#ffabab}
+.github-dialog [data-error]:empty,.github-dialog [data-preview-summary]:empty,#ai-chat-error:empty,.chat-attachments:empty{display:none}
+.github-dialog input:not([type=checkbox]),.github-dialog select{display:block;width:100%}
+.github-dialog label:has(input[type=checkbox]){display:flex;align-items:center;gap:8px}
+.github-dialog .gh-mode [aria-pressed=true]{background:#214e70;border-color:#71bfff}
+.topbar .github-indicator{height:28px;padding:3px 6px}
+.topbar .ai-indicator{font:12px system-ui,sans-serif}
+.cad-assistant .ai-chat{min-height:0}
+.ai-chat-messages{flex:1;min-height:0;overflow:auto}
+.cad-assistant .ai-chat-header{flex-wrap:wrap}
+.cad-assistant .ai-chat-notice{min-width:9rem}
+.cad-assistant .ai-chat-header .ai-task-details{margin-left:auto}
+.cad-assistant [data-plan][hidden],.cad-assistant [data-branch][hidden]{display:none}
+#ai-chat-input{font-size:13px}
+#ai-chat-form{max-width:none}
+#ai-config-dialog button,.github-dialog button,.cad-assistant form button{margin:0}
+.ai-message>strong,.ai-token-meter>strong{letter-spacing:0;font-size:inherit}
+.ai-token-meter>strong{font-size:12px}
+.chat-markdown p,.chat-markdown blockquote{white-space:pre-wrap;margin:6px 0}
+.chat-markdown ul,.chat-markdown ol{padding-left:24px;margin:8px 0}
+#ai-chat-form .ai-confirm{display:inline-flex;align-items:center;gap:5px;font-size:12px;white-space:nowrap;margin-left:auto}
+.chat-attachments>span{gap:4px;overflow-wrap:anywhere}
+.chat-attachments button{font-size:11px;padding:2px 4px}
+.chat-markdown h1,.chat-markdown h2,.chat-markdown h3,.chat-markdown h4,.chat-markdown h5,.chat-markdown h6{margin:12px 0 6px;padding:0;font-size:1.08em}
+.cad-branch-toolbar{display:flex;align-items:center;gap:5px}
 body[data-ai-preview=true] .command-ribbon,body[data-ai-preview=true] #history-content,body[data-ai-preview=true] #parameters-content,body[data-ai-preview=true] #properties-content,body[data-ai-preview=true] #workbench-labs{opacity:.6}
+@media(max-width:650px){.ai-model-picker select{width:180px}.ai-config-row>[name=reasoning]{width:65%}}
+
+.ai-model-picker .untested{font-style:italic}

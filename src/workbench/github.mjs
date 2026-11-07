@@ -15,7 +15,7 @@ export class CadGitHub {
   async status(){
     const settings=await this.settings(),account=this.peer?.account??null;
     return {connected:!!account,account,accountMatches:!!account&&settings.accountId===account.id,
-      settings,platformOrigin:this.adapter.embeddingOrigin};
+      settings,projectName:this.doc.value.metadata.name,dirty:this.doc.status().dirty||!!this.doc.pending(),platformOrigin:this.adapter.embeddingOrigin};
   }
   async execute(input){
     check(this.peer?.account,'PermissionDenied','Connect GitHub in Axiom Platform Settings.');

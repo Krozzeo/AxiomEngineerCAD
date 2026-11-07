@@ -2,8 +2,8 @@ import {api} from './cad-commands.mjs';
 
 export function mountApiPanel(document,host){
   host.className='cad-api';
-  host.insertAdjacentHTML('beforeend','<header class="cad-api-toolbar"><strong>Axiom · API</strong><input type="search" placeholder="Search API…" aria-label="Search API"></header><div class="cad-api-layout"><nav aria-label="API index"></nav><article></article></div>');
-  const search=host.querySelector('input'),nav=host.querySelector('nav'),page=host.querySelector('article');
+  host.insertAdjacentHTML('beforeend','<header class="cad-api-toolbar"><strong>Axiom · API</strong><input type="search" placeholder="Search API…" aria-label="Search API"></header><div class="cad-api-layout"><div class="cad-api-index" role="navigation" aria-label="API index"></div><article></article></div>');
+  const search=host.querySelector('input'),nav=host.querySelector('.cad-api-index'),page=host.querySelector('article');
   let index,selection='start',request=0;
   const element=(tag,text)=>{const node=document.createElement(tag);node.textContent=text;return node;};
   async function select(id){

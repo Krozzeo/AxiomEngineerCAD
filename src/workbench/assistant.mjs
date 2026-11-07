@@ -2,7 +2,9 @@ import {randomUUID} from 'node:crypto';
 import {dirname,join} from 'node:path';
 import {lstat,readFile} from 'node:fs/promises';
 import {atomicJson} from 'axiom-platform/files';
-import {effortsFor} from 'axiom-platform/ai/settings';
+import {effortsFor,probeBody} from 'axiom-platform/ai/settings';
+import {isAssistantModel,isVerifiedAssistantModel} from 'axiom-platform/ai/models';
+import {textOf} from 'axiom-platform/ai/contracts';
 import {check} from '../errors.mjs';
 import {registry} from '../commands/catalog.mjs';
 import {apiReference} from './api-reference.mjs';
@@ -52,25 +54,58 @@ export class CadAssistant {
     check(typeof settings.model==='string'&&(!settings.model||/^[A-Za-z0-9_.:/-]{1,128}$/.test(settings.model))
       &&typeof settings.instructions==='string'&&settings.instructions.length<=4000&&typeof settings.requireConfirmation==='boolean'
       &&['platform','default','none','minimal','low','medium','high','xhigh','max'].includes(settings.reasoning),'InvalidInput','Invalid assistant settings.');
-    for(const [key,[min,max]] of Object.entries(ranges))check(Number.isInteger(settings[key])&&settings[key]>=min&&settings[key]<=max,'InvalidInput','Invalid limit for '+key);
+    for(const [key,[min,max]] of Object.entries(ranges))check(Number.isInteger(settings[key])&&(settings[key]===0||settings[key]>=min&&settings[key]<=max),'InvalidInput','Invalid limit for '+key);
     await writeProjectPreferences(this.doc,'.engineer-assistant.json',settings);
     if(input.resetUsage===true){await this.ledger();this.usage=0;this.unreported=0;await this.saveLedger();}
     this.pending=null;
     return this.status();
   }
+  modelConfig(settings,account){
+    const model=settings.model||account.model;
+    const efforts=effortsFor(model,account.provider),inherited=account.defaults?.reasoning??'default';
+    const effort=settings.reasoning==='platform'?(efforts.includes(inherited)?inherited:'default'):settings.reasoning;
+    return {model,effort,efforts};
+  }
   async status(){
     await this.ledger();
-    const settings=await this.settings(),account=this.adapter.sharedAi?.state??{},model=settings.model||account.model;
+    const settings=await this.settings(),account=this.adapter.sharedAi?.state??{};
+    const {model,effort}=this.modelConfig(settings,account);
+    const task=this.currentTask??this.lastTask;
     return {connected:!!account.connected&&!!model&&model!=='not-selected',provider:account.provider,model,
-      defaultModel:account.model,settings,platformOrigin:this.adapter.embeddingOrigin,messages:this.messages,
+      defaultModel:account.model,effectiveReasoning:effort,settings,platformOrigin:this.adapter.embeddingOrigin,messages:this.messages,
       pending:this.pending&&{id:this.pending.id,summary:this.pending.summary},proposal:this.commands.proposals.get(this.proposal)?.state==='Ready'?this.proposal:null,busy:!!this.active,
-      reportedTokens:this.usage,unreportedRequests:this.unreported};
+      task:task?{requests:task.requests,tools:task.tools}:null,reportedTokens:this.usage,unreportedRequests:this.unreported};
+  }
+  async accountUsage(response){
+    if(Number.isSafeInteger(response.usage?.total_tokens)&&response.usage.total_tokens>=0)this.usage+=response.usage.total_tokens;
+    else this.unreported++;
+    if(!this.doc.closed)await this.saveLedger();
+  }
+  async test(input){
+    check(!this.active,'projectBusy','Wait for the current assistant request.');
+    check(typeof input.model==='string'&&(!input.model||/^[A-Za-z0-9_.:/-]{1,128}$/.test(input.model))&&typeof input.reasoning==='string',
+      'InvalidInput','Choose a model and reasoning effort.');
+    const peer=this.adapter.sharedAi,account=peer?.state??{},controller=new AbortController();
+    this.active=controller;
+    try{
+      const [settings]=await Promise.all([this.settings(),this.ledger()]);
+      check(!settings.maxProjectTokens||this.usage<settings.maxProjectTokens,'ResourceLimit','Project token budget reached.');
+      const {model,effort,efforts}=this.modelConfig(input,account);
+      check(account.connected&&model&&model!=='not-selected','PermissionDenied','Connect and select an AI model in Platform Settings.');
+      check(efforts.includes(effort),'InvalidInput','Choose a reasoning effort supported by the provider.');
+      const signal=AbortSignal.any([controller.signal,AbortSignal.timeout(30000)]);
+      const response=await peer.request('/responses',{signal,body:probeBody({model,reasoning:effort})});
+      await this.accountUsage(response);
+      check(response.status==='completed'&&textOf(response).trim(),'OperationFailed','The model did not complete the connection test.');
+    }finally{this.active=null;}
+    return this.status();
   }
   async models(){
     const peer=this.adapter.sharedAi;
     check(peer?.state.connected,'PermissionDenied','Connect AI in Axiom Platform Settings.');
     const result=await peer.request('/models');
-    return [...new Set(result.data.map(item=>item.id).filter(id=>typeof id==='string'))].sort();
+    const models=[...new Set(result.data.map(item=>item.id).filter(isAssistantModel))].sort();
+    return {models,untestedModels:models.filter(id=>!isVerifiedAssistantModel(id))};
   }
   add(role,text,shared=false){
     this.messages.push({role,text:text.slice(0,12000),shared});
@@ -94,10 +129,8 @@ export class CadAssistant {
   }
   async run(task,phase,settings,signal){
     const peer=this.adapter.sharedAi,account=peer?.state??{};
-    const model=settings.model||account.model;
+    const {model,effort,efforts}=this.modelConfig(settings,account);
     check(account.connected&&model&&model!=='not-selected','PermissionDenied','Connect and select an AI model in Platform Settings.');
-    const efforts=effortsFor(model,account.provider),inherited=account.defaults?.reasoning??'default';
-    const effort=settings.reasoning==='platform'?(efforts.includes(inherited)?inherited:'default'):settings.reasoning;
     check(efforts.includes(effort),'InvalidInput','Choose a reasoning effort supported by the provider.');
     const input=this.messages.filter(item=>task.share||!item.shared).slice(-12).map(({role,text})=>({role,content:text}));
     input.push({role:'user',content:JSON.stringify({editor:task.context,attachment:task.svg?'Orthographic SVG available to the local drawing tools':null,
@@ -110,18 +143,17 @@ export class CadAssistant {
     let actor,proposal,completed=false;
     const failedWrites=new Set();
     try{
-      while(task.requests<settings.maxRequests){
+      while(!settings.maxRequests||task.requests<settings.maxRequests){
         check(!signal.aborted,'Cancelled','Assistant request cancelled.');
         check(!settings.maxProjectTokens||this.usage<settings.maxProjectTokens,'ResourceLimit','Project token budget reached.');
         check(!settings.maxTaskTokens||this.usage-task.startUsage<settings.maxTaskTokens,'ResourceLimit','Task token budget reached.');
         check(peer.state.epoch===account.epoch,'RevisionConflict','The Platform connection changed.');
         task.requests++;
         const response=await peer.request('/responses',{signal,body:{model,store:false,input,instructions,
-          tools:phase==='plan'?[referenceTool,planTool,...(task.share?[commandTool]:[])]:[referenceTool,commandTool],max_output_tokens:settings.maxOutputTokens,
+          tools:phase==='plan'?[referenceTool,planTool,...(task.share?[commandTool]:[])]:[referenceTool,commandTool],...(settings.maxOutputTokens?{max_output_tokens:settings.maxOutputTokens}:{}),
           ...(account.provider==='openai'&&effort!=='default'?{include:['reasoning.encrypted_content']}:{}) ,
           ...(effort!=='default'?{reasoning:{effort}}:{})}});
-        if(Number.isSafeInteger(response.usage?.total_tokens)&&response.usage.total_tokens>=0)this.usage+=response.usage.total_tokens;else this.unreported++;
-        if(!this.doc.closed)await this.saveLedger();
+        await this.accountUsage(response);
         check(!signal.aborted,'Cancelled','Assistant request cancelled.');
         const outputs=response.output??[],toolCalls=outputs.filter(item=>item.type==='function_call');
         const text=outputs.flatMap(item=>item.type==='message'?item.content??[]:[]).map(part=>part.text??part.refusal??'').join('\n').trim();
@@ -135,7 +167,8 @@ export class CadAssistant {
         }
         input.push(...outputs.filter(item=>item.type!=='reasoning'||item.providerBlock||item.encrypted_content));
         for(const call of toolCalls){
-          check(++task.tools<=settings.maxTools,'ResourceLimit','Assistant tool limit reached.');
+          task.tools++;
+          check(!settings.maxTools||task.tools<=settings.maxTools,'ResourceLimit','Assistant tool limit reached.');
           let result,name;
           try{
             const args=JSON.parse(call.arguments);
@@ -179,16 +212,18 @@ export class CadAssistant {
     const controller=new AbortController();
     this.active=controller;
     const settings=await Promise.all([this.settings(),this.ledger()]).then(([settings])=>settings).catch(error=>{this.active=null;throw error;});
-    const signal=AbortSignal.any([controller.signal,AbortSignal.timeout(settings.maxSeconds*1000)]);
+    const signal=settings.maxSeconds?AbortSignal.any([controller.signal,AbortSignal.timeout(settings.maxSeconds*1000)]):controller.signal;
     try{
       if(input.action==='approve'){
         const task=this.pending;
         check(task&&task.id===input.id,'RevisionConflict','This plan was replaced.');
         this.pending=null;
         check(task.revision===this.doc.value.revision,'RevisionConflict','MAIN changed. Send the instruction again.');
+        this.currentTask=task;
         await this.run(task,'execute',settings,signal);
       }else{
         check(input.action==='message'&&typeof input.text==='string'&&input.text.trim()&&input.text.length<=8000
+          &&(input.requireConfirmation===undefined||typeof input.requireConfirmation==='boolean')
           &&(!input.svg||typeof input.svg==='string'&&Buffer.byteLength(input.svg)<=8192),'InvalidInput','Enter a bounded message and optional SVG.');
         this.pending=null;
         const share=input.share===true;
@@ -202,13 +237,17 @@ export class CadAssistant {
             selection:input.selection?String(input.selection).slice(0,240):null});
         }
         const task={id:randomUUID(),revision:this.doc.value.revision,context,share,svg:share?input.svg:null,startUsage:this.usage,requests:0,tools:0};
+        this.currentTask=task;
         await this.run(task,'plan',settings,signal);
-        if(this.pending&&!settings.requireConfirmation){
+        if(this.pending&&!(input.requireConfirmation??settings.requireConfirmation)){
           this.pending=null;
           await this.run(task,'execute',settings,signal);
         }
       }
-    }finally{this.active=null;}
+    }finally{
+      if(this.currentTask){const {requests,tools}=this.currentTask;this.lastTask={requests,tools};this.currentTask=null;}
+      this.active=null;
+    }
     return this.status();
   }
   close(){this.active?.abort();}
