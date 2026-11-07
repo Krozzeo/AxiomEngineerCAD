@@ -25,6 +25,10 @@ import {CommandSession} from '../src/commands/session.mjs';
 import {reviewDemo} from '../src/commands/demo.mjs';
 import {proofDemo} from '../src/proof/demo.mjs';
 import {ProofSession} from '../src/proof/session.mjs';
+import {SharedAiProvider} from 'axiom-platform/ai-peer';
+import {SharedGitHubClient} from 'axiom-platform/github-peer';
+import {CadAssistant} from '../src/workbench/assistant.mjs';
+import {CadGitHub} from '../src/workbench/github.mjs';
 import {readLayout,saveLayout} from '../src/workbench/layout.mjs';
 
 export class EngineerAdapter {
@@ -89,6 +93,8 @@ export class EngineerAdapter {
         check(u.origin === p.platformOrigin && u.protocol === 'http:' && u.hostname === '127.0.0.1', 'permissionDenied', 'Invalid host origin.');
       }
       this.root = await realpath(p.authorizedRoot); this.embeddingOrigin = p.platformOrigin;
+      if(p.services?.ai&&process.send)this.sharedAi=new SharedAiProvider({sessionId:this.sessionId,state:p.services.ai});
+      if(p.services?.github&&process.send)this.sharedGitHub=new SharedGitHubClient({sessionId:this.sessionId,account:p.services.github});
       return {protocolVersion:1, productId:manifest.productId, productVersion:manifest.productVersion, capabilities:manifest.capabilities};
     }
     check(this.root && !this.ended, 'cancelled', 'Initialize a live session first.');
@@ -126,6 +132,7 @@ export class EngineerAdapter {
         this.doc.lab = new LabSession(this.doc);
         this.doc.proof = new ProofSession(this.doc,this.root);
         this.doc.commands = new CommandSession(this.doc,{sessionId:this.sessionId,root:this.root});await this.doc.commands.load();
+        this.assistant=new CadAssistant(this);this.github=new CadGitHub(this);
         this.runtime = await this.start({adapter:this, embeddingOrigin:this.embeddingOrigin});
         check(!this.ended, 'cancelled', 'Session closed before document creation completed.');
         if (create) await atomicJson(path, value);
@@ -178,6 +185,7 @@ export class EngineerAdapter {
     }
   }
   async cleanup() {
+    this.assistant?.close();
     if (this.doc) this.doc.closed = true;
     await this.doc?.proof?.close();
     await this.doc?.commands?.close();
@@ -185,13 +193,20 @@ export class EngineerAdapter {
     const runtime = this.runtime; this.runtime = null;
     try { await runtime?.close(); } finally { const release = this.release; this.release = null; await release?.(); this.doc = null; }
   }
-  async shutdown() { this.ended = true; if (this.doc) this.doc.closed = true; return this.enqueue(() => this.cleanup()); }
+  async shutdown() { this.ended = true; this.sharedAi?.close(); this.sharedGitHub?.close(); if (this.doc) this.doc.closed = true; return this.enqueue(() => this.cleanup()); }
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   check(process.send, 'permissionDenied', 'Use Platform or the direct CLI to launch Engineer.');
   const adapter = new EngineerAdapter();
   process.on('message', async message => {
+    if(message?.kind==='service.ai'){adapter.sharedAi?.receive(message);return;}
+    if(message?.kind==='service.account'){adapter.sharedGitHub?.receive(message);return;}
+    if(message?.kind==='service.reply'){
+      if(adapter.sharedAi?.pending.has(message.requestId))adapter.sharedAi.receive(message);
+      else adapter.sharedGitHub?.receive(message);
+      return;
+    }
     try { const result = await adapter.request(message); process.send?.({...message, params:undefined, ok:true, result}); }
     catch (error) { process.send?.({...message, params:undefined, ok:false, error:{code:error.code ?? 'operationFailed', message:error.message}}); }
   });

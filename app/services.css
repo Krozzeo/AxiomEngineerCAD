@@ -1,0 +1,30 @@
+.cad-api,.cad-assistant{height:100%;min-height:0;display:flex;flex-direction:column}
+.cad-api-toolbar{display:flex;align-items:center;gap:.75rem;padding:.55rem;border-bottom:1px solid #30435c}
+.cad-api-toolbar input{flex:1;min-width:0}
+.cad-api-layout{display:grid;grid-template-columns:minmax(110px,28%) 1fr;min-height:0;flex:1}
+.cad-api-layout nav,.cad-api-layout article{overflow:auto;padding:.65rem;min-width:0}
+.cad-api-layout nav{display:block;border-right:1px solid #30435c}
+.cad-api-layout nav button{display:block;width:100%;text-align:left;overflow-wrap:anywhere}
+.cad-api-layout nav .selected{background:#214267;border-color:#6cacf1}
+.cad-api-layout pre{white-space:pre-wrap;overflow-wrap:anywhere}
+.cad-service-dialog{width:min(620px,94vw);max-height:88vh;overflow:auto;color:#dce8f6;background:#142232;border:1px solid #476482}
+.cad-service-dialog header,.cad-service-actions{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+.cad-service-dialog header h2{flex:1}
+.cad-service-dialog fieldset{display:grid;gap:.45rem;margin:.6rem 0;border-color:#30435c}
+.cad-service-dialog label{display:flex;align-items:center;justify-content:space-between;gap:.75rem}
+.cad-service-dialog input:not([type=checkbox]),.cad-service-dialog textarea,.cad-service-dialog select{min-width:12rem}
+.cad-service-indicator{position:relative;color:#96a9bc}
+.cad-service-indicator img{width:18px;height:18px}
+.cad-service-indicator[data-connection=disconnected]{opacity:.62}
+.cad-service-indicator[data-connection=linked]{color:#65d29b}
+.cad-service-indicator[data-connection=unlinked]{color:#f6bf67}
+.cad-service-indicator[data-connection=linked]::after,.cad-service-indicator[data-connection=unlinked]::after{content:"";position:absolute;right:2px;bottom:2px;width:6px;height:6px;border-radius:50%;background:currentColor}
+.cad-assistant-log{flex:1;overflow:auto;min-height:3rem;padding:.5rem}
+.cad-assistant-log p{white-space:pre-wrap;overflow-wrap:anywhere}
+.cad-assistant-log p[data-role=user]{color:#acd5ff}
+.cad-assistant form{display:grid;gap:.4rem;padding:.5rem;border-top:1px solid #30435c}
+.cad-assistant textarea{width:100%;resize:vertical}
+.cad-assistant input[type=file]{width:100%}
+.cad-assistant-status{margin:.35rem;overflow-wrap:anywhere}
+.cad-branch-toolbar{display:flex;align-items:center;gap:.2rem}
+body[data-ai-preview=true] .command-ribbon,body[data-ai-preview=true] #history-content,body[data-ai-preview=true] #parameters-content,body[data-ai-preview=true] #properties-content,body[data-ai-preview=true] #workbench-labs{opacity:.6}

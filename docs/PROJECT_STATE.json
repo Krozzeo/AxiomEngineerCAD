@@ -8,19 +8,19 @@
   },
   "milestone": {
     "current": "E2.M4",
-    "status": "0.2.3 drawing reconstruction candidate; E2.M3 owner validated",
+    "status": "0.2.4 pre-E3 integration candidate",
     "ownerAcceptance": "pending",
-    "next": "E3.M1 after E2.M4 delivery and owner direction"
+    "next": "Owner tests both CAD flows with GPT-5.6 Luna medium before E3.M1"
   },
   "lastDelivered": {
-    "version": "0.2.2",
-    "commit": "d27a821ae978efe4beb71dda6a6283eddb15d5ee",
+    "version": "0.2.3",
+    "commit": "7945d5c1bac966b9972d7251ccfa393836344904",
     "pullRequest": 18,
-    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-18-d27a821ae978efe4beb71dda6a6283eddb15d5ee",
-    "acceptanceRun": 42322003328,
-    "publicationRun": 42323148339,
-    "artifactSha256": "1dc073126993c3dd594ebb56614b176546d346143cfbde0d7eb8399f54c259ca",
-    "verification": "Exact Windows/Linux acceptance and real public Platform 0.1.13 discovery, installation, proposal review and independent PDF. Owner validated E2.M3."
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-18-7945d5c1bac966b9972d7251ccfa393836344904",
+    "acceptanceRun": 42328350087,
+    "publicationRun": 42330424483,
+    "artifactSha256": "689fd7234531024c3602ac398a97c8e49ea8687434688d047aea91902275f930",
+    "verification": "Windows and Ubuntu acceptance. Public Platform 0.1.13 installation verified, including reconstruction and PDF."
   },
   "constraints": [
     "MASTER_DESIGN is intent; implementation requires code and matching evidence.",
@@ -33,23 +33,23 @@
     "implementation": "IMPLEMENTATION_STATUS.md",
     "handoff": "AI_HANDOFF.md",
     "architecture": "docs/architecture/ADR_REGISTER.md",
-    "currentCadScope": "docs/milestones/E2_M4_DRAWING_RECONSTRUCTION.md",
+    "currentCadScope": "docs/PRE_E3_ASSISTANT.md",
     "deliveryGate": "docs/MILESTONE_DELIVERY.md"
   },
   "candidate": {
-    "version": "0.2.3",
+    "version": "0.2.4",
     "branch": "engineer/sketch-navigation-0.1.9",
-    "status": "E2.M4 drawing reconstruction candidate"
+    "status": "Pre-E3 assistant and project integrations"
   },
   "previousDelivered": {
-    "version": "0.2.1",
-    "commit": "765cc2f3c72c729f3fc4c682dd3b16bf9dece81d",
+    "version": "0.2.2",
+    "commit": "d27a821ae978efe4beb71dda6a6283eddb15d5ee",
     "pullRequest": 18,
-    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-18-765cc2f3c72c729f3fc4c682dd3b16bf9dece81d",
-    "acceptanceRun": 42319108708,
-    "publicationRun": 42320251915,
-    "artifactSha256": "49ecf586ffefee41be382c766353e74e54513cc090308f1eef0302abb1fcd84e",
-    "verification": "Exact Windows/Linux acceptance and real public Platform 0.1.13 discovery, download, activation and independent PDF from installed demo. Owner validated E2.M2."
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-18-d27a821ae978efe4beb71dda6a6283eddb15d5ee",
+    "acceptanceRun": 42322003328,
+    "publicationRun": 42323148339,
+    "artifactSha256": "1dc073126993c3dd594ebb56614b176546d346143cfbde0d7eb8399f54c259ca",
+    "verification": "Exact Windows/Linux acceptance and real public Platform 0.1.13 discovery, installation, proposal review and independent PDF. Owner validated E2.M3."
   },
   "earlierDelivered": {
     "version": "0.1.8",

@@ -1,6 +1,6 @@
-# Engineer handoff - E2.M4 drawing reconstruction / 0.2.3 candidate
+# Engineer handoff - pre-E3 assistant integrations / 0.2.4 candidate
 
-Start with `npm run context`, AGENTS.md, [compact context](docs/PROJECT_CONTEXT.md) and the [E2.M4 report](docs/milestones/E2_M4_DRAWING_RECONSTRUCTION.md). Owner validated E2.M3 and requested E2.M4. Preserve prior source and immutable version semantics.
+Start with `npm run context`, AGENTS.md, [compact context](docs/PROJECT_CONTEXT.md) and the [integration notes](docs/PRE_E3_ASSISTANT.md). E3.M1 follows the owner’s live model tests.
 
 ## Source and authority
 
