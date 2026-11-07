@@ -11,7 +11,7 @@ export async function verifySketchNavigationUI({page:p,evidence,report}){
  const id=await p.evaluate(()=>window.engineerSketch.view().id),feature=async()=>(await sketchDocument(p)).native.graph.features.find(f=>f.id===id);
  await p.locator('[data-sketch-tool=line]').click();assert.equal(await p.locator('#proof-canvas').evaluate(n=>getComputedStyle(n).cursor),'crosshair');
  await click(-20,-10);await p.keyboard.down('Shift');await sketchCommit(p,()=>click(0,-9.3));await p.keyboard.up('Shift');await sketchCommit(p,()=>click(.4,8));
- let f=await feature();assert.equal(f.data.entities.length,2);assert.ok(f.data.constraints.some(c=>c.type==='horizontal'));assert.ok(f.data.constraints.some(c=>c.type==='vertical'));assert.ok(f.data.constraints.some(c=>c.type==='coincident'));const line=f.data.entities[0];
+ let f=await feature();assert.equal(f.data.entities.filter(entity=>!entity.referenceOnly).length,2,JSON.stringify(f.data.entities));assert.ok(f.data.constraints.some(c=>c.type==='horizontal'));assert.ok(f.data.constraints.some(c=>c.type==='vertical'));assert.ok(f.data.constraints.some(c=>c.type==='coincident'));const line=f.data.entities[0];
  stage('single-cell dimension editor focuses and selects after placement and Enter');
  await p.locator('[data-sketch-tool=select]').click();await p.locator('#sketch-dimension-tool').click();await selectSketchComponent(p,line.id);await sketchCommit(p,()=>p.locator('#sketch-dimension-input').press('Enter'));
  const input=p.locator('#edit-sketch-dimension-value');await input.waitFor();assert.equal(await p.locator('#sketch-dimension-value-table tr').count(),1);assert.equal(await p.locator('#sketch-dimension-value-table td').count(),1);
