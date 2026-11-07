@@ -2,7 +2,7 @@
 
 Local-first, browser-operated parametric mechanical CAD and engineering-documentation product in the Axiom family, designed from the outset for both human users and AI agents.
 
-> **Current candidate: 0.2.5 / pre-E3 integrations.** See [assistant, API and GitHub](docs/PRE_E3_ASSISTANT.md).
+> **Current candidate: 0.2.6 / pre-E3 integrations.** See [assistant, API and GitHub](docs/PRE_E3_ASSISTANT.md).
 
 Start development with `npm run context` and [the compact context](docs/PROJECT_CONTEXT.md). The [workflow](docs/DEVELOPMENT_WORKFLOW.md) selects focused checks during implementation, then complete exact-head acceptance and real installation proof for delivery.
 

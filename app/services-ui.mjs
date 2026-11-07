@@ -1,6 +1,7 @@
 import {api} from './cad-commands.mjs';
 import {mountApiPanel} from './api-panel.mjs';
 import {renderChatText} from './chat-format.mjs';
+import {mountTaskInfo} from './assistant-task-info.mjs';
 import {aiConfigMarkup,githubMarkup,chatMarkup,paintTokenMeter} from './services-markup.mjs';
 
 export function mountServices({document,dock,menu,header,assistant,apiPanel}){
@@ -29,6 +30,7 @@ export function mountServices({document,dock,menu,header,assistant,apiPanel}){
   assistant.insertAdjacentHTML('beforeend',chatMarkup);
   const form=assistant.querySelector('form'),log=assistant.querySelector('[role=log]'),chatStatus=assistant.querySelector('#ai-chat-error');
   const input=form.elements.message,submit=form.querySelector('[type=submit]'),cancel=form.querySelector('[data-stop]');
+  const taskInfo=mountTaskInfo({document,prefix:'ai',api,onError:error=>{chatStatus.textContent=error.message;}});
   const cq=selector=>config.querySelector(selector),chat=selector=>assistant.querySelector(selector);
   let aiState,gitState,reviewPlan,focus='model',viewing=false,changing=false,branchKey;
   window.addEventListener('engineer-panel-activated',event=>{if(event.detail!=='assistant')focus=event.detail;});
@@ -46,29 +48,51 @@ export function mountServices({document,dock,menu,header,assistant,apiPanel}){
     if(window.parent!==window)window.parent.postMessage({kind:'axiom.platform.settings',section},state.platformOrigin);
     else window.open(state.platformOrigin+'/settings/'+section,'_blank','noopener');
   };
-  const planButtons=assistant.querySelector('[data-plan]'),chatBranch=assistant.querySelector('[data-branch]');
-  async function switchBranch(id,panel=focus==='drawing'?'drawing':'model'){
+  const planButtons=assistant.querySelector('[data-plan]');
+  let applying=false,viewedProposal=null;
+  function setPreview(id){
+    viewedProposal=id;viewing=!!id;document.body.dataset.aiPreview=String(viewing);
+    for(const selector of ['.command-ribbon','#history-content','#parameters-content','#properties-content','#workbench-labs','#inspector-content','#save','#cad-undo']){
+      const node=document.querySelector(selector);if(node)node.inert=viewing;
+    }
+    paintBranches();
+  }
+  async function presentBranch(id){
     const viewport=window.engineerViewport;
+    try{return await viewport.switchProposal(id,true);}
+    catch(error){if(!/UnsupportedCapability|LostReference|IncompatibleVersion/.test(error.message))throw error;return viewport.switchProposal(id);}
+  }
+  async function switchBranch(id,panel=focus==='drawing'?'drawing':'model'){
     if(window.engineerSketch?.view()||window.engineerOperationFeature)throw Error('Finish the current edit before switching branches.');
     if(changing)return;
-    changing=true;
+    changing=true;paintBranches();
     try{
-      if(!id&&panel==='drawing'){
-        const {document:main}=await api('document');
-        if(!main.experiment&&main.native?.graph.features.filter(feature=>feature.type==='sketch-extrusion'&&!feature.disabled).length!==1)panel='model';
-      }
-      await viewport.switchProposal(id,panel==='drawing');
-      dock.openPanel(panel);
-      viewing=!!id;document.body.dataset.aiPreview=String(viewing);
-      for(const selector of ['.command-ribbon','#history-content','#parameters-content','#properties-content','#workbench-labs','#inspector-content','#save','#cad-undo']){
-        const node=document.querySelector(selector);if(node)node.inert=viewing;
-      }
-      paintBranches();
-    }finally{changing=false;}
+      const proof=await presentBranch(id);
+      setPreview(id);
+      if(proof.drawing)dock.openPanel('drawing');
+      dock.openPanel(panel==='drawing'&&proof.drawing?'drawing':'model');
+    }catch(error){
+      if(id){setPreview(null);await presentBranch(null).catch(()=>{});}
+      throw error;
+    }finally{changing=false;paintBranches();}
   }
-  async function review(){
-    if(viewing)await switchBranch(null);
-    await window.engineerReviewProposal(aiState.proposal);
+  async function review(){await window.engineerReviewProposal(aiState.proposal);}
+  async function apply(){
+    const id=viewedProposal;
+    if(!id||id!==aiState?.proposal||applying||changing)return;
+    applying=true;paintBranches();
+    const panel=focus==='drawing'?'drawing':'model';
+    try{
+      const proof=window.engineerViewport.proof;
+      if(proof?.proposalId!==id)throw Error('Open the current preview before applying.');
+      const result=await window.engineerApplyProposal(id);
+      setPreview(null);
+      const source=await api('document');
+      window.dispatchEvent(new CustomEvent('engineer-document-changed',{detail:source}));
+      try{await switchBranch(null,panel);}
+      catch(error){throw Error('Revision '+result.revision+' was saved. The view could not reload: '+error.message);}
+      chatStatus.textContent='Applied and saved · revision '+result.revision;
+    }finally{applying=false;paintBranches();await refreshAI().catch(()=>{});}
   }
   async function discard(){
     const id=aiState.proposal,proposal=(await api('cad/status')).proposals.find(item=>item.id===id);
@@ -79,21 +103,23 @@ export function mountServices({document,dock,menu,header,assistant,apiPanel}){
     paintAI(await api('assistant/status'));
   }
   function paintBranches(){
-    const ready=!!aiState?.proposal&&!sending&&!aiState?.busy;
-    for(const key of ['review','preview','apply','discard'])chat('[data-'+key+']').disabled=!ready;
-    chat('[data-preview]').textContent=viewing?'MAIN':'Preview';
+    const ready=!!aiState?.proposal&&!sending&&!aiState?.busy&&!applying&&!changing;
+    for(const key of ['review','preview','discard'])chat('[data-'+key+']').disabled=!ready;
+    chat('[data-apply]').disabled=!ready||viewedProposal!==aiState.proposal;
+    const previewLabel=viewing?'Exit preview':'Preview';
+    chat('[data-preview]').textContent=previewLabel;
     const key=JSON.stringify([aiState?.proposal,viewing,ready]);if(key===branchKey)return;branchKey=key;
     toolbar.hidden=!aiState?.proposal&&!viewing;toolbar.replaceChildren();
-    chatBranch.hidden=!viewing;chatBranch.replaceChildren();
     if(toolbar.hidden)return;
-    toolbar.append(button(viewing?'MAIN':'Preview',run(chatStatus,()=>switchBranch(viewing?null:aiState.proposal))));
-    if(viewing)for(const target of [toolbar,chatBranch])target.append(button('Model',run(chatStatus,()=>switchBranch(aiState.proposal,'model'))),button('Drawing',run(chatStatus,()=>switchBranch(aiState.proposal,'drawing'))));
-    if(ready)toolbar.append(button('Review changes',run(chatStatus,review)),button('Apply',run(chatStatus,review)),button('Discard',run(chatStatus,discard)));
+    const preview=button(previewLabel,run(chatStatus,()=>switchBranch(viewing?null:aiState.proposal)));preview.disabled=!ready;
+    const commit=button('Apply',run(chatStatus,apply));commit.disabled=!ready||!viewing;
+    toolbar.append(preview,button('Review changes',run(chatStatus,review)),commit,button('Discard',run(chatStatus,discard)));
+    for(const control of toolbar.querySelectorAll('button'))if(!ready)control.disabled=true;
   }
-  for(const [id,action] of Object.entries({review,apply:review,discard,preview:()=>switchBranch(viewing?null:aiState.proposal)}))
+  for(const [id,action] of Object.entries({review,apply,discard,preview:()=>switchBranch(viewing?null:aiState.proposal)}))
     chat('[data-'+id+']').onclick=run(chatStatus,action);
-  window.addEventListener('engineer-document-changed',()=>{if(viewing)void run(chatStatus,()=>switchBranch(null))();});
-  let sending=false,logKey,planKey,models=[],untestedModels=[];
+  window.addEventListener('engineer-document-changed',()=>{if(viewing&&!applying)void run(chatStatus,()=>switchBranch(null))();});
+  let sending=false,logKey,planKey,lastTaskId,models=[],untestedModels=[];
   const updateComposer=()=>{
     const css=window.getComputedStyle(input),line=parseFloat(css.lineHeight)||20,extra=parseFloat(css.paddingTop)+parseFloat(css.paddingBottom)+2;
     input.style.height='auto';const max=line*10+extra;
@@ -114,10 +140,18 @@ export function mountServices({document,dock,menu,header,assistant,apiPanel}){
   async function turn(data){
     if(data.action==='stop'){paintAI(await api('assistant/turn',data));return;}
     if(sending)return;
+    const previousProposal=aiState?.proposal;
     sending=true;chatStatus.textContent='';
     if(data.action==='message')paintAI({...aiState,messages:[...aiState.messages,{role:'user',text:data.text}],busy:true,pending:null});
     else paintAI({...aiState,busy:true,pending:null});
-    try{paintAI(await api('assistant/turn',data));}
+    try{
+      const next=await api('assistant/turn',data);paintAI(next);
+      if(next.proposal&&next.proposal!==previousProposal){
+        const prefersDrawing=next.task?.steps.some(step=>step.tool==='cad.drawing.layout.set.v1'&&step.status==='completed');
+        try{await switchBranch(next.proposal,prefersDrawing?'drawing':'model');}
+        catch(error){chatStatus.textContent='Proposal ready. Preview could not open: '+error.message;}
+      }
+    }
     catch(error){await refreshAI().catch(()=>{});throw error;}
     finally{sending=false;updateComposer();paintBranches();}
   }
@@ -148,10 +182,8 @@ export function mountServices({document,dock,menu,header,assistant,apiPanel}){
       if(next.pending)planButtons.append(button('Apruebo',run(chatStatus,()=>turn({action:'approve',id:next.pending.id}))),
         button('Desapruebo',run(chatStatus,()=>turn({action:'reject',id:next.pending.id}))));
     }
-    chat('.ai-task-status').textContent=next.busy?'Working…':next.connected?next.model:'Connect an AI model in Platform Settings.';
-    const task=next.task;
-    chat('[data-task-usage]').textContent=(task?'Requests '+task.requests+' · Tool calls '+task.tools+' · ':'')+
-      next.reportedTokens.toLocaleString()+' reported project tokens'+(next.unreportedRequests?' · '+next.unreportedRequests+' unreported requests':'');
+    if(next.task?.id!==lastTaskId){lastTaskId=next.task?.id;taskInfo.select(lastTaskId);}
+    taskInfo.paint(next.tasks??[],{limits:next.settings});
     for(const scope of [assistant,config])paintTokenMeter(scope.querySelector('.ai-token-meter'),next.reportedTokens,next.settings.maxProjectTokens);
     const limit=next.settings.maxProjectTokens;
     cq('[data-usage]').textContent='Project total: '+next.reportedTokens.toLocaleString()+' tokens · Limit: '+(limit?limit.toLocaleString():'Limitless')+
@@ -329,9 +361,6 @@ export function mountServices({document,dock,menu,header,assistant,apiPanel}){
   }
   configMenu.append(make('summary','Config'),choices);menu.insertBefore(configMenu,menu.querySelector('#panels-menu'));
   void run(chatStatus,refreshAI)();void run(ghStatus,refreshGit)();
-  window.addEventListener('engineer-proof-built',event=>{
-    if(viewing&&event.detail.proposalId!==aiState?.proposal)void run(chatStatus,()=>switchBranch(null,'model'))();
-  });
   const timer=setInterval(()=>{if(document.hidden)return;void refreshAI().catch(()=>{});},2500);
   const gitTimer=setInterval(()=>{if(!document.hidden&&!ghWorking)void refreshGit().catch(()=>{});},4000);
   window.addEventListener('pagehide',()=>{clearInterval(timer);clearInterval(gitTimer);composerResize.disconnect();},{once:true});

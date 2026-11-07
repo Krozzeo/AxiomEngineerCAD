@@ -1,4 +1,4 @@
-# Engineer handoff - pre-E3 assistant integrations / 0.2.5 candidate
+# Engineer handoff - E2 stabilization / 0.2.6 candidate
 
 Start with `npm run context`, AGENTS.md, [compact context](docs/PROJECT_CONTEXT.md) and the [integration notes](docs/PRE_E3_ASSISTANT.md). E3.M1 follows the owner’s live model tests.
 

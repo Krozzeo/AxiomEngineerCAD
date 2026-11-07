@@ -8,6 +8,7 @@ import {textOf} from 'axiom-platform/ai/contracts';
 import {check} from '../errors.mjs';
 import {registry} from '../commands/catalog.mjs';
 import {apiReference} from './api-reference.mjs';
+import {formatAiHistory} from '../../app/assistant-history-format.mjs';
 
 const writable=new Set(['cad.drawing.layout.set.v1','cad.drawing.reconstruct.v1','cad.extrusion.create.v1','cad.extrusion.update.v1','cad.feature.update.v1','cad.parameter.set.v1','cad.sketch.create.v1','cad.sketch.entity.add.v1','cad.sketch.entity.update.v1','cad.sketch.constraint.add.v1']);
 const readable=new Set(['cad.entities.list.v1','cad.feature.inspect.v1','cad.parameter.inspect.v1','cad.sketch.inspect.v1','cad.selection.inspect.v1','cad.drawing.evidence.inspect.v1']);
@@ -17,14 +18,15 @@ const string={type:'string'};
 const planTool=functionTool('propose_plan','Use only for an actionable CAD change. Ask for clarification as text when information is missing.',{summary:string});
 const referenceTool=functionTool('api_section','Fetch one indexed CAD API reference section by ID.',{id:string});
 const commandTool=functionTool('cad_command','Use a permitted CAD tool; inputJson is the JSON object matching the reference schema. Attached SVG is injected locally for drawing commands.',{name:string,inputJson:string});
+const historyFile='.engineer-assistant-history.json',historyBytes=1024*1024;
 const defaults={model:'',reasoning:'platform',requireConfirmation:true,instructions:'',maxRequests:12,maxTools:24,maxOutputTokens:4096,maxSeconds:180,maxProjectTokens:100000,maxTaskTokens:40000};
 const ranges={maxRequests:[2,50],maxTools:[1,60],maxOutputTokens:[512,16384],maxSeconds:[15,300],maxProjectTokens:[0,1000000000],maxTaskTokens:[0,1000000000]};
 
-export async function readProjectPreferences(doc,name,fallback){
+export async function readProjectPreferences(doc,name,fallback,maxBytes=32768){
   const path=join(dirname(doc.path),name);
   try{
     const info=await lstat(path);
-    check(info.isFile()&&!info.isSymbolicLink()&&info.nlink===1&&info.size<=32768,'PermissionDenied','Invalid project settings file.');
+    check(info.isFile()&&!info.isSymbolicLink()&&info.nlink===1&&info.size<=maxBytes,'PermissionDenied','Invalid project settings file.');
     const data=JSON.parse(await readFile(path,'utf8'));
     check(data.documentId===doc.value.documentId,'LostReference','Settings belong to another project.');
     return data.settings;
@@ -66,15 +68,36 @@ export class CadAssistant {
     const effort=settings.reasoning==='platform'?(efforts.includes(inherited)?inherited:'default'):settings.reasoning;
     return {model,effort,efforts};
   }
+  async loadHistory(){
+    this.historyRead??=readProjectPreferences(this.doc,historyFile,[],historyBytes).then(value=>{
+      check(Array.isArray(value),'InvalidInput','Invalid assistant history.');
+      this.tasks=value;
+    });
+    return this.historyRead;
+  }
+  async saveHistory(){
+    if(this.doc.closed)return;
+    while(this.tasks.length>1&&Buffer.byteLength(JSON.stringify(this.tasks))>historyBytes-1024)this.tasks.shift();
+    if(Buffer.byteLength(JSON.stringify(this.tasks))>historyBytes-1024){
+      this.historyError='This task is too large to persist in the local history. Download it before closing.';
+      return;
+    }
+    try{await writeProjectPreferences(this.doc,historyFile,this.tasks);this.historyError=null;}
+    catch(error){this.historyError=error.message;}
+  }
+  async history(){
+    await this.loadHistory();
+    return {filename:'Axiom-CAD-AI-history.txt',text:formatAiHistory(this.tasks)};
+  }
   async status(){
-    await this.ledger();
+    await Promise.all([this.ledger(),this.loadHistory()]);
     const settings=await this.settings(),account=this.adapter.sharedAi?.state??{};
     const {model,effort}=this.modelConfig(settings,account);
-    const task=this.currentTask??this.lastTask;
+    const task=this.currentTask?.history??this.tasks.at(-1);
     return {connected:!!account.connected&&!!model&&model!=='not-selected',provider:account.provider,model,
       defaultModel:account.model,effectiveReasoning:effort,settings,platformOrigin:this.adapter.embeddingOrigin,messages:this.messages,
       pending:this.pending&&{id:this.pending.id,summary:this.pending.summary},proposal:this.commands.proposals.get(this.proposal)?.state==='Ready'?this.proposal:null,busy:!!this.active,
-      task:task?{requests:task.requests,tools:task.tools}:null,reportedTokens:this.usage,unreportedRequests:this.unreported};
+      task:task??null,tasks:this.tasks,historyError:this.historyError??null,reportedTokens:this.usage,unreportedRequests:this.unreported};
   }
   async accountUsage(response){
     if(Number.isSafeInteger(response.usage?.total_tokens)&&response.usage.total_tokens>=0)this.usage+=response.usage.total_tokens;
@@ -88,7 +111,7 @@ export class CadAssistant {
     const peer=this.adapter.sharedAi,account=peer?.state??{},controller=new AbortController();
     this.active=controller;
     try{
-      const [settings]=await Promise.all([this.settings(),this.ledger()]);
+      const [settings]=await Promise.all([this.settings(),this.ledger(),this.loadHistory()]);
       check(!settings.maxProjectTokens||this.usage<settings.maxProjectTokens,'ResourceLimit','Project token budget reached.');
       const {model,effort,efforts}=this.modelConfig(input,account);
       check(account.connected&&model&&model!=='not-selected','PermissionDenied','Connect and select an AI model in Platform Settings.');
@@ -132,6 +155,8 @@ export class CadAssistant {
     const {model,effort,efforts}=this.modelConfig(settings,account);
     check(account.connected&&model&&model!=='not-selected','PermissionDenied','Connect and select an AI model in Platform Settings.');
     check(efforts.includes(effort),'InvalidInput','Choose a reasoning effort supported by the provider.');
+    const trace=task.history;
+    Object.assign(trace,{model,reasoning:effort,status:'running',phase,limits:{...settings,instructions:undefined}});
     const input=this.messages.filter(item=>task.share||!item.shared).slice(-12).map(({role,text})=>({role,content:text}));
     input.push({role:'user',content:JSON.stringify({editor:task.context,attachment:task.svg?'Orthographic SVG available to the local drawing tools':null,
       proposalInstruction:phase==='execute'?task.summary:undefined})});
@@ -157,17 +182,25 @@ export class CadAssistant {
         check(!signal.aborted,'Cancelled','Assistant request cancelled.');
         const outputs=response.output??[],toolCalls=outputs.filter(item=>item.type==='function_call');
         const text=outputs.flatMap(item=>item.type==='message'?item.content??[]:[]).map(part=>part.text??part.refusal??'').join('\n').trim();
+        const usage=response.usage??{},total=usage.total_tokens;
+        trace.requests=task.requests;
+        trace.requestUsage.push({request:task.requests,stage:phase,providerStatus:response.status,
+          inputTokens:usage.input_tokens??0,cachedInputTokens:usage.input_tokens_details?.cached_tokens??0,
+          outputTokens:usage.output_tokens??0,reasoningTokens:usage.output_tokens_details?.reasoning_tokens??0,totalTokens:total??null,message:text.slice(0,12000)});
+        trace.usage.totalTokens=this.usage-task.startUsage;
         if(!toolCalls.length){
           check(response.status!=='incomplete'&&text,'OperationFailed','The model returned no complete answer.');
           if(proposal&&!failedWrites.size){
             const result=await this.invoke(actor,'cad.proposal.validate.v1',{proposalId:proposal.id},proposal,task.revision);
-            this.proposal=result.proposal.id;
+            this.proposal=result.proposal.id;trace.workspaceId=this.proposal;
+            trace.steps.push({tool:'cad.proposal.validate.v1',status:'completed',request:task.requests});
           }
+          trace.response=text.slice(0,12000);trace.status='completed';
           this.add('assistant',text,task.share);completed=!proposal||!failedWrites.size;return;
         }
         input.push(...outputs.filter(item=>item.type!=='reasoning'||item.providerBlock||item.encrypted_content));
         for(const call of toolCalls){
-          task.tools++;
+          task.tools++;trace.toolCalls=task.tools;
           check(!settings.maxTools||task.tools<=settings.maxTools,'ResourceLimit','Assistant tool limit reached.');
           let result,name;
           try{
@@ -175,6 +208,8 @@ export class CadAssistant {
             if(call.name==='api_section')result=apiReference(args.id);
             else if(call.name==='propose_plan'&&phase==='plan'){
               check(task.share&&typeof args.summary==='string'&&args.summary.trim()&&args.summary.length<=4000,'InvalidInput','Share CAD context and provide a bounded plan.');
+              trace.steps.push({tool:call.name,status:'completed',request:task.requests});
+              trace.messages.push(args.summary);trace.response=args.summary;trace.status='awaiting confirmation';
               task.summary=args.summary;this.add('assistant',args.summary,task.share);this.pending=task;completed=true;return;
             }else{
               check(task.share&&call.name==='cad_command','PermissionDenied','CAD context sharing is required.');
@@ -189,11 +224,13 @@ export class CadAssistant {
               if(writable.has(name)&&!proposal){
                 check(!this.commands.editingSketch,'projectBusy','Finish editing the sketch before creating an AI proposal.');
                 proposal=await this.invoke(actor,'cad.proposal.create.v1',{label:'AI Assistant proposal'},null,task.revision);
+                trace.steps.push({tool:'cad.proposal.create.v1',status:'completed',request:task.requests});
               }
               result=await this.invoke(actor,name,argsObject,proposal,task.revision);
               if(writable.has(name)){proposal=result.proposal;failedWrites.delete(name);}
             }
           }catch(error){if(phase==='execute'&&writable.has(name))failedWrites.add(name);result={error:error.code??'InvalidInput',message:error.message};}
+          trace.steps.push({tool:name??call.name,status:result?.error?'failed':'completed',...(result?.error?{error:result.message,errorCode:result.error}:{}),request:task.requests});
           input.push({type:'function_call_output',call_id:call.call_id,output:JSON.stringify(result)});
         }
       }
@@ -208,10 +245,15 @@ export class CadAssistant {
   async turn(input){
     if(input.action==='stop'){this.active?.abort();return this.status();}
     check(!this.active,'projectBusy','An assistant task is already running.');
-    if(input.action==='reject'){check(this.pending?.id===input.id,'RevisionConflict','This plan was replaced.');this.pending=null;this.add('assistant','Plan discarded.');return this.status();}
+    if(input.action==='reject'){
+      check(this.pending?.id===input.id,'RevisionConflict','This plan was replaced.');
+      const {history,share}=this.pending;this.pending=null;this.add('user','Desapruebo',share);this.add('assistant','Plan discarded.',share);
+      Object.assign(history,{status:'rejected',response:'Plan discarded.',completedAt:new Date().toISOString()});await this.saveHistory();
+      return this.status();
+    }
     const controller=new AbortController();
     this.active=controller;
-    const settings=await Promise.all([this.settings(),this.ledger()]).then(([settings])=>settings).catch(error=>{this.active=null;throw error;});
+    const settings=await Promise.all([this.settings(),this.ledger(),this.loadHistory()]).then(([settings])=>settings).catch(error=>{this.active=null;throw error;});
     const signal=settings.maxSeconds?AbortSignal.any([controller.signal,AbortSignal.timeout(settings.maxSeconds*1000)]):controller.signal;
     try{
       if(input.action==='approve'){
@@ -219,13 +261,13 @@ export class CadAssistant {
         check(task&&task.id===input.id,'RevisionConflict','This plan was replaced.');
         this.pending=null;
         check(task.revision===this.doc.value.revision,'RevisionConflict','MAIN changed. Send the instruction again.');
-        this.currentTask=task;
+        this.currentTask=task;this.add('user','Apruebo',task.share);
         await this.run(task,'execute',settings,signal);
       }else{
         check(input.action==='message'&&typeof input.text==='string'&&input.text.trim()&&input.text.length<=8000
           &&(input.requireConfirmation===undefined||typeof input.requireConfirmation==='boolean')
           &&(!input.svg||typeof input.svg==='string'&&Buffer.byteLength(input.svg)<=8192),'InvalidInput','Enter a bounded message and optional SVG.');
-        this.pending=null;
+        if(this.pending){Object.assign(this.pending.history,{status:'superseded',completedAt:new Date().toISOString()});this.pending=null;}
         const share=input.share===true;
         this.add('user',input.text,share);
         const allowed=['model','drawing','history','inspector','parameters','properties','activity','diagnostics','api','assistant'];
@@ -237,15 +279,24 @@ export class CadAssistant {
             selection:input.selection?String(input.selection).slice(0,240):null});
         }
         const task={id:randomUUID(),revision:this.doc.value.revision,context,share,svg:share?input.svg:null,startUsage:this.usage,requests:0,tools:0};
-        this.currentTask=task;
+        task.history={id:task.id,projectId:this.doc.value.documentId,objective:input.text,createdAt:new Date().toISOString(),
+          status:'running',phase:'plan',requests:0,toolCalls:0,usage:{totalTokens:0},requestUsage:[],steps:[],messages:[]};
+        this.currentTask=task;this.tasks.push(task.history);
         await this.run(task,'plan',settings,signal);
         if(this.pending&&!(input.requireConfirmation??settings.requireConfirmation)){
           this.pending=null;
           await this.run(task,'execute',settings,signal);
         }
       }
+    }catch(error){
+      if(this.currentTask){const trace=this.currentTask.history;trace.status=signal.aborted?'cancelled':'failed';trace.error={code:error.code??'OperationFailed',message:error.message};}
+      throw error;
     }finally{
-      if(this.currentTask){const {requests,tools}=this.currentTask;this.lastTask={requests,tools};this.currentTask=null;}
+      if(this.currentTask){
+        const trace=this.currentTask.history;
+        if(trace.status!=='awaiting confirmation')trace.completedAt=new Date().toISOString();
+        this.currentTask=null;await this.saveHistory();
+      }
       this.active=null;
     }
     return this.status();

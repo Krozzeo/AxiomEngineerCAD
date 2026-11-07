@@ -51,10 +51,17 @@ export const githubMarkup=`<p data-account role="status"></p><p data-error role=
 export const chatMarkup=`<div class="ai-chat">
   <div class="ai-chat-header">
     ${meter('AI project tokens used')}
-    <p class="ai-chat-notice">AI changes are isolated proposals. Review and accept them explicitly before saving. For CAD tasks, enable context sharing in More info.</p>
+    <p class="ai-chat-notice">AI changes are isolated proposals. Review and accept them explicitly before saving. CAD context is shared with your configured provider when enabled in More info.</p>
     <details class="ai-task-details"><summary>More info…</summary><div class="ai-task-popover">
-      <p class="ai-task-status" role="status"></p><p data-task-usage></p>
-      <label><input name="share" form="ai-chat-form" type="checkbox"> Share current CAD context with the configured provider</label>
+      <header class="ai-task-history"><strong id="ai-task-requests">Requests 0/0</strong><span>
+        <button id="ai-task-copy" class="icon-button" aria-label="Copy task details" title="Copy task details"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="8" y="8" width="12" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15 8V3H3v13h5" fill="none" stroke="currentColor" stroke-width="2"/></svg></button>
+        <button id="ai-task-download" class="icon-button" aria-label="Download complete AI history" title="Download complete project AI history">${icon('download')}</button>
+        <button id="ai-task-previous" class="icon-button" aria-label="Previous task">${icon('chevron-up')}</button>
+        <button id="ai-task-next" class="icon-button" aria-label="Next task">${icon('chevron-down')}</button>
+        <span id="ai-task-page" aria-label="Task page">0 / 0</span>
+      </span></header>
+      <label class="cad-context-switch"><input name="share" form="ai-chat-form" type="checkbox" role="switch" checked> Share current CAD context with the configured provider</label>
+      <p id="ai-task-status" role="status"></p><div id="ai-request-usage"></div><ol id="ai-task-steps"></ol>
     </div></details>
   </div>
   <div class="ai-chat-messages" role="log" aria-live="polite"></div>

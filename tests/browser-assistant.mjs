@@ -7,6 +7,7 @@ import {sketchDocument} from './browser-sketch.mjs';
 export async function verifyAssistantUI({context,host,observe,evidence}){
   let step=0;
   const output=[
+    {type:'function_call',call_id:'rejected-plan',name:'propose_plan',arguments:'{"summary":"First plan to reject."}'},
     {type:'function_call',call_id:'plan',name:'propose_plan',arguments:'{"summary":"Reconstruct the attached plate."}'},
     {type:'function_call',call_id:'build',name:'cad_command',arguments:'{"name":"cad.drawing.reconstruct.v1","inputJson":"{}"}'},
     {type:'message',role:'assistant',content:[{type:'output_text',text:'The candidate is ready.'}]}
@@ -86,7 +87,7 @@ export async function verifyAssistantUI({context,host,observe,evidence}){
     const chat=page.locator('[data-dock=right] #assistant-content');
     await chat.waitFor();
     await chat.locator('.ai-task-details summary').click();
-    await chat.getByRole('checkbox',{name:'Share current CAD context with the configured provider'}).check();
+    assert.equal(await chat.getByRole('switch',{name:'Share current CAD context with the configured provider'}).isChecked(),true);
     const svg=await readFile(new URL('../app/e2-m4-drawing.svg',import.meta.url));
     await chat.locator('input[type=file]').setInputFiles({name:'fixture.svg',mimeType:'image/svg+xml',buffer:svg});
     await chat.locator('.ai-task-details summary').click();
@@ -99,14 +100,21 @@ export async function verifyAssistantUI({context,host,observe,evidence}){
     await chat.locator('.ai-message.user').filter({hasText:'Reconstruct this drawing.'}).waitFor();
     await chat.getByRole('button',{name:'Apruebo',exact:true}).waitFor();
     assert.equal((await sketchDocument(page)).native.graph.features.length,0);
+    await chat.getByRole('button',{name:'Desapruebo',exact:true}).click();
+    await chat.locator('.ai-message.user').filter({hasText:'Desapruebo'}).waitFor();
+    await chat.locator('input[type=file]').setInputFiles({name:'fixture.svg',mimeType:'image/svg+xml',buffer:svg});
+    await input.fill('Reconstruct the attached drawing.');
+    await input.press('Enter');
     await chat.getByRole('button',{name:'Apruebo',exact:true}).click();
-    await chat.getByRole('button',{name:'Preview',exact:true}).click();
+    await chat.locator('.ai-message.user').filter({hasText:'Apruebo'}).waitFor();
+    await chat.getByRole('button',{name:'Exit preview',exact:true}).waitFor();
     await page.waitForFunction(()=>window.engineerViewport.proof?.proposalId&&window.engineerViewport.proof.exact?.volumeMm3>0);
     await page.locator('[data-source-id=drawing-extrusion]').waitFor();
-    await chat.getByRole('button',{name:'Drawing',exact:true}).click();
+    await page.locator('[data-panel=drawing]').click();
     await page.waitForFunction(()=>window.engineerViewport.proof?.drawing?.dimension?.valueMm===48);
-    await chat.getByRole('button',{name:'MAIN',exact:true}).click();
-    await page.waitForFunction(()=>window.engineerViewport.proof&&!window.engineerViewport.proof.proposalId&&!window.engineerViewport.proof.exact);
+    await chat.getByRole('button',{name:'Exit preview',exact:true}).click();
+    try{await page.waitForFunction(()=>window.engineerViewport.proof&&!window.engineerViewport.proof.proposalId&&!window.engineerViewport.proof.exact,{},{timeout:9000});}
+    catch(error){throw Error(JSON.stringify(await page.evaluate(()=>({proof:window.engineerViewport.proof?.revision,status:document.querySelector('#proof-status').textContent,chat:document.querySelector('#ai-chat-error').textContent,branch:document.body.dataset.aiPreview}))),{cause:error});}
     if(evidence){
       await page.screenshot({path:join(evidence,'pre-e3-assistant-chat-right.png')});
       await page.getByLabel('Dock assistant',{exact:true}).selectOption('center');
@@ -115,12 +123,27 @@ export async function verifyAssistantUI({context,host,observe,evidence}){
       await page.getByLabel('Dock assistant',{exact:true}).selectOption('right');
       await chat.waitFor();
     }
+    await chat.locator('.ai-task-details summary').click();
+    await chat.locator('#ai-task-steps li').filter({hasText:'cad.drawing.reconstruct.v1'}).waitFor();
+    await chat.locator('#ai-request-usage').getByText(/Agent response: The candidate is ready/).waitFor();
+    await chat.getByRole('button',{name:'Previous task'}).click();
+    await chat.locator('#ai-task-status').filter({hasText:'rejected'}).waitFor();
+    await chat.getByRole('button',{name:'Next task'}).click();
+    const download=page.waitForEvent('download');
+    await chat.getByRole('button',{name:'Download complete AI history'}).click();
+    assert.equal((await download).suggestedFilename(),'Axiom-CAD-AI-history.txt');
+    await chat.locator('.ai-task-details summary').click();
+    await chat.getByRole('button',{name:'Preview',exact:true}).click();
+    await chat.getByRole('button',{name:'Exit preview',exact:true}).waitFor();
     await chat.getByRole('button',{name:'Review changes',exact:true}).click();
     await page.locator('#review-drawing-evidence').filter({hasText:'Maximum deviation 0.000000 mm'}).waitFor();
-    await page.locator('#review-confirm').check();
-    await page.locator('#review-apply').click();
-    await page.locator('#review-dialog').waitFor({state:'hidden'});
+    await page.locator('#review-dismiss').click();
+    await chat.getByRole('button',{name:'Apply',exact:true}).click();
+    await chat.getByText(/Applied and saved/).waitFor();
+    assert.equal(await page.locator('#review-dialog').isVisible(),false);
+    await page.waitForFunction(()=>window.engineerViewport.proof?.revision===1&&!window.engineerViewport.proof.proposalId&&window.engineerViewport.proof.drawing);
     assert.equal((await sketchDocument(page)).native.graph.features.length,2);
+    assert.equal(JSON.parse(await readFile(path,'utf8')).revision,1);
   }finally{
     const revision=JSON.parse(await readFile(path,'utf8')).revision;
     await page.close();
