@@ -21,8 +21,11 @@
 .command-ribbon .ribbon-grid button[data-command-size=small]{width:25px!important;min-width:25px!important}
 .ribbon-split{display:inline-flex;align-items:stretch;flex:none}
 .ribbon-split[data-split-size=large]{flex-direction:column}
-.command-ribbon .ribbon-split .ribbon-arrow{min-width:13px;padding:0 2px;height:auto;min-height:0;background:transparent;border:0;font-size:10px}
-.command-ribbon .ribbon-split[data-split-size=large] .ribbon-arrow{height:13px}
+.command-ribbon .operation-page .ribbon-arrow{min-width:13px!important;padding:0 2px;height:22px!important;min-height:0;align-items:center;justify-content:center;background:transparent;border:0;font-size:10px}
+.command-ribbon .ribbon-split[data-split-size=large]>[data-command-size=large]{height:54px!important}
+.command-ribbon .ribbon-split[data-split-size=large] .ribbon-arrow{height:13px!important}
 .ribbon-options{margin:0;padding:4px;min-width:185px;background:#142232;color:#e8f1fc;border:1px solid #52667e;border-radius:4px;box-shadow:0 6px 18px #0008}
 .ribbon-options:popover-open{display:grid;gap:2px}
-.command-ribbon .ribbon-options button{height:26px;display:flex;align-items:center;justify-content:flex-start;gap:6px;padding:3px 6px;font-size:11px;white-space:nowrap}
+.command-ribbon .ribbon-options button{height:26px!important;display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:6px;padding:3px 6px;font-size:11px;white-space:nowrap}
+
+.command-ribbon .ribbon-options button svg,.command-ribbon .ribbon-options button img{width:16px;height:16px}
