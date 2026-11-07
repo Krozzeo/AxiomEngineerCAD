@@ -15,6 +15,7 @@ import manifest from './product.json' with {type:'json'};
 import {LabSession} from '../src/lab/session.mjs';
 import {recipe,KERNEL} from '../src/lab/profile.mjs';
 import {assemblyFixture} from '../src/assembly/fixtures.mjs';
+import {upgrade} from '../src/native/schema.mjs';
 import {NativeSession,createVersion} from '../src/native/session.mjs';
 import {runWorker} from '../src/lab/jobs.mjs';
 import {integratedDemo} from '../src/integration/demo.mjs';
@@ -24,6 +25,10 @@ import {CommandSession} from '../src/commands/session.mjs';
 import {reviewDemo} from '../src/commands/demo.mjs';
 import {proofDemo} from '../src/proof/demo.mjs';
 import {ProofSession} from '../src/proof/session.mjs';
+import {SharedAiProvider} from 'axiom-platform/ai-peer';
+import {SharedGitHubClient} from 'axiom-platform/github-peer';
+import {CadAssistant} from '../src/workbench/assistant.mjs';
+import {CadGitHub} from '../src/workbench/github.mjs';
 import {readLayout,saveLayout} from '../src/workbench/layout.mjs';
 
 export class EngineerAdapter {
@@ -44,7 +49,7 @@ export class EngineerAdapter {
     return this.execute(m.method, m.params);
   }
   async execute(method, params) {
-    if(method.startsWith('proof.')){check(this.doc&&!this.ended,'cancelled','Open a live study first.');const name=method.slice(6);check(['catalog','status','result','build','cancel','pick','export','preflight'].includes(name),'unsupportedCapability','Unknown proof operation.');const reads=['catalog','status','result'];if(reads.includes(name))return this.doc.proof[name]();const id=params.operationId,key=JSON.stringify({method,params});check(typeof id==='string'&&/^[a-zA-Z0-9_-]{8,100}$/.test(id),'invalidRequest','Use a unique bounded operation identity.');const old=this.receipts.get(id);if(old){check(old.key===key,'invalidRequest','Operation identity reused.');if(old.error)fail(old.error.code,old.error.message);return structuredClone(old.result);}check(this.receipts.size<256,'projectBusy','Receipt budget reached.');try{const result=await this.doc.proof[name](params);this.receipts.set(id,{key,result:structuredClone(result)});return result;}catch(e){this.receipts.set(id,{key,error:{code:e.code??'operationFailed',message:e.message}});throw e;}}
+    if(method.startsWith('proof.')){check(this.doc&&!this.ended,'cancelled','Open a live study first.');const name=method.slice(6);check(['catalog','status','result','build','cancel','pick','export','preflight'].includes(name),'unsupportedCapability','Unknown proof operation.');const reads=['catalog','status','result'];if(reads.includes(name))return this.doc.proof[name]();const id=params.operationId,key=JSON.stringify({method,params});check(typeof id==='string'&&/^[a-zA-Z0-9_-]{8,100}$/.test(id),'invalidRequest','Use a unique bounded operation identity.');const old=this.receipts.get(id);if(old){check(old.key===key,'invalidRequest','Operation identity reused.');if(old.error)fail(old.error.code,old.error.message);return structuredClone(old.result);}try{const result=await this.doc.proof[name](params);this.receipts.set(id,{key,result:structuredClone(result)});return result;}catch(e){this.receipts.set(id,{key,error:{code:e.code??'operationFailed',message:e.message}});throw e;}}
     if(['cad.catalog','cad.context','cad.status','cad.invoke','cad.grant','cad.revoke','cad.cancel'].includes(method)){check(this.doc&&!this.ended,'cancelled','Open a live study first.');return this.handle(method,params);}
     check(['initialize', ...manifest.capabilities, 'document.inspect', 'document.edit', 'document.buffer','lab.run','lab.inspect','lab.cancel','lab.apply','lab.fixture','native.inspect','native.convert','native.graph','native.snapshot','native.publish','native.restore','native.refresh','native.attach','native.adopt','native.recover','native.removeVersion','ui.layout.get','ui.layout.save','ui.visibility.get','ui.visibility.save'].includes(method),
       'unsupportedCapability', 'This build does not implement that operation.');
@@ -59,7 +64,7 @@ export class EngineerAdapter {
         if (previous.error) fail(previous.error.code, previous.error.message);
         return structuredClone(previous.result);
       }
-      check(this.receipts.size < 256, 'projectBusy', 'Session operation limit reached. Close and reopen.');
+
     }
     try {
       const result = await this.handle(method, params);
@@ -88,6 +93,8 @@ export class EngineerAdapter {
         check(u.origin === p.platformOrigin && u.protocol === 'http:' && u.hostname === '127.0.0.1', 'permissionDenied', 'Invalid host origin.');
       }
       this.root = await realpath(p.authorizedRoot); this.embeddingOrigin = p.platformOrigin;
+      if(p.services?.ai&&process.send)this.sharedAi=new SharedAiProvider({sessionId:this.sessionId,state:p.services.ai});
+      if(p.services?.github&&process.send)this.sharedGitHub=new SharedGitHubClient({sessionId:this.sessionId,account:p.services.github});
       return {protocolVersion:1, productId:manifest.productId, productVersion:manifest.productVersion, capabilities:manifest.capabilities};
     }
     check(this.root && !this.ended, 'cancelled', 'Initialize a live session first.');
@@ -97,7 +104,13 @@ export class EngineerAdapter {
       const destination=await authorized(this.root,p.destination);
       check((await readdir(destination)).length===0,'projectBusy','Demos require a fresh empty destination.');
       const projects=[];let nativePaths;if(p.demoIds.some(id=>id.startsWith('e0-m4-')||id==='e0-m5-review')){const docs=await nativeDemo();nativePaths={};for(const [id,key,folderName]of [['e0-m4-source','source','E0-M4-Source'],['e0-m4-native','consumer','E0-M4-Native']]){const folder=join(destination,folderName);await mkdir(folder);const path=join(folder,FILENAME);await atomicJson(path,docs[key]);nativePaths[id]=path;}if(p.demoIds.includes('e0-m5-review')){const folder=join(destination,'E0-M5-Review');await mkdir(folder);const path=join(folder,FILENAME);await atomicJson(path,await reviewDemo(docs.consumer));nativePaths['e0-m5-review']=path;}}
-      for(const demoId of p.demoIds){if(demoId==='e1-m5-extrusion'){const folder=join(destination,'E1-M5-Extrusion-Sketch-Workbench');await mkdir(folder);const path=join(folder,FILENAME),value=await extrusionDemo(),proof=(await runWorker('native-verify',{document:value})).result;value.native.versions.push(createVersion(value,proof));await atomicJson(path,value);projects.push({demoId,path,...await this.detect(path)});continue;}if(demoId==='e1-m4-parameters'){const folder=join(destination,'E1-M4-Equations-Sketch-Workbench');await mkdir(folder);const path=join(folder,FILENAME),value=await parameterDemo(),proof=(await runWorker('native-verify',{document:value})).result;value.native.versions.push(createVersion(value,proof));await atomicJson(path,value);await atomicJson(join(folder,'.engineer-visibility.json'),{schemaVersion:1,documentId:value.documentId,revision:0,entries:['sketch-on-top','sketch-on-right','sketch-relations-practice'].map(id=>({id,state:'hide'}))});projects.push({demoId,path,...await this.detect(path)});continue;}if(demoId==='e1-m3-sketch'){const folder=join(destination,'E1-M3-Parametric-Sketches');await mkdir(folder);const path=join(folder,FILENAME),value=await parametricDemo(),proof=(await runWorker('native-verify',{document:value})).result;value.native.versions.push(createVersion(value,proof));await atomicJson(path,value);projects.push({demoId,path,...await this.detect(path)});continue;}if(demoId==='e1-m2-sketch'){const folder=join(destination,'E1-M2-Sketches');await mkdir(folder);const path=join(folder,FILENAME),value=sketchDemo(),proof=(await runWorker('native-verify',{document:value})).result;value.native.versions.push(createVersion(value,proof));await atomicJson(path,value);projects.push({demoId,path,...await this.detect(path)});continue;}if(['e0-m7-integrated','e1-m1-workbench'].includes(demoId)){const workbench=demoId==='e1-m1-workbench',folder=join(destination,workbench?'E1-M1-Workbench':'E0-M7-Integrated');await mkdir(folder);const path=join(folder,FILENAME),value=integratedDemo();if(workbench)value.metadata.name='E1.M1 Model Workbench';const proof=(await runWorker('native-verify',{document:value})).result,version=createVersion(value,proof);value.native.versions.push(version);value.native.graph.drawings.push({id:'drawing-history',revision:0,sheets:[{id:'sheet-history',size:'A4',views:[{id:'view-history',model:{documentId:value.documentId,definitionId:value.native.graph.primaryDefinitionId,versionId:version.id}}],notes:[{id:'note-history',viewId:'view-history',text:'Initial integrated width40/depth10; retained immutable source.'}]}]});await atomicJson(path,value);projects.push({demoId,path,...await this.detect(path)});continue;}if(demoId==='e0-m6-drawing-gpu'){const folder=join(destination,'E0-M6-Drawing-GPU');await mkdir(folder);const path=join(folder,FILENAME);await atomicJson(path,proofDemo());projects.push({demoId,path,...await this.detect(path)});continue;}if(nativePaths?.[demoId]){projects.push({demoId,path:nativePaths[demoId],...await this.detect(nativePaths[demoId])});continue;}const spatial=demoId==='e0-m3-mates',folder=join(destination,spatial?'E0-M3-Spatial-Lab':'E0-M2-Geometry-Lab');await mkdir(folder);
+      for(const demoId of p.demoIds){
+        if(demoId==='e2-m4-drawing-reconstruction'){
+          const folder=join(destination,'E2-M4-Drawing-Reconstruction');await mkdir(folder);
+          const path=join(folder,FILENAME);await atomicJson(path,upgrade(blank('E2.M4 Drawing Reconstruction')));
+          projects.push({demoId,path,...await this.detect(path)});continue;
+        }
+        if(demoId==='e2-m3-drawing-proposal'){const folder=join(destination,'E2-M3-Drawing-Proposal');await mkdir(folder);const path=join(folder,FILENAME),value=await extrusionDemo(),proof=(await runWorker('native-verify',{document:value})).result;value.native.versions.push(createVersion(value,proof));await atomicJson(path,value);projects.push({demoId,path,...await this.detect(path)});continue;}if(demoId==='e1-m4-parameters'){const folder=join(destination,'E1-M4-Equations-Sketch-Workbench');await mkdir(folder);const path=join(folder,FILENAME),value=await parameterDemo(),proof=(await runWorker('native-verify',{document:value})).result;value.native.versions.push(createVersion(value,proof));await atomicJson(path,value);await atomicJson(join(folder,'.engineer-visibility.json'),{schemaVersion:1,documentId:value.documentId,revision:0,entries:['sketch-on-top','sketch-on-right','sketch-relations-practice'].map(id=>({id,state:'hide'}))});projects.push({demoId,path,...await this.detect(path)});continue;}if(demoId==='e1-m3-sketch'){const folder=join(destination,'E1-M3-Parametric-Sketches');await mkdir(folder);const path=join(folder,FILENAME),value=await parametricDemo(),proof=(await runWorker('native-verify',{document:value})).result;value.native.versions.push(createVersion(value,proof));await atomicJson(path,value);projects.push({demoId,path,...await this.detect(path)});continue;}if(demoId==='e1-m2-sketch'){const folder=join(destination,'E1-M2-Sketches');await mkdir(folder);const path=join(folder,FILENAME),value=sketchDemo(),proof=(await runWorker('native-verify',{document:value})).result;value.native.versions.push(createVersion(value,proof));await atomicJson(path,value);projects.push({demoId,path,...await this.detect(path)});continue;}if(['e0-m7-integrated','e1-m1-workbench'].includes(demoId)){const workbench=demoId==='e1-m1-workbench',folder=join(destination,workbench?'E1-M1-Workbench':'E0-M7-Integrated');await mkdir(folder);const path=join(folder,FILENAME),value=integratedDemo();if(workbench)value.metadata.name='E1.M1 Model Workbench';const proof=(await runWorker('native-verify',{document:value})).result,version=createVersion(value,proof);value.native.versions.push(version);value.native.graph.drawings.push({id:'drawing-history',revision:0,sheets:[{id:'sheet-history',size:'A4',views:[{id:'view-history',model:{documentId:value.documentId,definitionId:value.native.graph.primaryDefinitionId,versionId:version.id}}],notes:[{id:'note-history',viewId:'view-history',text:'Initial integrated width40/depth10; retained immutable source.'}]}]});await atomicJson(path,value);projects.push({demoId,path,...await this.detect(path)});continue;}if(demoId==='e0-m6-drawing-gpu'){const folder=join(destination,'E0-M6-Drawing-GPU');await mkdir(folder);const path=join(folder,FILENAME);await atomicJson(path,proofDemo());projects.push({demoId,path,...await this.detect(path)});continue;}if(nativePaths?.[demoId]){projects.push({demoId,path:nativePaths[demoId],...await this.detect(nativePaths[demoId])});continue;}const spatial=demoId==='e0-m3-mates',folder=join(destination,spatial?'E0-M3-Spatial-Lab':'E0-M2-Geometry-Lab');await mkdir(folder);
         const value=spatial?{...blank('E0.M3 Spatial Mate Lab'),provisional:'E0.M3',assembly:assemblyFixture('coaxial')}:{...blank('E0.M2 Geometry & Sketch Lab'),provisional:'E0.M2',experiment:{profile:'E0.M2-probe-v0',kernel:KERNEL,spec:recipe()}};
         const path=join(folder,FILENAME);await atomicJson(path,value);projects.push({demoId,path,...await this.detect(path)});}
       return {productVersion:manifest.productVersion,projects};
@@ -119,6 +132,7 @@ export class EngineerAdapter {
         this.doc.lab = new LabSession(this.doc);
         this.doc.proof = new ProofSession(this.doc,this.root);
         this.doc.commands = new CommandSession(this.doc,{sessionId:this.sessionId,root:this.root});await this.doc.commands.load();
+        this.assistant=new CadAssistant(this);this.github=new CadGitHub(this);
         this.runtime = await this.start({adapter:this, embeddingOrigin:this.embeddingOrigin});
         check(!this.ended, 'cancelled', 'Session closed before document creation completed.');
         if (create) await atomicJson(path, value);
@@ -171,6 +185,7 @@ export class EngineerAdapter {
     }
   }
   async cleanup() {
+    this.assistant?.close();
     if (this.doc) this.doc.closed = true;
     await this.doc?.proof?.close();
     await this.doc?.commands?.close();
@@ -178,13 +193,20 @@ export class EngineerAdapter {
     const runtime = this.runtime; this.runtime = null;
     try { await runtime?.close(); } finally { const release = this.release; this.release = null; await release?.(); this.doc = null; }
   }
-  async shutdown() { this.ended = true; if (this.doc) this.doc.closed = true; return this.enqueue(() => this.cleanup()); }
+  async shutdown() { this.ended = true; this.sharedAi?.close(); this.sharedGitHub?.close(); if (this.doc) this.doc.closed = true; return this.enqueue(() => this.cleanup()); }
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   check(process.send, 'permissionDenied', 'Use Platform or the direct CLI to launch Engineer.');
   const adapter = new EngineerAdapter();
   process.on('message', async message => {
+    if(message?.kind==='service.ai'){adapter.sharedAi?.receive(message);return;}
+    if(message?.kind==='service.account'){adapter.sharedGitHub?.receive(message);return;}
+    if(message?.kind==='service.reply'){
+      if(adapter.sharedAi?.pending.has(message.requestId))adapter.sharedAi.receive(message);
+      else adapter.sharedGitHub?.receive(message);
+      return;
+    }
     try { const result = await adapter.request(message); process.send?.({...message, params:undefined, ok:true, result}); }
     catch (error) { process.send?.({...message, params:undefined, ok:false, error:{code:error.code ?? 'operationFailed', message:error.message}}); }
   });

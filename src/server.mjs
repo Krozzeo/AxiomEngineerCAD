@@ -1,3 +1,4 @@
+import {apiReference} from './workbench/api-reference.mjs';
 import {createServer} from 'node:http';
 import {randomBytes} from 'node:crypto';
 import {readFile} from 'node:fs/promises';
@@ -30,6 +31,23 @@ export async function startEditor({adapter, embeddingOrigin}) {
           const value=await adapter.enqueue(()=>{adapter.doc.commands.agent((req.headers.authorization??'').replace(/^Bearer /,''));if(name==='catalog')return adapter.doc.commands.catalog();if(name==='context')return adapter.doc.commands.context(actor);if(name==='status')return adapter.doc.commands.status(actor);if(name==='cancel'){check(adapter.doc.commands.job?.owner===actor.id,'permissionDenied','Only owned jobs can be cancelled.');return adapter.doc.commands.cancelJob();}return adapter.doc.commands.invoke(params,actor);});return respond(res,200,value);
         }
         check(req.headers.authorization === 'Bearer ' + token, 'permissionDenied', 'Authenticate this editor session.');
+        if(req.method==='GET'&&url.pathname==='/v1/api/reference')return respond(res,200,apiReference(url.searchParams.get('id')));
+        if(url.pathname.startsWith('/v1/assistant/')||url.pathname.startsWith('/v1/github/')){
+          const [service,action]=url.pathname.slice(4).split('/');
+          const reads=service==='assistant'?['status','models','history']:['status'];
+          const writes=service==='assistant'?['configure','turn','test']:['action'];
+          check(adapter.doc&&!adapter.doc.closed&&(req.method==='GET'&&reads.includes(action)||req.method==='POST'&&writes.includes(action)),'permissionDenied','Unknown service action.');
+          let input={};
+          if(req.method==='POST'){
+            let size=0;const chunks=[];
+            for await(const chunk of req){size+=chunk.length;check(size<=32768,'InvalidInput','Request exceeds 32 KiB.');chunks.push(chunk);}
+            input=JSON.parse(Buffer.concat(chunks).toString('utf8'));
+            check(input&&typeof input==='object'&&!Array.isArray(input),'InvalidInput','Expected request fields.');
+          }
+          const peer=adapter[service];
+          const result=service==='github'&&action==='action'?await peer.execute(input):await peer[action](input);
+          return respond(res,200,result);
+        }
         const close = url.pathname === '/v1/close';
         check(!close || !embeddingOrigin, 'permissionDenied', 'Close this hosted session from Axiom Platform.');
         const method = routes[url.pathname] ?? (close ? 'project.close' : null);
@@ -52,7 +70,7 @@ export async function startEditor({adapter, embeddingOrigin}) {
       const vendor=vendorFiles.find(name=>url.pathname==='/solver-vendor/'+name),shared=solverAssets[url.pathname];
       if(req.method==='GET'&&(vendor||shared)){res.writeHead(200,{...headers,'Content-Type':vendor?.endsWith('.wasm')?'application/wasm':'text/javascript; charset=utf-8'});return res.end(await readFile(new URL(vendor?'../node_modules/@salusoft89/planegcs/dist/'+vendor:'./'+shared,import.meta.url)));}
       const assets = {'/':['index.html','text/html'], '/app.mjs':['app.mjs','text/javascript'], '/styles.css':['styles.css','text/css'], '/lab.mjs':['lab.mjs','text/javascript'], '/assembly.mjs':['assembly.mjs','text/javascript'], '/native.mjs':['native.mjs','text/javascript'], '/review.mjs':['review.mjs','text/javascript'], '/proof.mjs':['proof.mjs','text/javascript'], '/gpu-view.mjs':['gpu-view.mjs','text/javascript'], '/cad-camera.mjs':['cad-camera.mjs','text/javascript'], '/integration.mjs':['integration.mjs','text/javascript'], '/workbench.mjs':['workbench.mjs','text/javascript'], '/workbench.css':['workbench.css','text/css']};
-      for(const name of ['search-select.mjs','sketch-targets.mjs','parameter-manager.mjs','sketch-dimensions.mjs','sketch-manager.mjs','sketch-solver-worker.mjs','sketch-solver-client.mjs','cad-commands.mjs','feature-actions.mjs','gpu-highlights.mjs','sketch-workbench.mjs','presentation.mjs','interaction-workbench.mjs','panel-channel.mjs','editor-document.mjs','icons.mjs','dock-layout.mjs','dock-workbench.mjs'])assets['/'+name]=[name,'text/javascript'];assets['/dock.css']=['dock.css','text/css'];for(const name of ['close','save','reload','scene','settings','folder','folder-open','lock','unlock','chevron-down','chevron-up','download','plus','open-tabs'])assets['/icons/'+name+'.svg']=['icons/'+name+'.svg','image/svg+xml'];assets['/interaction.css']=['interaction.css','text/css'];assets['/sketch.css']=['sketch.css','text/css'];assets['/parameters.css']=['parameters.css','text/css'];assets['/favicon.svg']=['favicon.svg','image/svg+xml'];assets['/soft-drag.mjs']=['../src/sketch/soft-drag.mjs','text/javascript'];assets['/model-owner.mjs']=['model-owner.mjs','text/javascript'];assets['/sketch-references.mjs']=['../src/sketch/references.mjs','text/javascript'];assets['/dimension-intent.mjs']=['../src/sketch/dimension-intent.mjs','text/javascript'];assets['/ribbon-sizes.mjs']=['ribbon-sizes.mjs','text/javascript'];const asset = assets[url.pathname];
+      for(const name of ['sketch-snap.mjs','convert-entities.mjs','selection-menu.mjs','sketch-picking.mjs','model-candidates.mjs','operation-preview.mjs','sketch-external.mjs','preview-requests.mjs','search-select.mjs','sketch-targets.mjs','parameter-manager.mjs','sketch-dimensions.mjs','sketch-manager.mjs','sketch-solver-worker.mjs','sketch-solver-client.mjs','cad-commands.mjs','feature-actions.mjs','gpu-highlights.mjs','sketch-workbench.mjs','presentation.mjs','interaction-workbench.mjs','panel-channel.mjs','editor-document.mjs','icons.mjs','dock-layout.mjs','dock-workbench.mjs','api-panel.mjs','services-ui.mjs','services-markup.mjs','chat-format.mjs','assistant-task-info.mjs','assistant-history-format.mjs'])assets['/'+name]=[name,'text/javascript'];assets['/dock.css']=['dock.css','text/css'];for(const name of ['close','save','reload','scene','settings','folder','folder-open','lock','unlock','chevron-down','chevron-up','download','plus','open-tabs','github','ai-off','ai-on','attachment'])assets['/icons/'+name+'.svg']=['icons/'+name+'.svg','image/svg+xml'];assets['/interaction.css']=['interaction.css','text/css'];assets['/sketch.css']=['sketch.css','text/css'];assets['/parameters.css']=['parameters.css','text/css'];assets['/product.json']=['../platform/product.json','application/json'];assets['/favicon.svg']=['favicon.svg','image/svg+xml'];assets['/e2-m4-drawing.svg']=['e2-m4-drawing.svg','image/svg+xml'];assets['/soft-drag.mjs']=['../src/sketch/soft-drag.mjs','text/javascript'];assets['/model-owner.mjs']=['model-owner.mjs','text/javascript'];assets['/reference-anchors.mjs']=['../src/sketch/reference-anchors.mjs','text/javascript'];assets['/external-geometry.mjs']=['../src/sketch/external-geometry.mjs','text/javascript'];assets['/sketch-references.mjs']=['../src/sketch/references.mjs','text/javascript'];assets['/dimension-intent.mjs']=['../src/sketch/dimension-intent.mjs','text/javascript'];assets['/ribbon-sizes.mjs']=['ribbon-sizes.mjs','text/javascript'];assets['/services.css']=['services.css','text/css'];const asset = assets[url.pathname];
       if (req.method !== 'GET' || !asset) return respond(res, 404, {code:'unsupportedCapability', message:'Not found.'});
       res.writeHead(200, {...headers, 'Content-Type':asset[1] + '; charset=utf-8'});
       res.end(await readFile(new URL('../app/' + asset[0], import.meta.url)));

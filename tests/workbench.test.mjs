@@ -16,7 +16,7 @@ import {perspectiveMatrix,cameraMatrix,project,fitCamera,normalView,pointerMode}
 const near=(a,b,t=1e-5)=>assert.ok(Math.abs(a-b)<t,`${a} != ${b}`);
 async function setup(t,empty=false){const f=await fixture(t);if(empty)await f.call('project.create',{path:f.folder,name:'Empty workbench'});else{const d=await f.call('project.demos',{demoIds:['e1-m1-workbench'],destination:f.folder});await f.call('project.open',{path:d.projects[0].path});}return {...f,path:f.adapter.doc.path,s:f.adapter.doc.proof,c:f.adapter.doc.commands};}
 async function build(f,extra={}){f.s.build({operationId:randomUUID(),expectedRevision:0,viewportOnly:true,...extra});await f.s.job.promise;assert.equal(f.s.job.state,'completed',JSON.stringify(f.s.job.error));return f.s.result();}
-async function invoke(f,name,inputs={},extra={}){const {effects,...context}=f.c.context(),tool=f.c.catalog().tools.find(t=>t.name==='cad.'+name+'.v1');return f.c.invoke({...context,operationId:randomUUID(),traceId:randomUUID(),toolName:tool.name,toolVersion:'1',capability:tool.capability,effectClass:'ReadOnly',inputs,...extra});}
+async function invoke(f,name,inputs={},extra={},actor){const {effects,...context}=f.c.context(actor),tool=f.c.catalog().tools.find(t=>t.name==='cad.'+name+'.v1');return f.c.invoke({...context,operationId:randomUUID(),traceId:randomUUID(),toolName:tool.name,toolVersion:'1',capability:tool.capability,effectClass:'ReadOnly',inputs,...extra},actor);}
 test('empty and legacy document exposes canonical orthonormal definition datums without conversion or writes',async t=>{const f=await setup(t,true),before=await readFile(f.path),r=await build(f),datums=baseDatums(f.adapter.doc.value);assert.equal(datums.length,7);assert.equal(r.scene.occurrences.length,0);assert.equal(r.drawing,null);assert.equal(f.adapter.doc.value.formatVersion,0);assert.equal(f.adapter.doc.value.revision,0);for(const d of datums){assert.deepEqual(d.originMm,[0,0,0]);if(d.datumType!=='point')near(Math.hypot(...(d.normal??d.direction)),1);assert.deepEqual(d.occurrencePath,['definition-main']);}assert.deepEqual(await readFile(f.path),before);});
 test('empty workbench datum picks have stable semantic identities and cannot export a fictional drawing',async t=>{const f=await setup(t,true),r=await build(f),d=r.scene.datums.find(d=>d.id==='datum-xy'),picked=f.s.pick({operationId:randomUUID(),expectedRevision:0,manifestId:r.manifestId,kind:'datum',selectionId:d.selectionId});assert.equal(picked.id,'datum-xy');assert.deepEqual(picked.normal,[0,0,1]);assert.equal(picked.frame,'definition-local');await assert.rejects(f.s.export({operationId:randomUUID(),expectedRevision:0,manifestId:r.manifestId,confirmation:'DownloadLocalPDF'}),{code:'UnsupportedCapability'});});
 test('actual B-Rep corners are independently bounded vertices, not tessellation samples',async t=>{const f=await setup(t),r=await build(f),m=r.scene.models[0].mesh;assert.equal(m.exactVertices.length,8);for(const v of m.exactVertices){assert.equal(v.kind,'vertex');assert.ok([-20,20].includes(v.pointMm[0]));assert.ok([-15,15].includes(v.pointMm[1]));assert.ok([0,10].includes(v.pointMm[2]));assert.equal(v.role.split('+').length,3);}assert.equal(new Set(m.exactVertices.map(v=>v.role)).size,8);near(m.volumeMm3,12000-90*Math.PI);});
@@ -33,3 +33,39 @@ test('normal-to and explicit navigation bindings separate camera modes from enti
 test('actual previous0.0.7 reader reopens the new workbench demo unchanged without a schema migration',async t=>{const f=await setup(t),before=await readFile(f.path),dir=resolve('.axiom/e1-old-reader-'+randomUUID());assert.ok(dir.startsWith(resolve('.axiom')));await mkdir(dir,{recursive:true});t.after(()=>rm(dir,{recursive:true,force:true}));const exec=promisify(execFile),git=process.platform==='win32'&&existsSync('C:/Program Files/Git/cmd/git.exe')?'C:/Program Files/Git/cmd/git.exe':'git',archive=await exec(git,['archive','--format=tar','6d799f1955854cdf2540cf8aad2af5ae773f823f','src','platform','package.json','package-lock.json'],{encoding:'buffer',maxBuffer:4*1024*1024}),tar=join(dir,'source.tar');await writeFile(tar,archive.stdout);await exec('tar',['-xf',tar,'-C',dir]);const code=`import {readDocument} from ${JSON.stringify(pathToFileURL(join(dir,'src/document.mjs')).href)};const v=await readDocument(${JSON.stringify(f.path)});console.log(JSON.stringify({format:v.formatVersion,revision:v.revision,name:v.metadata.name}));`,out=await exec(process.execPath,['--input-type=module','-e',code]);assert.equal(JSON.parse(out.stdout).format,1);assert.equal(JSON.parse(out.stdout).name,'E1.M1 Model Workbench');assert.deepEqual(await readFile(f.path),before);});
 
 test('two UI views share only an identical in-flight read computation and retain cancellation/stale guards',async t=>{const f=await setup(t),a=f.s.build({operationId:randomUUID(),expectedRevision:0,viewportOnly:true}),b=f.s.build({operationId:randomUUID(),expectedRevision:0,viewportOnly:true});assert.equal(a.job.id,b.job.id);assert.throws(()=>f.s.build({operationId:randomUUID(),expectedRevision:0,viewportOnly:false}),{code:'projectBusy'});f.s.cancel({operationId:randomUUID()});await f.s.job.promise;assert.equal(f.s.job.state,'cancelled');assert.equal(f.s.proof,null);});
+
+test('headless evidence captures exact face and edge identities with a bounded visual and rejects stale input',async t=>{
+ const f=await fixture(t),demo=await f.call('project.demos',{demoIds:['e2-m3-drawing-proposal'],destination:f.folder});
+ await f.call('project.open',{path:demo.projects[0].path});
+ f.c=f.adapter.doc.commands;
+ const before=await readFile(demo.projects[0].path),document=f.adapter.doc.value;
+ const target={kind:'face',definitionId:'definition-main',producerId:'extrusion-plate',role:'top',occurrencePath:['definition-main']};
+ const grant=f.c.grant(),agent=f.c.agent(grant.token);
+ async function query(name,inputs){
+  const receipt=await invoke(f,name,inputs,{},agent);
+  assert.equal(receipt.receipt.outcome,'accepted',JSON.stringify(receipt));
+  await f.c.job.promise;
+  assert.equal(f.c.job.state,'completed',JSON.stringify(f.c.job.error));
+  return f.c.job.result;
+ }
+ const face=await query('selection.inspect',target);
+ const image=await query('viewport.capture',target);
+ assert.deepEqual(image.selection,face);
+ assert.equal(image.selection.source.contentHash,hash(document));
+ near(face.areaMm2,1200-9*Math.PI);
+ assert.match(image.svg,/<path d="M/);
+ assert.match(image.svg,/<desc>Model revision /);
+ assert.ok(Buffer.byteLength(image.svg)<=10000);
+ const proof=(await runWorker('drawing-proof',{document,viewportOnly:true})).result;
+ const edge=proof.scene.models[0].mesh.edges.find(item=>!item.displayHidden&&item.resolution==='ResolvedStable');
+ const wire=await query('viewport.capture',{...target,kind:'edge',role:edge.role});
+ near(wire.selection.lengthMm,edge.lengthMm);
+ const stale=await invoke(f,'viewport.capture',target,{expectedDocumentRevision:document.revision+1});
+ assert.equal(stale.receipt.error.code,'RevisionConflict');
+ const missing=await invoke(f,'viewport.capture',{...target,role:'missing'});
+ assert.equal(missing.receipt.outcome,'accepted');
+ await f.c.job.promise;
+ assert.equal(f.c.job.error.code,'LostReference');
+ assert.equal(f.adapter.doc.proof.proof,null);
+ assert.deepEqual(await readFile(demo.projects[0].path),before);
+});

@@ -2,7 +2,7 @@
 
 Local-first, browser-operated parametric mechanical CAD and engineering-documentation product in the Axiom family, designed from the outset for both human users and AI agents.
 
-> **Current work: 0.1.8 / E1.M5 sketch interactions.** Owner-requested changes passed local domain, full browser and independent PDF validation. [Scope and test flow](docs/milestones/E1_M5_UX_0_1_8.md), [ADR025](docs/architecture/ADR-025-SKETCH-INTERACTION-AND-PLANAR-SUPPORT.md). Exact-head CI, immutable publication and actual public installation remain delivery gates; owner acceptance is separate.
+> **Current candidate: 0.2.6 / pre-E3 integrations.** See [assistant, API and GitHub](docs/PRE_E3_ASSISTANT.md).
 
 Start development with `npm run context` and [the compact context](docs/PROJECT_CONTEXT.md). The [workflow](docs/DEVELOPMENT_WORKFLOW.md) selects focused checks during implementation, then complete exact-head acceptance and real installation proof for delivery.
 
@@ -10,7 +10,7 @@ Start development with `npm run context` and [the compact context](docs/PROJECT_
 
 Every completed review milestone is delivered as an experimental prepared installation. In Platform 0.1.12+, open **Installations → Add installation → Axiom Engineer CAD → Refresh**, select the published experimental build, download/install and activate. Then create an Engineer project. Source PRs and passing tests alone are not installable publications. See [milestone delivery](docs/MILESTONE_DELIVERY.md) for the publication and verification gate.
 
-**Current demo:** **E1.M5 Extrusion & Sketch Workbench**. Install/activate the selected version and use **Load Demos**. The preceding verified public delivery is [0.1.7 / PR15](https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-15-e887a1338c4326603e360b435703ca6ab4d8717a). The 0.1.8 review candidate adds the owner-requested sketch interactions described in [the review guide](docs/milestones/E1_M5_UX_0_1_8.md). Current exact-head CI and compatible experimental installation evidence are maintained on [PR16](https://github.com/Krozzeo/AxiomEngineerCAD/pull/16); match the build provenance before installing. The production catalog advertises only its current M5 demo and preserves earlier user projects. Historical labs remain explicit acceptance fixtures.
+**Current demo:** **E2.M4 Drawing Reconstruction**. Install and activate the selected build, then use **Load Demos**. Last verified delivery: [0.2.3 / PR18](https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-18-7945d5c1bac966b9972d7251ccfa393836344904).
 
 The 0.1.8 workbench adds live primitive previews, persistent Snap (hold Ctrl to bypass), atomic relation cleanup, all geometric constraints in Parameter Manager, searchable binding/value controls, repairable conflict/missing-reference lists, intuitive signed dimensions and planar-face sketch supports. New Sketch previews normal/right orientation; Exit Sketch returns selection to its source. Conservative planar geometry witnesses require explicit repair when the supporting face changes. [Technical decisions and compatibility](docs/architecture/ADR-025-SKETCH-INTERACTION-AND-PLANAR-SUPPORT.md).
 

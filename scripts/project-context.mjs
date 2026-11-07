@@ -27,7 +27,7 @@ if(process.argv.includes('--check')){
   console.log(JSON.stringify({
     contextValid:!errors.length,errors,canonical:state.canonical,
     working:{version:pkg.version,branch:query(['branch','--show-current']),commit:query(['rev-parse','HEAD']),changes:query(['status','--short'])},
-    milestone:state.milestone,lastDelivered:state.lastDelivered,
+    milestone:state.milestone,candidate:state.candidate??null,lastDelivered:state.lastDelivered,
     constraints:state.constraints,navigation:state.navigation,
     start:'Read AGENTS.md and docs/PROJECT_CONTEXT.md; select affected contracts/functions. Do not dump the full tool catalogue or old logs.'
   },null,2));

@@ -1,6 +1,6 @@
-# Engineer handoff — E1.M5 sketch interactions /0.1.8
+# Engineer handoff - E2 stabilization / 0.2.6 candidate
 
-Start with `npm run context`, AGENTS.md and `docs/PROJECT_CONTEXT.md`. Reuse the reviewed Master baseline only when its hash matches; follow AGENTS1 on mismatch or foundational decisions. `docs/PROJECT_STATE.json` indexes the last delivered CAD build (0.1.8 / PR16), owner acceptance and authoritative evidence. The current process work changes development instructions/CI, not CAD behavior or version. See `docs/DEVELOPMENT_WORKFLOW.md`. Preserve previous immutable builds and all user files; delivery does not approve E2, main merge or stable publication.
+Start with `npm run context`, AGENTS.md, [compact context](docs/PROJECT_CONTEXT.md) and the [integration notes](docs/PRE_E3_ASSISTANT.md). E3.M1 follows the owner’s live model tests.
 
 ## Source and authority
 

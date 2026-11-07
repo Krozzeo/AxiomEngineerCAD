@@ -36,3 +36,44 @@ test('history write failure before Apply and changed primary preserve MAIN witho
 test('first exact extrusion and typed semantic measurement work through the registered command path',async t=>{const f=await fixture(t),{upgrade}=await import('../src/native/schema.mjs'),{blank}=await import('../src/document.mjs'),path=join(f.folder,FILENAME);await atomicJson(path,upgrade(blank('Empty native study')));await f.call('project.open',{path});const s=f.adapter.doc.commands,q=value=>({value,unit:'mm'});ok(await invoke(s,'feature.extrude',{featureId:'extrusion-first',definitionId:'definition-main',width:q(40),height:q(30),depth:q(10)},'MainMutation'));await done(s);ok(await invoke(s,'geometry.measure',{featureId:'extrusion-first',role:'top'}));const measure=await done(s);assert.deepEqual(measure.volume,{value:12000,unit:'mm3'});assert.equal(measure.reference.selector.producerId,'extrusion-first');assert.equal(measure.reference.state,'ResolvedStable');});
 test('deterministic command trace replays independently to the same validated candidate',async t=>{const f=await setup(t),p=await proposal(f.commands);await change(f.commands,p);ok(await invoke(f.commands,'feature.update',{featureId:'feature-geometry',parameter:'height',quantity:{value:35,unit:'mm'}},'LocalProposal',p));await done(f.commands);const replay=await proposal(f.commands);for(const cmd of p.commands){ok(await invoke(f.commands,cmd.name.slice(4,-3),cmd.inputs,'LocalProposal',replay));await done(f.commands);}assert.equal(hash(p.candidate),hash(replay.candidate));await validateProposal(f.commands,replay);assert.ok(Math.abs(replay.proof.after.geometry.volumeMm3-(21000-180*Math.PI))<1e-6);assert.equal(f.adapter.doc.value.experiment.spec.width,40);});
 test('closing live tool work cancels the isolated process and leaves saved MAIN unchanged',async t=>{const f=await setup(t),bytes=await readFile(f.path);ok(await invoke(f.commands,'geometry.measure',{featureId:'feature-geometry'}));await f.adapter.shutdown();assert.equal(f.commands.job.state,'cancelled');assert.deepEqual(await readFile(f.path),bytes);assert.equal(f.commands.grants.size,0);});
+
+test('local agent drawing plan is isolated, reviewable, saved by a human, and revision bound',async t=>{
+ const f=await fixture(t),demo=await f.call('project.demos',{demoIds:['e2-m3-drawing-proposal'],destination:f.folder}),path=demo.projects[0].path;
+ await f.call('project.open',{path});
+ const s=f.adapter.doc.commands,grant=s.grant(),agent=s.agent(grant.token),before=await readFile(path);
+ const layout={producerId:'extrusion-plate',orientation:'landscape',views:['front'],dimensions:['depth']};
+ async function draft(){
+  const p=await proposal(s,agent);
+  ok(await invoke(s,'drawing.layout.set',layout,'LocalProposal',p,agent));await done(s);
+  await validateProposal(s,p,agent);return p;
+ }
+ const p=await draft();
+ assert.deepEqual(await readFile(path),before);
+ assert.deepEqual(f.adapter.doc.value.native.graph.drawings,[]);
+ const h=await review(s,p);
+ assert.deepEqual(p.review.evidence.drawing.before.views.map(v=>v.name),['top','front']);
+ assert.deepEqual(p.review.evidence.drawing.after.views.map(v=>v.name),['front']);
+ assert.equal(p.review.evidence.drawing.after.sheet.widthMm,297);
+ assert.deepEqual(p.review.evidence.drawing.after.dimensions,[{name:'depth',valueMm:10,kind:'driving'}]);
+ const args={proposalId:p.id,reviewHash:h,confirmation:'ApplyAndSave'};
+ const denied=await invoke(s,'proposal.apply',args,'MainMutation',p,agent);
+ assert.equal(denied.receipt.error.code,'PermissionDenied');
+
+ const cancelled=await draft(),cancelledHash=await review(s,cancelled);
+ ok(await invoke(s,'proposal.cancel',{proposalId:cancelled.id},'LocalProposal',cancelled,agent));
+ const failed=await invoke(s,'proposal.apply',{...args,proposalId:cancelled.id,reviewHash:cancelledHash},'MainMutation',cancelled);
+ assert.equal(failed.receipt.outcome,'rejected');
+ const stale=await draft(),staleHash=await review(s,stale);
+ ok(await invoke(s,'proposal.apply',args,'MainMutation',p));
+ const staleResult=await invoke(s,'proposal.apply',{...args,proposalId:stale.id,reviewHash:staleHash},'MainMutation',stale);
+ assert.equal(staleResult.receipt.error.code,'ProposalStale');
+ const saved=JSON.parse(await readFile(path,'utf8'));
+ assert.deepEqual(saved.native.graph.drawings[0].layout,layout);
+ assert.equal(saved.revision,1);
+ const {buildProof}=await import('../src/proof/kernel.mjs');
+ const {drawing}=await buildProof(saved);
+ assert.deepEqual(drawing.views.map(v=>v.name),['front']);
+ const pdf=Buffer.from(drawing.pdfBase64,'base64').toString();
+ assert.match(pdf,/10[.]000 mm/);
+ assert.doesNotMatch(pdf,/40[.]000 mm/);
+});

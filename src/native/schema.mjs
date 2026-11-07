@@ -43,7 +43,16 @@ export function validateGraph(g,{documentId,versions=[],depth=0,ancestors=[]}={}
   acyclic(g.definitions,x=>g.instances.filter(i=>i.ownerDefinitionId===x&&!i.dependencyId).map(i=>i.definitionId));
   const versionMap=new Map(versions.map(v=>[v.id,v.content]));
   const entityId=x=>{check(id(x)&&!ids.has(x),'InvalidNativeGraph','Duplicate drawing entity ID.');ids.add(x);};
-  for(const drawing of g.drawings){check(keys(drawing,['id','revision','sheets'])&&Number.isSafeInteger(drawing.revision)&&drawing.revision>=0,'InvalidNativeGraph','Invalid drawing revision.');boundedArray(drawing.sheets,4);
+  for(const drawing of g.drawings){check(keys(drawing,['id','revision','sheets','layout'])&&Number.isSafeInteger(drawing.revision)&&drawing.revision>=0,'InvalidNativeGraph','Invalid drawing revision.');boundedArray(drawing.sheets,4);
+    if(drawing.layout!==undefined){
+      const {layout}=drawing,validList=(items,allowed)=>Array.isArray(items)&&items.length>0&&new Set(items).size===items.length&&items.every(item=>allowed.includes(item));
+      check(drawing.id==='drawing-e2-layout'&&keys(layout,['producerId','orientation','views','dimensions'])&&id(layout.producerId)
+        &&['portrait','landscape'].includes(layout.orientation)&&validList(layout.views,['top','front'])
+        &&validList(layout.dimensions,['width','depth'])&&(!layout.dimensions.includes('width')||layout.views.includes('top'))
+        &&(!layout.dimensions.includes('depth')||layout.views.includes('front'))
+        &&drawing.sheets.length===1&&drawing.sheets[0]?.size==='A4'&&drawing.sheets[0]?.views?.length===0,
+      'InvalidNativeGraph','Invalid E2 drawing layout or dimension-to-view mapping.');
+    }
     for(const sheet of drawing.sheets){entityId(sheet.id);check(keys(sheet,['id','size','views','notes'])&&['A0','A1','A2','A3','A4'].includes(sheet.size),'InvalidNativeGraph','Invalid native sheet metadata.');boundedArray(sheet.views,8);boundedArray(sheet.notes,32);
       const views=new Set();for(const view of sheet.views){entityId(view.id);views.add(view.id);check(keys(view,['id','model'])&&keys(view.model,['documentId','definitionId','versionId'])&&view.model.documentId===documentId&&digest(view.model.versionId)&&versionMap.get(view.model.versionId)?.graph.definitions.some(d=>d.id===view.model.definitionId),'LostReference','Drawing binds an explicit retained model version.');}
       for(const note of sheet.notes){entityId(note.id);check(keys(note,['id','viewId','text'])&&views.has(note.viewId)&&text(note.text,1024),'LostReference','Invalid note/source view.');}}

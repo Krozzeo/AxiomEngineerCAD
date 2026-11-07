@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 297" data-units="mm" data-scale="1">
+  <rect data-role="top" x="30" y="35" width="48" height="32" fill="none" stroke="#233449"/>
+  <circle data-role="bore" cx="48" cy="55" r="4" fill="none" stroke="#233449"/>
+  <rect data-role="front" x="30" y="105" width="48" height="12" fill="none" stroke="#233449"/>
+  <line data-role="bore-left" x1="44" y1="105" x2="44" y2="117" stroke="#233449" stroke-dasharray="2 1"/>
+  <line data-role="bore-right" x1="52" y1="105" x2="52" y2="117" stroke="#233449" stroke-dasharray="2 1"/>
+  <text data-dimension="width" x="30" y="74">48 mm</text>
+  <text data-dimension="height" x="84" y="53">32 mm</text>
+  <text data-dimension="depth" x="84" y="115">12 mm</text>
+  <text data-dimension="boreDiameter" x="48" y="50">8 mm</text>
+  <text data-dimension="boreX" x="32" y="90">18 mm</text>
+  <text data-dimension="boreY" x="84" y="61">12 mm</text>
+</svg>
