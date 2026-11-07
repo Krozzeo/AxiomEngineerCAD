@@ -11,7 +11,23 @@ export function featureOf(value,id){const f=value.native?.graph.features.find(f=
 function length(q,targetUnit){check(Object.hasOwn(UNITS,q.unit),'InvalidUnits','Choose mm, cm, m or inch for length.');return q.value*UNITS[q.unit]/UNITS[targetUnit];}
 // One pure command reducer serves manual MAIN changes, headless replay and isolated proposals.
 export function command(value,name,input){check(value.formatVersion===1,'IncompatibleVersion','Open/convert a native v1 study first.');const next=structuredClone(value);
-  if(name==='cad.feature.enable.v1'){const f=next.native.graph.features.find(f=>f.id===input.featureId);check(f&&['sketch-primitives','sketch-extrusion','geometry-probe'].includes(f.type),'LostReference','Choose an editable sketch or operation.');if(input.enabled)delete f.disabled;else f.disabled=true;}
+  if(name==='cad.drawing.layout.set.v1'){
+    const graph=next.native.graph,producer=graph.features.find(f=>f.id===input.producerId);
+    check(producer?.type===EXTRUSION_TYPE&&producer.definitionId===graph.primaryDefinitionId&&!producer.disabled,
+      'LostReference','Choose an enabled extrusion in the primary definition.');
+    const current=graph.drawings.find(drawing=>drawing.id==='drawing-e2-layout');
+    const layout={...input,views:['top','front'].filter(view=>input.views.includes(view)),
+      dimensions:['width','depth'].filter(dimension=>input.dimensions.includes(dimension))};
+    check((!layout.dimensions.includes('width')||layout.views.includes('top'))&&(!layout.dimensions.includes('depth')||layout.views.includes('front')),
+      'InvalidInput','Width requires the top view and depth requires the front view.');
+    if(!current||canonical(current.layout)!==canonical(layout)){
+      const drawing={id:'drawing-e2-layout',revision:(current?.revision??-1)+1,layout,
+        sheets:[{id:'sheet-e2-a4',size:'A4',views:[],notes:[]}]};
+      graph.drawings=graph.drawings.filter(item=>item!==current);
+      graph.drawings.push(drawing);
+    }
+  }
+  else if(name==='cad.feature.enable.v1'){const f=next.native.graph.features.find(f=>f.id===input.featureId);check(f&&['sketch-primitives','sketch-extrusion','geometry-probe'].includes(f.type),'LostReference','Choose an editable sketch or operation.');if(input.enabled)delete f.disabled;else f.disabled=true;}
   else if(name.startsWith('cad.extrusion.')){
    const target={kind:'feature',featureId:input.featureId,parameter:'depth'};
    check(!input.depthParameterId||input.replaceDepthBinding,'InvalidInput','A depth driver requires an explicit binding update.');

@@ -1,6 +1,6 @@
-# Engineer handoff - E2.M2 associative drawing / 0.2.1 candidate
+# Engineer handoff - E2.M3 drawing proposal / 0.2.2 candidate
 
-Start with `npm run context`, AGENTS.md, [compact context](docs/PROJECT_CONTEXT.md) and the [E2.M2 report](docs/milestones/E2_M2_ASSOCIATIVE_DRAWING.md). Owner validated E2.M1 and requested E2.M2. Preserve prior source and immutable version semantics.
+Start with `npm run context`, AGENTS.md, [compact context](docs/PROJECT_CONTEXT.md) and the [E2.M3 report](docs/milestones/E2_M3_DRAWING_PROPOSAL.md). Owner validated E2.M2 and requested E2.M3. Preserve prior source and immutable version semantics.
 
 ## Source and authority
 

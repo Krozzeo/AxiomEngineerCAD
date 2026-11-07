@@ -16,8 +16,10 @@ export function vectorSheet(drawing){
       for(let i=0;i<16;i++){const b=(i+1)*Math.PI/8,k=4/3*Math.tan((b-a)/4),ca=Math.cos(a),sa=Math.sin(a),cb=Math.cos(b),sb=Math.sin(b);ops.push(`${n(cx+r*(ca-k*sa))} ${n(cy+r*(sa+k*ca))} ${n(cx+r*(cb+k*sb))} ${n(cy+r*(sb-k*cb))} ${n(cx+r*cb)} ${n(cy+r*sb)} c`);a=b;}ops.push('h S');svg.push(`<circle cx="${n(cx)}" cy="${n(cy)}" r="${n(r)}"/>`);
     }}
   }
-  const dim=drawing.dimension,y=dim.yMm,x1=dim.x1Mm,x2=dim.x2Mm;line([x1,y-3],[x1,dim.extensionToYmm]);line([x2,y-3],[x2,dim.extensionToYmm]);line([x1,y],[x2,y]);for(const [x,sign]of [[x1,1],[x2,-1]]){line([x,y],[x+sign*2,y+1]);line([x,y],[x+sign*2,y-1]);}text((x1+x2)/2-8,y+3,3.5,`${dim.valueMm.toFixed(3)} mm`);
-  if(drawing.depthDimension){
+  if(!drawing.layout||drawing.layout.dimensions.includes('width')){
+    const dim=drawing.dimension,y=dim.yMm,x1=dim.x1Mm,x2=dim.x2Mm;line([x1,y-3],[x1,dim.extensionToYmm]);line([x2,y-3],[x2,dim.extensionToYmm]);line([x1,y],[x2,y]);for(const [x,sign]of [[x1,1],[x2,-1]]){line([x,y],[x+sign*2,y+1]);line([x,y],[x+sign*2,y-1]);}text((x1+x2)/2-8,y+3,3.5,`${dim.valueMm.toFixed(3)} mm`);
+  }
+  if(drawing.depthDimension&&(!drawing.layout||drawing.layout.dimensions.includes('depth'))){
     const {xMm:x,edgeXmm:edge,y1Mm:a,y2Mm:b,valueMm}=drawing.depthDimension;
     for(const [y,sign] of [[a,1],[b,-1]]){
       line([edge,y],[x+3,y]);line([x,y],[x-1,y+sign*2]);line([x,y],[x+1,y+sign*2]);

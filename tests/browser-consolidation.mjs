@@ -6,7 +6,7 @@ import {createSketchFromSupport,selectSketchComponent,sketchCommit,sketchDocumen
 import {openParameters,addInlineParameter} from './browser-parameters.mjs';
 
 export async function verifyConsolidationProjectUI({context,host,evidence,observe,report}){
- const demo=host.manager.catalog().recents.find(p=>p.name==='E2.M2 Associative Drawing'),fixture=JSON.parse(await readFile(demo.path,'utf8'));
+ const demo=host.manager.catalog().recents.find(p=>p.name==='E2.M3 Drawing Proposal'),fixture=JSON.parse(await readFile(demo.path,'utf8'));
  fixture.documentId='engineer-document://'+crypto.randomUUID();fixture.native.versions=[];fixture.native.publications=[];fixture.metadata.name='E1.M5 Consolidation Acceptance';
  const folder=await mkdtemp(join(host.manager.root,'consolidation-')),path=join(folder,'project.engineer-provisional.json');await writeFile(path,JSON.stringify(fixture));
  const open=()=>host.manager.execute({operationId:crypto.randomUUID(),action:'open',productId:demo.productId,path});
@@ -19,6 +19,25 @@ export async function verifyConsolidationProjectUI({context,host,evidence,observ
  await p.waitForFunction(()=>window.engineerViewport.proof?.drawing?.depthDimension?.valueMm===10);
  const pdfDownload=p.waitForEvent('download');await p.locator('#proof-export').click();
  await (await pdfDownload).saveAs(join(evidence,'e2-m2-extrusion.pdf'));
+ stage('local scripted agent proposes and human approves an associative drawing layout');
+ await p.locator('.wb-menubar').getByText('Tools',{exact:true}).click();
+ await p.locator('[data-wb-action=review]').click();
+ await p.locator('#review-script-drawing').click();
+ await p.locator('#review-status').filter({hasText:'Isolated proposal prepared'}).waitFor();
+ assert.deepEqual((await sketchDocument(p)).native.graph.drawings,[]);
+ await p.locator('#review-validate').click();
+ await p.locator('#review-status').filter({hasText:'Proposal validated'}).waitFor();
+ await p.locator('#review-open').click();
+ const evidenceText=p.locator('#review-drawing-evidence');
+ await evidenceText.waitFor();
+ assert.match(await evidenceText.textContent(),/after: 297 .*210 mm; front .*2 hidden edges.*depth 10 mm/);
+ assert.ok(await p.locator('#review-apply').isDisabled());
+ await p.locator('#review-confirm').check();await p.locator('#review-apply').click();
+ await p.locator('#review-status').filter({hasText:'Applied and saved'}).waitFor();
+ await tab('Drawing');await p.locator('#proof-show-sheet').click();
+ await p.waitForFunction(()=>window.engineerViewport.proof?.drawing?.layout?.orientation==='landscape');
+ const proposalPdf=p.waitForEvent('download');await p.locator('#proof-export').click();
+ await (await proposalPdf).saveAs(join(evidence,'e2-m3-proposal.pdf'));
  await tab('View');await p.locator('#proof-show-model').click();
  const click=async(x,y,opts)=>{const q=await sketchScreen(p,x,y);await p.mouse.click(q.x,q.y,opts);},move=async(x,y)=>{const q=await sketchScreen(p,x,y);await p.mouse.move(q.x,q.y);};
  const id=()=>p.evaluate(()=>window.engineerSketch.view()?.id),exit=async()=>{await p.locator('#edit-sketch-exit').click();await p.waitForFunction(()=>!window.engineerSketch.view());await sketchSettled(p);},gpu=await p.evaluate(()=>window.engineerViewport.renderer.info.state==='ready');

@@ -32,7 +32,7 @@ test('exact HLR draws a circular opening, hidden silhouette and bound dimensions
 });
 
 test('drawing export rejects a stale manifest after a working revision changes',async t=>{
- const f=await fixture(t),d=await f.call('project.demos',{demoIds:['e2-m2-associative-drawing'],destination:f.folder});
+ const f=await fixture(t),d=await f.call('project.demos',{demoIds:['e2-m3-drawing-proposal'],destination:f.folder});
  await f.call('project.open',{path:d.projects[0].path});
  const adapter=f.adapter,s=adapter.doc.proof,revision=adapter.doc.value.revision;
  s.build({expectedRevision:revision,operationId:randomUUID()});

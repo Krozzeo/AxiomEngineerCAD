@@ -7,20 +7,20 @@
     "sha256": "9c2f3857a4a7f1156b1c10b82d2e76680604393b7f5799081f6fd22694502de6"
   },
   "milestone": {
-    "current": "E2.M2",
-    "status": "0.2.1 associative drawing candidate; E2.M1 owner validated",
+    "current": "E2.M3",
+    "status": "0.2.2 local drawing proposal candidate; E2.M2 owner validated",
     "ownerAcceptance": "pending",
-    "next": "E2.M3 after E2.M2 delivery and owner direction"
+    "next": "E2.M4 after E2.M3 delivery and owner direction"
   },
   "lastDelivered": {
-    "version": "0.2.0",
-    "commit": "dd6cc043fcb642e59f16766bc5946a64c692664b",
+    "version": "0.2.1",
+    "commit": "765cc2f3c72c729f3fc4c682dd3b16bf9dece81d",
     "pullRequest": 18,
-    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-18-dd6cc043fcb642e59f16766bc5946a64c692664b",
-    "acceptanceRun": 42306021978,
-    "publicationRun": 42307370033,
-    "artifactSha256": "56784a310dad9fc5ce3ec9921c62aa5acd72cc8457869d8d8eb44cab6c851cdd",
-    "verification": "Exact Windows/Linux acceptance and real public Platform 0.1.13 discovery, download, activation and demo with NVIDIA. Owner verified original face and later edge evidence."
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-18-765cc2f3c72c729f3fc4c682dd3b16bf9dece81d",
+    "acceptanceRun": 42319108708,
+    "publicationRun": 42320251915,
+    "artifactSha256": "49ecf586ffefee41be382c766353e74e54513cc090308f1eef0302abb1fcd84e",
+    "verification": "Exact Windows/Linux acceptance and real public Platform 0.1.13 discovery, download, activation and independent PDF from installed demo. Owner validated E2.M2."
   },
   "constraints": [
     "MASTER_DESIGN is intent; implementation requires code and matching evidence.",
@@ -33,23 +33,23 @@
     "implementation": "IMPLEMENTATION_STATUS.md",
     "handoff": "AI_HANDOFF.md",
     "architecture": "docs/architecture/ADR_REGISTER.md",
-    "currentCadScope": "docs/milestones/E2_M2_ASSOCIATIVE_DRAWING.md",
+    "currentCadScope": "docs/milestones/E2_M3_DRAWING_PROPOSAL.md",
     "deliveryGate": "docs/MILESTONE_DELIVERY.md"
   },
   "candidate": {
-    "version": "0.2.1",
+    "version": "0.2.2",
     "branch": "engineer/sketch-navigation-0.1.9",
-    "status": "E2.M2 associative drawing candidate"
+    "status": "E2.M3 local drawing proposal candidate"
   },
   "previousDelivered": {
-    "version": "0.1.14",
-    "commit": "77a2a983867907e9fdefc6464b5e1e241e7317f7",
+    "version": "0.2.0",
+    "commit": "dd6cc043fcb642e59f16766bc5946a64c692664b",
     "pullRequest": 18,
-    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-18-77a2a983867907e9fdefc6464b5e1e241e7317f7",
-    "acceptanceRun": 42198339703,
-    "publicationRun": 42200677683,
-    "artifactSha256": "ff139bbf98830cd528c9c3efaac8a52a5d62c59e9e961a82fda0c3397fb55137",
-    "verification": "Exact Windows/Linux acceptance; official ZIP activated and tested via local folder in Platform 0.1.13 with NVIDIA. Anonymous catalog verification rate-limited."
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-18-dd6cc043fcb642e59f16766bc5946a64c692664b",
+    "acceptanceRun": 42306021978,
+    "publicationRun": 42307370033,
+    "artifactSha256": "56784a310dad9fc5ce3ec9921c62aa5acd72cc8457869d8d8eb44cab6c851cdd",
+    "verification": "Exact Windows/Linux acceptance and real public Platform 0.1.13 discovery, download, activation and demo with NVIDIA. Owner verified original face and later edge evidence."
   },
   "earlierDelivered": {
     "version": "0.1.8",

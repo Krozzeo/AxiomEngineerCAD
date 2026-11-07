@@ -78,18 +78,23 @@ export function extrusionSheet(shape,{feature,profile,frame},value,source){
   check(near(frontLeft,left)&&near(frontRight,right)&&near(depth,feature.data.depthMm)
     &&top.visible.filter(e=>e.kind==='circle').length===(profile.outer.kind==='circle'?1:0)+profile.holes.length,
     'UnsupportedCapability','The projected dimensions or circular boundaries could not be verified.');
-  const scale=[1,.5,.25,.1].find(s=>width*s<=145&&(topHigh-topLow)*s<=65&&depth*s<=65);
+  const retained=value.native.graph.drawings.find(drawing=>drawing.layout),layout=retained?.layout;
+  check(!layout||layout.producerId===feature.id,'LostReference','The saved drawing refers to another extrusion.');
+  const landscape=layout?.orientation==='landscape',widthMm=landscape?297:210,heightMm=landscape?210:297;
+  const topY=landscape?155:225,frontY=landscape?48:66,maxHeight=landscape?42:65;
+  const scale=[1,.5,.25,.1].find(s=>width*s<=widthMm-65&&(topHigh-topLow)*s<=maxHeight&&depth*s<=maxHeight);
   check(scale,'UnsupportedCapability','The model does not fit the supported A4 scales.');
-  const x=105-(left+right)*scale/2;
-  Object.assign(top,{originMm:[x,225-topHigh*scale],heightMm:topHigh*scale});
-  Object.assign(front,{originMm:[x,66-bottom*scale],heightMm:upper*scale});
+  const x=widthMm/2-(left+right)*scale/2;
+  Object.assign(top,{originMm:[x,topY-topHigh*scale],heightMm:topHigh*scale});
+  Object.assign(front,{originMm:[x,frontY-bottom*scale],heightMm:upper*scale});
   const binding=value.native.graph.parameters.find(p=>p.targets?.some(t=>t.kind==='feature'&&t.featureId===feature.id&&t.parameter==='depth'));
   const x1=x+left*scale,x2=x+right*scale;
   const drawing={profile:'E2.M2-extrusion-drawing/1',title:value.metadata.name,source:{...source,producerId:feature.id,definitionId:feature.definitionId},
-    sheet:{size:'A4',widthMm:210,heightMm:297,scale,projection:'third-angle'},views:[top,front],
+    sheet:{size:'A4',widthMm,heightMm,scale,projection:'third-angle'},
+    views:[top,front].filter(view=>!layout||layout.views.includes(view.name)),...(layout?{drawingId:retained.id,layout}:{}),
     dimension:{kind:'reference',producerId:feature.id,parameter:'width',valueMm:width,unit:'mm',x1Mm:x1,x2Mm:x2,
       yMm:top.originMm[1]+topLow*scale-12,extensionToYmm:top.originMm[1]+topLow*scale},
     depthDimension:{kind:'driving',producerId:feature.id,parameter:'depth',...(binding?{parameterId:binding.id}:{}),
-      valueMm:depth,unit:'mm',y1Mm:66,y2Mm:66+depth*scale,edgeXmm:x2,xMm:x2+12}};
+      valueMm:depth,unit:'mm',y1Mm:frontY,y2Mm:frontY+depth*scale,edgeXmm:x2,xMm:x2+12}};
   return {...drawing,...vectorSheet(drawing)};
 }

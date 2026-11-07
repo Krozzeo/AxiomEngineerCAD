@@ -2,7 +2,7 @@
 
 Local-first, browser-operated parametric mechanical CAD and engineering-documentation product in the Axiom family, designed from the outset for both human users and AI agents.
 
-> **Current candidate: 0.2.1 / E2.M2 associative drawing.** See the [scope and owner test flow](docs/milestones/E2_M2_ASSOCIATIVE_DRAWING.md). Delivery requires exact-head acceptance and verified installation.
+> **Current candidate: 0.2.2 / E2.M3 reviewed drawing proposals.** See the [scope and owner test flow](docs/milestones/E2_M3_DRAWING_PROPOSAL.md). Delivery requires exact-head acceptance and verified installation.
 
 Start development with `npm run context` and [the compact context](docs/PROJECT_CONTEXT.md). The [workflow](docs/DEVELOPMENT_WORKFLOW.md) selects focused checks during implementation, then complete exact-head acceptance and real installation proof for delivery.
 
@@ -10,7 +10,7 @@ Start development with `npm run context` and [the compact context](docs/PROJECT_
 
 Every completed review milestone is delivered as an experimental prepared installation. In Platform 0.1.12+, open **Installations → Add installation → Axiom Engineer CAD → Refresh**, select the published experimental build, download/install and activate. Then create an Engineer project. Source PRs and passing tests alone are not installable publications. See [milestone delivery](docs/MILESTONE_DELIVERY.md) for the publication and verification gate.
 
-**Current demo:** **E2.M2 Associative Drawing**. Install and activate the selected build, then use **Load Demos**. Last verified delivery: [0.2.0 / PR18](https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-18-dd6cc043fcb642e59f16766bc5946a64c692664b).
+**Current demo:** **E2.M3 Drawing Proposal**. Install and activate the selected build, then use **Load Demos**. Last verified delivery: [0.2.1 / PR18](https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-18-765cc2f3c72c729f3fc4c682dd3b16bf9dece81d).
 
 The 0.1.8 workbench adds live primitive previews, persistent Snap (hold Ctrl to bypass), atomic relation cleanup, all geometric constraints in Parameter Manager, searchable binding/value controls, repairable conflict/missing-reference lists, intuitive signed dimensions and planar-face sketch supports. New Sketch previews normal/right orientation; Exit Sketch returns selection to its source. Conservative planar geometry witnesses require explicit repair when the supporting face changes. [Technical decisions and compatibility](docs/architecture/ADR-025-SKETCH-INTERACTION-AND-PLANAR-SUPPORT.md).
 

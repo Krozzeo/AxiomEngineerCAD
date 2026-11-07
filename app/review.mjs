@@ -19,11 +19,32 @@ action('review-propose',()=>create());
 async function enable(){automation=await api('grant',{});$('review-token').value=automation.token;status('Local automation enabled for ReadOnly / LocalProposal. MAIN and Apply remain human-only.');}
 action('review-enable',enable);action('review-revoke',async()=>{await api('revoke',{});automation=null;$('review-token').value='';status('Automation grants revoked; owned pending proposals are cancelled.');await refresh();});
 action('review-script',async()=>{if(!automation)await enable();await create(true);});
+action('review-script-drawing',async()=>{
+ if(!automation)await enable();
+ const extrusions=[];
+ let offset=0;
+ do{
+  const page=await invoke('entities.list',{kind:'features',limit:25,offset},'ReadOnly',null,true);
+  extrusions.push(...page.items.filter(feature=>feature.type==='sketch-extrusion'));
+  offset=page.nextOffset;
+ }while(offset!==null);
+ if(extrusions.length!==1)throw Error('Open a model with one supported extrusion.');
+ const p=await invoke('proposal.create',{label:'Local scripted landscape drawing'},'LocalProposal',null,true);
+ selected=p;
+ const r=await invoke('drawing.layout.set',{producerId:extrusions[0].id,orientation:'landscape',views:['front'],dimensions:['depth']},'LocalProposal',p,true);
+ job=r.jobId;phase='proposal-edit';$('review-cancel-job').disabled=false;status('Computing isolated drawing proposal; MAIN is unchanged.');
+});
 action('review-validate',async()=>{const r=await invoke('proposal.validate',{proposalId:selected.id},'LocalProposal',selected);job=r.jobId;phase='validation';$('review-cancel-job').disabled=false;status('Validating exact before/after geometry, constraints and dependencies…');});
 action('review-cancel-job',()=>api('cancel',{}));
 action('review-cancel',async()=>{await invoke('proposal.cancel',{proposalId:selected.id},'LocalProposal',selected);status('Proposal cancelled. MAIN is unchanged.');await refresh();});
 action('review-measure',async()=>{const r=await invoke('geometry.measure',{featureId:$('review-feature').value});job=r.jobId;phase='measurement';$('review-cancel-job').disabled=false;status('Measuring the actual exact-kernel shape…');});
-action('review-open',async()=>{let offset=0,rows=[],evidence,firstHash;do{const r=await invoke('proposal.review',{proposalId:selected.id,offset,limit:10,maxBytes:12000},'ReadOnly',selected);if(firstHash&&r.reviewHash!==firstHash)throw Error('RevisionConflict: review changed while paging.');firstHash=r.reviewHash;evidence=r.evidence;rows.push(...r.items);offset=r.nextOffset;}while(offset!==null);reviewHash=firstHash;$('review-diff').replaceChildren();for(const row of rows){const title=document.createElement('h3'),pre=document.createElement('pre');title.textContent=row.path+(row.continued?' · continued':'');pre.textContent='Before: '+row.before+'\nAfter:  '+row.after;$('review-diff').append(title,pre);}const before=evidence.before?.volumeMm3,after=evidence.after?.volumeMm3;$('review-evidence').textContent=`${rows.length} reviewed diff row(s) · Exact volume: ${before?.toFixed(6)??'not present'} → ${after?.toFixed(6)??'not present'} mm³. ${evidence.checks.join('; ')}.${evidence.sketchAfter?.length?' Sketches: '+evidence.sketchAfter.map(s=>s.id+' '+s.status+' ('+(s.dof<0?'?':s.dof)+' DOF)').join('; ')+'.':''}`;$('review-confirm').checked=false;$('review-apply').disabled=true;$('review-dialog').showModal();});
+action('review-open',async()=>{let offset=0,rows=[],evidence,firstHash;do{const r=await invoke('proposal.review',{proposalId:selected.id,offset,limit:10,maxBytes:12000},'ReadOnly',selected);if(firstHash&&r.reviewHash!==firstHash)throw Error('RevisionConflict: review changed while paging.');firstHash=r.reviewHash;evidence=r.evidence;rows.push(...r.items);offset=r.nextOffset;}while(offset!==null);reviewHash=firstHash;$('review-diff').replaceChildren();for(const row of rows){const title=document.createElement('h3'),pre=document.createElement('pre');title.textContent=row.path+(row.continued?' · continued':'');pre.textContent='Before: '+row.before+'\nAfter:  '+row.after;$('review-diff').append(title,pre);}const before=evidence.before?.volumeMm3,after=evidence.after?.volumeMm3;$('review-evidence').textContent=`${rows.length} reviewed diff row(s) · Exact volume: ${before?.toFixed(6)??'not present'} → ${after?.toFixed(6)??'not present'} mm³. ${evidence.checks.join('; ')}.${evidence.sketchAfter?.length?' Sketches: '+evidence.sketchAfter.map(s=>s.id+' '+s.status+' ('+(s.dof<0?'?':s.dof)+' DOF)').join('; ')+'.':''}`;const drawing=$('review-drawing-evidence');
+ drawing.hidden=!evidence.drawing;
+ if(evidence.drawing){
+  const summary=result=>result.sheet.widthMm+' × '+result.sheet.heightMm+' mm; '+result.views.map(view=>view.name+' ('+view.hidden+' hidden edges)').join(', ')+'; '+result.dimensions.map(d=>d.name+' '+d.valueMm+' mm').join(', ');
+  drawing.textContent='Drawing before: '+summary(evidence.drawing.before)+' → after: '+summary(evidence.drawing.after);
+ }else drawing.textContent='';
+ $('review-confirm').checked=false;$('review-apply').disabled=true;$('review-dialog').showModal();});
 $('review-confirm').addEventListener('change',()=>{$('review-apply').disabled=!$('review-confirm').checked;});
 action('review-dismiss',()=>{$('review-dialog').close();status('Proposal retained without changing MAIN.');});
 action('review-apply',async()=>{if(!$('review-confirm').checked)return;const r=await invoke('proposal.apply',{proposalId:selected.id,reviewHash,confirmation:'ApplyAndSave'},'MainMutation',selected);$('review-dialog').close();status('Applied and saved · document revision '+r.revision+'. Durable operation receipt recorded.');await documentChanged();$('review-receipt').textContent=JSON.stringify({applyReceipt:r},null,2);});
