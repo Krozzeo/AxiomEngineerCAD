@@ -115,6 +115,7 @@ export async function verifyAssistantUI({context,host,observe,evidence}){
     await chat.getByRole('button',{name:'Exit preview',exact:true}).click();
     try{await page.waitForFunction(()=>window.engineerViewport.proof&&!window.engineerViewport.proof.proposalId&&!window.engineerViewport.proof.exact,{},{timeout:9000});}
     catch(error){throw Error(JSON.stringify(await page.evaluate(()=>({proof:window.engineerViewport.proof?.revision,status:document.querySelector('#proof-status').textContent,chat:document.querySelector('#ai-chat-error').textContent,branch:document.body.dataset.aiPreview}))),{cause:error});}
+    await page.waitForFunction(()=>{const button=document.querySelector('#assistant-content [data-preview]');return button?.textContent==='Preview'&&!button.disabled;});
     if(evidence){
       await page.screenshot({path:join(evidence,'pre-e3-assistant-chat-right.png')});
       await page.getByLabel('Dock assistant',{exact:true}).selectOption('center');
