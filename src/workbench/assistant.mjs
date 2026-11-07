@@ -10,7 +10,7 @@ import {registry} from '../commands/catalog.mjs';
 import {apiReference} from './api-reference.mjs';
 import {formatAiHistory} from '../../app/assistant-history-format.mjs';
 
-const writable=new Set(['cad.drawing.layout.set.v1','cad.drawing.reconstruct.v1','cad.extrusion.create.v1','cad.extrusion.update.v1','cad.feature.update.v1','cad.parameter.set.v1','cad.sketch.create.v1','cad.sketch.entity.add.v1','cad.sketch.entity.update.v1','cad.sketch.constraint.add.v1']);
+const writable=new Set(['cad.drawing.layout.set.v1','cad.drawing.reconstruct.v1','cad.extrusion.create.v1','cad.extrusion.update.v1','cad.feature.update.v1','cad.parameter.set.v1','cad.sketch.create.v1','cad.sketch.entity.add.v1','cad.sketch.entity.update.v1','cad.sketch.constraint.add.v1','cad.sketch.polygon.v1','cad.sketch.split.v1','cad.sketch.trim.v1','cad.sketch.mirror.v1','cad.sketch.pattern.v1']);
 const readable=new Set(['cad.entities.list.v1','cad.feature.inspect.v1','cad.parameter.inspect.v1','cad.sketch.inspect.v1','cad.selection.inspect.v1','cad.drawing.evidence.inspect.v1']);
 const functionTool=(name,description,properties)=>({type:'function',name,description,strict:true,
   parameters:{type:'object',additionalProperties:false,properties,required:Object.keys(properties)}});
