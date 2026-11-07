@@ -1,3 +1,4 @@
+import {arcPoint} from '../sketch/curves.mjs';
 import {exactReferenceGeometry} from './reference-geometry.mjs';
 import {planarSupport} from './planar.mjs';
 import {capFrame} from './frame.mjs';
@@ -9,7 +10,7 @@ import {closedProfile} from './loops.mjs';
 import {EXTRUSION_TYPE,validateExtrusion} from './profile.mjs';
 import {check} from '../errors.mjs';
 const EPS=1e-6,dot=(a,b)=>a.reduce((s,x,i)=>s+x*b[i],0),sub=(a,b)=>a.map((x,i)=>x-b[i]),world=(f,p,z=0)=>f.origin.map((x,i)=>x+f.u[i]*p[0]+f.v[i]*p[1]+f.normal[i]*z);
-function drawing(loop){if(loop.kind==='circle')return cad.drawCircle(loop.radius).translate(loop.center);let pen=cad.draw(loop.points[0]);for(const p of loop.points.slice(1))pen=pen.lineTo(p);return pen.close();}
+function drawing(loop){if(loop.kind==='circle')return cad.drawCircle(loop.radius).translate(loop.center);if(loop.kind==='curved'){const pen=cad.draw(loop.edges[0].a);for(const edge of loop.edges){if(edge.type==='arc')pen.threePointsArcTo(edge.b,arcPoint(edge,.5));else pen.lineTo(edge.b);}return pen.close();}let pen=cad.draw(loop.points[0]);for(const p of loop.points.slice(1))pen=pen.lineTo(p);return pen.close();}
 
 function capMatches(shape,frame){return shape.faces.filter(face=>face.geomType==='PLANE'&&dot(face.normalAt().toTuple(),frame.normal)>1-1e-9&&Math.abs(dot(sub(face.center.toTuple(),frame.origin),frame.normal))<EPS);}
 function capLineage(builder,previous,output){if(!previous.element)return previous;const modified=builder.Modified(previous.element.wrapped);try{const count=modified.Size();if(count>1)return {state:'AmbiguousReference',candidates:count};if(count===1){const descendant=cad.cast(modified.First()),matches=output.faces.filter(face=>face.isSame(descendant));return matches.length===1?{state:'ResolvedReidentified',candidates:1,element:matches[0]}:{state:matches.length?'AmbiguousReference':'LostReference',candidates:matches.length};}if(builder.IsDeleted(previous.element.wrapped))return {state:'LostReference',candidates:0};const matches=output.faces.filter(face=>face.isSame(previous.element));return matches.length===1?{state:previous.state,candidates:1,element:matches[0]}:{state:matches.length?'AmbiguousReference':'LostReference',candidates:matches.length};}finally{modified.delete();}}

@@ -4,9 +4,9 @@ Start with `npm run context`. `PROJECT_STATE.json` records the reviewed Master h
 
 Platform owns generic local lifecycle, credentials and shared AI/review SDK. Engineer owns exact geometry, sketch solving, native history, assemblies, drawings and semantic CAD operations. Source mutations share revision-checked commands; GPU triangles and pixel IDs never establish native identity. Keep immutable builds/user files and human authorization boundaries intact.
 
-E0 completed feasibility, E1 delivered exact extrusion/sketch and E2 delivered local model/drawing workflows. The 0.2.6 E2 stabilization candidate adds automatic isolated previews, human Apply with atomic Save, and project task history. Live model evaluation remains separate from the synthetic transport tests.
+E0 completed feasibility, E1 delivered exact extrusion/sketch and E2 delivered local model/drawing workflows. E2 is closed and published as 0.2.6 stable. The 0.3.0 E3.M1 candidate covers bounded extended sketch tools and exact mixed arc/line extrusion. Live model evaluation remains separate from the synthetic transport tests.
 
-Current implemented bounds: supported primary-part extrusion chain, point/line/circle/four-line rectangles, typed constraints/equations, inline Parameter Manager, docking and separate windows. General planar supports use conservative geometry witnesses: changed faces require explicit repair. Existing dimensions preserve old sign semantics; newer strict source extensions are refused by older readers. Full feature breadth, arcs and general edit-proof topology remain later work.
+Current implemented bounds: supported primary-part extrusion chain, point/line/circle/four-line rectangles, typed constraints/equations, inline Parameter Manager, docking and separate windows. General planar supports use conservative geometry witnesses: changed faces require explicit repair. Existing dimensions preserve old sign semantics; newer strict source extensions are refused by older readers. General feature breadth and edit-proof topology remain later work.
 
 Select a narrow entry point:
 
