@@ -1,6 +1,6 @@
 # Engineer implementation status
 
-Current candidate: **0.2.2 / E2.M3 reviewed drawing proposals**. See [scope and demo](docs/milestones/E2_M3_DRAWING_PROPOSAL.md). The verified 0.2.1 delivery is indexed in PROJECT_STATE.
+Current candidate: **0.2.3 / E2.M4 drawing reconstruction**. See [scope and demo](docs/milestones/E2_M4_DRAWING_RECONSTRUCTION.md). The verified 0.2.2 delivery is indexed in PROJECT_STATE.
 
 Previous CAD: **0.1.8 / E1.M5 sketch interactions — delivered for owner review**, source `4f38a0e6ccc2f4e1dfd331beaa2d20b4352501d5` / PR16. Exact Windows/Linux acceptance, immutable experimental publication and actual public Platform installation passed. Owner acceptance remains pending. `docs/PROJECT_STATE.json` is the compact delivery/evidence index; no E2 progression, main merge or stable release is claimed.
 

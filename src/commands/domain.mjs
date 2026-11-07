@@ -5,12 +5,15 @@ import {parameterCommand,applyParameters,parameterTarget} from '../parameters/pr
 import {sketchCommand,pruneImplicitReferences} from '../sketch/profile.mjs';
 import {check,validate,validateMetadata} from '../document.mjs';
 import {recipe,UNITS,KERNEL} from '../lab/profile.mjs';
-import {syncBindings,canonical} from '../native/schema.mjs';
+import {syncBindings,canonical,hash} from '../native/schema.mjs';
 import {hasIntegration,synchronize,dimensions} from '../integration/profile.mjs';
+import {drawingEvidence,DRAWING_TRANSLATOR} from '../proof/drawing-evidence.mjs';
+import {M5_PROFILE} from '../sketch/relations.mjs';
 export function featureOf(value,id){const f=value.native?.graph.features.find(f=>f.id===id);check(f,'LostReference','Feature identity is missing.');check(f.type==='geometry-probe','UnsupportedCapability','This command requires a geometry-probe feature.');return f;}
 function length(q,targetUnit){check(Object.hasOwn(UNITS,q.unit),'InvalidUnits','Choose mm, cm, m or inch for length.');return q.value*UNITS[q.unit]/UNITS[targetUnit];}
 // One pure command reducer serves manual MAIN changes, headless replay and isolated proposals.
-export function command(value,name,input){check(value.formatVersion===1,'IncompatibleVersion','Open/convert a native v1 study first.');const next=structuredClone(value);
+export function command(value,name,input){check(value.formatVersion===1,'IncompatibleVersion','Open/convert a native v1 study first.');if(name==='cad.drawing.reconstruct.v1')return reconstruct(value,input.svg);
+ const next=structuredClone(value);
   if(name==='cad.drawing.layout.set.v1'){
     const graph=next.native.graph,producer=graph.features.find(f=>f.id===input.producerId);
     check(producer?.type===EXTRUSION_TYPE&&producer.definitionId===graph.primaryDefinitionId&&!producer.disabled,
@@ -47,5 +50,33 @@ export function command(value,name,input){check(value.formatVersion===1,'Incompa
     next.experiment={profile:'E0.M2-probe-v0',kernel:KERNEL,spec:recipe({scenario:'extrude',width:length(input.width,'mm'),height:length(input.height,'mm'),depth:length(input.depth,'mm')})};syncBindings(next);next.native.graph.features.find(f=>f.type==='geometry-probe'&&f.definitionId===input.definitionId).id=input.featureId;
   }else check(false,'UnsupportedCapability','No registered shared mutation handler.');
   pruneImplicitReferences(next);for(const f of next.native?.graph.features??[])if(f.type==='sketch-primitives'){const old=value.native?.graph.features.find(x=>x.id===f.id),removed=(old?.data.entities??[]).filter(e=>e.external).map(e=>e.external.producerId);f.dependsOn=f.dependsOn.filter(id=>!removed.includes(id)||id===f.data.plane.producerId||f.data.entities.some(e=>e.external?.producerId===id));}applyParameters(next);syncBindings(next);validate(next);return next;
+}
+function reconstruct(value,svg){
+ const graph=value.native.graph;
+ check(!graph.features.length&&!graph.instances.length&&!graph.drawings.length,
+  'UnsupportedCapability','Reconstruction requires an empty native part.');
+ const {values}=drawingEvidence(svg),{width,height,depth,boreDiameter,boreX,boreY}=values;
+ const sketchId='drawing-profile',featureId='drawing-extrusion',definitionId=graph.primaryDefinitionId;
+ const apply=(name,input)=>{value=command(value,'cad.'+name+'.v1',input);};
+ const ref=(entityId,role='entity')=>({entityId,role});
+ apply('sketch.create',{sketchId,definitionId,name:'Reconstructed plate profile',plane:{kind:'datum',role:'xy'},profile:M5_PROFILE});
+ apply('sketch.entity.add',{sketchId,unit:'mm',entity:{id:'drawing-outline',type:'rectangle',construction:false,a:[0,0],b:[width,height]}});
+ const lines=value.native.graph.features[0].data.entities;
+ const base=lines.find(e=>e.a[1]===0&&e.b[1]===0),side=lines.find(e=>e.a[0]===width&&e.b[0]===width);
+ apply('sketch.entity.add',{sketchId,unit:'mm',entity:{id:'drawing-bore',type:'circle',construction:false,center:[boreX,boreY],radius:boreDiameter/2}});
+ for(const constraint of [
+  {id:'drawing-origin',type:'fixed',refs:[ref(base.id,'a')],value:[0,0]},
+  {id:'drawing-width',name:'DrawingWidth',type:'length',refs:[ref(base.id)],value:width},
+  {id:'drawing-height',name:'DrawingHeight',type:'length',refs:[ref(side.id)],value:height},
+  {id:'drawing-diameter',name:'DrawingBoreDiameter',type:'diameter',refs:[ref('drawing-bore')],value:boreDiameter},
+  {id:'drawing-bore-x',type:'x',refs:[ref('drawing-bore','center')],value:boreX},
+  {id:'drawing-bore-y',type:'y',refs:[ref('drawing-bore','center')],value:boreY}
+ ])apply('sketch.constraint.add',{sketchId,constraint:{...constraint,driving:true}});
+ apply('extrusion.create',{featureId,sketchId,name:'Reconstructed extrusion',depthMm:depth,reverse:false,operation:'new-body'});
+ const source=Buffer.from(svg);
+ value.native.graph.sources.push({id:'drawing-source',filename:'orthographic-source.svg',bytes:source.length,sha256:hash(source),
+  base64:source.toString('base64'),translator:{id:DRAWING_TRANSLATOR,version:'1'},fidelity:'Explicit dimensions and orthographic SVG geometry'});
+ validate(value);
+ return value;
 }
 export function featureContext(value,id){const extrusion=value.native.graph.features.find(f=>f.id===id&&f.type===EXTRUSION_TYPE);if(extrusion)return {id,definitionId:extrusion.definitionId,type:extrusion.type,name:extrusion.data.name,sketchId:extrusion.data.sketchId,operation:extrusion.data.operation,reverse:extrusion.data.reverse,dimensions:{depth:{value:extrusion.data.depthMm,unit:'mm'}},selectors:['top','bottom'].map(role=>({producerId:id,role,kind:'face',kernel:KERNEL})),kernel:KERNEL};const f=featureOf(value,id),s=recipe(f.data.spec);return {id:f.id,definitionId:f.definitionId,type:f.type,scenario:s.scenario,dimensions:Object.fromEntries(['width','height','depth','radius','count'].map(k=>[k,{value:s[k],unit:k==='count'?'scalar':s.unit}])),selectors:['top','bottom'].map(role=>({producerId:f.id,role,kind:'face',kernel:KERNEL})),...(hasIntegration(value)?{drivingParameters:dimensions(value.native.graph),profile:'E0.M7-chain/1'}:{}),kernel:KERNEL};}

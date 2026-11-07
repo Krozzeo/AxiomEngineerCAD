@@ -47,6 +47,8 @@ export const DEFINITIONS=[
   define('sketch.delete',['MainMutation','LocalProposal'],object({sketchId:string}),'Delete a sketch only when no feature depends on it.'),
   define('workbench.inspect',['ReadOnly'],object({...paging},[]),'Page source-linked feature, component, mate and canonical datum identities without modifying the document.'),
   define('selection.inspect',['ReadOnly'],object({kind:{type:'string',enum:['vertex','edge','face','body','instance','feature','datum']},definitionId:string,producerId:string,role:string,occurrencePath:{type:'array',minItems:1,maxItems:9,items:string}}),'Resolve a stable semantic target in its exact occurrence through the real worker, independently of GPU pixel IDs.'),
+  define('drawing.evidence.inspect',['ReadOnly'],object({svg:{type:'string',minLength:1,maxLength:8192}}),'Read a bounded SVG source and report explicit dimensions or a clarification question.'),
+  define('drawing.reconstruct',['LocalProposal'],object({svg:{type:'string',minLength:1,maxLength:8192}}),'Propose an editable plate sketch and extrusion from complete orthographic SVG evidence.'),
   define('drawing.layout.set',['LocalProposal'],object({
     producerId:string,orientation:{type:'string',enum:['portrait','landscape']},
     views:{type:'array',minItems:1,maxItems:2,uniqueItems:true,items:{type:'string',enum:['top','front']}},

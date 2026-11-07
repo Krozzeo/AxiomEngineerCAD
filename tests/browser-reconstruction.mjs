@@ -1,0 +1,48 @@
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {join} from 'node:path';
+import {sketchDocument} from './browser-sketch.mjs';
+
+export async function verifyReconstructionUI({context,host,evidence,observe,report}){
+ const demo=host.manager.catalog().recents.find(p=>p.name==='E2.M4 Drawing Reconstruction');
+ assert.ok(demo);
+ const open=()=>host.manager.execute({operationId:crypto.randomUUID(),action:'open',productId:demo.productId,path:demo.path});
+ let session=await open(),page=await context.newPage();observe(page);await page.goto(session.editorUrl);
+ await page.locator('body[data-sketch-ready=true]').waitFor();
+ const source=await readFile(demo.path);
+ await page.locator('.wb-menubar').getByText('Tools',{exact:true}).click();
+ await page.locator('[data-wb-action=review]').click();
+ const input=page.locator('#review-drawing-source'),sample=await readFile(new URL('../app/e2-m4-drawing.svg',import.meta.url),'utf8');
+ const status=page.locator('#review-status');
+ await input.setInputFiles({name:'missing-depth.svg',mimeType:'image/svg+xml',buffer:Buffer.from(sample.replace(/.*data-dimension="depth".*\r?\n/,''))});
+ await page.locator('#review-reconstruct').click();
+ await status.filter({hasText:/NeedsClarification.*depth/}).waitFor();
+ assert.deepEqual(await readFile(demo.path),source);
+ await input.setInputFiles({name:'plate.svg',mimeType:'image/svg+xml',buffer:Buffer.from(sample)});
+ await page.locator('#review-reconstruct').click();
+ await status.filter({hasText:'Isolated proposal prepared'}).waitFor();
+ assert.equal((await sketchDocument(page)).native.graph.features.length,0);
+ await page.locator('#review-validate').click();
+ await status.filter({hasText:'Proposal validated'}).waitFor();
+ await page.locator('#review-open').click();
+ await page.locator('#review-drawing-evidence').filter({hasText:'Maximum deviation 0.000000 mm'}).waitFor();
+ assert.ok(await page.locator('#review-apply').isDisabled());
+ await page.locator('#review-confirm').check();await page.locator('#review-apply').click();
+ await status.filter({hasText:'Applied and saved'}).waitFor();
+ const saved=await sketchDocument(page);
+ assert.equal(saved.native.graph.features[0].type,'sketch-primitives');
+ assert.equal(saved.native.graph.features[1].data.depthMm,12);
+ assert.deepEqual(Buffer.from(saved.native.graph.sources[0].base64,'base64'),Buffer.from(sample));
+ await page.locator('.ribbon-tabs').getByRole('tab',{name:'Drawing',exact:true}).click();
+ await page.locator('#proof-show-sheet').click();
+ await page.waitForFunction(()=>window.engineerViewport.proof?.drawing?.dimension?.valueMm===48);
+ const download=page.waitForEvent('download');await page.locator('#proof-export').click();
+ await (await download).saveAs(join(evidence,'e2-m4-reconstructed.pdf'));
+ const close=async()=>{page.on('dialog',dialog=>dialog.accept());await page.close();await host.manager.execute({operationId:crypto.randomUUID(),action:'close',sessionId:session.sessionId,expectedRevision:saved.revision,decision:'discard'});};
+ await close();
+ session=await open();page=await context.newPage();observe(page);await page.goto(session.editorUrl);
+ await page.waitForFunction(()=>window.engineerViewport?.proof?.exact?.validity.brepValid===true);
+ assert.deepEqual(await sketchDocument(page),saved);
+ await close();
+ report.reconstruction={passed:true,missingDepthClarification:true,isolatedUntilApply:true,reprojectionMm:0,sourcePreserved:true,reopen:true};
+}

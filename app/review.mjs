@@ -34,15 +34,32 @@ action('review-script-drawing',async()=>{
  const r=await invoke('drawing.layout.set',{producerId:extrusions[0].id,orientation:'landscape',views:['front'],dimensions:['depth']},'LocalProposal',p,true);
  job=r.jobId;phase='proposal-edit';$('review-cancel-job').disabled=false;status('Computing isolated drawing proposal; MAIN is unchanged.');
 });
+action('review-reconstruct',async()=>{
+ if(!automation)await enable();
+ const file=$('review-drawing-source').files[0];
+ if(file?.size>8192)throw Error('Drawing evidence exceeds 8 KiB.');
+ const svg=file?await file.text():await fetch('/e2-m4-drawing.svg').then(response=>{
+  if(!response.ok)throw Error('Sample drawing is unavailable.');
+  return response.text();
+ });
+ await invoke('drawing.evidence.inspect',{svg},'ReadOnly',null,true);
+ const p=await invoke('proposal.create',{label:'Local drawing-to-model reconstruction'},'LocalProposal',null,true);
+ selected=p;
+ const r=await invoke('drawing.reconstruct',{svg},'LocalProposal',p,true);
+ job=r.jobId;phase='proposal-edit';$('review-cancel-job').disabled=false;status('Reconstructing in an isolated proposal; MAIN is unchanged.');
+});
 action('review-validate',async()=>{const r=await invoke('proposal.validate',{proposalId:selected.id},'LocalProposal',selected);job=r.jobId;phase='validation';$('review-cancel-job').disabled=false;status('Validating exact before/after geometry, constraints and dependencies…');});
 action('review-cancel-job',()=>api('cancel',{}));
 action('review-cancel',async()=>{await invoke('proposal.cancel',{proposalId:selected.id},'LocalProposal',selected);status('Proposal cancelled. MAIN is unchanged.');await refresh();});
 action('review-measure',async()=>{const r=await invoke('geometry.measure',{featureId:$('review-feature').value});job=r.jobId;phase='measurement';$('review-cancel-job').disabled=false;status('Measuring the actual exact-kernel shape…');});
 action('review-open',async()=>{let offset=0,rows=[],evidence,firstHash;do{const r=await invoke('proposal.review',{proposalId:selected.id,offset,limit:10,maxBytes:12000},'ReadOnly',selected);if(firstHash&&r.reviewHash!==firstHash)throw Error('RevisionConflict: review changed while paging.');firstHash=r.reviewHash;evidence=r.evidence;rows.push(...r.items);offset=r.nextOffset;}while(offset!==null);reviewHash=firstHash;$('review-diff').replaceChildren();for(const row of rows){const title=document.createElement('h3'),pre=document.createElement('pre');title.textContent=row.path+(row.continued?' · continued':'');pre.textContent='Before: '+row.before+'\nAfter:  '+row.after;$('review-diff').append(title,pre);}const before=evidence.before?.volumeMm3,after=evidence.after?.volumeMm3;$('review-evidence').textContent=`${rows.length} reviewed diff row(s) · Exact volume: ${before?.toFixed(6)??'not present'} → ${after?.toFixed(6)??'not present'} mm³. ${evidence.checks.join('; ')}.${evidence.sketchAfter?.length?' Sketches: '+evidence.sketchAfter.map(s=>s.id+' '+s.status+' ('+(s.dof<0?'?':s.dof)+' DOF)').join('; ')+'.':''}`;const drawing=$('review-drawing-evidence');
- drawing.hidden=!evidence.drawing;
+ drawing.hidden=!evidence.drawing&&!evidence.reprojection;
  if(evidence.drawing){
   const summary=result=>result.sheet.widthMm+' × '+result.sheet.heightMm+' mm; '+result.views.map(view=>view.name+' ('+view.hidden+' hidden edges)').join(', ')+'; '+result.dimensions.map(d=>d.name+' '+d.valueMm+' mm').join(', ');
   drawing.textContent='Drawing before: '+summary(evidence.drawing.before)+' → after: '+summary(evidence.drawing.after);
+ }else if(evidence.reprojection){
+  const {views,maxDeviationMm,references}=evidence.reprojection;
+  drawing.textContent='Reprojection matched '+views.join(' and ')+'. Maximum deviation '+maxDeviationMm.toFixed(6)+' mm. Source dimensions: '+references.map(ref=>ref.field+' '+ref.valueMm+' mm').join(', ')+'.';
  }else drawing.textContent='';
  $('review-confirm').checked=false;$('review-apply').disabled=true;$('review-dialog').showModal();});
 $('review-confirm').addEventListener('change',()=>{$('review-apply').disabled=!$('review-confirm').checked;});

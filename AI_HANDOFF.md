@@ -1,6 +1,6 @@
-# Engineer handoff - E2.M3 drawing proposal / 0.2.2 candidate
+# Engineer handoff - E2.M4 drawing reconstruction / 0.2.3 candidate
 
-Start with `npm run context`, AGENTS.md, [compact context](docs/PROJECT_CONTEXT.md) and the [E2.M3 report](docs/milestones/E2_M3_DRAWING_PROPOSAL.md). Owner validated E2.M2 and requested E2.M3. Preserve prior source and immutable version semantics.
+Start with `npm run context`, AGENTS.md, [compact context](docs/PROJECT_CONTEXT.md) and the [E2.M4 report](docs/milestones/E2_M4_DRAWING_RECONSTRUCTION.md). Owner validated E2.M3 and requested E2.M4. Preserve prior source and immutable version semantics.
 
 ## Source and authority
 

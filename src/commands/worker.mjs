@@ -1,3 +1,4 @@
+import {drawingEvidence as extractDrawing,compareReprojection,DRAWING_TRANSLATOR} from '../proof/drawing-evidence.mjs';
 import {buildProof} from '../proof/kernel.mjs';
 import {canonical,hash} from '../native/schema.mjs';
 import {executionContent} from './execution.mjs';
@@ -21,4 +22,10 @@ if(layout(candidate)&&canonical(layout(before))!==canonical(layout(candidate))){
  };
  drawingEvidence={before:await summarize(before),after:await summarize(candidate)};
 }
-return {valid:true,before:beforeProof,after:afterProof,...(drawingEvidence?{drawingEvidence}:{}),...(normalize?{candidate,diagnostics}:{}),checks:['native graph and immutable closure','actual exact-kernel analytic oracles','actual sketch/spatial profile when present','semantic reference resolution','pinned runtime integrity']};}
+const source=candidate.native?.graph.sources.find(item=>item.translator.id===DRAWING_TRANSLATOR);
+let reprojection;
+if(source&&!before.native?.graph.sources.some(item=>item.sha256===source.sha256)){
+ const extracted=extractDrawing(Buffer.from(source.base64,'base64').toString('utf8'));
+ reprojection={...compareReprojection((await buildProof(candidate)).drawing,extracted),sourceHash:source.sha256};
+}
+return {valid:true,before:beforeProof,after:afterProof,...(reprojection?{reprojection}:{}),...(drawingEvidence?{drawingEvidence}:{}),...(normalize?{candidate,diagnostics}:{}),checks:['native graph and immutable closure','actual exact-kernel analytic oracles','actual sketch/spatial profile when present','semantic reference resolution','pinned runtime integrity']};}
