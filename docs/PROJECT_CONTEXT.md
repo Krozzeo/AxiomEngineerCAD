@@ -4,7 +4,7 @@ Start with `npm run context`. `PROJECT_STATE.json` records the reviewed Master h
 
 Platform owns generic local lifecycle, credentials and shared AI/review SDK. Engineer owns exact geometry, sketch solving, native history, assemblies, drawings and semantic CAD operations. Source mutations share revision-checked commands; GPU triangles and pixel IDs never establish native identity. Keep immutable builds/user files and human authorization boundaries intact.
 
-E0 completed its feasibility foundation and E1 delivered the exact extrusion/sketch workbench through 0.1.14. The owner explicitly requested E2.M1. The 0.2.0 candidate adds bounded visual evidence for semantic selections and feature visibility interactions; see PROJECT_STATE and the current scope report.
+E0 completed the feasibility foundation. E1 delivered the exact extrusion and sketch workbench. The owner validated E2.M1 semantic evidence and requested E2.M2. The 0.2.1 candidate generates an associative A4 sheet from a supported single extrusion. See PROJECT_STATE and the current scope report for delivery status.
 
 Current implemented bounds: supported primary-part extrusion chain, point/line/circle/four-line rectangles, typed constraints/equations, inline Parameter Manager, docking and separate windows. General planar supports use conservative geometry witnesses: changed faces require explicit repair. Existing dimensions preserve old sign semantics; newer strict source extensions are refused by older readers. Full feature breadth, arcs and general edit-proof topology remain later work.
 

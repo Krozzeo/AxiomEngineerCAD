@@ -6,13 +6,20 @@ import {createSketchFromSupport,selectSketchComponent,sketchCommit,sketchDocumen
 import {openParameters,addInlineParameter} from './browser-parameters.mjs';
 
 export async function verifyConsolidationProjectUI({context,host,evidence,observe,report}){
- const demo=host.manager.catalog().recents.find(p=>p.name==='E2.M1 Semantic Geometry & Evidence'),fixture=JSON.parse(await readFile(demo.path,'utf8'));
+ const demo=host.manager.catalog().recents.find(p=>p.name==='E2.M2 Associative Drawing'),fixture=JSON.parse(await readFile(demo.path,'utf8'));
  fixture.documentId='engineer-document://'+crypto.randomUUID();fixture.native.versions=[];fixture.native.publications=[];fixture.metadata.name='E1.M5 Consolidation Acceptance';
  const folder=await mkdtemp(join(host.manager.root,'consolidation-')),path=join(folder,'project.engineer-provisional.json');await writeFile(path,JSON.stringify(fixture));
  const open=()=>host.manager.execute({operationId:crypto.randomUUID(),action:'open',productId:demo.productId,path});
  let session=await open(),p=await context.newPage();observe(p);await p.goto(session.editorUrl);await p.locator('body[data-sketch-ready=true]').waitFor();await p.waitForFunction(()=>window.engineerViewport?.proof?.exact?.volumeMm3>0);
  const stage=text=>{report.consolidationStage=text;console.log('CONSOLIDATION',text);};
  const tab=name=>p.locator('.ribbon-tabs').getByRole('tab',{name,exact:true}).click(),model=async()=>{await p.locator('#panels-menu > summary').click();await p.locator('[data-open-panel=model]').click();};
+ stage('single-extrusion drawing exports a vector sheet');
+ await tab('Drawing');await p.locator('#proof-show-sheet').click();
+ await p.locator('#proof-sheet svg').waitFor();
+ await p.waitForFunction(()=>window.engineerViewport.proof?.drawing?.depthDimension?.valueMm===10);
+ const pdfDownload=p.waitForEvent('download');await p.locator('#proof-export').click();
+ await (await pdfDownload).saveAs(join(evidence,'e2-m2-extrusion.pdf'));
+ await tab('View');await p.locator('#proof-show-model').click();
  const click=async(x,y,opts)=>{const q=await sketchScreen(p,x,y);await p.mouse.click(q.x,q.y,opts);},move=async(x,y)=>{const q=await sketchScreen(p,x,y);await p.mouse.move(q.x,q.y);};
  const id=()=>p.evaluate(()=>window.engineerSketch.view()?.id),exit=async()=>{await p.locator('#edit-sketch-exit').click();await p.waitForFunction(()=>!window.engineerSketch.view());await sketchSettled(p);},gpu=await p.evaluate(()=>window.engineerViewport.renderer.info.state==='ready');
  await tab('Sketch');await createSketchFromSupport(p,'xy');await sketchSettled(p);const sketchId=await id(),data=async()=>(await sketchDocument(p)).native.graph.features.find(f=>f.id===sketchId).data;

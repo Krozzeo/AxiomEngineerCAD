@@ -37,6 +37,8 @@ jobs:
         run: python scripts/verify-vector-pdf.py
       - name: Independently verify integrated current and historical drawings
         run: python scripts/verify-vector-pdf.py test-results --integrated
+      - name: Independently verify the associative extrusion PDF
+        run: python scripts/verify-vector-pdf.py test-results --extrusion
       - uses: actions/upload-artifact@v4
         if: always()
         with:

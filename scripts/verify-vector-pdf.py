@@ -15,7 +15,10 @@ def near(a, b, eps=0.0001):
     assert abs(a - b) < eps, (a, b)
 
 integrated = '--integrated' in sys.argv
+extrusion = '--extrusion' in sys.argv
 fixtures = [('integrated-a4-40',40,10),('integrated-a4-60',60,15),('integrated-a4-historical',40,10)] if integrated else [('drawing-a4-40',40,10),('drawing-a4-60',60,10)]
+if extrusion:
+    fixtures = [('e2-m2-extrusion',40,10)]
 for stem,width,depth in fixtures:
     path = folder / f'{stem}.pdf'
     reader = PdfReader(path, strict=True)
@@ -26,17 +29,19 @@ for stem,width,depth in fixtures:
     assert len(page.images) == 0
     text = page.extract_text()
     assert f'{width}.000 mm' in text
-    assert all(t in text for t in ['TOP', 'FRONT', 'RIGHT', 'third-angle', 'NOT RELEASED FOR MANUFACTURE'])
+    assert all(t in text for t in ['TOP', 'FRONT', 'third-angle', 'NOT RELEASED FOR MANUFACTURE'])
+    assert (f'{depth}.000 mm' if extrusion else 'RIGHT') in text
     raw = path.read_bytes()
     assert all(t not in raw for t in [b'/JavaScript', b'/Launch', b'/OpenAction', b'/Image'])
     with pdfplumber.open(path) as doc:
         p = doc.pages[0]
         assert not p.images
         # Independent fixed fixture oracle: top plate width and height, not emitter metadata.
-        top_edges = [line for line in p.lines if abs(line['y0'] / pt - 220) < .0001 and abs(line['y1'] - line['y0']) < .0001]
-        assert any(abs(line['x0'] / pt - (60 - width / 2)) < .0001 and abs(line['x1'] / pt - (60 + width / 2)) < .0001 for line in top_edges)
+        top_y, center_x = (225, 105) if extrusion else (220, 60)
+        top_edges = [line for line in p.lines if abs(line['y0'] / pt - top_y) < .0001 and abs(line['y1'] - line['y0']) < .0001]
+        assert any(abs(line['x0'] / pt - (center_x - width / 2)) < .0001 and abs(line['x1'] / pt - (center_x + width / 2)) < .0001 for line in top_edges)
         hidden = [line for line in p.lines if line['dash'][0]]
-        assert len(hidden) == 4
+        assert len(hidden) == (2 if extrusion else 4)
         for line in hidden:
             near(line['height'] / pt, depth)
             near(line['width'], 0)
@@ -65,6 +70,6 @@ for stem,width,depth in fixtures:
         image = folder / f'{stem}-rendered.png'
         p.to_image(resolution=120).save(image)
         results.append({'file':path.name, 'sha256':hashlib.sha256(raw).hexdigest(), 'pageMm':[210,297], 'widthMm':width, 'depthMm':depth, 'rasterImages':0, 'hiddenLines':len(hidden), 'circleCubicSegments':cubics, 'maxMeasuredCircleDeviationMm':deviation, 'rendered':image.name})
-report = {'passed':True, 'profile':'E0.M7-independent-pdf/1' if integrated else 'E0.M6-independent-pdf/1', 'readers':{n:importlib.metadata.version(n) for n in ['pypdf','pdfplumber','pypdfium2']}, 'files':results}
-(folder / ('integrated-pdf-validation.json' if integrated else 'pdf-validation.json')).write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
+report = {'passed':True, 'profile':'E2.M2-independent-pdf/1' if extrusion else ('E0.M7-independent-pdf/1' if integrated else 'E0.M6-independent-pdf/1'), 'readers':{n:importlib.metadata.version(n) for n in ['pypdf','pdfplumber','pypdfium2']}, 'files':results}
+(folder / ('extrusion-pdf-validation.json' if extrusion else ('integrated-pdf-validation.json' if integrated else 'pdf-validation.json'))).write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
 print(json.dumps(report))

@@ -35,7 +35,7 @@ test('actual previous0.0.7 reader reopens the new workbench demo unchanged witho
 test('two UI views share only an identical in-flight read computation and retain cancellation/stale guards',async t=>{const f=await setup(t),a=f.s.build({operationId:randomUUID(),expectedRevision:0,viewportOnly:true}),b=f.s.build({operationId:randomUUID(),expectedRevision:0,viewportOnly:true});assert.equal(a.job.id,b.job.id);assert.throws(()=>f.s.build({operationId:randomUUID(),expectedRevision:0,viewportOnly:false}),{code:'projectBusy'});f.s.cancel({operationId:randomUUID()});await f.s.job.promise;assert.equal(f.s.job.state,'cancelled');assert.equal(f.s.proof,null);});
 
 test('headless evidence captures exact face and edge identities with a bounded visual and rejects stale input',async t=>{
- const f=await fixture(t),demo=await f.call('project.demos',{demoIds:['e2-m1-semantic-evidence'],destination:f.folder});
+ const f=await fixture(t),demo=await f.call('project.demos',{demoIds:['e2-m2-associative-drawing'],destination:f.folder});
  await f.call('project.open',{path:demo.projects[0].path});
  f.c=f.adapter.doc.commands;
  const before=await readFile(demo.projects[0].path),document=f.adapter.doc.value;

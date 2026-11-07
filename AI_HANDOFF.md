@@ -1,6 +1,6 @@
-# Engineer handoff - E2.M1 semantic geometry and visual evidence / 0.2.0 candidate
+# Engineer handoff - E2.M2 associative drawing / 0.2.1 candidate
 
-Start with `npm run context`, AGENTS.md, [compact context](docs/PROJECT_CONTEXT.md) and the [E2.M1 report](docs/milestones/E2_M1_SEMANTIC_EVIDENCE.md). Owner authorized E2.M1. See PROJECT_STATE for prior delivery and retain prior source/version semantics.
+Start with `npm run context`, AGENTS.md, [compact context](docs/PROJECT_CONTEXT.md) and the [E2.M2 report](docs/milestones/E2_M2_ASSOCIATIVE_DRAWING.md). Owner validated E2.M1 and requested E2.M2. Preserve prior source and immutable version semantics.
 
 ## Source and authority
 

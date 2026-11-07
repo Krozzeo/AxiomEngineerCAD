@@ -8,15 +8,22 @@ export function vectorSheet(drawing){
   const line=(a,b,hidden=false)=>{ops.push(`${hidden?'[1.5 1] 0 d':'[] 0 d'} ${n(a[0])} ${n(a[1])} m ${n(b[0])} ${n(b[1])} l S`);svg.push(`<path d="M${a.map(n).join(' ')}L${b.map(n).join(' ')}"${hidden?' stroke-dasharray="1.5 1"':''}/>`);};
   const text=(x,y,size,value)=>{ops.push(`BT /F1 ${n(size)} Tf 1 0 0 1 ${n(x)} ${n(y)} Tm (${literal(value)}) Tj ET`);svg.push(`<text x="${n(x)}" y="${n(-y)}" font-size="${n(size)}" transform="scale(1,-1)" fill="#172b40" stroke="none">${xml(value)}</text>`);};
   line([10,10],[w-10,10]);line([w-10,10],[w-10,h-10]);line([w-10,h-10],[10,h-10]);line([10,h-10],[10,10]);
-  text(15,h-19,5,'AXIOM ENGINEER CAD');text(15,h-27,3.5,drawing.title);text(15,25,3,'A4 | mm | scale 1:1 | third-angle projection');text(15,19,3,'GEOMETRIC REVIEW DRAFT - NOT RELEASED FOR MANUFACTURE');text(15,13,2.4,`Source revision ${drawing.source.revision} | ${drawing.source.contentHash.slice(0,23)}`);
-  for(const view of drawing.views){const [dx,dy]=view.originMm;const shift=p=>[p[0]+dx,p[1]+dy];text(dx-12,dy+view.heightMm+8,3.5,view.name.toUpperCase());
+  text(15,h-19,5,'AXIOM ENGINEER CAD');text(15,h-27,3.5,drawing.title);text(15,25,3,'A4 | mm | scale '+(drawing.sheet.scale===1?'1:1':'1:'+1/drawing.sheet.scale)+' | third-angle projection');text(15,19,3,'GEOMETRIC REVIEW DRAFT - NOT RELEASED FOR MANUFACTURE');text(15,13,2.4,`Source revision ${drawing.source.revision} | ${drawing.source.contentHash.slice(0,23)}`);
+  for(const view of drawing.views){const [dx,dy]=view.originMm;const shift=p=>[p[0]*drawing.sheet.scale+dx,p[1]*drawing.sheet.scale+dy];text(dx-12,dy+view.heightMm+8,3.5,view.name.toUpperCase());
     for(const [group,hidden]of [[view.hidden,true],[view.visible,false]])for(const p of group){if(p.kind==='line')line(shift(p.a),shift(p.b),hidden);else{
-      const [cx,cy]=shift(p.center),r=p.radius;ops.push('[] 0 d');let a=0;ops.push(`${n(cx+r)} ${n(cy)} m`);
+      const [cx,cy]=shift(p.center),r=p.radius*drawing.sheet.scale;ops.push('[] 0 d');let a=0;ops.push(`${n(cx+r)} ${n(cy)} m`);
       // Sixteen cubic arcs: declared radial deviation < 0.0001 mm in this profile.
       for(let i=0;i<16;i++){const b=(i+1)*Math.PI/8,k=4/3*Math.tan((b-a)/4),ca=Math.cos(a),sa=Math.sin(a),cb=Math.cos(b),sb=Math.sin(b);ops.push(`${n(cx+r*(ca-k*sa))} ${n(cy+r*(sa+k*ca))} ${n(cx+r*(cb+k*sb))} ${n(cy+r*(sb-k*cb))} ${n(cx+r*cb)} ${n(cy+r*sb)} c`);a=b;}ops.push('h S');svg.push(`<circle cx="${n(cx)}" cy="${n(cy)}" r="${n(r)}"/>`);
     }}
   }
   const dim=drawing.dimension,y=dim.yMm,x1=dim.x1Mm,x2=dim.x2Mm;line([x1,y-3],[x1,dim.extensionToYmm]);line([x2,y-3],[x2,dim.extensionToYmm]);line([x1,y],[x2,y]);for(const [x,sign]of [[x1,1],[x2,-1]]){line([x,y],[x+sign*2,y+1]);line([x,y],[x+sign*2,y-1]);}text((x1+x2)/2-8,y+3,3.5,`${dim.valueMm.toFixed(3)} mm`);
+  if(drawing.depthDimension){
+    const {xMm:x,edgeXmm:edge,y1Mm:a,y2Mm:b,valueMm}=drawing.depthDimension;
+    for(const [y,sign] of [[a,1],[b,-1]]){
+      line([edge,y],[x+3,y]);line([x,y],[x-1,y+sign*2]);line([x,y],[x+1,y+sign*2]);
+    }
+    line([x,a],[x,b]);text(x+2,(a+b)/2,3.5,`${valueMm.toFixed(3)} mm`);
+  }
   text(115,13,2.4,drawing.source.versionId?'Retained '+drawing.source.versionId.slice(0,23):'Working model');
   const stream=`q\n2.834645669291339 0 0 2.834645669291339 0 0 cm\n0.18 w\n0.09 0.17 0.25 RG\n${ops.join('\n')}\nQ\n`;
   const objects=['<< /Type /Catalog /Pages 2 0 R >>','<< /Type /Pages /Kids [3 0 R] /Count 1 >>',`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${n(w*72/25.4)} ${n(h*72/25.4)}] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>`,'<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',`<< /Length ${Buffer.byteLength(stream)} >>\nstream\n${stream}endstream`];
