@@ -8,7 +8,7 @@
   },
   "milestone": {
     "current": "E3.M1",
-    "status": "0.3.0 extended sketch candidate",
+    "status": "0.3.1 extended sketch candidate",
     "ownerAcceptance": "pending",
     "next": "Owner reviews E3.M1 extended sketch demo before E3.M2"
   },
@@ -37,9 +37,9 @@
     "deliveryGate": "docs/MILESTONE_DELIVERY.md"
   },
   "candidate": {
-    "version": "0.3.0",
+    "version": "0.3.1",
     "branch": "engineer/e3-m1-sketch-breadth",
-    "status": "Arcs, regular polygons, trim/split, mirror and bounded sketch patterns"
+    "status": "Sketch ribbon variants, cubic splines, marquee and parameter-driven patterns"
   },
   "previousDelivered": {
     "version": "0.2.5",

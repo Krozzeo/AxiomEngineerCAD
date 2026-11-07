@@ -28,7 +28,7 @@ export function sketchExternalReferences({getState,getScene,onCandidate}){
   merge(items){sync();return [...items,...[...pending.values()].map(p=>p.entity).filter(e=>!items.some(x=>x.id===e.id))];},
   anchors(){const state=sync();return state?[...pending.values()].flatMap(p=>referenceAnchors(state.id,p.entity,(...parts)=>'preview-'+p.entity.id+'-'+parts.at(-1))):[];},
   inputs(inputs,context){
-   const state=getState(),refs=[...(inputs.constraint?.refs??[]),...(inputs.constraints??[]).flatMap(c=>c.refs),...(inputs.snaps??[]).map(s=>s.to),...(inputs.snapTarget?[inputs.snapTarget]:[])],ids=new Set(refs.map(r=>r.entityId)),entities=[];
+   const state=getState(),refs=[...(inputs.constraint?.refs??[]),...(inputs.constraints??[]).flatMap(c=>c.refs),...(inputs.snaps??[]).map(s=>s.to),...(inputs.snapTarget?[inputs.snapTarget]:[]),...(inputs.axisId?[{entityId:inputs.axisId}]:[]),...(inputs.reference?[inputs.reference]:[])],ids=new Set(refs.map(r=>r.entityId)),entities=[];
    for(const item of pending.values())if(ids.has(item.entity.id)&&!state.items.some(e=>e.id===item.entity.id)){
     if(item.revision!==context.expectedDocumentRevision)throw Error('Source changed. Select the model reference again.');
     entities.push(structuredClone(item.entity));

@@ -88,3 +88,23 @@ test('E3.M1 regular polygons, associative mirror and bounded patterns solve toge
   }
   assert.equal((await solveParametric(data)).valid,true);
 });
+
+test('managed pattern follows typed parameters and retains copy identities',()=>{
+  const set=(doc,id,unit,expression)=>command(doc,'cad.parameter.set.v1',{parameter:{id,definitionId:null,name:id,unit,expression}});
+  let doc=set(extendedSketchDemo(),'RepeatCount','scalar','3');
+  doc=set(doc,'RepeatSpacing','mm','5 mm');
+  doc=run(doc,'pattern',{id:'driven-pattern',entityIds:['practice-circle'],reference:ref('practice-axis'),
+    count:3,spacing:5,mode:'linear',countParameterId:'RepeatCount',spacingParameterId:'RepeatSpacing'});
+  const read=source=>{
+    const {patterns,entities}=feature(source).data;
+    return patterns[0].generated.map(id=>entities.find(e=>e.id===id));
+  };
+  const initial=read(doc);
+  assert.deepEqual(initial.map(e=>e.center),[[14,27],[14,32]]);
+  doc=set(doc,'RepeatSpacing','mm','8 mm');
+  assert.deepEqual(read(doc).map(e=>e.id),initial.map(e=>e.id));
+  assert.deepEqual(read(doc).map(e=>e.center),[[14,30],[14,38]]);
+  doc=set(doc,'RepeatCount','scalar','2');
+  assert.deepEqual(read(doc).map(e=>e.id),[initial[0].id]);
+  assert.throws(()=>command(doc,'cad.parameter.delete.v1',{parameterId:'RepeatSpacing'}),{code:'LostReference'});
+});

@@ -1,4 +1,4 @@
-import {searchSelect} from './search-select.mjs';
+import {operationValue} from './operation-inspector.mjs';
 import {previewRequests} from './preview-requests.mjs';
 import './interaction-workbench.mjs';
 import {editorDocument as document} from './editor-document.mjs';
@@ -89,13 +89,12 @@ function schedulePreview(){
  }
  async function extrusionFields(data){const owner=editing,source=await api('document');if(editing!==owner)return;const name=document.createElement('label'),input=document.createElement('input');name.textContent='Name';input.dataset.extrusionName='true';input.maxLength=128;input.value=data.name??'Extrusion';name.append(input);$('feature-operation-fields').prepend(name);
  const fields=$('feature-operation-fields'),depthMm=data.dimensions?.depth.value??data.depthMm??10,featureId=owner.item?.id,graph=source.document.native.graph,definitionId=graph.features.find(f=>f.id===(featureId??owner.input?.sketchId))?.definitionId;
- const options=graph.parameters.filter(p=>(p.unit==='mm'||p.unitMode==='auto'&&!p.targets?.length)&&(!p.definitionId||p.definitionId===definitionId)).map(p=>({value:p.id,label:p.name,depth:p.value})),driver=graph.parameters.find(p=>p.targets?.some(t=>t.kind==='feature'&&t.featureId===featureId&&t.parameter==='depth'));
- const row=document.createElement('div'),title=document.createElement('label');title.textContent='Depth (mm)';title.htmlFor='extrusion-depth-value';row.className='sketch-dimension-driver operation-value';
+ const options=graph.parameters.filter(p=>(p.unit==='mm'||p.unitMode==='auto'&&!p.targets?.length)&&(!p.definitionId||p.definitionId===definitionId)).map(p=>({value:p.id,label:p.name,depth:p.value,number:p.value})),driver=graph.parameters.find(p=>p.targets?.some(t=>t.kind==='feature'&&t.featureId===featureId&&t.parameter==='depth'));
  const commit=(value,id,focus)=>{if(editing!==owner)return;if(!Number.isFinite(value)||value<.001||value>10000){notify('Depth must be between 0.001 and 10000 mm.');return;}Object.assign(owner.depth,{depthMm:value,parameterId:id});if(!id)control.setLiteral(value);if(focus){control.input.focus({preventScroll:true});control.input.select();}schedulePreview();};
- const control=searchSelect({document,field:'operation-depth-driver',label:'Depth or parameter',options,value:driver?.id??'',allowNumber:true,onSelect:id=>commit(options.find(p=>p.value===id)?.depth,id,true),onLiteral:(value,{focus})=>commit(value,null,focus)});
- control.input.id='extrusion-depth-value';control.input.dataset.parameter='depth';if(!driver)control.setLiteral(depthMm);
- owner.depth={depthMm,parameterId:driver?.id??null,options,control};const table=document.createElement('table');table.className='operation-value-table';table.insertRow().insertCell().append(control.element);row.append(table);
- if(featureId){const button=document.createElement('button');button.type='button';button.innerHTML=icon('separate');button.title='Go to source';button.setAttribute('aria-label','Go to source');button.onclick=()=>window.dispatchEvent(new CustomEvent('engineer-open-dimension-source',{detail:{parameterId:owner.depth.parameterId,featureId,parameter:'depth'}}));row.append(button);}
+ const {title,row,control}=operationValue(document,{field:'extrusion-depth-value',label:'Depth (mm)',options,value:depthMm,id:driver?.id,onChange:commit,
+  onSource:featureId?()=>window.dispatchEvent(new CustomEvent('engineer-open-dimension-source',{detail:{parameterId:owner.depth.parameterId,featureId,parameter:'depth'}})):null});
+ row.classList.add('sketch-dimension-driver');control.input.dataset.parameter='depth';
+ owner.depth={depthMm,parameterId:driver?.id??null,options,control};
  fields.append(title,row);
  const focusDepth=()=>{if(editing===owner&&!editor.hidden){control.input.focus({preventScroll:true});control.input.select();}};
  requestAnimationFrame(focusDepth);

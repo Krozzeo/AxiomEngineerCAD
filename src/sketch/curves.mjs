@@ -100,3 +100,44 @@ export function arcTangencyValid(a,b){
   if(length<=eps)return false;
   return [a,b].every((entity,i)=>entity.type!=='arc'||within(entity,entity.center.map((n,k)=>n+(i?-1:1)*entity.radius*axis[k]/length)));
 }
+
+export function circleThrough(a,b,c){
+ const u=delta(b,a),v=delta(c,a),den=2*cross(u,v);
+ if(Math.abs(den)<eps)return null;
+ const uu=dot(u,u),vv=dot(v,v);
+ const offset=[(uu*v[1]-vv*u[1])/den,(vv*u[0]-uu*v[0])/den];
+ return {center:a.map((n,i)=>n+offset[i]),radius:Math.hypot(...offset),clockwise:den<0};
+}
+export function splineSegments(e,steps=64){
+ const points=Array.from({length:steps+1},(_,i)=>{
+  const t=i/steps,u=1-t;
+  return e.a.map((n,k)=>u**3*n+3*u*u*t*e.control1[k]+3*u*t*t*e.control2[k]+t**3*e.b[k]);
+ });
+ return points.slice(1).map((p,i)=>[points[i],p]);
+}
+export function rectanglePoints(a,b,third){
+ if(!third)return [a,[b[0],a[1]],b,[a[0],b[1]]];
+ const u=delta(b,a),length=Math.hypot(...u);
+ if(length<eps)return null;
+ const n=[-u[1]/length,u[0]/length],width=dot(delta(third,b),n);
+ if(Math.abs(width)<eps)return null;
+ return [a,b,b.map((x,i)=>x+width*n[i]),a.map((x,i)=>x+width*n[i])];
+}
+
+export function sketchTransform(mode,{axis,center,spacing,reverse=false},index=1){
+ const sign=reverse?-1:1;
+ if(mode==='circular'){
+  const angle=spacing*sign*index,c=Math.cos(angle),s=Math.sin(angle);
+  return p=>{const [x,y]=delta(p,center);return [center[0]+x*c-y*s,center[1]+x*s+y*c];};
+ }
+ const v=delta(axis.b,axis.a),length=Math.hypot(...v);
+ if(mode==='mirror')return p=>mix(p,mix(axis.a,axis.b,dot(delta(p,axis.a),v)/(length*length)),2);
+ return p=>p.map((n,k)=>n+v[k]/length*spacing*sign*index);
+}
+export function transformSketchEntity(source,map,{mirror=false,id=source.id}={}){
+ const entity={id,type:source.type,construction:source.construction};
+ for(const role of ['a','b','center','point','control1','control2'])if(source[role])entity[role]=map(source[role]);
+ if(circular(source))entity.radius=source.radius;
+ if(source.type==='arc')entity.clockwise=mirror?!source.clockwise:source.clockwise;
+ return entity;
+}

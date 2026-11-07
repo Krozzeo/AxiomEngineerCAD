@@ -17,3 +17,17 @@
 #sketch-transform{padding:8px;border-bottom:1px solid #435870}
 #sketch-transform label{margin:6px 0;display:flex;justify-content:space-between;align-items:center;gap:5px}
 #sketch-transform input,#sketch-transform select{width:55%}
+
+#sketch-tool-help{padding:6px 2px}
+#edit-sketch-inspector[data-creation=true]>:not(#sketch-tool-help){display:none}
+.sketch-construction-control{display:inline-flex;align-items:center;gap:5px}
+.sketch-construction-control input{appearance:none;width:29px!important;height:16px;position:relative;background:#142132;border:1px solid #536b84;border-radius:10px;margin:0;cursor:pointer}
+.sketch-construction-control input::after{content:'';position:absolute;width:10px;height:10px;left:2px;top:2px;background:#90a8be;border-radius:50%}
+.sketch-construction-control input:checked{background:#2b6b9e}.sketch-construction-control input:checked::after{left:auto;right:2px;background:#ddedff}
+
+#edit-sketch-inspector[data-operation=true]>:not(#sketch-transform){display:none}
+.operation-inspector{padding:4px}
+.operation-selection{margin:5px 0;border:1px solid #405872;border-radius:4px;padding:5px;cursor:pointer}
+.operation-selection.active{border-color:#69b9f3;background:#1d3850}
+.operation-selection h4{margin:0 0 4px}.operation-selection table{width:100%}
+.operation-selection button{padding:2px!important}.operation-inspector-actions{display:flex;gap:6px;margin:8px 0}

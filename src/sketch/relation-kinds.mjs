@@ -3,7 +3,7 @@ import {circular,arcAngles} from './curves.mjs';
 export const M4_PROFILE='E1.M4-sketch/1',M5_PROFILE='E1.M5-sketch/1',isParametric=profile=>['E1.M3-sketch/1',M4_PROFILE,M5_PROFILE].includes(profile);
 export const dimensions=['length','radius','diameter','x','y','distance','distance-x','distance-y','angle','line-distance'];
 export const extendedRelations=['parallel','perpendicular','collinear','equal','concentric','coradial','tangent','point-on-line','point-on-circle','midpoint','horizontal-points','vertical-points','equal-curve-length','symmetry',...dimensions.slice(5)];
-export function pointAt(entities,ref){const e=entities.find(e=>e.id===ref?.entityId);if(!e)return null;if(e.type==='line'&&ref.role==='midpoint')return e.a.map((n,i)=>(n+e.b[i])/2);return ['a','b','point','center'].includes(ref.role)&&Array.isArray(e[ref.role])?e[ref.role]:null;}
+export function pointAt(entities,ref){const e=entities.find(e=>e.id===ref?.entityId);if(!e)return null;if(e.type==='line'&&ref.role==='midpoint')return e.a.map((n,i)=>(n+e.b[i])/2);return ['a','b','point','center','control1','control2'].includes(ref.role)&&Array.isArray(e[ref.role])?e[ref.role]:null;}
 export function validReference(entities,ref){const e=entities.find(e=>e.id===ref.entityId);return Boolean(ref.role==='entity'?e:pointAt(entities,ref));}
 const entity=(es,ref)=>es.find(e=>e.id===ref.entityId),vector=l=>l.b.map((n,i)=>n-l.a[i]),length=l=>Math.hypot(...vector(l)),cross=(a,b)=>a[0]*b[1]-a[1]*b[0],dot=(a,b)=>a[0]*b[0]+a[1]*b[1],wrap=x=>Math.atan2(Math.sin(x),Math.cos(x));
 const curveLength=e=>e.type==='line'?length(e):e.radius*(e.type==='arc'?Math.abs(arcAngles(e).sweep):2*Math.PI);

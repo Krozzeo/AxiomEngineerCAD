@@ -1,9 +1,8 @@
-import {intersections,parameterOn,pointOn,circular,polygonPoints} from './curves.mjs';
-import {derivedId} from './relations.mjs';
+import {intersections,parameterOn,pointOn,circular,polygonPoints,sketchTransform,transformSketchEntity} from './curves.mjs';
+import {derivedId,pointAt} from './relations.mjs';
 import {check} from '../errors.mjs';
 
 const eps=1e-7;
-const blend=(a,b,t)=>a.map((n,i)=>n+(b[i]-n)*t);
 const ref=(entityId,role='entity')=>({entityId,role});
 const relation=(id,type,refs)=>({id,type,refs,driving:true,value:null});
 const editable=e=>e&&!e.external;
@@ -84,8 +83,7 @@ function transform(data,name,input,sketchId){
   if(mirror){
     const axis=data.entities.find(e=>e.id===input.axisId);
     check(axis?.type==='line'&&!sources.includes(axis),'InvalidInput','Choose a separate straight mirror axis.');
-    const dx=axis.b[0]-axis.a[0],dy=axis.b[1]-axis.a[1],den=dx*dx+dy*dy;
-    mapping=p=>{const t=((p[0]-axis.a[0])*dx+(p[1]-axis.a[1])*dy)/den;return blend(p,blend(axis.a,axis.b,t),2);};
+    mapping=sketchTransform('mirror',{axis});
   }else if(input.mode==='linear'){
     check(input.step&&Math.hypot(...input.step)>eps,'InvalidGeometry','Enter a nonzero linear pattern step.');
     mapping=(p,i)=>p.map((n,k)=>n+input.step[k]*i);
@@ -94,11 +92,8 @@ function transform(data,name,input,sketchId){
     mapping=(p,i)=>{const [x,y]=p.map((n,k)=>n-input.center[k]),c=Math.cos(input.angle*i),s=Math.sin(input.angle*i);return [input.center[0]+x*c-y*s,input.center[1]+x*s+y*c];};
   }
   for(let i=1;i<(mirror?2:input.count);i++)for(const source of sources){
-    const id=derivedId(sketchId,input.id,source.id,i),next={id,type:source.type,construction:source.construction};
-    const roles=['a','b','center','point'].filter(role=>source[role]);
-    for(const role of roles)next[role]=mapping(source[role],i);
-    if(circular(source))next.radius=source.radius;
-    if(source.type==='arc')next.clockwise=mirror?!source.clockwise:source.clockwise;
+    const id=derivedId(sketchId,input.id,source.id,i),next=transformSketchEntity(source,p=>mapping(p,i),{id,mirror});
+    const roles=['a','b','center','point','control1','control2'].filter(role=>source[role]);
     data.entities.push(next);
     if(mirror){
       for(const role of roles)data.constraints.push(relation(derivedId(id,role),'symmetry',[ref(source.id,role),ref(id,role),ref(input.axisId)]));
@@ -109,5 +104,41 @@ function transform(data,name,input,sketchId){
 export function extendSketch(data,name,input,sketchId){
   if(name==='polygon')addPolygon(data,input,sketchId);
   else if(name==='split'||name==='trim')editSpan(data,input,name==='split',sketchId);
+  else if(name==='pattern'&&input.reference){
+    data.patterns??=[];
+    check(!data.patterns.some(item=>item.id===input.id),'InvalidInput','The pattern identity already exists.');
+    const {id,mode,entityIds,reference,count,spacing,reverse=false,countParameterId,spacingParameterId}=input;
+    data.patterns.push({id,mode,entityIds,reference,count,spacing,reverse,generated:[],
+      ...(countParameterId?{countParameterId}:{}),...(spacingParameterId?{spacingParameterId}:{})});
+  }
   else transform(data,name,input,sketchId);
+}
+
+export function synchronizePatterns(graph){
+ for(const feature of graph.features.filter(f=>f.data?.patterns)){
+  const data=feature.data;
+  for(const pattern of data.patterns){
+   const {id,mode,entityIds,reference,reverse}=pattern;
+   const value=(key,unit)=>{
+    const parameterId=pattern[key+'ParameterId'];
+    if(!parameterId)return pattern[key];
+    const p=graph.parameters.find(item=>item.id===parameterId);
+    check(p&&(!p.definitionId||p.definitionId===feature.definitionId),'LostReference','The pattern driver is missing or outside the sketch scope.');
+    check(p.unit===unit,'InvalidUnits','Pattern '+key+' requires '+unit+'.');return p.value;
+   };
+   const count=value('count','scalar'),spacing=value('spacing',mode==='circular'?'rad':'mm');
+   check(Number.isInteger(count)&&count>=2&&count<=12&&Number.isFinite(spacing)&&spacing>eps&&spacing<=(mode==='circular'?2*Math.PI:1000),'InvalidInput','Pattern count or spacing is outside its supported range.');
+   const sources=selected(data,entityIds),axis=data.entities.find(e=>e.id===reference.entityId),center=mode==='circular'&&pointAt(data.entities,reference);
+   check(mode==='circular'?center:axis?.type==='line'&&reference.role==='entity','LostReference','Select a straight pattern direction or a semantic center point.');
+   const signature=JSON.stringify([count,spacing,reverse,mode==='circular'?center:[axis.a,axis.b],sources]);
+   if(signature===pattern.signature)continue;
+   const copies=[];
+   for(let i=1;i<count;i++)for(const source of sources)
+    copies.push(transformSketchEntity(source,sketchTransform(mode,{axis,center,spacing,reverse},i),{id:derivedId(feature.id,id,source.id,i)}));
+   const removed=new Set(pattern.generated.filter(key=>!copies.some(e=>e.id===key)));
+   check(!data.constraints.some(c=>c.refs.some(r=>removed.has(r.entityId))),'ConstraintConflict','Lowering the pattern count would remove an entity used by a constraint.');
+   data.entities=[...data.entities.filter(e=>!pattern.generated.includes(e.id)),...copies];
+   pattern.generated=copies.map(e=>e.id);pattern.signature=signature;
+  }
+ }
 }

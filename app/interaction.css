@@ -13,3 +13,16 @@
 .cad-workbench .cad-feature-menu{background:#142232;color:#edf4ff;border:1px solid #52667e;box-shadow:0 8px 26px #0008;color-scheme:dark}.cad-workbench .cad-feature-menu button{background:transparent;color:inherit}.cad-workbench .cad-feature-menu button:hover{background:#30465e}
 .feature-state-icons{display:flex;margin-left:auto;gap:3px;flex-shrink:0;color:#9ab0c6}.feature-state-icons svg{width:14px;height:14px}.wb-tree-node{display:flex;align-items:center;gap:5px}.command-ribbon [data-command-size]{min-height:0}.command-ribbon [data-command-size=small]{font-size:0!important;padding:5px!important;width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center}.command-ribbon [data-command-size=small] svg,.command-ribbon [data-command-size=small] img{width:18px;height:18px}.command-ribbon [data-command-size=medium]{display:inline-flex;flex-direction:row;align-items:center;gap:5px;font-size:11px;height:30px;padding:4px 7px}.command-ribbon [data-command-size=large]{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:11px;min-width:70px;height:64px;padding:5px 8px;white-space:normal;text-align:center}.command-ribbon [data-command-size=large] svg,.command-ribbon [data-command-size=large] img{width:28px;height:28px}
 .command-ribbon .operation-page button[data-command-size=small]{height:30px!important;min-width:30px!important;width:30px!important}.command-ribbon .operation-page button[data-command-size=medium]{height:30px!important;min-width:0!important;flex-direction:row}.command-ribbon .operation-page button[data-command-size=large]{height:64px!important;flex-direction:column;min-width:70px}.command-ribbon .operation-page button[hidden]{display:none!important}
+
+.ribbon-column,.ribbon-grid{display:grid;gap:1px;align-content:center;flex:none}
+.ribbon-column{grid-template-rows:repeat(3,minmax(0,22px))}
+.ribbon-grid{grid-template-columns:repeat(3,max-content);grid-template-rows:repeat(3,22px)}
+.command-ribbon .ribbon-column button[data-command-size=medium],.command-ribbon .ribbon-grid button[data-command-size=small]{height:22px!important;padding-block:1px!important}
+.command-ribbon .ribbon-grid button[data-command-size=small]{width:25px!important;min-width:25px!important}
+.ribbon-split{display:inline-flex;align-items:stretch;flex:none}
+.ribbon-split[data-split-size=large]{flex-direction:column}
+.command-ribbon .ribbon-split .ribbon-arrow{min-width:13px;padding:0 2px;height:auto;min-height:0;background:transparent;border:0;font-size:10px}
+.command-ribbon .ribbon-split[data-split-size=large] .ribbon-arrow{height:13px}
+.ribbon-options{margin:0;padding:4px;min-width:185px;background:#142232;color:#e8f1fc;border:1px solid #52667e;border-radius:4px;box-shadow:0 6px 18px #0008}
+.ribbon-options:popover-open{display:grid;gap:2px}
+.command-ribbon .ribbon-options button{height:26px;display:flex;align-items:center;justify-content:flex-start;gap:6px;padding:3px 6px;font-size:11px;white-space:nowrap}

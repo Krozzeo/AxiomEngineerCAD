@@ -36,13 +36,26 @@ export async function verifyExtendedSketchUI({context,host,evidence,observe,repo
     assert.ok(Math.abs((await practice()).entities.find(e=>e.id==='practice-trim').b[0]-26)<1e-5);
     await tool('split');await sketchCommit(page,()=>click(19,32));
     await tool('select');await selectSketchComponent(page,'practice-circle');
-    await page.locator('#sketch-mirror').click();await page.getByLabel('Mirror axis').selectOption('practice-axis');
+    await page.locator('#sketch-mirror').click();await selectSketchComponent(page,'practice-axis');
     await sketchCommit(page,()=>page.locator('#sketch-transform').getByRole('button',{name:'Apply',exact:true}).click());
     assert.ok((await practice()).entities.some(e=>e.type==='circle'&&e.center[0]<-10&&e.center[1]>20&&!e.construction));
-    await selectSketchComponent(page,'practice-circle');await page.locator('#sketch-pattern').click();
-    await page.getByLabel('Pattern type').selectOption('circular');
+    await selectSketchComponent(page,'practice-circle');await page.getByRole('button',{name:'Sketch Pattern options'}).click();
+    await page.locator('#sketch-circular-pattern').click();
+    await selectSketchComponent(page,'practice-axis','midpoint');
     await sketchCommit(page,()=>page.locator('#sketch-transform').getByRole('button',{name:'Apply',exact:true}).click());
     assert.ok((await practice()).entities.filter(e=>e.type==='circle'&&!e.construction).length>=4);
+    await tool('spline');
+    await page.locator('#edit-sketch-inspector').getByRole('heading',{name:'Spline',exact:true}).waitFor();
+    await click(-30,18,{bypass:true});await click(-24,22,{bypass:true});await click(-18,15,{bypass:true});
+    await sketchCommit(page,()=>click(-12,18,{bypass:true}));
+    const spline=(await practice()).entities.find(e=>e.type==='spline');
+    assert.ok(spline?.control1&&spline.control2);
+    await tool('select');
+    const corners=await Promise.all([sketchScreen(page,-34,27),sketchScreen(page,-9,13)]);
+    await page.mouse.move(corners[0].x,corners[0].y);await page.mouse.down();
+    await page.mouse.move(corners[1].x,corners[1].y,{steps:8});await page.mouse.up();
+    assert.ok(await page.locator('[data-sketch-entity-id="'+spline.id+'"][data-role=entity][aria-selected=true]').count()||
+      await page.locator('[data-sketch-entity="'+spline.id+'"] path[stroke="#7979ff"]').count());
     if(evidence)await page.screenshot({path:join(evidence,'e3-m1-extended-sketch.png')});
     await page.locator('#edit-sketch-exit').click();await sketchSettled(page);
     const saved=page.waitForResponse(r=>r.url().endsWith('/v1/save'));await page.locator('#save').click();
@@ -51,7 +64,7 @@ export async function verifyExtendedSketchUI({context,host,evidence,observe,repo
     await page.close();await close(session,source.revision);session=null;
     session=await open();page=await context.newPage();observe(page);await page.goto(session.editorUrl);await waitEditorIdle(page);
     assert.deepEqual(await sketchDocument(page),source);
-    report.extendedSketch={passed:true,arcs:true,polygon:true,trim:true,split:true,mirror:true,pattern:true,saveReopen:true};
+    report.extendedSketch={passed:true,arcs:true,polygon:true,trim:true,split:true,mirror:true,pattern:true,spline:true,marquee:true,saveReopen:true};
   }finally{
     await page.close().catch(()=>{});
     if(session)await close(session,JSON.parse(await readFile(entry.path,'utf8')).revision);

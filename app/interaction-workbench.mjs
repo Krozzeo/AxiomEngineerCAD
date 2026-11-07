@@ -1,3 +1,4 @@
+import {segmentPath} from './segment-path.mjs';
 import './dock-workbench.mjs';
 import './workbench.mjs';
 import {editorDocument as document} from './editor-document.mjs';
@@ -19,7 +20,7 @@ function index(){feedbackScene=null;records=new Map();for(const o of r.scene?.oc
     continue;
    }
    const edges=new Map();for(let j=g.start;j<g.start+g.count;j+=3){const t=m.triangles.slice(j,j+3);for(let k=0;k<3;k++){const a=t[k],b=t[(k+1)%3],key=[a,b].sort((a,b)=>a-b).join(':');const old=edges.get(key);edges.set(key,old?{...old,count:old.count+1}:{a,b,count:1});}}add(o.faceSelectionIds[g.role],'face',[...edges.values()].filter(e=>e.count===1).map(e=>[world(m.vertices.slice(e.a*3,e.a*3+3),o),world(m.vertices.slice(e.b*3,e.b*3+3),o)]));}}
-  for(const sketch of r.scene?.sketches??[]){add(sketch.selectionId,'feature',sketch.entities.flatMap(e=>e.segments),sketch.entities.flatMap(e=>e.points));for(const e of sketch.entities)add('sketch:'+e.id,'sketch',e.segments,e.points);}
+  for(const sketch of r.scene?.sketches??[]){add(sketch.selectionId,'feature',sketch.entities.flatMap(e=>e.segments),sketch.entities.flatMap(e=>e.points));for(const e of sketch.entities){add('sketch:'+e.id,'sketch',e.segments,e.points);records.get('sketch:'+e.id).construction=e.construction;}}
   for(const d of r.scene?.datums??[]){const extent=Math.min(300,Math.max(40,r.camera.span/5));if(d.datumType==='point')add(d.selectionId,'vertex',[],[d.originMm],d);else if(d.datumType==='axis')add(d.selectionId,'datum',[[d.direction.map(x=>-x*extent),d.direction.map(x=>x*extent)]],[],d);else{const axes=d.normal.map((x,i)=>x===0?i:-1).filter(x=>x>=0),p=[[-1,-1],[1,-1],[1,1],[-1,1]].map(c=>{const a=[0,0,0];axes.forEach((j,i)=>a[j]=c[i]*extent);return a;});add(d.selectionId,'datum',p.map((a,i)=>[a,p[(i+1)%4]]),[],d);}}}
 function sourceIds(item){if(!item)return [];const sketch=r.scene?.sketches?.find(s=>s.id===item.id);if(sketch)return [sketch.selectionId];if(item.kind==='datum')return [r.scene?.datums?.find(d=>d.id===item.id)?.selectionId].filter(Boolean);const items=window.engineerSourceItems?.()??[],depends=(id,seen=new Set())=>{if(id===item.id)return true;if(seen.has(id))return false;seen.add(id);return (items.find(i=>i.id===id)?.dependsOn??[]).some(x=>depends(x,seen));};return (r.scene?.occurrences??[]).filter(o=>item.kind==='instance'?o.path.at(-1)===item.id:depends(o.featureId)).map(o=>o.featureSelectionId);}
 const AXES=[[0,'X','#ef3340'],[1,'Y','#21d147'],[2,'Z','#225cff']],EDGE_SELECTED='#7979ff';
@@ -34,6 +35,11 @@ function paint(){
  const draw=(id,color,isSelected=false)=>{const e=records.get(id);if(!e||r.scene?.sketches?.some(s=>s.selectionId===id&&s.id===window.engineerSketch?.view()?.id))return;
  if(e.reference){if(isSelected)color=EDGE_SELECTED;const axis=e.reference.datumType==='axis';for(const [a,b]of e.segments){const p=point(a),q=point(b);if(p[2]<0||q[2]<0)continue;svg('path',{d:`M${p[0]} ${p[1]}L${q[0]} ${q[1]}`,stroke:color,'stroke-width':(axis?1.5:2.5)*scale,'stroke-linecap':'round',...(axis?{'stroke-dasharray':`${36*scale} ${4.5*scale} ${.75*scale} ${4.5*scale}`}:{}),'data-reference-id':e.reference.id});}
  for(const p of e.points){const a=point(p);if(a[2]<0||a[2]>1)continue;svg('circle',{cx:a[0],cy:a[1],r:4*scale,fill:isSelected?EDGE_SELECTED:color,'data-reference-id':e.reference.id});for(const [i,label,c]of AXES){const end=[...p];end[i]+=frame.camera.span*.045;const b=point(end);arrow(overlay,a,b,c,2*scale);const text=svg('text',{x:b[0]+5*scale,y:b[1]+3*scale,fill:c,'font-size':12*scale,'data-origin-axis':label});text.textContent=label;}}return;}
+ const sketch=r.scene?.sketches?.find(item=>item.selectionId===id);
+ if(sketch){for(const entity of sketch.entities)draw('sketch:'+entity.id,color,isSelected);return;}
+ if(e.construction&&e.segments.length){
+  svg('path',{d:segmentPath(e.segments,point),fill:'none',stroke:isSelected?EDGE_SELECTED:color,'stroke-width':1.5*scale,'stroke-dasharray':`${7*scale} ${4*scale}`,'data-construction-entity':id});return;
+ }
  if(!feedbackChanged)return;const c=rgb(isSelected?EDGE_SELECTED:color);for(const [a,b]of e.segments){const k=key(a,b);if(!isSelected&&occupied.has(k))continue;if(isSelected)occupied.add(k);lines.push([...a,...b,...c,(e.kind==='edge'?4:2.5)*scale]);}for(const p of e.points){const k=p.join(',');if(!isSelected&&occupied.has(k))continue;if(isSelected)occupied.add(k);points.push([...p,...p,...rgb(isSelected?EDGE_SELECTED:color),10*scale]);}};
  for(const sketch of r.scene?.sketches??[])if(sketch.id!==window.engineerSketch?.view()?.id&&window.engineerVisibility?.(sketch.id)!=='hide'&&window.engineerVisibility?.(sketch.id)!=='delete'&&!selected.has(sketch.selectionId)&&!hovered.has(sketch.selectionId))for(const e of sketch.entities)draw('sketch:'+e.id,'#53667d');
  for(const id of selected)draw(id,SELECTED,true);for(const id of hovered)draw(id,HOVER);
