@@ -442,7 +442,12 @@ document.addEventListener('click',event=>{
 },true);
 function onDown(event){if(!current||busy||event.button!==0||event.target.closest?.('.sketch-heading'))return;if(event.target!==canvas&&!panel.contains(event.target))return;if(event.altKey||$('proof-mode').value!=='Select')return;event.preventDefault();event.stopImmediatePropagation();canvas.focus({preventScroll:true});if(converter.active){sourceAt(event).then(source=>{
  if(source&&source.target.kind!=='face')converter.pick(source.target,source.picked.selectionId);
- else{const projected=projectedReferenceAt(event);if(projected)converter.pick(projected.target);else if(source)converter.pick(source.target,source.picked.selectionId);}
+ else{
+  const projected=projectedReferenceAt(event);
+  if(projected)converter.pick(projected.target);
+  else if(source)converter.pick(source.target,source.picked.selectionId);
+  else if(r.info.state!=='ready')status('Renderer unavailable; choose a datum or a verified projection.');
+ }
  }).catch(e=>status(e.message));return;}if(mode==='equation-curve')return;if(mode==='trim'&&!localHits(event).some(hit=>hit.ref.role==='entity')){
   const start=coordinate(event);trimStroke={id:event.pointerId,points:[start]};draw();
   canvas.setPointerCapture?.(event.pointerId);return;
