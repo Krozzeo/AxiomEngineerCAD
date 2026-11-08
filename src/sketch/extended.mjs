@@ -125,7 +125,10 @@ function transform(data,name,input,sketchId){
     check(input.center&&Math.abs(input.angle)>eps,'InvalidGeometry','Enter a nonzero circular pattern step.');
     mapping=(p,i)=>{const [x,y]=p.map((n,k)=>n-input.center[k]),c=Math.cos(input.angle*i),s=Math.sin(input.angle*i);return [input.center[0]+x*c-y*s,input.center[1]+x*s+y*c];};
   }
-  for(let i=1;i<(mirror?2:input.count);i++)for(const source of sources){
+  const count=mirror?2:input.count;
+  check(Number.isSafeInteger(count)&&count>=2,'InvalidInput','Pattern count must be an integer of at least two.');
+  check((count-1)*sources.length<=MAX_SKETCH_ENTITIES-data.entities.length,'ResourceLimit','The resulting sketch exceeds the document geometry capacity.');
+  for(let i=1;i<count;i++)for(const source of sources){
     const id=derivedId(sketchId,input.id,source.id,i),next=transformSketchEntity(source,p=>mapping(p,i),{id,mirror});
     const roles=['a','b','center','point','control1','control2'].filter(role=>source[role]);
     data.entities.push(next);
