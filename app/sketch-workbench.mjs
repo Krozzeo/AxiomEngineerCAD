@@ -297,23 +297,27 @@ async function sourceAt(event,candidate){
 let sourceCache=null;
  async function externalPlacement(event,local,commit=false,epoch){
   if(!current||busy)return local;
-  const projected=!local.ref&&!event.ctrlKey?projectedReferenceAt(event):null;
-  if(projected){
-   const {geometry,role,target}=projected,q=coordinate(event),radial=mode==='circle'&&anchor&&role==='entity';
-   const parameter=geometry.type!=='point'?nearestParameter(geometry,radial?anchor:q):null;
-   const xy=pointAt([geometry],{entityId:geometry.id,role})??(parameter===null?null:pointOn(geometry,parameter));
-   if(xy&&(!radial||Math.hypot(...xy.map((n,i)=>n-anchor[i]))>1e-7)){
-    upstreamHover=geometry;
-    const ref=commit?externalRefs.resolve(target,role):{entityId:'external-hover',role};
-    if(ref)return {coordinate:xy,ref:{entityId:ref.entityId,role},label:'Snap · '+geometry.name};
-   }
-  }else upstreamHover=null;
   const sequence=epoch??++hoverSequence,owner=current,tool=mode,start=anchor;
   const eligible=()=>current===owner&&mode===tool&&anchor===start&&(commit||sequence===hoverSequence);
   try{
    const picked=r.info.state==='ready'?await r.pick(...pointerPosition(event)):r.referencePick?.(...pointerPosition(event));
    if(!eligible())return local;
    const origin=originAt(event),overLocal=!origin&&localHits(event).length>0;
+   const kind=picked?.kind??r.kind(picked?.selectionId);
+   if(!overLocal&&!origin&&!['vertex','edge','datum'].includes(kind)){
+    const projected=projectedReferenceAt(event);
+    upstreamHover=projected?.geometry??null;
+    if(projected&&!local.ref&&!event.ctrlKey){
+     const {geometry,role,target}=projected,q=coordinate(event),radial=mode==='circle'&&anchor&&role==='entity';
+     const parameter=geometry.type!=='point'?nearestParameter(geometry,radial?anchor:q):null;
+     const xy=pointAt([geometry],{entityId:geometry.id,role})??(parameter===null?null:pointOn(geometry,parameter));
+     if(xy&&(!radial||Math.hypot(...xy.map((n,i)=>n-anchor[i]))>1e-7)){
+      upstreamHover=geometry;
+      const ref=commit?externalRefs.resolve(target,role):{entityId:'external-hover',role};
+      if(ref)return {coordinate:xy,ref:{entityId:ref.entityId,role},label:'Snap · '+geometry.name};
+     }
+    }
+   }else upstreamHover=null;
    window.engineerHoverReference?.(overLocal?0:picked?.selectionId??0);
    if(overLocal||event.ctrlKey||local.ref&&(local.ref.entityId==='origin:reference-frame'||!origin)||!picked?.selectionId||!['vertex','edge','datum'].includes(picked.kind??r.kind(picked.selectionId)))return local;
    const key=v.proof?.manifestId+':'+picked.selectionId+':'+(picked.componentRole??'');
@@ -374,9 +378,27 @@ let sourceCache=null;
   if(!hit)return null;
   return {...choices.find(item=>item.geometry.id===hit.ref.entityId),role:hit.ref.role};
  }
- async function pickExternal(event){const projected=projectedReferenceAt(event);if(projected)return externalRefs.resolve(projected.target,projected.role);const source=await sourceAt(event);if(!source)return null;return externalRefs.resolve(source.target,source.picked.componentRole);}
+ async function pickExternal(event){
+  const source=await sourceAt(event);
+  if(source&&['vertex','edge','datum'].includes(source.target.kind))return externalRefs.resolve(source.target,source.picked.componentRole);
+  const projected=projectedReferenceAt(event);
+  if(projected)return externalRefs.resolve(projected.target,projected.role);
+  return source?externalRefs.resolve(source.target,source.picked.componentRole):null;
+ }
 let hoverSequence=0;
-function probeExternal(event,local){const sequence=++hoverSequence,projected=local?null:projectedReferenceAt(event);const next=projected?.geometry??null;if(upstreamHover!==next){upstreamHover=next;draw();}if(projected||local){window.engineerHoverReference?.(0);return;}const position=pointerPosition(event);Promise.resolve(r.info.state==='ready'?r.pick(...position):r.referencePick?.(...position)).then(pick=>{if(sequence===hoverSequence&&current)window.engineerHoverReference?.(pick?.selectionId??0);}).catch(()=>{});}
+function probeExternal(event,local){
+ const sequence=++hoverSequence;
+ const show=geometry=>{if(upstreamHover!==geometry){upstreamHover=geometry;draw();}};
+ if(local){show(null);window.engineerHoverReference?.(0);return;}
+ const position=pointerPosition(event);
+ Promise.resolve(r.info.state==='ready'?r.pick(...position):r.referencePick?.(...position)).then(pick=>{
+  if(sequence!==hoverSequence||!current)return;
+  const kind=pick?.kind??r.kind(pick?.selectionId);
+  const projected=['vertex','edge','datum'].includes(kind)?null:projectedReferenceAt(event);
+  show(projected?.geometry??null);
+  window.engineerHoverReference?.(projected?0:pick?.selectionId??0);
+ }).catch(()=>{});
+}
 // A Manager datum is a sketch reference while editing, without selecting a second feature.
 document.addEventListener('click',event=>{
  if(!current||busy||mode!=='select'||!event.isTrusted)return;
