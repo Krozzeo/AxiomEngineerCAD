@@ -1,5 +1,5 @@
 import {extendSketch,seedPolygonCenter} from './extended.mjs';
-import {equationPoints} from './equation-curve.mjs';
+import {equationGeometry} from './equation-curve.mjs';
 import {circularSegments,splineSegments,equationSegments,MAX_SKETCH_ENTITIES} from './curves.mjs';
 import {referenceAnchors} from './reference-anchors.mjs';
 import {validateSupportFrame} from '../extrusion/planar.mjs';
@@ -24,8 +24,9 @@ export function validateSketch(f,g,ids=new Set()){
   }
  }
  for(const entity of d.entities)if(entity.type==='equation-curve'){
-  const expected=equationPoints(entity.recipe,g.parameters,f.definitionId,planeFrame(f,g));
+  const geometry=equationGeometry(entity.recipe,g.parameters,f.definitionId,planeFrame(f,g)),expected=geometry.samples;
   check(expected.every((point,i)=>point.every((n,j)=>Math.abs(n-entity.samples[i][j])<1e-7)),'InvalidGeometry','Equation curve coordinates differ from their source expression.');
+  if(entity.tangents)check(geometry.tangents.every((v,i)=>v?v.every((n,j)=>Math.abs(n-entity.tangents[i]?.[j])<1e-7):entity.tangents[i]===null),'InvalidGeometry','Equation tangents differ from their source expression.');
  }
  for(const key of ['mirrors','conversions'])if(d[key]){
   check(d.profile===M5_PROFILE&&Array.isArray(d[key]),'InvalidInput','Invalid sketch operation history.');
@@ -124,7 +125,7 @@ export function sketchCommand(next,name,input){const g=next.native.graph;
  }
  if(name==='cad.sketch.equation-curve.add.v1'){
   const {id,recipe,construction}=input;
-  const entity={id,type:'equation-curve',construction,recipe:structuredClone(recipe),samples:equationPoints(recipe,g.parameters,f.definitionId,planeFrame(f,g))};
+  const entity={id,type:'equation-curve',construction,recipe:structuredClone(recipe),...equationGeometry(recipe,g.parameters,f.definitionId,planeFrame(f,g))};
   const original=f.data.entities.find(e=>e.id===id);
   check(input.replace?original?.type==='equation-curve':!original,'LostReference','The equation curve operation changed.');
   sketchCommand(next,input.replace?'cad.sketch.entity.update.v1':'cad.sketch.entity.add.v1',{sketchId:f.id,entity,unit:'mm'});return;
@@ -132,7 +133,7 @@ export function sketchCommand(next,name,input){const g=next.native.graph;
  const extended=name.match(/^cad\.sketch\.(polygon|split|trim|mirror|pattern)\.v1$/);
  if(extended){
   check(f.data.profile===M5_PROFILE,'UnsupportedCapability','Upgrade the sketch before using extended tools.');
-  extendSketch(f.data,extended[1],input,f.id);return;
+  extendSketch(f.data,extended[1],input,f.id,g);return;
  }
  if(name.startsWith('cad.sketch.constraint.')){
  const incoming=input.constraint;
@@ -141,9 +142,44 @@ export function sketchCommand(next,name,input){const g=next.native.graph;
  check(isParametric(f.data.profile),'UnsupportedCapability','Upgrade the sketch before adding relations.');const cs=f.data.constraints,i=cs.findIndex(c=>c.id===(input.constraintId??input.constraint?.id));if(name==='cad.sketch.constraint.delete.v1'){check(i>=0,'LostReference','Relation is missing.');cs.splice(i,1);}else if(name==='cad.sketch.constraint.add.v1'){check(i<0,'InvalidInput','Relation ID already exists.');if(!input.allowOverdefined&&f.data.profile===M5_PROFILE&&input.constraint.driving&&dimensions.includes(input.constraint.type)){const incoming=input.constraint,radial=c=>['radius','diameter'].includes(c.type),same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);check(!cs.some(c=>c.driving&&(radial(c)&&radial(incoming)&&c.refs[0].entityId===incoming.refs[0].entityId||c.type===incoming.type&&(same(c.refs,incoming.refs)||['distance','line-distance'].includes(c.type)&&same(c.refs,[...incoming.refs].reverse())))),'ConstraintConflict','This dimension is already driven. Edit its existing dimension or create a reference dimension.');}seedPolygonCenter(f.data,input.constraint);cs.push(structuredClone(input.constraint));}else{check(name==='cad.sketch.constraint.update.v1'&&i>=0,'LostReference','Relation is missing.');check(f.data.profile===M5_PROFILE||cs[i].driving||input.constraint.value===cs[i].value&&input.constraint.driving===false,'InvalidInput','A reference dimension cannot drive geometry. Remove it before creating a driving dimension.');cs[i]=structuredClone(input.constraint);}return;}
  if(name==='cad.sketch.reference.rename.v1'){check(f.data.profile===M5_PROFILE,'UnsupportedCapability','Upgrade the sketch before naming references.');const e=f.data.entities.find(e=>e.id===input.ref.entityId);check(e,'LostReference','Reference is missing.');if(input.ref.role==='entity'||e.type==='point'&&input.ref.role==='point')e.name=input.name;else{check((e.type==='line'?['a','b','midpoint']:e.type==='circle'?['center']:e.type==='arc'?['a','b','center']:e.type==='spline'?['a','b','control1','control2']:[]).includes(input.ref.role),'LostReference','Invalid point role.');e.pointNames={...e.pointNames,[input.ref.role]:input.name};}return;}
  if(name==='cad.sketch.drag.v1'){check(!f.data.patterns?.some(pattern=>pattern.generated.includes(input.ref.entityId)),'ConstraintConflict','Edit the pattern or its source geometry to move this copy.');check(isParametric(f.data.profile),'UnsupportedCapability','Upgrade the sketch before constrained drag.');if(input.snapTarget){const e=f.data.entities.find(e=>e.id===input.ref.entityId),role={circle:'center',arc:'center',line:'midpoint',spline:'a',point:'point'}[e?.type],from=input.ref.role==='entity'&&role?{entityId:e.id,role}:input.ref;attachSnap(f,from,input.snapTarget);}return;}
- const entities=f.data.entities,index=entities.findIndex(e=>e.id===(input.entityId??input.entity?.id));if(name==='cad.sketch.entity.delete.v1'){check(index>=0,'LostReference','Sketch primitive is missing.');check(![...(f.data.patterns??[]),...(f.data.mirrors??[])].some(operation=>operation.generated.includes(input.entityId)||operation.entityIds.includes(input.entityId)||operation.axisId===input.entityId||operation.reference?.entityId===input.entityId),'ConstraintConflict','Edit the sketch operation before removing one of its participants.');pruneSketchOperations(f.data,input.entityId);entities.splice(index,1);if(f.data.constraints)f.data.constraints=f.data.constraints.filter(c=>!c.refs.some(r=>r.entityId===input.entityId));return;}
+ const entities=f.data.entities,index=entities.findIndex(e=>e.id===(input.entityId??input.entity?.id));if(name==='cad.sketch.entity.delete.v1'){check(index>=0,'LostReference','Sketch primitive is missing.');removeSketchEntity(f.data,f.id,input.entityId);return;}
  check(Object.hasOwn(UNITS,input.unit),'InvalidUnits','Choose mm, cm, m or inch.');const e=structuredClone(input.entity),factor=UNITS[input.unit];for(const k of ['point','a','b','center','control1','control2','corner'])if(e[k])e[k]=e[k].map(x=>x*factor);if(e.radius!==undefined)e.radius*=factor;validateEntity(e);
  if(name==='cad.sketch.entity.add.v1'){check(index<0,'InvalidInput','Primitive ID already exists.');if(isParametric(f.data.profile)&&e.type==='rectangle')expandRectangle(f.data,e,f.id);else entities.push(e);if(e.external){if(e.external.kind!=='datum'&&!f.dependsOn.includes(e.external.producerId))f.dependsOn.push(e.external.producerId);f.data.constraints.push(...referenceAnchors(f.id,e,derivedId));}for(const snap of input.snaps??[]){check(e.type!=='rectangle'||['a','b'].includes(snap.fromRole),'InvalidInput','Rectangle snaps identify its two chosen opposite corners.');const from=e.type==='rectangle'?(snap.fromRole==='b'?{entityId:derivedId(f.id,e.id,'edge',2),role:'a'}:{entityId:e.id,role:'a'}):{entityId:e.id,role:snap.fromRole};attachSnap(f,from,snap.to);}if(input.alignment){check(e.type==='line'&&f.data.profile===M5_PROFILE,'InvalidInput','Alignment requires a current straight line.');f.data.constraints.push({id:derivedId(f.id,e.id,input.alignment),type:input.alignment,refs:[{entityId:e.id,role:'entity'}],driving:true,value:null});}}else{check(name==='cad.sketch.entity.update.v1'&&index>=0,'LostReference','Sketch primitive is missing.');check(entities[index].type===e.type,'InvalidInput','Update preserves primitive identity and type.');check(!f.data.patterns?.some(pattern=>pattern.generated.includes(e.id)),'ConstraintConflict','Edit the pattern or its source geometry to change this copy.');entities[index]={...entities[index],...e};}
+}
+
+function removeSketchEntity(data,sketchId,id){
+ const removed=new Set([id]);
+ for(let size=-1;size!==removed.size;){
+  size=removed.size;
+  for(const mirror of data.mirrors??[]){
+   check(!removed.has(mirror.axisId),'ConstraintConflict','Choose a different mirror axis before removing it.');
+   mirror.entityIds=mirror.entityIds.filter(source=>{
+    const copy=derivedId(sketchId,mirror.id,source,1);
+    if(!removed.has(source)&&!removed.has(copy))return true;
+    removed.add(copy);return false;
+   });
+   mirror.generated=mirror.generated.filter(copy=>!removed.has(copy));
+  }
+  for(const pattern of data.patterns??[]){
+   check(!removed.has(pattern.reference.entityId),'ConstraintConflict','Choose a different pattern reference before removing it.');
+   const before=pattern.entityIds;
+   pattern.entityIds=before.filter(source=>!removed.has(source));
+   const affected=new Set();
+   for(const source of before.filter(source=>removed.has(source)))
+    for(let i=1;i<=MAX_SKETCH_ENTITIES;i++)affected.add(derivedId(sketchId,pattern.id,source,i));
+   for(const copy of pattern.generated)if(affected.has(copy))removed.add(copy);
+   pattern.omitted=[...new Set([...(pattern.omitted??[]),...pattern.generated.filter(copy=>removed.has(copy)&&!affected.has(copy))])];
+   pattern.generated=pattern.generated.filter(copy=>!removed.has(copy));
+   delete pattern.signature;
+  }
+ }
+ data.entities=data.entities.filter(e=>!removed.has(e.id));
+ if(data.constraints)data.constraints=data.constraints.filter(c=>!c.refs.some(r=>removed.has(r.entityId)));
+ for(const key of ['mirrors','patterns'])if(data[key]){
+  data[key]=data[key].filter(o=>o.entityIds.length&&o.generated.length);
+  if(!data[key].length)delete data[key];
+ }
+ for(const item of removed)pruneSketchOperations(data,item);
 }
 
 export function pruneSketchOperations(data,id){

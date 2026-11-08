@@ -6,7 +6,8 @@ import {icon} from './icons.mjs';
 const same=(a,b)=>a?.entityId===b?.entityId&&a?.role===b?.role;
 export function sketchTransforms({document,host,ribbon,getState,selected,selectMode,label,mutate,parameters,openInspector,redraw,status,onActive}){
  const buttons=new Map(),{element:panel,heading,actions}=operationPanel(document,host,'sketch-transform');
- const values=document.createElement('div'),reverse=document.createElement('button');
+ const values=document.createElement('div'),reverse=document.createElement('button'),independent=document.createElement('input'),independentLabel=document.createElement('label');
+ independent.type='checkbox';independentLabel.append(independent,document.createTextNode(' Independent'));
  reverse.type='button';reverse.innerHTML=icon('rotate');reverse.setAttribute('aria-label','Reverse direction');reverse.title='Reverse direction';
  let draft=null,working=false;
  const sources=operationSelection(document,{title:'Entities',activate:()=>selectTable(0),remove:ref=>{draft.sources=draft.sources.filter(r=>!same(r,ref));paint();}});
@@ -51,7 +52,7 @@ export function sketchTransforms({document,host,ribbon,getState,selected,selectM
     countParameterId:operation.countParameterId,spacingParameterId:operation.spacingParameterId,
     distribution:operation.distribution??'step',reverse:!!operation.reverse,previous:operation.generated?.length??0});
   }
-  const active=draft;values.replaceChildren();
+  const active=draft;independent.checked=false;independentLabel.lastChild.textContent=mode==='mirror'?' Independent mirroring':' Independent pattern';values.replaceChildren(independentLabel);
   for(const [name,button]of buttons)button.setAttribute('aria-pressed',String(name===mode||name==='linear'&&mode==='circular'));
   panel.hidden=false;onActive(true);openInspector();paint();(draft.table?target:sources).element.focus({preventScroll:true});
   if(mode!=='mirror'){
@@ -92,7 +93,7 @@ export function sketchTransforms({document,host,ribbon,getState,selected,selectM
   if(!draft||working||apply.disabled)return;
   const state=getState(),{owner,id,mode,context,sources,target,count,spacing,distribution,reverse,countParameterId,spacingParameterId,replacing}=draft;
   if(owner!==state?.id){cancel();return;}
-  const fields={sketchId:owner,id,entityIds:sources.map(ref=>ref.entityId),...(replacing?{replace:true}:{})};
+  const fields={sketchId:owner,id,entityIds:sources.map(ref=>ref.entityId),...(replacing?{replace:true}:{}),...(independent.checked?{independent:true}:{})};
   working=true;paint();
   try{
    if(mode==='mirror')await mutate('sketch.mirror',{...fields,axisId:target.entityId},context);

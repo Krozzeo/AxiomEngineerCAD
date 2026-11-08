@@ -116,7 +116,7 @@ function editSpan(data,input,split,sketchId){
   }
 }
 const invariantRelations=new Set(['coincident','parallel','perpendicular','collinear','equal','concentric','coradial','tangent','point-on-line','point-on-circle','midpoint','symmetry','spline-tangent','equal-curve-length','length','radius','diameter','distance','line-distance','angle']);
-function inheritedRelations(data,sources,operationId,instance,mirror,mapPoint){
+function inheritedRelations(data,sources,operationId,instance,mirror,mapPoint,independent=false){
  const mapping=new Map(sources.map(source=>[source.id,derivedId(data.sketchId,operationId,source.id,instance)]));
  const origin=mapPoint([0,0]),axis=mapPoint([1,0]).map((n,i)=>n-origin[i]);
  const aligned=Math.abs(axis[1])<1e-7?'same':Math.abs(axis[0])<1e-7?'swap':null;
@@ -129,7 +129,7 @@ function inheritedRelations(data,sources,operationId,instance,mirror,mapPoint){
   return [{
    ...structuredClone(c),type,id:derivedId(operationId,'inherited',instance,c.id),
    refs:c.refs.map(r=>({...r,entityId:mapping.get(r.entityId)})),
-   ...(dimensions.includes(type)?{driving:false}:{}),
+   ...(dimensions.includes(type)&&!independent?{driving:false}:{}),
    ...(mirror&&c.direction!==undefined?{direction:-c.direction}:{}),
   }];
  });
@@ -151,12 +151,12 @@ function transform(data,name,input,sketchId){
   const count=mirror?2:input.count;
   check(Number.isSafeInteger(count)&&count>=2,'InvalidInput','Pattern count must be an integer of at least two.');
   check((count-1)*sources.length<=MAX_SKETCH_ENTITIES-data.entities.length,'ResourceLimit','The resulting sketch exceeds the document geometry capacity.');
-  const inherited=mirror?inheritedRelations({...data,sketchId},sources,input.id,1,true,mapping):[];
+  const inherited=mirror?inheritedRelations({...data,sketchId},sources,input.id,1,true,mapping,!!input.independent):[];
   for(let i=1;i<count;i++)for(const source of sources){
     const id=derivedId(sketchId,input.id,source.id,i),next=transformSketchEntity(source,p=>mapping(p,i),{id,mirror});
     const roles=['a','b','center','point','control1','control2'].filter(role=>source[role]);
     data.entities.push(next);
-    if(mirror){
+    if(mirror&&!input.independent){
       for(const role of roles)data.constraints.push(relation(derivedId(id,role),'symmetry',[ref(source.id,role),ref(id,role),ref(input.axisId)]));
       if(source.type==='circle')data.constraints.push(relation(derivedId(id,'radius'),'equal',[ref(source.id),ref(id)]));
     }
@@ -164,7 +164,7 @@ function transform(data,name,input,sketchId){
   data.constraints.push(...inherited);
   return inherited.map(c=>c.id);
 }
-export function extendSketch(data,name,input,sketchId){
+export function extendSketch(data,name,input,sketchId,graph){
   if(name==='polygon')addPolygon(data,input,sketchId);
   else if(name==='trim'&&input.stroke){
     const strokes=input.stroke.slice(1).map((b,i)=>({type:'line',a:input.stroke[i],b})).filter(s=>Math.hypot(...s.a.map((n,i)=>n-s.b[i]))>eps);
@@ -191,21 +191,29 @@ export function extendSketch(data,name,input,sketchId){
     }
     const inherited=transform(data,name,input,sketchId);
     const operation={id:input.id,entityIds:[...input.entityIds],axisId:input.axisId,generated,inherited};
-    if(old)Object.assign(old,operation);else (data.mirrors??=[]).push(operation);
+    if(input.independent){
+     if(old)data.mirrors=data.mirrors.filter(item=>item!==old);
+     if(!data.mirrors?.length)delete data.mirrors;
+    }else if(old)Object.assign(old,operation);else (data.mirrors??=[]).push(operation);
   }
   else if(name==='pattern'&&input.reference){
     data.patterns??=[];
     const old=data.patterns.find(item=>item.id===input.id);
     check(input.replace?old:!old,'LostReference','The pattern operation changed.');
     const {id,mode,entityIds,reference,count,spacing,distribution,reverse=false,countParameterId,spacingParameterId}=input;
-    const operation={id,mode,entityIds,reference,count,spacing,reverse,generated:old?.generated??[],inherited:old?.inherited??[],...(distribution?{distribution}:{}),
+    const operation={id,mode,entityIds,reference,count,spacing,reverse,generated:old?.generated??[],inherited:old?.inherited??[],...(old?.omitted?{omitted:old.omitted}:{}),...(distribution?{distribution}:{}),
       ...(countParameterId?{countParameterId}:{}),...(spacingParameterId?{spacingParameterId}:{})};
     if(old)data.patterns[data.patterns.indexOf(old)]=operation;else data.patterns.push(operation);
+    if(input.independent){
+     synchronizePatterns(graph,sketchId,input.id);
+     data.patterns=data.patterns.filter(item=>item.id!==input.id);
+     if(!data.patterns.length)delete data.patterns;
+    }
   }
   else transform(data,name,input,sketchId);
 }
 
-export function synchronizePatterns(graph,featureId=null){
+export function synchronizePatterns(graph,featureId=null,independentId=null){
  for(const feature of graph.features.filter(f=>f.data?.patterns&&(!featureId||f.id===featureId))){
   const data=feature.data;
   for(const pattern of data.patterns){
@@ -224,16 +232,18 @@ export function synchronizePatterns(graph,featureId=null){
    const step=patternStep(mode,distribution,spacing,count);
    check((count-1)*sources.length<=MAX_SKETCH_ENTITIES-data.entities.length+pattern.generated.length,'ResourceLimit','The resulting sketch exceeds the document geometry capacity.');
    const sourceIds=new Set(entityIds),sourceRelations=data.constraints.filter(c=>c.refs.every(r=>sourceIds.has(r.entityId)));
-   const signature=createHash('sha256').update(JSON.stringify([count,step,reverse,mode==='circular'?center:[axis.a,axis.b],sources,sourceRelations])).digest('hex');
+   const signature=createHash('sha256').update(JSON.stringify([count,step,reverse,mode==='circular'?center:[axis.a,axis.b],sources,sourceRelations,pattern.omitted??[],id===independentId])).digest('hex');
    if(signature===pattern.signature)continue;
-   const copies=[],inherited=[],oldRelations=new Set(pattern.inherited??[]);
-   for(let i=1;i<count;i++)for(const source of sources)
-    copies.push(transformSketchEntity(source,sketchTransform(mode,{axis,center,spacing:step,reverse},i),{id:derivedId(feature.id,id,source.id,i)}));
+   const copies=[],inherited=[],omitted=new Set(pattern.omitted??[]),oldRelations=new Set(pattern.inherited??[]);
+   for(let i=1;i<count;i++)for(const source of sources){
+    const copyId=derivedId(feature.id,id,source.id,i);
+    if(!omitted.has(copyId))copies.push(transformSketchEntity(source,sketchTransform(mode,{axis,center,spacing:step,reverse},i),{id:copyId}));
+   }
    const retained=new Set(copies.map(e=>e.id)),previous=new Set(pattern.generated);
    const removed=new Set(pattern.generated.filter(key=>!retained.has(key)));
    check(!data.constraints.some(c=>!oldRelations.has(c.id)&&c.refs.some(r=>removed.has(r.entityId))),'ConstraintConflict','Lowering the pattern count would remove an entity used by a constraint.');
    data.entities=[...data.entities.filter(e=>!previous.has(e.id)),...copies];
-   for(let i=1;i<count;i++)inherited.push(...inheritedRelations({constraints:sourceRelations,sketchId:feature.id},sources,id,i,false,sketchTransform(mode,{axis,center,spacing:step,reverse},i)));
+   for(let i=1;i<count;i++)inherited.push(...inheritedRelations({constraints:sourceRelations,sketchId:feature.id},sources,id,i,false,sketchTransform(mode,{axis,center,spacing:step,reverse},i),id===independentId).filter(c=>c.refs.every(r=>retained.has(r.entityId))));
    data.constraints=[...data.constraints.filter(c=>!oldRelations.has(c.id)),...inherited];
    pattern.generated=copies.map(e=>e.id);pattern.inherited=inherited.map(c=>c.id);pattern.signature=signature;
   }

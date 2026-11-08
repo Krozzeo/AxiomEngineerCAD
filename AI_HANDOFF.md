@@ -1,8 +1,8 @@
-# Engineer handoff - E3.M1 extended sketches / 0.3.3 candidate
+# Engineer handoff - E3.M2 feature operations / 0.3.4 candidate
 
-Start with `npm run context`, AGENTS.md, [compact context](docs/PROJECT_CONTEXT.md) and the [integration notes](docs/PRE_E3_ASSISTANT.md). E3.M1 follows the owner’s live model tests.
+Start with `npm run context`, AGENTS.md, [compact context](docs/PROJECT_CONTEXT.md) and the [integration notes](docs/PRE_E3_ASSISTANT.md). E3.M2 follows the owner’s request to advance alongside sketch corrections.
 
-E2 was owner-accepted, merged and published stable as 0.2.6. E3.M1 is a separate experimental delivery. See [tools and demo](docs/E3_M1_EXTENDED_SKETCHES.md).
+E2 was owner-accepted, merged and published stable as 0.2.6. E3.M2 is a separate experimental delivery. See [tools and demo](docs/E3_M2_FEATURE_OPERATIONS.md).
 
 ## Source and authority
 
@@ -22,7 +22,7 @@ Local retained domain corpus: 225 passed. The full Chrome 156/NVIDIA browser run
 
 Focused development harness: `ENGINEER_HARDWARE=1 node scripts/check-sketch-interactions-ui.mjs`; evidence `.axiom/sketch-interactions-ui/`. `verifyInteractionProjectUI` creates a test identity from installed current demo source, without copying immutable history, and verifies actual Save/Close/Reopen. `tests/sketch-interactions.test.mjs` contains exact numeric/negative/old-reader tests. Full browser preserves earlier review/native/authorization/docking/camera/five-PDF checks. Historical unsnapped primitive fixtures explicitly hold Ctrl; new acceptance proves default Snap. GPU absence uses a labeled actual semantic-list path, never a physical picking claim.
 
-Before delivery complete the full retained corpus, independent PDFs, relocated package checks, exact-head Win/Linux CI, immutable experimental ZIP+manifest and genuine public Platform discovery/install/activate/launch. Current candidate status is not delivery. Update PR/body and workspace delivery JSON with exact commit, workflows, bytes/hash and real installation evidence. E3.M1 owner acceptance and any future stable merge are separate.
+Before delivery complete the full retained corpus, independent PDFs, relocated package checks, exact-head Win/Linux CI, immutable experimental ZIP+manifest and genuine public Platform discovery/install/activate/launch. Current candidate status is not delivery. Update PR/body and workspace delivery JSON with exact commit, workflows, bytes/hash and real installation evidence. E3.M2 owner acceptance and any future stable merge are separate.
 
 Delivered 0.1.7 evidence: CI 41565076456, publication 41566221173, ZIP 99,900,683 bytes SHA256 855a5d6bffd2ff5c22781b05a542aa297477fa644012ebf29688be3274770383; public Platform13/Chrome 156/NVIDIA/fivePDF, zero page errors. See workspace deliverables/Engineer-E1-M5-0.1.7-*. Earlier intermediate immutable artifacts remain preserved.
 

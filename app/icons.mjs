@@ -17,4 +17,5 @@ Object.assign(paths,{
  'dim-radius':'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18M12 12l6-6M15 6h3v3',
  'dim-diameter':'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18M6 18L18 6M6 15v3h3M15 6h3v3'
 });
+paths['constraint-equation-tangent']=paths['constraint-tangent'];
 export function icon(name){return paths[name]?`<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="${paths[name]}" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`:`<img src="/icons/${name}.svg" width="18" height="18" alt="">`;}

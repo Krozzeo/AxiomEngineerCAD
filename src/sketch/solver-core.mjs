@@ -1,6 +1,6 @@
 import {arcTangencyValid,circular} from './curves.mjs';
 import {solveSoftDrag,dragComponent} from './soft-drag.mjs';
-import {M5_PROFILE,isParametric,measure as measured,residuals as equations,drivingConflicts,dimensions,splineHandleRoles,entityForReference,wholeReference} from './relation-kinds.mjs';
+import {M5_PROFILE,isParametric,measure as measured,residuals as equations,drivingConflicts,dimensions,splineHandleRoles,entityForReference,wholeReference,equationTangent} from './relation-kinds.mjs';
 export function createSketchSolver({validateEntity,make_gcs_wrapper,SolveStatus,derivedId,pointAt,validReference,TOLERANCES,SOLVER,check}){
 const accepted=s=>['UnderDefined','FullyDefined','RedundantConsistent'].includes(s);
 const vars=entities=>entities.flatMap((e,i)=>['point','a','b','center','control1','control2','radius'].filter(k=>e[k]!==undefined).flatMap(k=>k==='radius'?[{i,k,j:null}]:[0,1].map(j=>({i,k,j}))));
@@ -38,7 +38,7 @@ async function solveParametric(data,{drag,reuse}={}){if(drag&&data.profile===M5_
    const circle=put(e.id,{type:'circle',c_id:refIds.get(e.id+':center'),radius:e.radius});compiled.set(e.id,circle);
    if(e.type==='arc')for(const role of ['a','b'])put(e.id+':arc-'+role,{type:'point_on_circle',p_id:refIds.get(e.id+':'+role),c_id:circle});
   }}
- const point=ref=>{const key=ref.entityId+':'+ref.role;if(refIds.has(key))return refIds.get(key);const p=pointAt(source,ref),id=put(key,{type:'point',x:p[0],y:p[1],fixed:false});refIds.set(key,id);put(key+':binding',{type:'p2p_symmetric_ppp',p1_id:refIds.get(ref.entityId+':a'),p2_id:refIds.get(ref.entityId+':b'),p_id:id});return id;};
+ const point=ref=>{const key=ref.entityId+':'+ref.role;if(refIds.has(key))return refIds.get(key);const p=pointAt(source,ref),fixed=source.find(e=>e.id===ref.entityId)?.type==='equation-curve',id=put(key,{type:'point',x:p[0],y:p[1],fixed});refIds.set(key,id);if(!fixed)put(key+':binding',{type:'p2p_symmetric_ppp',p1_id:refIds.get(ref.entityId+':a'),p2_id:refIds.get(ref.entityId+':b'),p_id:id});return id;};
  const lineFor=ref=>{
   const roles=splineHandleRoles(ref.role);
   if(!roles)return compiled.get(ref.entityId);
@@ -71,6 +71,20 @@ async function solveParametric(data,{drag,reuse}={}){if(drag&&data.profile===M5_
   else if(c.type==='point-on-line')pair('',{type:'point_on_line_pl',...pl()});
   else if(c.type==='midpoint'){const l=p?other:target;pair('',{type:'p2p_symmetric_ppp',p1_id:endpoint(l,0),p2_id:endpoint(l,1),p_id:p??q});}
   else if(c.type==='concentric'||c.type==='coradial'){coincident(center(e),center(f));if(c.type==='coradial')pair('radius',{type:'equal_radius_cc',c1_id:line,c2_id:second});}
+  else if(c.type==='equation-tangent'){
+   const equation=p?e:f,otherShape=p?f:e,t=equationTangent(equation,p?target:other),anchor=p??q;
+   const origin=pointAt(source,p?target:other),end=put(c.id+':tangent-end',{type:'point',x:origin[0]+t[0],y:origin[1]+t[1],fixed:true});
+   const tangent=put(c.id+':tangent-line',{type:'line',p1_id:anchor,p2_id:end});
+   if(otherShape.type==='line'){
+    pair('direction',{type:'parallel',l1_id:tangent,l2_id:p?second:line});
+    pair('contact',{type:'point_on_line_pl',p_id:anchor,l_id:p?second:line});
+   }else{
+    const normalEnd=put(c.id+':normal-end',{type:'point',x:origin[0]-t[1],y:origin[1]+t[0],fixed:true});
+    const normal=put(c.id+':normal-line',{type:'line',p1_id:anchor,p2_id:normalEnd});
+    pair('direction',{type:'point_on_line_pl',p_id:center(otherShape),l_id:normal});
+    pair('contact',{type:'point_on_circle',p_id:anchor,c_id:p?second:line});
+   }
+  }
   else if(c.type==='tangent'){if(circular(e)&&circular(f))pair('',{type:'tangent_circumf',p1_id:center(e),p2_id:center(f),rd1:{o_id:line,prop:'radius'},rd2:{o_id:second,prop:'radius'},internal:false});else pair('',{type:'tangent_lc',l_id:e.type==='line'?line:second,c_id:circular(e)?line:second});}
   else if(c.type==='equal'||c.type==='equal-curve-length'){if(e.type===f.type||c.type==='equal'&&circular(e)&&circular(f))pair('',e.type==='line'?{type:'equal_length',l1_id:line,l2_id:second}:{type:'equal_radius_cc',c1_id:line,c2_id:second});else {const l=e.type==='line'?e:f,circle=e.type==='circle'?e:f,origin=put(c.id+'aux-origin',{type:'point',x:0,y:0,fixed:true}),b=put(c.id+'aux-b',{type:'point',x:circle.radius,y:0,fixed:false}),d=put(c.id+'aux-c',{type:'point',x:circle.radius,y:circle.radius*2*Math.PI,fixed:false}),base=put(c.id+'aux-base',{type:'line',p1_id:origin,p2_id:b}),height=put(c.id+'aux-height',{type:'line',p1_id:b,p2_id:d}),diagonal=put(c.id+'aux-diagonal',{type:'line',p1_id:origin,p2_id:d});pair('horizontal',{type:'horizontal_l',l_id:base});pair('vertical',{type:'vertical_l',l_id:height});pair('radius',{type:'p2p_distance',p1_id:origin,p2_id:b,distance:{o_id:compiled.get(circle.id),prop:'radius'}});pair('angle',{type:'l2l_angle_ll',l1_id:base,l2_id:diagonal,angle:Math.atan(2*Math.PI)});pair('length',{type:'equal_length',l1_id:height,l2_id:e.type==='line'?line:second});}}
   else check(false,'UnsupportedCapability','Unsupported solver relation.');

@@ -1,3 +1,4 @@
+import {circleThrough,parameterOn} from './curves.mjs';
 // Projection is proposed in the UI and independently checked against exact source geometry.
 const fail=message=>{throw Object.assign(Error(message),{code:'LostReference'});};
 const dot=(a,b)=>a.reduce((s,x,i)=>s+x*b[i],0);
@@ -40,14 +41,31 @@ export function externalGeometry(scene,target,frame){
  if(target.kind==='vertex'||item.datumType==='point'||item.type==='point'&&target.kind==='sketch')return {type:'point',point:project(item.pointMm??item.originMm),construction:true,name:'External '+name};
  if(target.kind==='edge'||target.kind==='sketch'){
   const curve=item.curve;
-  if(curve?.full){
+  if(curve){
    const alignment=Math.abs(dot(curve.normal,frame.normal)),center=project(curve.centerMm);
    if(alignment<1e-7){
     const direction=cross(curve.normal,frame.normal);
     const offset=[dot(direction,frame.u),dot(direction,frame.v)].map(n=>n*curve.radiusMm);
-    return {type:'line',a:center.map((n,i)=>n-offset[i]),b:center.map((n,i)=>n+offset[i]),construction:true,name:'External '+name+' profile'};
+    let a=center.map((n,i)=>n-offset[i]),b=center.map((n,i)=>n+offset[i]);
+    if(!curve.full){
+     const radial=direction.map(n=>n*curve.radiusMm),normal=curve.normal,u=item.points[0].map((n,i)=>(n-curve.centerMm[i])/curve.radiusMm),v=cross(normal,u);
+     const flatten=point=>{const d=point.map((n,i)=>n-curve.centerMm[i]);return [dot(d,u),dot(d,v)];};
+     const start=flatten(item.points[0]),mid=flatten(item.points[Math.floor(item.points.length/2)]),end=flatten(item.points.at(-1));
+     const arc={...circleThrough(start,mid,end),type:'arc',a:start,b:end};
+     const candidates=[project(item.points[0]),project(item.points.at(-1))];
+     for(const sign of [-1,1]){
+      const extremum=curve.centerMm.map((n,i)=>n+sign*radial[i]),t=parameterOn(arc,flatten(extremum));
+      if(t!==null&&t>=-1e-7&&t<=1+1e-7)candidates.push(project(extremum));
+     }
+     candidates.sort((p,q)=>dot(p,offset)-dot(q,offset));[a,b]=[candidates[0],candidates.at(-1)];
+    }
+    return {type:'line',a,b,construction:true,name:'External '+name+' profile'};
    }
-   if(1-alignment<1e-7)return {type:'circle',center,radius:curve.radiusMm,construction:true,name:'External '+name+' projection'};
+   if(1-alignment<1e-7){
+    if(curve.full)return {type:'circle',center,radius:curve.radiusMm,construction:true,name:'External '+name+' projection'};
+    const a=project(item.points[0]),b=project(item.points.at(-1)),mid=project(item.points[Math.floor(item.points.length/2)]);
+    return {type:'arc',a,b,...circleThrough(a,mid,b),construction:true,name:'External '+name+' projection'};
+   }
   }
   points=item.points;
  }

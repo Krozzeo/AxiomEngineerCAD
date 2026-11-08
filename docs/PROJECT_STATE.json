@@ -7,10 +7,10 @@
     "sha256": "9c2f3857a4a7f1156b1c10b82d2e76680604393b7f5799081f6fd22694502de6"
   },
   "milestone": {
-    "current": "E3.M1",
-    "status": "0.3.3 extended sketch candidate",
+    "current": "E3.M2",
+    "status": "0.3.4 feature operations candidate",
     "ownerAcceptance": "pending",
-    "next": "Owner reviews E3.M1 extended sketch demo before E3.M2"
+    "next": "Owner reviews E3.M2 feature operations before E3.M3"
   },
   "lastDelivered": {
     "version": "0.2.6",
@@ -33,13 +33,13 @@
     "implementation": "IMPLEMENTATION_STATUS.md",
     "handoff": "AI_HANDOFF.md",
     "architecture": "docs/architecture/ADR_REGISTER.md",
-    "currentCadScope": "docs/E3_M1_EXTENDED_SKETCHES.md",
+    "currentCadScope": "docs/E3_M2_FEATURE_OPERATIONS.md",
     "deliveryGate": "docs/MILESTONE_DELIVERY.md"
   },
   "candidate": {
-    "version": "0.3.3",
+    "version": "0.3.4",
     "branch": "engineer/e3-m1-sketch-breadth",
-    "status": "Exact sketch silhouettes, editable sketch operations, associative patterns and freehand trim"
+    "status": "Extruded and revolved cuts, revolved solids, feature mirrors and patterns, and sketch reference fixes"
   },
   "previousDelivered": {
     "version": "0.2.5",

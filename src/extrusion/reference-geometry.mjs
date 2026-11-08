@@ -14,8 +14,8 @@ export function exactReferenceGeometry(shape){
  };
  let edges=shape.edges.map((edge,i)=>{
   const line=edge.geomType==='LINE',points=Array.from({length:line?2:65},(_,j)=>edge.pointAt(j/(line?1:64)).toTuple()),ends=[edge.startPoint.toTuple(),edge.endPoint.toTuple()];
-  const circle=edge.geomType==='CIRCLE'&&Math.hypot(...ends[0].map((x,k)=>x-ends[1][k]))<1e-7;
-  const witness=line?{type:'line',ends:ends.map(rounded).sort((a,b)=>JSON.stringify(a).localeCompare(JSON.stringify(b)))}:circle?{type:'circle',bounds:edge.boundingBox.bounds,length:edge.length}:null;
+  const circular=edge.geomType==='CIRCLE',circle=circular&&Math.hypot(...ends[0].map((x,k)=>x-ends[1][k]))<1e-7;
+  const witness=line?{type:'line',ends:ends.map(rounded).sort((a,b)=>JSON.stringify(a).localeCompare(JSON.stringify(b)))}:circle?{type:'circle',bounds:edge.boundingBox.bounds,length:edge.length}:circular?{type:'arc',ends:ends.map(rounded).sort((a,b)=>JSON.stringify(a).localeCompare(JSON.stringify(b))),mid:rounded(points[32])}:null;
   return {_members:[edge.hashCode],_endpoints:ends,kind:'edge',role:witness?'edge:'+digest(witness):'transient-edge-'+i,resolution:witness?'ResolvedStable':'TransientDisplayOnly',lengthMm:edge.length,points,...(internal(edge)?{displayHidden:true}:{}),...(edge.geomType==='CIRCLE'?{curve:circleWitness(points),bounds:edge.boundingBox.bounds}:{})};
  });
  // A circular boundary can consist of several exact B-Rep arcs. Accept the

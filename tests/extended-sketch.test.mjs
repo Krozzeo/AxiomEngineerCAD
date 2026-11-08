@@ -271,3 +271,57 @@ test('pattern rebuilds after constrained source drag and keeps the copied relati
  const renamed=feature(edited).data.entities.find(e=>e.id===old.generated[0]);
  near(renamed.a[1]-lookup('chain-a').a[1],14);
 });
+
+
+test('individual transformed entities can be deleted and independent results keep their internal joins',()=>{
+ const seed=()=>{
+  let d=extendedSketchDemo();
+  for(const [id,a,b] of [['side-a',[-62,-43],[-55,-43]],['side-b',[-55,-43],[-55,-37]]])
+   d=run(d,'entity.add',{entity:{id,type:'line',a,b,construction:false},unit:'mm'});
+  return run(d,'constraint.add',{constraint:relation('side-join','coincident',[ref('side-a','b'),ref('side-b','a')])});
+ };
+ const mirror={id:'editable-mirror',entityIds:['side-a','side-b'],axisId:'practice-axis'};
+ let d=run(seed(),'mirror',mirror),old=feature(d).data.mirrors[0];
+ d=run(d,'entity.delete',{entityId:old.generated[0]});
+ assert.deepEqual(feature(d).data.mirrors[0].entityIds,['side-b']);
+ assert.ok(feature(d).data.entities.some(e=>e.id==='side-a'));
+ assert.ok(feature(d).data.entities.some(e=>e.id===old.generated[1]));
+ d=run(seed(),'mirror',{...mirror,independent:true});
+ assert.equal(feature(d).data.mirrors,undefined);
+ assert.equal(feature(d).data.constraints.length,feature(seed()).data.constraints.length+1);
+ const pattern={id:'editable-pattern',mode:'linear',entityIds:mirror.entityIds,reference:ref('practice-axis'),count:3,spacing:10};
+ d=run(seed(),'pattern',pattern);old=feature(d).data.patterns[0];
+ d=run(d,'entity.delete',{entityId:old.generated[0]});
+ assert.deepEqual(feature(d).data.patterns[0].generated,old.generated.slice(1));
+ d=run(d,'pattern',{...pattern,replace:true,spacing:14});
+ assert.deepEqual(feature(d).data.patterns[0].generated,old.generated.slice(1));
+ d=run(d,'entity.delete',{entityId:'side-b'});
+ assert.deepEqual(feature(d).data.patterns[0].entityIds,['side-a']);
+ assert.deepEqual(feature(d).data.patterns[0].generated,[old.generated[2]]);
+ d=run(seed(),'pattern',{...pattern,independent:true});
+ assert.equal(feature(d).data.patterns,undefined);
+});
+
+test('equation curve endpoints drive a coincidence and an endpoint tangent',async()=>{
+ let d=run(extendedSketchDemo(),'equation-curve.add',{id:'reference-equation',construction:false,recipe:{mode:'x',start:'-10',end:'10',first:'x ^ 2 / 10'}});
+ d=run(d,'entity.add',{entity:{id:'eq-point',type:'point',point:[-9,9],construction:false},unit:'mm'});
+ d=run(d,'entity.add',{entity:{id:'eq-line',type:'line',a:[9,8],b:[13,16],construction:false},unit:'mm'});
+ d=run(d,'constraint.add',{constraint:relation('eq-coincidence','coincident',[ref('eq-point','point'),ref('reference-equation','a')])});
+ d=run(d,'constraint.add',{constraint:relation('eq-tangent','equation-tangent',[ref('reference-equation','b'),ref('eq-line')])});
+ const result=await solveParametric(feature(d).data);
+ assert.equal(result.valid,true,result.status);
+ const line=result.entities.find(e=>e.id==='eq-line');
+ near((line.b[1]-line.a[1])/(line.b[0]-line.a[0]),2);
+ assert.deepEqual(result.entities.find(e=>e.id==='eq-point').point,[-10,10]);
+});
+
+test('an open semicircular B-Rep edge keeps a stable identity and its edge-on projection is bounded by the arc',async()=>{
+ const doc=extendedSketchDemo(),practice=feature(doc);practice.data.plane={kind:'datum',role:'yz'};
+ const {scene}=await buildProof(doc,{viewportOnly:true,rollbackAt:practice.id}),model=scene.models[0];
+ const arc=model.mesh.edges.find(e=>e.curve&&!e.curve.full);
+ assert.equal(arc.resolution,'ResolvedStable');
+ const frame={origin:[0,0,0],u:[0,1,0],v:[0,0,1],normal:[1,0,0]};
+ const projection=externalGeometry(scene,{kind:'edge',role:arc.role,producerId:model.featureId,definitionId:model.definitionId,occurrencePath:[model.definitionId]},frame);
+ assert.equal(projection.type,'line');
+ near(Math.min(projection.a[0],projection.b[0]),0);near(Math.max(projection.a[0],projection.b[0]),16);
+});

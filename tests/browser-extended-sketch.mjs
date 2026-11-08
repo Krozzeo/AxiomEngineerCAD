@@ -106,6 +106,24 @@ export async function verifyExtendedSketchUI({context,host,evidence,observe,repo
     await page.keyboard.down('Shift');await page.mouse.click(outline.x,outline.y);await page.keyboard.up('Shift');
     await sketchCommit(page,()=>page.locator('[data-add-relation=point-on-line]').click());
     assert.ok((await sideData()).entities.some(e=>e.external?.kind==='silhouette'&&e.external.role.startsWith('outline:')));
+    await tool('point');await sketchCommit(page,()=>click(4,12,{bypass:true}));
+    const arcPoint=(await sideData()).entities.filter(e=>e.type==='point'&&!e.referenceOnly).at(-1);
+    await tool('select');await selectSketchComponent(page,arcPoint.id,'point');
+    const arcPick=await sketchScreen(page,4,8);
+    await page.keyboard.down('Shift');await page.mouse.click(arcPick.x,arcPick.y);await page.keyboard.up('Shift');
+    await sketchCommit(page,()=>page.locator('[data-add-relation=point-on-line]').click());
+    const arcReference=(await sideData()).entities.find(e=>e.external?.kind==='edge');
+    assert.ok(arcReference,'The projected cap arc must retain its exact edge identity.');
+    const viewport=await page.locator('#proof-canvas').boundingBox();
+    await page.mouse.move(viewport.x+viewport.width*.7,viewport.y+viewport.height*.7);
+    await page.keyboard.down('Shift');await page.mouse.down({button:'middle'});
+    await page.mouse.move(viewport.x+viewport.width*.7+65,viewport.y+viewport.height*.7+24,{steps:4});
+    await page.mouse.up({button:'middle'});await page.keyboard.up('Shift');
+    const camera=await page.evaluate(()=>structuredClone(window.engineerViewport.renderer.camera));
+    await sketchCommit(page,()=>page.keyboard.press('Control+z'));
+    assert.deepEqual(await page.evaluate(()=>window.engineerViewport.renderer.camera),camera);
+    await sketchCommit(page,()=>page.keyboard.press('Control+y'));
+    assert.deepEqual(await page.evaluate(()=>window.engineerViewport.renderer.camera),camera);
     await page.locator('#edit-sketch-exit').click();await sketchSettled(page);
     const saved=page.waitForResponse(r=>r.url().endsWith('/v1/save'));await page.locator('#save').click();
     assert.equal((await saved).status(),200);
@@ -113,7 +131,7 @@ export async function verifyExtendedSketchUI({context,host,evidence,observe,repo
     await page.close();await close(session,source.revision);session=null;
     session=await open();page=await context.newPage();observe(page);await page.goto(session.editorUrl);await waitEditorIdle(page);
     assert.deepEqual(await sketchDocument(page),source);
-    report.extendedSketch={passed:true,arcs:true,polygon:true,trim:true,split:true,mirror:true,pattern:true,spline:true,marquee:true,equationCurve:true,externalPattern:true,semicircleSilhouette:true,saveReopen:true};
+    report.extendedSketch={passed:true,arcs:true,polygon:true,trim:true,split:true,mirror:true,pattern:true,spline:true,marquee:true,equationCurve:true,externalPattern:true,semicircleSilhouette:true,semicircleArc:true,undoCamera:true,saveReopen:true};
   }finally{
     const revision=session?await sketchDocument(page).then(doc=>doc.revision).catch(()=>null):null;
     await page.close().catch(()=>{});

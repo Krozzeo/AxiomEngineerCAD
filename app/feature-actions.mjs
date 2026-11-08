@@ -45,7 +45,7 @@ document.addEventListener('contextmenu',event=>{const id=event.target.closest?.(
 const file=document.querySelector('.wb-menubar details:first-child .wb-menu'),top=document.createElement('button');top.id='cad-undo';top.innerHTML=icon('undo');top.title='Undo · Ctrl+Z';top.setAttribute('aria-label','Undo');document.querySelector('.topbar').insertBefore(top,document.querySelector('.stage'));
 const buttons={};for(const action of ['undo','redo']){const b=document.createElement('button');b.id='cad-'+action+'-menu';b.innerHTML=icon(action)+'<span>'+action[0].toUpperCase()+action.slice(1)+'</span><kbd>Ctrl+'+(action==='undo'?'Z':'Y')+'</kbd>';file.append(b);buttons[action]=b;b.addEventListener('click',run(()=>history(action)));}top.addEventListener('click',run(()=>history('undo')));
 async function updateHistory(){const s=await api('cad/status');for(const a of ['undo','redo'])buttons[a].disabled=historyBusy||!s.history?.[a==='undo'?'canUndo':'canRedo'];top.disabled=buttons.undo.disabled;}
-async function history(action){if(historyBusy)return;historyBusy=true;top.disabled=true;for(const button of Object.values(buttons))button.disabled=true;try{const sketch=window.engineerSketch.view();await mutate('history.'+action,{});const source=await api('document');if(sketch&&source.document.native?.graph.features.some(f=>f.id===sketch.id))await window.engineerSketch.open(sketch.id,{upgrade:false});else await v.build();notify((action==='undo'?'Undo':'Redo')+' applied to a new working revision. Save to persist.');}finally{historyBusy=false;await updateHistory();}}
+async function history(action){if(historyBusy)return;historyBusy=true;top.disabled=true;for(const button of Object.values(buttons))button.disabled=true;try{const sketch=window.engineerSketch.view();await mutate('history.'+action,{});const source=await api('document');if(sketch&&source.document.native?.graph.features.some(f=>f.id===sketch.id))await window.engineerSketch.open(sketch.id,{upgrade:false,focus:false,alignView:false});else await v.build();notify((action==='undo'?'Undo':'Redo')+' applied to a new working revision. Save to persist.');}finally{historyBusy=false;await updateHistory();}}
 document.addEventListener('keydown',run(event=>{if((event.ctrlKey||event.metaKey)&&['z','y'].includes(event.key.toLowerCase())){if(event.target.closest?.('input,textarea')&&!event.target.readOnly)return;event.preventDefault();return history(event.key.toLowerCase()==='y'?'redo':'undo');}}));
 const view=document.querySelector('.wb-menubar details:nth-child(3) .wb-menu'),restore=document.createElement('button');restore.textContent='Restore reference entries';restore.addEventListener('click',run(async()=>{const changes=[...visibility].filter(([,state])=>state==='delete').map(([id])=>({id,state:'default'}));if(changes.length)await changeVisibility(changes);}));view.append(restore);window.addEventListener('engineer-document-changed',()=>updateHistory().catch(()=>{}));setInterval(()=>updateHistory().catch(()=>{}),800);for(const button of Object.values(buttons))button.disabled=true;top.disabled=true;await updateHistory().catch(error=>notify('History connection unavailable. Reload the editor to reconnect. '+error.message));try{applyVisibility(await api('ui/visibility'));}catch(error){notify(error.message);}
 
@@ -69,7 +69,13 @@ let previewTimer=null,previewSequence=0,previewChain=Promise.resolve();
   else {if(!value||!Number.isFinite(Number(value)))throw Error('Enter a depth in mm or select a length parameter.');parameterId=null;depthMm=Number(value);}
  }
  if(!Number.isFinite(depthMm)||depthMm<.001||depthMm>10000)throw Error('Depth must be between 0.001 and 10000 mm.');
- return {...(editing.create?editing.input:{featureId:editing.item.id}),name:fields.querySelector('[data-extrusion-name]').value,depthMm,reverse:fields.querySelector('[data-extrusion-reverse]').getAttribute('aria-pressed')==='true',replaceDepthBinding:true,...(parameterId?{depthParameterId:parameterId}:{})};
+ const settings=editing.create?editing.input:editing.data,form=settings.form;
+ const read=name=>fields.querySelector('[data-feature-setting="'+name+'"]').value;
+ const specialized=form==='revolve'?{axisId:read('axisId'),angleDeg:Number(read('angleDeg'))}:form==='repeat'?{repeat:{
+  ...settings.repeat,axis:read('axis'),count:settings.repeat.kind==='mirror'?2:Number(read('count')),
+  offsetMm:Number(read('offsetMm')),angleDeg:Number(read('angleDeg'))
+ }}:{};
+ return {...(editing.create?editing.input:{featureId:editing.item.id}),...specialized,name:fields.querySelector('[data-extrusion-name]').value,depthMm,reverse:fields.querySelector('[data-extrusion-reverse]').getAttribute('aria-pressed')==='true',replaceDepthBinding:true,...(parameterId?{depthParameterId:parameterId}:{})};
 }
 function schedulePreview(){
  clearTimeout(previewTimer);const sequence=++previewSequence,owner=editing;
@@ -105,12 +111,65 @@ function schedulePreview(){
  row.classList.add('sketch-dimension-driver');control.input.dataset.parameter='depth';
  owner.depth={depthMm,parameterId:driver?.id??null,options,control};
  fields.append(title,row);
- const focusDepth=()=>{if(editing===owner&&!editor.hidden){control.input.focus({preventScroll:true});control.input.select();}};
+ if(data.form){
+  title.hidden=row.hidden=true;
+  const field=(id,caption,value,choices=null)=>{
+   const label=document.createElement('label'),input=document.createElement(choices?'select':'input');
+   label.textContent=caption;input.dataset.featureSetting=id;
+   if(choices)for(const [key,name]of choices)input.append(new Option(name,key));
+   else{input.type='number';input.step='any';input.required=true;}
+   input.value=value;label.append(input);fields.append(label);return label;
+  };
+  if(data.form==='revolve'){
+   const sketch=graph.features.find(f=>f.id===(owner.create?owner.input.sketchId:data.sketchId));
+   const axes=sketch.data.entities.filter(e=>e.type==='line'&&e.construction).map((e,i)=>[e.id,e.name??'Construction line '+(i+1)]);
+   field('axisId','Revolve axis',data.axisId??axes[0]?.[0]??'',[['','Choose an axis'],...axes]);
+   field('angleDeg','Angle (°)',data.angleDeg??360);
+  }else{
+   const {kind,axis,count,offsetMm,angleDeg}=data.repeat;
+   field('axis',kind==='mirror'?'Plane normal':'Axis',axis,[['x','X'],['y','Y'],['z','Z']]);
+   field('count','Instances including source',count).hidden=kind==='mirror';
+   field('offsetMm',kind==='mirror'?'Plane offset (mm)':'Step (mm)',offsetMm).hidden=kind==='circular';
+   field('angleDeg','Angular step (°)',angleDeg).hidden=kind!=='circular';
+  }
+ }
+ const focusDepth=()=>{if(editing===owner&&!editor.hidden&&!data.form){control.input.focus({preventScroll:true});control.input.select();}};
  requestAnimationFrame(focusDepth);
- const reverse=document.createElement('button');reverse.type='button';reverse.dataset.extrusionReverse='true';reverse.setAttribute('aria-pressed',String(!!data.reverse));reverse.innerHTML=icon('rotate')+' Reverse direction';reverse.onclick=()=>{reverse.setAttribute('aria-pressed',String(reverse.getAttribute('aria-pressed')!=='true'));schedulePreview();};$('feature-operation-fields').append(reverse);const label=document.createElement('label'),preview=document.createElement('input');label.className='feature-preview-toggle';preview.type='checkbox';preview.id='feature-operation-preview';preview.checked=true;label.append(preview,document.createTextNode(' Preview'));$('feature-operation-fields').append(label);}
+ const reverse=document.createElement('button');reverse.type='button';reverse.hidden=data.form==='repeat';reverse.dataset.extrusionReverse='true';reverse.setAttribute('aria-pressed',String(!!data.reverse));reverse.innerHTML=icon('rotate')+' Reverse direction';reverse.onclick=()=>{reverse.setAttribute('aria-pressed',String(reverse.getAttribute('aria-pressed')!=='true'));schedulePreview();};$('feature-operation-fields').append(reverse);const label=document.createElement('label'),preview=document.createElement('input');label.className='feature-preview-toggle';preview.type='checkbox';preview.id='feature-operation-preview';preview.checked=true;label.append(preview,document.createTextNode(' Preview'));$('feature-operation-fields').append(label);}
 $('feature-operation-fields').addEventListener('change',schedulePreview);
 $('feature-operation-form').addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.target.closest('button')){event.preventDefault();event.stopPropagation();if(event.target.id!=='extrusion-depth-value')schedulePreview();}});
 function cancelOperation(event){if(!editing)return;if(event.type==='keydown'&&event.key!=='Escape')return;event.preventDefault();event.stopImmediatePropagation();$('feature-operation-done').click();}
 document.addEventListener('keydown',cancelOperation,true);v.renderer.canvas.parentElement.addEventListener('contextmenu',cancelOperation,true);
-const extrude=document.createElement('button');extrude.id='cad-extrude-sketch';extrude.dataset.commandSize='large';extrude.innerHTML=icon('feature')+'<span>Extrude</span>';document.querySelector('[data-operations=Features]').prepend(extrude);
-extrude.addEventListener('click',run(async()=>{const state=await api('document'),g=state.document.native?.graph;if(!g)throw Error('Convert this study first.');const sketchId=window.engineerSketch.view()?.id??v.selection?.producerId??deleteSourceSelection?.id,sketch=g.features.find(f=>f.id===sketchId&&f.type==='sketch-primitives');if(!sketch)throw Error('Select a closed sketch in Features or Model, then Extrude.');if(window.engineerSketch.view())await window.engineerSketch.exit();const features=g.features.filter(f=>f.type==='sketch-extrusion'),tip=features.find(f=>!features.some(x=>x.data.baseFeatureId===f.id));editing={create:true,ctx:await context(),input:{featureId:'extrusion-'+crypto.randomUUID(),sketchId,name:'Extrusion '+(features.length+1),depthMm:10,reverse:false,operation:tip?'add':'new-body',...(tip?{baseFeatureId:tip.id}:{})}};window.engineerOperationFeature=sketchId;window.dispatchEvent(new CustomEvent('engineer-feature-edit-changed'));$('feature-operation-fields').replaceChildren();await extrusionFields({name:editing.input.name,reverse:false,depthMm:10});editor.hidden=false;$('edit-sketch-inspector').hidden=true;document.querySelector('.proof-inspector').hidden=true;window.engineerDock.openPanel('model');window.engineerDock.openPanel('inspector');schedulePreview();}));
+const featuresRibbon=document.querySelector('[data-operations=Features]');
+async function beginFeature(kind,title){
+ const {document:source}=await api('document'),g=source.native?.graph;
+ if(!g)throw Error('Convert this study first.');
+ const selectedId=window.engineerSketch.view()?.id??v.selection?.producerId??deleteSourceSelection?.id;
+ const features=g.features.filter(f=>f.type==='sketch-extrusion'),tip=features.find(f=>!features.some(x=>x.data.baseFeatureId===f.id));
+ const repeating=['mirror','linear','circular'].includes(kind),cutting=kind==='cut'||kind==='revolve-cut',revolve=kind.startsWith('revolve');
+ const seed=repeating?features.find(f=>f.id===selectedId&&f.data.form!=='repeat'):null;
+ if(repeating&&!seed)throw Error('Select an extrusion, cut or revolve feature in the Feature Manager.');
+ const sketch=g.features.find(f=>f.id===(seed?.data.sketchId??selectedId)&&f.type==='sketch-primitives');
+ if(!sketch)throw Error('Select the closed source sketch in the Feature Manager or Model.');
+ if(cutting&&!tip)throw Error('Create a solid before cutting material.');
+ if(window.engineerSketch.view())await window.engineerSketch.exit();
+ const input={featureId:'extrusion-'+crypto.randomUUID(),sketchId:sketch.id,name:title+' '+(features.length+1),
+  depthMm:10,reverse:false,operation:cutting||seed?.data.operation==='cut'?'cut':tip?'add':'new-body',...(tip?{baseFeatureId:tip.id}:{})};
+ if(revolve)Object.assign(input,{form:'revolve',axisId:sketch.data.entities.find(e=>e.type==='line'&&e.construction)?.id??'',angleDeg:360});
+ if(repeating)Object.assign(input,{form:'repeat',repeat:{kind,sourceFeatureId:seed.id,axis:'x',count:kind==='mirror'?2:3,offsetMm:kind==='mirror'?0:10,angleDeg:90}});
+ editing={create:true,ctx:await context(),input};window.engineerOperationFeature=sketch.id;
+ window.dispatchEvent(new CustomEvent('engineer-feature-edit-changed'));
+ $('feature-operation-fields').replaceChildren();await extrusionFields(input);
+ editor.hidden=false;$('edit-sketch-inspector').hidden=true;document.querySelector('.proof-inspector').hidden=true;
+ window.engineerDock.openPanel('model');window.engineerDock.openPanel('inspector');schedulePreview();
+}
+const featureButtons=[
+ ['extrude','Extrude','feature'],['cut','Extruded Cut','feature'],['revolve','Revolve','rotate'],
+ ['revolve-cut','Revolved Cut','rotate'],['mirror','Mirror Feature','mirror'],
+ ['linear','Linear Feature Pattern','pattern'],['circular','Circular Feature Pattern','circular-pattern']
+].map(([kind,title,glyph])=>{
+ const button=document.createElement('button');button.id=kind==='extrude'?'cad-extrude-sketch':'cad-feature-'+kind;
+ button.dataset.commandSize='large';button.innerHTML=icon(glyph)+'<span>'+title+'</span>';
+ button.addEventListener('click',run(()=>beginFeature(kind,title)));return button;
+});
+featuresRibbon.prepend(...featureButtons);
