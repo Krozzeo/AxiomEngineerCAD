@@ -1,6 +1,6 @@
 import {operationSelection,operationValue} from './operation-inspector.mjs';
 import {sketchTransform,transformSketchEntity,patternStep,MAX_SKETCH_ENTITIES} from '/curves.mjs';
-import {pointAt} from '/relation-kinds.mjs';
+import {pointAt,splineHandleRoles} from '/relation-kinds.mjs';
 import {icon} from './icons.mjs';
 
 const same=(a,b)=>a?.entityId===b?.entityId&&a?.role===b?.role;
@@ -18,7 +18,7 @@ export function sketchTransforms({document,host,ribbon,getState,selected,selectM
  panel.append(heading,sources.element,target.element,values,actions);
  function selectTable(index){if(!draft||draft.table===index)return;draft.table=index;paint();}
  function shape(ref){return getState()?.items.find(e=>e.id===ref?.entityId);}
- function validSource(ref){const e=shape(ref);return !!e&&!e.external&&e.type!=='equation-curve';}
+ function validSource(ref){const e=shape(ref);return !!e&&!e.external&&e.type!=='equation-curve'&&!splineHandleRoles(ref.role);}
  function validTarget(ref){const e=shape(ref);return draft?.mode==='circular'?!!pointAt(getState().items,ref):e?.type==='line';}
  function paint(){
   if(!draft)return;

@@ -1,3 +1,4 @@
+import {dimensionIntent} from '../src/sketch/dimension-intent.mjs';
 import {extrusionDemo} from '../src/extrusion/demo.mjs';
 import {externalGeometry} from '../src/sketch/external-geometry.mjs';
 import {buildProof} from '../src/proof/kernel.mjs';
@@ -216,4 +217,18 @@ test('side-on cylinder yields two independently proven silhouette segments and e
   definitionId:model.definitionId,producerId:model.featureId,occurrencePath:[model.definitionId]},frame));
  for(const line of lines){near(line.a[0],line.b[0]);near(Math.abs(line.b[1]-line.a[1]),10);}
  near(Math.abs(lines[0].a[0]-lines[1].a[0]),6);
+});
+
+
+test('a spline handle is an editable line reference for a driving dimension and relation',async()=>{
+ let doc=run(extendedSketchDemo(),'entity.add',{entity:{id:'handle-test',type:'spline',construction:false,a:[-30,-20],b:[-15,-20],control1:[-26,-17],control2:[-18,-20]},unit:'mm'});
+ const handle=ref('handle-test','handle-a'),intent=dimensionIntent(feature(doc).data.entities,[handle],'distance');
+ near(intent.value,5);
+ doc=run(doc,'constraint.add',{constraint:{...intent,id:'handle-length',value:8}});
+ doc=run(doc,'constraint.add',{constraint:relation('handle-horizontal','horizontal',[handle])});
+ const solved=await solveParametric(feature(doc).data);
+ assert.equal(solved.valid,true,solved.status);
+ const spline=solved.entities.find(e=>e.id==='handle-test');
+ near(spline.a[1],spline.control1[1]);
+ near(Math.abs(spline.a[0]-spline.control1[0]),8);
 });
