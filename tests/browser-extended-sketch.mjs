@@ -63,6 +63,11 @@ export async function verifyExtendedSketchUI({context,host,evidence,observe,repo
     await sketchCommit(page,()=>page.locator('.sketch-equation-form').getByRole('button',{name:'Apply'}).click());
     const equation=(await practice()).entities.find(e=>e.type==='equation-curve');
     assert.equal(equation.samples.length,65);
+    await tool('select');
+    const curveBody=await sketchScreen(page,...equation.samples[18]);
+    await page.mouse.dblclick(curveBody.x,curveBody.y);
+    await page.locator('.sketch-equation-form').getByLabel('f(x)',{exact:true}).waitFor();
+    await tool('select');
     await page.locator('#sketch-manager-tab').click();
     await page.locator('[data-sketch-operation="'+equation.id+'"]').dblclick();
     await page.locator('.sketch-equation-form').getByLabel('f(x)',{exact:true}).fill('x');

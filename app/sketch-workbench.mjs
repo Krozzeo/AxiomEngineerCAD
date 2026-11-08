@@ -459,6 +459,19 @@ document.addEventListener('click',event=>{
  event.preventDefault();event.stopImmediatePropagation();
  try{if(converter.active){converter.pick(item,r.scene.datums.find(d=>d.id===item.id)?.selectionId);return;}const ref=externalRefs.resolve(item);if(ref)choose(ref,{add:event.shiftKey});else status('Choose a vertex, edge, Origin or a reference intersecting the sketch plane.');}catch(error){status(error.message);}
 },true);
+let equationClick=null;
+function editEquationOnDoubleClick(event,target){
+ const previous=equationClick;equationClick=null;
+ if(event.pointerType!=='mouse'||event.shiftKey||event.ctrlKey||event.metaKey||transform.active||dimensionUI.active)return false;
+ const ref=localHits(event).find(({ref})=>ref.role==='entity'&&items.some(e=>e.id===ref.entityId&&e.type==='equation-curve'))?.ref;
+ const operation=current.operations.find(item=>item.id===ref?.entityId);
+ if(!operation||target?.entityId==='origin:reference-frame')return false;
+ const click={id:operation.id,sketchId:current.sketchId,revision:current.documentRevision,x:event.clientX,y:event.clientY,time:event.timeStamp};
+ // The sketch SVG is redrawn during selection, so the browser cannot reliably double-click the same hit path.
+ if(previous?.sketchId!==click.sketchId||previous.revision!==click.revision||previous.id!==click.id||click.time-previous.time>450||Math.hypot(click.x-previous.x,click.y-previous.y)>5){equationClick=click;return false;}
+ ribbon.querySelector('[data-sketch-tool=equation-curve]').click();
+ equationTool.open(operation).catch(e=>status(e.message));return true;
+}
 function onDown(event){if(!current||busy||event.button!==0||event.target.closest?.('.sketch-heading'))return;if(event.target!==canvas&&!panel.contains(event.target))return;if(event.altKey||$('proof-mode').value!=='Select')return;event.preventDefault();event.stopImmediatePropagation();canvas.focus({preventScroll:true});if(converter.active){sourceAt(event).then(source=>{
  if(source&&source.target.kind!=='face')converter.pick(source.target,source.picked.selectionId);
  else{
@@ -470,7 +483,7 @@ function onDown(event){if(!current||busy||event.button!==0||event.target.closest
  }).catch(e=>status(e.message));return;}if(mode==='equation-curve')return;if(mode==='trim'&&!localHits(event).some(hit=>hit.ref.role==='entity')){
   const start=coordinate(event);trimStroke={id:event.pointerId,points:[start]};draw();
   canvas.setPointerCapture?.(event.pointerId);return;
- }if(mode!=='select'){const owner=current,tool=mode;placeTask=placeTask.then(()=>{if(current===owner&&mode===tool&&!busy)return place(event);}).catch(e=>status(e.message));return;}const target=hit(event);if(!target){
+ }if(mode!=='select'){const owner=current,tool=mode;placeTask=placeTask.then(()=>{if(current===owner&&mode===tool&&!busy)return place(event);}).catch(e=>status(e.message));return;}const target=hit(event);if(editEquationOnDoubleClick(event,target))return;if(!target){
   if(originAt(event)){pickExternal(event).then(ref=>choose(ref,{add:event.shiftKey})).catch(e=>status(e.message));return;}
   const start=pointerPosition(event);marquee={start,end:start,id:event.pointerId,moved:false,add:event.shiftKey};
   canvas.setPointerCapture?.(event.pointerId);return;
@@ -523,15 +536,6 @@ async function onUp(event){
  }
  if(!drag||event.button!==0)return;event.preventDefault();event.stopImmediatePropagation();const active=drag;previewTarget=null;if(previewTask)await previewTask;if(active.moved){const last=snapPosition(event,{exclude:active.ref.entityId,offset:active.offset});active.target=last.coordinate;active.snapTarget=last.ref;}drag=null;previewSequence++;committingDrag=true;try{if(active.moved){const final=await constrainedPreview(solverData(),{ref:active.ref,target:active.target},active.context);if(!final.valid)throw Error('Drag cannot change geometry: '+final.status+'. Inspect its relations or diagnostics.');preview=final.entities;draw();const changed=preview.some((entity,index)=>['point','a','b','center','control1','control2','radius'].some(key=>Array.isArray(entity[key])?entity[key].some((n,i)=>Math.abs(n-items[index][key][i])>1e-7):typeof entity[key]==='number'&&Math.abs(entity[key]-items[index][key])>1e-7));if(changed||active.snapTarget)await mutate('sketch.drag',{sketchId:current.sketchId,ref:active.ref,target:active.target,...(active.snapTarget?{snapTarget:active.snapTarget}:{})},active.context);else status('No free movement in this direction. Source unchanged.');}}finally{committingDrag=false;preview=null;cursorSnap=null;draw();}}
 document.addEventListener('keydown',event=>{if(event.key==='Control'&&lastSketchPointer&&(mode!=='select'||drag))onMove({...lastSketchPointer,ctrlKey:true});});document.addEventListener('keyup',event=>{if(event.key==='Control'&&lastSketchPointer&&(mode!=='select'||drag))onMove({...lastSketchPointer,ctrlKey:false});});
-canvas.parentElement.addEventListener('dblclick',error(async event=>{
- if(!current||busy||mode!=='select'||event.button!==0)return;
- const match=localHits(event).find(({ref})=>ref.role==='entity'&&items.some(e=>e.id===ref.entityId&&e.type==='equation-curve'));
- if(!match)return;
- const operation=current.operations.find(item=>item.id===match.ref.entityId);
- if(!operation)return;
- event.preventDefault();event.stopImmediatePropagation();
- ribbon.querySelector('[data-sketch-tool=equation-curve]').click();await equationTool.open(operation);
-}),true);
 canvas.parentElement.addEventListener('pointerdown',onDown,true);document.addEventListener('pointermove',onMove);document.addEventListener('pointerup',error(onUp),true);document.addEventListener('pointercancel',draftCancel);
 // Hit paths remain navigable with the same Model handlers; the editing overlay never owns camera state.
 for(const type of ['pointerdown','pointermove','pointerup','wheel'])panel.addEventListener(type,event=>{if(event.target.closest?.('.sketch-heading'))return;if(type==='wheel'||event.button===1||event.buttons===4){event.preventDefault();const C=type==='wheel'?WheelEvent:PointerEvent;canvas.dispatchEvent(new C(type,{bubbles:true,cancelable:true,clientX:event.clientX,clientY:event.clientY,button:event.button,buttons:event.buttons,pointerId:event.pointerId,shiftKey:event.shiftKey,ctrlKey:event.ctrlKey,altKey:event.altKey,deltaY:event.deltaY}));}},{passive:false});
