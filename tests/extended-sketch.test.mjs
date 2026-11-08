@@ -1,5 +1,10 @@
+import {extrusionDemo} from '../src/extrusion/demo.mjs';
+import {externalGeometry} from '../src/sketch/external-geometry.mjs';
+import {buildProof} from '../src/proof/kernel.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {dragComponent} from '../src/sketch/soft-drag.mjs';
+import {interpolatedSplines} from '../src/sketch/curves.mjs';
 import {extendedSketchDemo} from '../src/sketch/extended-demo.mjs';
 import {command} from '../src/commands/domain.mjs';
 import {verifyCommand} from '../src/commands/worker.mjs';
@@ -43,7 +48,7 @@ test('E3.M1 tangent relations reject contact outside the visible arc sweep',asyn
   }
 });
 
-test('E3.M1 trim and split preserve retained endpoint identities and refuse lost dimension drivers',async()=>{
+test('E3.M1 trim and split preserve retained endpoint identities and remove invalidated dimension drivers',async()=>{
   const doc=extendedSketchDemo();
   const fixed=run(doc,'constraint.add',{constraint:relation('fixed-trim-start','fixed',[ref('practice-trim','a')],[12,32])});
   const trimmed=run(fixed,'trim',{entityId:'practice-trim',newEntityId:'trim-right',fraction:.7});
@@ -55,7 +60,8 @@ test('E3.M1 trim and split preserve retained endpoint identities and refuse lost
   assert.equal(verified.valid,true);
   assert.deepEqual(feature(verified.candidate).data.entities.find(e=>e.id==='split-right').a,[19,32]);
   const driven=run(doc,'constraint.add',{constraint:relation('trim-length','length',[ref('practice-trim')],28)});
-  assert.throws(()=>run(driven,'trim',{entityId:'practice-trim',newEntityId:'no-trim',fraction:.7}),{code:'ConstraintConflict'});
+  const cut=run(driven,'trim',{entityId:'practice-trim',newEntityId:'right-cut',fraction:.7});
+  assert.equal(feature(cut).data.constraints.some(c=>c.id==='trim-length'),false);
   assert.deepEqual(feature(driven).data.entities.find(e=>e.id==='practice-trim').b,[40,32]);
 });
 
@@ -107,4 +113,107 @@ test('managed pattern follows typed parameters and retains copy identities',()=>
   doc=set(doc,'RepeatCount','scalar','2');
   assert.deepEqual(read(doc).map(e=>e.id),[initial[0].id]);
   assert.throws(()=>command(doc,'cad.parameter.delete.v1',{parameterId:'RepeatSpacing'}),{code:'LostReference'});
+});
+
+test('fit spline spans pass through fit points and solve with tangent continuity',async()=>{
+ const points=[[-28,12],[-23,16],[-15,12]];
+ const entities=interpolatedSplines(points,false).map((entity,i)=>({...entity,id:'spline-'+i}));
+ const doc=run(extendedSketchDemo(),'spline.chain',{entities});
+ const data=feature(doc).data,solved=await solveParametric(data);
+ assert.equal(solved.valid,true);
+ assert.equal(data.constraints.some(c=>c.type==='spline-tangent'),true);
+ assert.deepEqual(data.entities.find(e=>e.id==='spline-0').b,points[1]);
+ assert.deepEqual(data.entities.find(e=>e.id==='spline-1').a,points[1]);
+});
+
+test('linear and circular patterns retain implicit datum references and distribute total spacing',async()=>{
+ const external=(id,type,role,geometry)=>({id,type,construction:true,referenceOnly:true,
+  external:{kind:'datum',definitionId:'definition-main',producerId:'reference-frame',role,occurrencePath:['definition-main']},...geometry});
+ const axis=external('test-axis','line','x',{a:[-100,0],b:[100,0]});
+ const center=external('test-center','point','origin',{point:[0,0]});
+ let doc=run(extendedSketchDemo(),'pattern',{id:'linear-total',entityIds:['practice-circle'],reference:ref(axis.id),
+  externalEntities:[axis],count:14,spacing:52,distribution:'total',mode:'linear'});
+ let data=feature(doc).data;
+ assert.equal(data.patterns[0].generated.length,13);
+ assert.deepEqual(data.entities.find(e=>e.id===data.patterns[0].generated.at(-1)).center,[66,22]);
+ doc=run(doc,'pattern',{id:'full-circle',entityIds:['practice-circle'],reference:ref(center.id,'point'),
+  externalEntities:[center],count:4,spacing:Math.PI*2,distribution:'total',mode:'circular'});
+ data=feature(doc).data;
+ const final=data.entities.find(e=>e.id===data.patterns[1].generated.at(-1));
+ near(final.center[0],22);near(final.center[1],-14);
+ assert.equal((await verifyCommand({before:extendedSketchDemo(),after:doc,normalize:true,requireSolved:true,sketchId:'extended-practice'})).valid,true);
+});
+
+
+test('placing a polygon center on a remote fixed point preserves all six equal sides',async()=>{
+ const doc=run(extendedSketchDemo(),'polygon',{id:'center-test',center:[-60,-40],vertex:[-54,-40],sides:6,construction:false});
+ const target=run(doc,'entity.add',{entity:{id:'target-center',type:'point',point:[-25,-35],construction:false},unit:'mm'});
+ const fixed=run(target,'constraint.add',{constraint:relation('fix-target-center','fixed',[ref('target-center','point')],[-25,-35])});
+ const before=feature(fixed).data,guide=before.entities.filter(e=>e.type==='circle'&&e.construction).at(-1);
+ const input=run(fixed,'constraint.add',{constraint:relation('join-center','coincident',[ref(guide.id,'center'),ref('target-center','point')])});
+ const data=feature(input).data,solved=await solveParametric(data);
+ assert.equal(solved.valid,true,JSON.stringify({status:solved.status,conflicts:solved.conflicts}));
+ assert.deepEqual(solved.entities.find(e=>e.id===guide.id).center,[-25,-35]);
+ assert.equal(data.constraints.filter(c=>c.type==='equal'&&c.refs[0].entityId==='center-test').length,5);
+});
+
+test('equation curves recalculate from scoped parameters and survive a solver round trip',async()=>{
+ const set=(doc,expression)=>command(doc,'cad.parameter.set.v1',{parameter:{id:'CurveGain',definitionId:null,name:'CurveGain',unit:'scalar',expression}});
+ let doc=set(extendedSketchDemo(),'2');
+ doc=run(doc,'equation-curve.add',{id:'equation-x',construction:true,recipe:{mode:'x',start:'0',end:'4',first:'CurveGain * x'}});
+ const read=value=>feature(value).data.entities.find(e=>e.id==='equation-x');
+ assert.deepEqual(read(doc).samples.at(-1),[4,8]);
+ const changed=set(doc,'3');
+ assert.deepEqual(read(changed).samples.at(-1),[4,12]);
+ const checked=await verifyCommand({before:doc,after:changed,normalize:true,requireSolved:true});
+ assert.deepEqual(read(checked.candidate).samples.at(-1),[4,12]);
+});
+
+
+test('a drag across six independent polygons solves only the connected seven entities first',async t=>{
+ let doc=extendedSketchDemo();
+ for(let i=0;i<6;i++)doc=run(doc,'polygon',{id:'stress-'+i,center:[10*i-80,-55],vertex:[10*i-77,-55],sides:6,construction:false});
+ const data=feature(doc).data,target=ref('stress-0','a'),component=dragComponent(data,target);
+ assert.equal(component.entities.length,7);
+ const start=performance.now(),solved=await solveParametric(component,{drag:{ref:target,target:[-76,-54]}});
+ t.diagnostic('Connected drag solve: '+(performance.now()-start).toFixed(1)+' ms from a '+data.entities.length+'-entity sketch.');
+ assert.equal(solved.valid,true);
+ near(solved.drag.effectiveTarget[0],-76);
+ near(solved.drag.effectiveTarget[1],-54);
+});
+
+test('an upstream sketch line is independently resolved and verified for a downstream dimension',async()=>{
+ const base=extendedSketchDemo();
+ const downstream=command(base,'cad.sketch.create.v1',{sketchId:'linked-sketch',definitionId:'definition-main',name:'Linked sketch',plane:{kind:'datum',role:'xy'},profile:'E1.M5-sketch/1'});
+ const local=command(downstream,'cad.sketch.entity.add.v1',{sketchId:'linked-sketch',entity:{id:'linked-point',type:'point',point:[14,35],construction:false},unit:'mm'});
+ const external={id:'linked-line',type:'line',a:[12,32],b:[40,32],construction:true,referenceOnly:true,
+  external:{kind:'sketch',definitionId:'definition-main',producerId:'extended-practice',role:'practice-trim',occurrencePath:['definition-main']}};
+ const after=command(local,'cad.sketch.constraint.add.v1',{sketchId:'linked-sketch',
+  constraint:relation('linked-distance','distance',[ref('linked-point','point'),ref('linked-line')],3),externalEntities:[external]});
+ assert.ok(feature(after,'linked-sketch').dependsOn.includes('extended-practice'));
+ assert.equal((await verifyCommand({before:local,after,normalize:true,requireSolved:true,sketchId:'linked-sketch'})).valid,true);
+});
+
+
+test('a trim stroke removes isolated crossed spans and their invalidated relations atomically',()=>{
+ const add=(doc,id,a,b)=>run(doc,'entity.add',{entity:{id,type:'line',a,b,construction:false},unit:'mm'});
+ let doc=add(extendedSketchDemo(),'isolated-a',[-62,-45],[-50,-45]);
+ doc=add(doc,'isolated-b',[-62,-41],[-50,-41]);
+ doc=run(doc,'constraint.add',{constraint:relation('isolated-length','length',[ref('isolated-a')],12)});
+ const after=run(doc,'trim',{newEntityId:'trim-stroke',stroke:[[-55,-47],[-55,-39]]});
+ const data=feature(after).data;
+ assert.ok(!data.entities.some(e=>e.id.startsWith('isolated-')));
+ assert.ok(!data.constraints.some(c=>c.id==='isolated-length'));
+ assert.ok(feature(doc).data.entities.some(e=>e.id==='isolated-a'));
+});
+
+test('side-on cylinder yields two independently proven silhouette segments and endpoints',async()=>{
+ const doc=await extrusionDemo(),proof=await buildProof(doc,{viewportOnly:true}),model=proof.scene.models[0];
+ const cylinder=model.mesh.cylinders.find(c=>Math.abs(c.radius-3)<1e-7);
+ assert.ok(cylinder);
+ const frame={origin:[0,0,0],u:[1,0,0],v:[0,0,1],normal:[0,-1,0]};
+ const lines=[':a',':b'].map(side=>externalGeometry(proof.scene,{kind:'silhouette',role:cylinder.role+side,
+  definitionId:model.definitionId,producerId:model.featureId,occurrencePath:[model.definitionId]},frame));
+ for(const line of lines){near(line.a[0],line.b[0]);near(Math.abs(line.b[1]-line.a[1]),10);}
+ near(Math.abs(lines[0].a[0]-lines[1].a[0]),6);
 });

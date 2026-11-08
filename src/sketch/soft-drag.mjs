@@ -1,3 +1,18 @@
+// Only connected relations can influence an interactive drag.
+export function dragComponent(data,ref){
+ const links=new Map();
+ for(const constraint of data.constraints)if(constraint.driving)for(const participant of constraint.refs){
+  const list=links.get(participant.entityId)??[];list.push(constraint);links.set(participant.entityId,list);
+ }
+ const entities=new Set([ref.entityId]),constraints=new Set();
+ for(const id of entities)for(const constraint of links.get(id)??[]){
+  if(constraints.has(constraint))continue;
+  constraints.add(constraint);
+  for(const participant of constraint.refs)entities.add(participant.entityId);
+ }
+ return {...data,entities:data.entities.filter(entity=>entities.has(entity.id)),constraints:[...constraints]};
+}
+
 // Pointer goals are projected into permitted motion; only exact solver results can escape.
 export async function solveSoftDrag(data,drag,{solve,jacobian,pointAt,derivedId,residuals,check}){
  check(drag?.ref&&Array.isArray(drag.target)&&drag.target.length===2&&drag.target.every(n=>Number.isFinite(n)&&Math.abs(n)<=1000),'InvalidInput','Invalid bounded drag target.');const e=data.entities.find(e=>e.id===drag.ref.entityId);check(e,'LostReference','Drag participant is missing.');const ref=drag.ref.role==='entity'?{entityId:e.id,role:e.type==='line'?'midpoint':['circle','arc'].includes(e.type)?'center':e.type==='spline'?'a':'point'}:drag.ref;const radial=ref.role==='circumference'&&e.type==='circle',offset=radial?drag.target.map((n,i)=>n-e.center[i]):null,magnitude=radial?Math.hypot(...offset):0,direction=radial?(magnitude>1e-9?offset.map(n=>n/magnitude):[1,0]):null;

@@ -29,5 +29,16 @@ export function exactReferenceGeometry(shape){
   .flatMap(e=>e._endpoints.map(digest)));
  const vertices=new Map();for(const edge of shape.edges)for(const p of [edge.startPoint.toTuple(),edge.endPoint.toTuple()]){const role='vertex:'+digest(p);if(!vertices.has(role))vertices.set(role,{kind:'vertex',role,resolution:'ResolvedStable',pointMm:p,...(!visibleVertices.has(digest(p))?{displayHidden:true}:{})});}
  const faceEdgeRoles=Object.fromEntries(shape.faces.map(face=>[face.hashCode,edges.filter(e=>face.edges.some(edge=>e._members.includes(edge.hashCode))).map(e=>e.role)]));
- return {edges:edges.map(({_members,_endpoints,...edge})=>edge),exactVertices:[...vertices.values()],faceEdgeRoles};
+ const cylinders=new Map();
+ for(const face of faces.filter(face=>face.geomType==='CYLINDRE')){
+  const bounds=edges.filter(edge=>edge.curve?.full&&edge.resolution==='ResolvedStable'&&faceEdgeRoles[face.hashCode].includes(edge.role)).sort((a,b)=>a.role.localeCompare(b.role));
+  if(bounds.length!==2)continue;
+  const [a,b]=bounds.map(edge=>edge.curve),delta=b.centerMm.map((n,i)=>n-a.centerMm[i]),length=Math.hypot(...delta);
+  if(length<1e-7||Math.abs(a.radiusMm-b.radiusMm)>1e-7)continue;
+  const direction=delta.map(n=>n/length);
+  if([a,b].some(circle=>Math.abs(direction.reduce((sum,n,i)=>sum+n*circle.normal[i],0))<1-1e-7))continue;
+  const role='cylinder:'+digest(bounds.map(edge=>edge.role));
+  cylinders.set(role,{role,a:a.centerMm,b:b.centerMm,direction,radius:a.radiusMm});
+ }
+ return {cylinders:[...cylinders.values()],edges:edges.map(({_members,_endpoints,...edge})=>edge),exactVertices:[...vertices.values()],faceEdgeRoles};
 }

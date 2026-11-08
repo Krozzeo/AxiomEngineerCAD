@@ -1,3 +1,4 @@
+import {completionRange as expressionRange} from './expression-completion.mjs';
 import './sketch-workbench.mjs';
 import './feature-actions.mjs';
 import './ribbon-sizes.mjs';
@@ -117,7 +118,7 @@ function renderGeometric(matches){
 let completions=null,completionInput=null,completionRange=null,completionIndex=0;
 function hideCompletions(){completions?.remove();completions=null;completionInput=null;}
 function applyCompletion(token){if(!completionInput)return;const input=completionInput,{start,end}=completionRange;input.setRangeText(token,start,end,'end');hideCompletions();input.focus();input.dispatchEvent(new Event('input',{bubbles:true}));hideCompletions();}
-function complete(input){const text=input.value,caret=input.selectionStart??text.length,prefix=text.slice(0,caret).match(/[A-Za-z_][A-Za-z_0-9.]*$/)?.[0]??'',start=caret-prefix.length,end=caret+(text.slice(caret).match(/^[A-Za-z_0-9.]*/)?.[0].length??0),list=$('parameter-completions');hideCompletions();list.replaceChildren();if(!prefix)return;const scope=input.closest('tr').querySelector('[data-field=definitionId]')?.value||null,candidates=[];
+function complete(input){const {prefix,start,end}=expressionRange(input),list=$('parameter-completions');hideCompletions();list.replaceChildren();if(!prefix)return;const scope=input.closest('tr').querySelector('[data-field=definitionId]')?.value||null,candidates=[];
 for(const p of rows.filter(p=>p.profile&&(p.definitionId===null||p.definitionId===scope))){const token=prefix.includes('.')?(p.definitionId===null?'doc.':'local.')+p.name:p.name;if(token.toLowerCase().startsWith(prefix.toLowerCase()))candidates.push({token,label:p.name+' · '+p.value+' '+p.unit});}
 for(const d of dimensions.filter(d=>d.expressionSymbol?.toLowerCase().startsWith(prefix.toLowerCase())))candidates.push({token:d.expressionSymbol,label:d.name+' · '+d.value+' '+d.unit});
 if(!candidates.length||candidates.some(c=>c.token===prefix))return;completionInput=input;completionRange={start,end};completionIndex=0;completions=input.ownerDocument.createElement('div');completions.className='parameter-completion-menu';completions.setAttribute('role','listbox');const box=input.getBoundingClientRect();Object.assign(completions.style,{position:'fixed',left:box.left+'px',top:box.bottom+'px',zIndex:10050,background:'#142232',border:'1px solid #49617c',maxHeight:'220px',overflowY:'auto'});

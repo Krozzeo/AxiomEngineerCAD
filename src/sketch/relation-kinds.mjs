@@ -2,7 +2,7 @@ import {check} from '../errors.mjs';
 import {circular,arcAngles} from './curves.mjs';
 export const M4_PROFILE='E1.M4-sketch/1',M5_PROFILE='E1.M5-sketch/1',isParametric=profile=>['E1.M3-sketch/1',M4_PROFILE,M5_PROFILE].includes(profile);
 export const dimensions=['length','radius','diameter','x','y','distance','distance-x','distance-y','angle','line-distance'];
-export const extendedRelations=['parallel','perpendicular','collinear','equal','concentric','coradial','tangent','point-on-line','point-on-circle','midpoint','horizontal-points','vertical-points','equal-curve-length','symmetry',...dimensions.slice(5)];
+export const extendedRelations=['parallel','perpendicular','collinear','equal','concentric','coradial','tangent','point-on-line','point-on-circle','midpoint','horizontal-points','vertical-points','equal-curve-length','symmetry','spline-tangent',...dimensions.slice(5)];
 export function pointAt(entities,ref){const e=entities.find(e=>e.id===ref?.entityId);if(!e)return null;if(e.type==='line'&&ref.role==='midpoint')return e.a.map((n,i)=>(n+e.b[i])/2);return ['a','b','point','center','control1','control2'].includes(ref.role)&&Array.isArray(e[ref.role])?e[ref.role]:null;}
 export function validReference(entities,ref){const e=entities.find(e=>e.id===ref.entityId);return Boolean(ref.role==='entity'?e:pointAt(entities,ref));}
 const entity=(es,ref)=>es.find(e=>e.id===ref.entityId),vector=l=>l.b.map((n,i)=>n-l.a[i]),length=l=>Math.hypot(...vector(l)),cross=(a,b)=>a[0]*b[1]-a[1]*b[0],dot=(a,b)=>a[0]*b[0]+a[1]*b[1],wrap=x=>Math.atan2(Math.sin(x),Math.cos(x));
@@ -10,6 +10,10 @@ const curveLength=e=>e.type==='line'?length(e):e.radius*(e.type==='arc'?Math.abs
 export function measure(es,c){const [r,s]=c.refs,e=entity(es,r),f=s&&entity(es,s),a=pointAt(es,r),b=s&&pointAt(es,s);if(c.type==='length')return length(e);if(['radius','diameter'].includes(c.type))return e.radius*(c.type==='diameter'?2:1);if(['x','y'].includes(c.type))return a[c.type==='x'?0:1]*(c.direction??1);if(c.type==='angle'){const u=vector(e),v=vector(f);return Math.atan2(cross(u,v),dot(u,v))*(c.direction??1);}if(c.type==='distance-x'||c.type==='distance-y')return (b[c.type==='distance-x'?0:1]-a[c.type==='distance-x'?0:1])*(c.direction??1);if(c.type==='line-distance'){const d=cross(vector(e),f.a.map((n,i)=>n-e.a[i]))/length(e);return c.direction===undefined?Math.abs(d):d*c.direction;}if(c.type==='distance'){if(a&&b)return Math.hypot(b[0]-a[0],b[1]-a[1]);const p=a??b,l=a?f:e;const d=cross(vector(l),p.map((n,i)=>n-l.a[i]))/length(l);return c.direction===undefined?Math.abs(d):d*c.direction;}throw Error('This relation is not a measured dimension.');}
 export function residuals(es,cs){return cs.filter(c=>c.driving).flatMap(c=>{const e=entity(es,c.refs[0]),f=c.refs[1]&&entity(es,c.refs[1]),a=pointAt(es,c.refs[0]),b=c.refs[1]&&pointAt(es,c.refs[1]);
  if(c.type==='line-distance')return [cross(vector(e),vector(f))/(length(e)*length(f)),measure(es,c)-c.value];if(dimensions.includes(c.type))return [c.type==='angle'?wrap(measure(es,c)-c.value):measure(es,c)-c.value];if(c.type==='fixed')return a.map((n,i)=>n-c.value[i]);if(c.type==='coincident')return a.map((n,i)=>n-b[i]);if(['horizontal','vertical'].includes(c.type))return c.refs.map(r=>{const l=entity(es,r);return c.type==='horizontal'?l.b[1]-l.a[1]:l.b[0]-l.a[0];});
+ if(c.type==='spline-tangent'){
+  const u=vector({a:e.control2,b:e.b}),v=vector({a:f.a,b:f.control1});
+  return [cross(u,v)/Math.max(Math.hypot(...u),Math.hypot(...v),1e-9)];
+ }
  if(c.type==='symmetry'){
   const axis=entity(es,c.refs[2]),u=vector(axis),d=length(axis);
   const midpoint=a.map((n,i)=>(n+b[i])/2-axis.a[i]);

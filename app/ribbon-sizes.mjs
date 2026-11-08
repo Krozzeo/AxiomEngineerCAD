@@ -18,12 +18,12 @@ export function commandMenu(button,items,size='small'){
  toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-haspopup','menu');
  menu.className='ribbon-options';menu.popover='auto';menu.role='menu';
  for(const item of items){item.dataset.commandSize='menu';item.role='menuitem';item.addEventListener('click',()=>menu.hidePopover());menu.append(item);}
- toggle.onclick=()=>{
-  if(menu.matches(':popover-open')){menu.hidePopover();return;}
+ toggle.popoverTargetElement=menu;
+ toggle.addEventListener('click',()=>{
   const bounds=group.getBoundingClientRect();
   menu.style.left=Math.min(bounds.left,window.innerWidth-235)+'px';
-  menu.style.top=bounds.bottom+'px';menu.showPopover();menu.querySelector('button')?.focus();
- };
+  menu.style.top=bounds.bottom+'px';
+ });
  menu.addEventListener('toggle',()=>toggle.setAttribute('aria-expanded',String(menu.matches(':popover-open'))));
  group.append(button,toggle,menu);return group;
 }

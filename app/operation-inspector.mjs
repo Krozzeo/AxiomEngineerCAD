@@ -1,10 +1,10 @@
 import {searchSelect} from './search-select.mjs';
 import {icon} from './icons.mjs';
 
-export function operationValue(document,{field,label,options=[],value,id,onChange,onSource}){
+export function operationValue(document,{field,label,options=[],value,id,onChange,onSource,emptyMessage=true}){
  const row=document.createElement('div'),title=document.createElement('label'),table=document.createElement('table');
  row.className='operation-value';title.textContent=label;title.htmlFor=field;table.className='operation-value-table';
- const control=searchSelect({document,field,label,options,value:id??'',allowNumber:true,
+ const control=searchSelect({document,field,label,options,value:id??'',allowNumber:true,emptyMessage,
   onSelect:key=>onChange(options.find(option=>option.value===key)?.number,key,true),
   onLiteral:(number,{focus})=>onChange(number,null,focus)});
  control.input.id=field;if(!id)control.setLiteral(value);

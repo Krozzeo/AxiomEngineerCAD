@@ -41,7 +41,7 @@ export function parameterOn(entity,p){
   const {start,sweep}=arcAngles(entity);
   return (sweep<0?wrap(start-angle):wrap(angle-start))/Math.abs(sweep);
 }
-export function pointOn(entity,t){return entity.type==='line'?mix(entity.a,entity.b,t):arcPoint(entity,t);}
+export function pointOn(entity,t){return entity.type==='line'?mix(entity.a,entity.b,t):entity.type==='circle'?entity.center.map((n,i)=>n+entity.radius*(i?Math.sin(t*tau):Math.cos(t*tau))):arcPoint(entity,t);}
 
 export function intersections(a,b){
   if(a.type==='line'&&b.type==='line'){
@@ -108,6 +108,18 @@ export function circleThrough(a,b,c){
  const offset=[(uu*v[1]-vv*u[1])/den,(vv*u[0]-uu*v[0])/den];
  return {center:a.map((n,i)=>n+offset[i]),radius:Math.hypot(...offset),clockwise:den<0};
 }
+export function interpolatedSplines(points,construction,previous){
+ const tangents=points.map((p,i)=>{
+  if(i===0&&previous)return delta(previous.b,previous.control2).map(n=>n*3);
+  const before=points[Math.max(0,i-1)],after=points[Math.min(points.length-1,i+1)];
+  return delta(after,before).map(n=>n/(i>0&&i<points.length-1?2:1));
+ });
+ return points.slice(1).map((b,i)=>{
+  const a=points[i],u=tangents[i],v=tangents[i+1];
+  return {type:'spline',construction,a,b,control1:a.map((n,k)=>n+u[k]/3),control2:b.map((n,k)=>n-v[k]/3)};
+ });
+}
+export const equationSegments=e=>e.samples.slice(1).map((point,i)=>[e.samples[i],point]);
 export function splineSegments(e,steps=64){
  const points=Array.from({length:steps+1},(_,i)=>{
   const t=i/steps,u=1-t;
@@ -122,6 +134,13 @@ export function rectanglePoints(a,b,third){
  const n=[-u[1]/length,u[0]/length],width=dot(delta(third,b),n);
  if(Math.abs(width)<eps)return null;
  return [a,b,b.map((x,i)=>x+width*n[i]),a.map((x,i)=>x+width*n[i])];
+}
+
+export const MAX_SKETCH_ENTITIES=1024;
+export function patternStep(mode,distribution,spacing,count){
+ if(distribution!=='total')return spacing;
+ const fullTurn=mode==='circular'&&Math.abs(spacing-2*Math.PI)<1e-9;
+ return spacing/(fullTurn?count:count-1);
 }
 
 export function sketchTransform(mode,{axis,center,spacing,reverse=false},index=1){

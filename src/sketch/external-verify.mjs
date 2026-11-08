@@ -11,6 +11,7 @@ else delete referenceDocument[key];
 }const sourceSketch=referenceDocument.native.graph.features.find(x=>x.id===f.id);
 sourceSketch.data.entities=[];
 sourceSketch.data.constraints=[];
+delete sourceSketch.data.patterns;
 sourceSketch.dependsOn=sourceSketch.data.plane.kind==='face'?[sourceSketch.data.plane.producerId]:[];
 for(const p of referenceDocument.native.graph.parameters)if(p.targets)p.targets=p.targets.filter(t=>t.sketchId!==f.id);
 const proof=await buildProof(referenceDocument,{viewportOnly:true,rollbackAt:f.id}),frame=planeFrame(f,c.graph);
