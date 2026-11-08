@@ -120,6 +120,7 @@ export async function verifyExtendedSketchUI({context,host,evidence,observe,repo
     await page.mouse.move(viewport.x+viewport.width*.7+65,viewport.y+viewport.height*.7+24,{steps:4});
     await page.mouse.up({button:'middle'});await page.keyboard.up('Shift');
     const camera=await page.evaluate(()=>structuredClone(window.engineerViewport.renderer.camera));
+    await page.locator('#proof-canvas').focus();
     await sketchCommit(page,()=>page.keyboard.press('Control+z'));
     assert.deepEqual(await page.evaluate(()=>window.engineerViewport.renderer.camera),camera);
     await sketchCommit(page,()=>page.keyboard.press('Control+y'));
