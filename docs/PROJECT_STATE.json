@@ -8,7 +8,7 @@
   },
   "milestone": {
     "current": "E3.M1",
-    "status": "0.3.2 extended sketch candidate",
+    "status": "0.3.3 extended sketch candidate",
     "ownerAcceptance": "pending",
     "next": "Owner reviews E3.M1 extended sketch demo before E3.M2"
   },
@@ -37,9 +37,9 @@
     "deliveryGate": "docs/MILESTONE_DELIVERY.md"
   },
   "candidate": {
-    "version": "0.3.2",
+    "version": "0.3.3",
     "branch": "engineer/e3-m1-sketch-breadth",
-    "status": "External pattern references, fit and equation curves, trim strokes, polygon and drag fixes"
+    "status": "Exact sketch silhouettes, editable sketch operations, associative patterns and freehand trim"
   },
   "previousDelivered": {
     "version": "0.2.5",

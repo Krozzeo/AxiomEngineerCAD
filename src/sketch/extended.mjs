@@ -1,3 +1,5 @@
+import {createHash} from 'node:crypto';
+import {dimensions} from './relation-kinds.mjs';
 import {intersections,parameterOn,pointOn,circular,polygonPoints,arcTangencyValid,sketchTransform,transformSketchEntity,patternStep,MAX_SKETCH_ENTITIES} from './curves.mjs';
 import {derivedId,pointAt} from './relations.mjs';
 import {check} from '../errors.mjs';
@@ -52,6 +54,7 @@ export function seedPolygonCenter(data,constraint){
 }
 function editSpan(data,input,split,sketchId){
   const [source]=selected(data,[input.entityId]);
+  check(!data.patterns?.some(pattern=>pattern.generated.includes(source.id)),'ConstraintConflict','Edit the pattern or its source geometry to trim this copy.');
   check(['line','arc'].includes(source.type),'UnsupportedCapability','Select a line or arc to trim or split.');
   const fractions=input.fractions??[input.fraction],inside=t=>t>eps&&t<1-eps;
   check(fractions.every(inside),'InvalidInput','Choose a point inside the segment.');
@@ -96,9 +99,10 @@ function editSpan(data,input,split,sketchId){
     }
     return true;
   });
-  if(!pieces.length&&data.patterns){
-    data.patterns=data.patterns.filter(pattern=>!pattern.generated.includes(source.id)&&!pattern.entityIds.includes(source.id)&&pattern.reference.entityId!==source.id);
-    if(!data.patterns.length)delete data.patterns;
+  if(!pieces.length)check(![...(data.patterns??[]),...(data.mirrors??[])].some(operation=>operation.generated.includes(source.id)||operation.entityIds.includes(source.id)||operation.axisId===source.id||operation.reference?.entityId===source.id),'ConstraintConflict','Edit the sketch operation before removing one of its participants.');
+  if(!pieces.length)for(const key of ['conversions'])if(data[key]){
+    data[key]=data[key].filter(o=>o.axisId!==source.id&&!o.entityIds.includes(source.id)&&!o.generated?.includes(source.id));
+    if(!data[key].length)delete data[key];
   }
   data.entities.splice(data.entities.indexOf(source),1,...pieces);
   if(split){
@@ -110,6 +114,25 @@ function editSpan(data,input,split,sketchId){
   }else if(source.type==='arc'&&pieces.length===2){
     data.constraints.push(relation(derivedId(sketchId,input.newEntityId,'trim-curve'),'coradial',pieces.map(e=>ref(e.id))));
   }
+}
+const invariantRelations=new Set(['coincident','parallel','perpendicular','collinear','equal','concentric','coradial','tangent','point-on-line','point-on-circle','midpoint','symmetry','spline-tangent','equal-curve-length','length','radius','diameter','distance','line-distance','angle']);
+function inheritedRelations(data,sources,operationId,instance,mirror,mapPoint){
+ const mapping=new Map(sources.map(source=>[source.id,derivedId(data.sketchId,operationId,source.id,instance)]));
+ const origin=mapPoint([0,0]),axis=mapPoint([1,0]).map((n,i)=>n-origin[i]);
+ const aligned=Math.abs(axis[1])<1e-7?'same':Math.abs(axis[0])<1e-7?'swap':null;
+ return data.constraints.filter(c=>c.refs.every(r=>mapping.has(r.entityId))).flatMap(c=>{
+  let type=c.type;
+  if(['horizontal','vertical'].includes(type)){
+   if(!aligned)return [];
+   if(aligned==='swap')type=type==='horizontal'?'vertical':'horizontal';
+  }else if(!invariantRelations.has(type))return [];
+  return [{
+   ...structuredClone(c),type,id:derivedId(operationId,'inherited',instance,c.id),
+   refs:c.refs.map(r=>({...r,entityId:mapping.get(r.entityId)})),
+   ...(dimensions.includes(type)?{driving:false}:{}),
+   ...(mirror&&c.direction!==undefined?{direction:-c.direction}:{}),
+  }];
+ });
 }
 function transform(data,name,input,sketchId){
   const sources=selected(data,input.entityIds);
@@ -128,6 +151,7 @@ function transform(data,name,input,sketchId){
   const count=mirror?2:input.count;
   check(Number.isSafeInteger(count)&&count>=2,'InvalidInput','Pattern count must be an integer of at least two.');
   check((count-1)*sources.length<=MAX_SKETCH_ENTITIES-data.entities.length,'ResourceLimit','The resulting sketch exceeds the document geometry capacity.');
+  const inherited=mirror?inheritedRelations({...data,sketchId},sources,input.id,1,true,mapping):[];
   for(let i=1;i<count;i++)for(const source of sources){
     const id=derivedId(sketchId,input.id,source.id,i),next=transformSketchEntity(source,p=>mapping(p,i),{id,mirror});
     const roles=['a','b','center','point','control1','control2'].filter(role=>source[role]);
@@ -137,33 +161,52 @@ function transform(data,name,input,sketchId){
       if(source.type==='circle')data.constraints.push(relation(derivedId(id,'radius'),'equal',[ref(source.id),ref(id)]));
     }
   }
+  data.constraints.push(...inherited);
+  return inherited.map(c=>c.id);
 }
 export function extendSketch(data,name,input,sketchId){
   if(name==='polygon')addPolygon(data,input,sketchId);
   else if(name==='trim'&&input.stroke){
-    const stroke={type:'line',a:input.stroke[0],b:input.stroke[1]};
-    check(Math.hypot(...stroke.a.map((n,i)=>n-stroke.b[i]))>eps,'InvalidGeometry','Draw a nonzero trim stroke.');
+    const strokes=input.stroke.slice(1).map((b,i)=>({type:'line',a:input.stroke[i],b})).filter(s=>Math.hypot(...s.a.map((n,i)=>n-s.b[i]))>eps);
+    check(strokes.length,'InvalidGeometry','Draw a nonzero trim stroke.');
     const edits=data.entities.filter(e=>editable(e)&&['line','arc'].includes(e.type)).map(e=>({
       entityId:e.id,newEntityId:derivedId(sketchId,input.newEntityId,e.id),
-      fractions:intersections(e,stroke).points.map(p=>parameterOn(e,p)).filter(t=>t>eps&&t<1-eps)
+      fractions:strokes.flatMap(stroke=>intersections(e,stroke).points).map(p=>parameterOn(e,p)).filter(t=>t>eps&&t<1-eps)
     })).filter(edit=>edit.fractions.length);
     check(edits.length,'LostReference','The trim stroke did not cross an editable span.');
     const original=data.entities.slice();
     for(const edit of edits)editSpan(data,{...edit,crossingEntities:original},false,sketchId);
   }
   else if(name==='split'||name==='trim')editSpan(data,input,name==='split',sketchId);
+  else if(name==='mirror'){
+    const old=data.mirrors?.find(item=>item.id===input.id),previous=new Set(old?.generated??[]);
+    check(input.replace?old:!old,'LostReference','The mirror operation changed.');
+    const generated=input.entityIds.map(id=>derivedId(sketchId,input.id,id,1)),next=new Set(generated);
+    if(old){
+     const intrinsic=new Set([...(old.inherited??[]),...old.generated.flatMap(id=>['a','b','center','point','control1','control2','radius'].map(role=>derivedId(id,role)))]);
+     check(!data.constraints.some(c=>!intrinsic.has(c.id)&&c.refs.some(r=>previous.has(r.entityId)&&!next.has(r.entityId))),
+       'ConstraintConflict','Remove downstream relations before changing these mirror entities.');
+     data.entities=data.entities.filter(e=>!previous.has(e.id));
+     data.constraints=data.constraints.filter(c=>!intrinsic.has(c.id));
+    }
+    const inherited=transform(data,name,input,sketchId);
+    const operation={id:input.id,entityIds:[...input.entityIds],axisId:input.axisId,generated,inherited};
+    if(old)Object.assign(old,operation);else (data.mirrors??=[]).push(operation);
+  }
   else if(name==='pattern'&&input.reference){
     data.patterns??=[];
-    check(!data.patterns.some(item=>item.id===input.id),'InvalidInput','The pattern identity already exists.');
+    const old=data.patterns.find(item=>item.id===input.id);
+    check(input.replace?old:!old,'LostReference','The pattern operation changed.');
     const {id,mode,entityIds,reference,count,spacing,distribution,reverse=false,countParameterId,spacingParameterId}=input;
-    data.patterns.push({id,mode,entityIds,reference,count,spacing,reverse,generated:[],...(distribution?{distribution}:{}),
-      ...(countParameterId?{countParameterId}:{}),...(spacingParameterId?{spacingParameterId}:{})});
+    const operation={id,mode,entityIds,reference,count,spacing,reverse,generated:old?.generated??[],inherited:old?.inherited??[],...(distribution?{distribution}:{}),
+      ...(countParameterId?{countParameterId}:{}),...(spacingParameterId?{spacingParameterId}:{})};
+    if(old)data.patterns[data.patterns.indexOf(old)]=operation;else data.patterns.push(operation);
   }
   else transform(data,name,input,sketchId);
 }
 
-export function synchronizePatterns(graph){
- for(const feature of graph.features.filter(f=>f.data?.patterns)){
+export function synchronizePatterns(graph,featureId=null){
+ for(const feature of graph.features.filter(f=>f.data?.patterns&&(!featureId||f.id===featureId))){
   const data=feature.data;
   for(const pattern of data.patterns){
    const {id,mode,entityIds,reference,reverse,distribution}=pattern;
@@ -180,16 +223,19 @@ export function synchronizePatterns(graph){
    check(mode==='circular'?center:axis?.type==='line'&&reference.role==='entity','LostReference','Select a straight pattern direction or a semantic center point.');
    const step=patternStep(mode,distribution,spacing,count);
    check((count-1)*sources.length<=MAX_SKETCH_ENTITIES-data.entities.length+pattern.generated.length,'ResourceLimit','The resulting sketch exceeds the document geometry capacity.');
-   const signature=JSON.stringify([count,step,reverse,mode==='circular'?center:[axis.a,axis.b],sources]);
+   const sourceIds=new Set(entityIds),sourceRelations=data.constraints.filter(c=>c.refs.every(r=>sourceIds.has(r.entityId)));
+   const signature=createHash('sha256').update(JSON.stringify([count,step,reverse,mode==='circular'?center:[axis.a,axis.b],sources,sourceRelations])).digest('hex');
    if(signature===pattern.signature)continue;
-   const copies=[];
+   const copies=[],inherited=[],oldRelations=new Set(pattern.inherited??[]);
    for(let i=1;i<count;i++)for(const source of sources)
     copies.push(transformSketchEntity(source,sketchTransform(mode,{axis,center,spacing:step,reverse},i),{id:derivedId(feature.id,id,source.id,i)}));
    const retained=new Set(copies.map(e=>e.id)),previous=new Set(pattern.generated);
    const removed=new Set(pattern.generated.filter(key=>!retained.has(key)));
-   check(!data.constraints.some(c=>c.refs.some(r=>removed.has(r.entityId))),'ConstraintConflict','Lowering the pattern count would remove an entity used by a constraint.');
+   check(!data.constraints.some(c=>!oldRelations.has(c.id)&&c.refs.some(r=>removed.has(r.entityId))),'ConstraintConflict','Lowering the pattern count would remove an entity used by a constraint.');
    data.entities=[...data.entities.filter(e=>!previous.has(e.id)),...copies];
-   pattern.generated=copies.map(e=>e.id);pattern.signature=signature;
+   for(let i=1;i<count;i++)inherited.push(...inheritedRelations({constraints:sourceRelations,sketchId:feature.id},sources,id,i,false,sketchTransform(mode,{axis,center,spacing:step,reverse},i)));
+   data.constraints=[...data.constraints.filter(c=>!oldRelations.has(c.id)),...inherited];
+   pattern.generated=copies.map(e=>e.id);pattern.inherited=inherited.map(c=>c.id);pattern.signature=signature;
   }
  }
 }

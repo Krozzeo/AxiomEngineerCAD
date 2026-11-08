@@ -1,14 +1,12 @@
-import {operationSelection,operationValue} from './operation-inspector.mjs';
+import {operationPanel,operationSelection,operationValue} from './operation-inspector.mjs';
 import {sketchTransform,transformSketchEntity,patternStep,MAX_SKETCH_ENTITIES} from '/curves.mjs';
 import {pointAt,splineHandleRoles} from '/relation-kinds.mjs';
 import {icon} from './icons.mjs';
 
 const same=(a,b)=>a?.entityId===b?.entityId&&a?.role===b?.role;
 export function sketchTransforms({document,host,ribbon,getState,selected,selectMode,label,mutate,parameters,openInspector,redraw,status,onActive}){
- const buttons=new Map(),panel=document.createElement('section');panel.id='sketch-transform';panel.className='operation-inspector';panel.hidden=true;
- host.prepend(panel);
- const heading=document.createElement('h3'),values=document.createElement('div'),actions=document.createElement('div'),reverse=document.createElement('button');
- actions.className='operation-inspector-actions';
+ const buttons=new Map(),{element:panel,heading,actions}=operationPanel(document,host,'sketch-transform');
+ const values=document.createElement('div'),reverse=document.createElement('button');
  reverse.type='button';reverse.innerHTML=icon('rotate');reverse.setAttribute('aria-label','Reverse direction');reverse.title='Reverse direction';
  let draft=null,working=false;
  const sources=operationSelection(document,{title:'Entities',activate:()=>selectTable(0),remove:ref=>{draft.sources=draft.sources.filter(r=>!same(r,ref));paint();}});
@@ -31,21 +29,28 @@ export function sketchTransforms({document,host,ribbon,getState,selected,selectM
   apply.disabled=working||!draft.sources.length||!validTarget(draft.target)||exceedsCapacity();
   redraw();
  }
- function exceedsCapacity(){return draft.mode!=='mirror'&&(draft.count-1)*draft.sources.length>MAX_SKETCH_ENTITIES-getState().items.length;}
+ function exceedsCapacity(){return draft.mode!=='mirror'&&(draft.count-1)*draft.sources.length>MAX_SKETCH_ENTITIES-getState().items.length+(draft.previous??0);}
  function cancel(){
   if(!draft||working)return;
   draft=null;panel.hidden=true;for(const button of buttons.values())button.setAttribute('aria-pressed','false');
   onActive(false);redraw();
  }
- async function open(mode){
-  if(draft?.mode===mode){cancel();return;}
+ async function open(mode,operation=null){
+  if(!operation&&draft?.mode===mode){cancel();return;}
   const state=getState();if(!state||working)return;
-  const seed=selected().filter(validSource),ids=new Set(seed.map(r=>r.entityId));
+  const seed=(operation?operation.entityIds.map(entityId=>({entityId,role:'entity'})):selected()).filter(validSource),ids=new Set(seed.map(r=>r.entityId));
   const initial=[...ids].map(entityId=>({entityId,role:'entity'}));
   const axes=state.items.filter(e=>e.type==='line'&&e.construction&&!e.referenceOnly&&!ids.has(e.id));
   selectMode();draft={mode,id:'transform-'+crypto.randomUUID(),owner:state.id,context:state.context,sources:initial,
     target:mode==='mirror'&&axes.length===1?{entityId:axes[0].id,role:'entity'}:null,table:initial.length?1:0,
     count:3,spacing:mode==='circular'?360:10,distribution:mode==='circular'?'total':'step',countParameterId:null,spacingParameterId:null,reverse:false};
+  if(operation){
+   const angle=mode==='circular'?180/Math.PI:1;
+   Object.assign(draft,{id:operation.id,replacing:true,target:operation.reference??{entityId:operation.axisId,role:'entity'},
+    count:operation.count??2,spacing:operation.spacing===undefined?10:operation.spacing*angle,
+    countParameterId:operation.countParameterId,spacingParameterId:operation.spacingParameterId,
+    distribution:operation.distribution??'step',reverse:!!operation.reverse,previous:operation.generated?.length??0});
+  }
   const active=draft;values.replaceChildren();
   for(const [name,button]of buttons)button.setAttribute('aria-pressed',String(name===mode||name==='linear'&&mode==='circular'));
   panel.hidden=false;onActive(true);openInspector();paint();(draft.table?target:sources).element.focus({preventScroll:true});
@@ -64,7 +69,8 @@ export function sketchTransforms({document,host,ribbon,getState,selected,selectM
    values.append(reverse,distribution);
    for(const [key,unit,caption] of [['count','scalar','Count'],['spacing',mode==='circular'?'rad':'mm',mode==='circular'?'Angular spacing (°)':'Spacing (mm)']]){
     const choices=available.filter(p=>p.unit===unit).map(p=>({value:p.id,label:p.name,number:unit==='rad'?p.value*180/Math.PI:p.value}));
-    const field=operationValue(document,{field:'sketch-pattern-'+key,label:caption,options:choices,value:draft[key],emptyMessage:false,
+    const driver=choices.find(choice=>choice.value===draft[key+'ParameterId']);if(driver)draft[key]=driver.number;
+    const field=operationValue(document,{field:'sketch-pattern-'+key,label:caption,options:choices,value:draft[key],id:draft[key+'ParameterId'],emptyMessage:false,
      onChange:(n,id,focus)=>{
       if(!Number.isFinite(n)||(key==='count'?(!Number.isSafeInteger(n)||n<2):n<=0)){status('Enter a supported '+caption.toLowerCase()+'.');field.control.setLiteral(draft[key]);return;}
       draft[key]=n;draft[key+'ParameterId']=id;if(!id)field.control.setLiteral(n);if(focus)field.control.input.select();paint();
@@ -73,6 +79,7 @@ export function sketchTransforms({document,host,ribbon,getState,selected,selectM
     });
     values.append(field.title,field.row);
    }
+   paint();
   }
  }
  for(const [mode,title,glyph]of [['mirror','Mirror Entities','mirror'],['linear','Sketch Pattern','pattern'],['circular','Circular Sketch Pattern','circular-pattern']]){
@@ -83,9 +90,9 @@ export function sketchTransforms({document,host,ribbon,getState,selected,selectM
  cancelButton.onclick=cancel;
  apply.onclick=async()=>{
   if(!draft||working||apply.disabled)return;
-  const state=getState(),{owner,id,mode,context,sources,target,count,spacing,distribution,reverse,countParameterId,spacingParameterId}=draft;
+  const state=getState(),{owner,id,mode,context,sources,target,count,spacing,distribution,reverse,countParameterId,spacingParameterId,replacing}=draft;
   if(owner!==state?.id){cancel();return;}
-  const fields={sketchId:owner,id,entityIds:sources.map(ref=>ref.entityId)};
+  const fields={sketchId:owner,id,entityIds:sources.map(ref=>ref.entityId),...(replacing?{replace:true}:{})};
   working=true;paint();
   try{
    if(mode==='mirror')await mutate('sketch.mirror',{...fields,axisId:target.entityId},context);
@@ -101,7 +108,7 @@ export function sketchTransforms({document,host,ribbon,getState,selected,selectM
    event.preventDefault();selectTable(draft.table?0:1);(draft.table?target:sources).element.focus();
   }
  },true);
- return {get active(){return !!draft;},cancel,consume(value){
+ return {get active(){return !!draft;},get highlighted(){return draft?(draft.table===0?draft.sources:draft.target?[draft.target]:[]):[];},edit:operation=>open(operation.mode??'mirror',operation),cancel,consume(value){
   if(!draft)return false;if(working||!value)return true;
   const refs=value.kind==='components'?value.refs:[value];
   for(const ref of refs){

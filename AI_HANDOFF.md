@@ -1,4 +1,4 @@
-# Engineer handoff - E3.M1 extended sketches / 0.3.2 candidate
+# Engineer handoff - E3.M1 extended sketches / 0.3.3 candidate
 
 Start with `npm run context`, AGENTS.md, [compact context](docs/PROJECT_CONTEXT.md) and the [integration notes](docs/PRE_E3_ASSISTANT.md). E3.M1 follows the owner’s live model tests.
 

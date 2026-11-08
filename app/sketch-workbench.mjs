@@ -37,9 +37,9 @@ function convertSources(){
 const internalAnchor=c=>c.driving&&['fixed','radius'].includes(c.type)&&c.refs.length===1&&items.some(e=>e.id===c.refs[0].entityId&&e.referenceOnly);
 
 const externalButton=document.createElement('button');externalButton.id='sketch-external-reference';externalButton.innerHTML=icon('convert')+' Convert Entities';externalButton.title='Convert selected external references into ordinary sketch geometry with projection relations';ribbon.append(externalButton);
-const converter=createConvertEntities({button:externalButton,getState:()=>current?{id:current.sketchId,frame:current.frame,context:current.editContext}:null,getScene:()=>r.scene,mutate,selectMode:()=>document.querySelector('[data-sketch-tool=select]').click(),status:text=>status(text),onActive:active=>{externalPicking=active;inspector.hidden=active;if(active)document.querySelector('.proof-inspector').hidden=true;},onHover:id=>{hoverSequence++;window.engineerHoverReference?.(id);},onSelected:ids=>window.engineerSketchReferences?.(ids),initialSelection:convertSources});
+const converter=createConvertEntities({button:externalButton,getState:()=>current?{id:current.sketchId,frame:current.frame,context:current.editContext}:null,getScene:()=>r.scene,mutate,selectMode:()=>document.querySelector('[data-sketch-tool=select]').click(),status:text=>status(text),onActive:active=>{externalPicking=active;inspector.hidden=active;if(active)document.querySelector('.proof-inspector').hidden=true;},onHover:id=>{hoverSequence++;window.engineerHoverReference?.(id);},onSelected:ids=>{window.engineerSketchReferences?.(ids);draw();},initialSelection:convertSources});
 async function addExternal(target,selectionId){converter.pick(target,selectionId);}
-let trimStroke=null,previousSpline=null,upstreamHover=null;
+let trimStroke=null,previousSpline=null,upstreamHover=null,upstreamHoverRole=null;
 let placementPoints=[],arcStart=null,arcStartSnap=null,draftPoint=null,anchorSnap=null,cursorSnap=null,lastSketchPointer=null;
 const status=text=>{$('edit-sketch-status').textContent=text;$('wb-hint').textContent=text;};
 const selectedRef=()=>selected?.kind==='component'?{entityId:selected.entityId,role:selected?.role}:null;
@@ -50,7 +50,15 @@ function action(id,fn){$(id).addEventListener('click',error(fn));}
 // Coalesce only concurrent reads of the same source revision; never retain completed data.
 const sketchReads=new Map();
 async function inspect(id){const editContext=await context(),key=editContext.scope.sessionId+':'+editContext.expectedDocumentRevision+':'+id;if(sketchReads.has(key))return sketchReads.get(key);const request=inspectSource(id,editContext);sketchReads.set(key,request);const clear=()=>{if(sketchReads.get(key)===request)sketchReads.delete(key);};request.then(clear,clear);return request;}
-async function inspectSource(id,editContext){const all=[];let offset=0,meta;do{meta=await invoke('sketch.inspect',{sketchId:id,offset,limit:25,maxBytes:14000},'ReadOnly',editContext);all.push(...meta.items);offset=meta.nextOffset;}while(offset!==null);const constraints=[];if(meta.constraintsAvailable){let cursor=0;do{const page=await invoke('sketch.inspect',{sketchId:id,collection:'constraints',offset:cursor,limit:25,maxBytes:14000},'ReadOnly',editContext);constraints.push(...page.items);cursor=page.nextOffset;}while(cursor!==null);}const source=await api('document');if(source.document.revision!==meta.documentRevision)throw Error('Source changed while reading sketch. Reopen it before editing.');const bindings=Object.fromEntries((source.document.native?.graph.parameters??[]).flatMap(p=>(p.targets??[]).filter(t=>t.kind==='dimension'&&t.sketchId===id).map(t=>[t.constraintId,p.id])));const parameters=(source.document.native?.graph.parameters??[]).filter(p=>p.profile&&(p.definitionId===null||p.definitionId===meta.definitionId||p.definitionId===source.document.native.graph.primaryDefinitionId)),bindingNames=Object.fromEntries(Object.entries(bindings).map(([id,parameterId])=>[id,parameters.find(p=>p.id===parameterId)?.name??parameterId]));return {...meta,items:all,constraints,editContext,bindings,bindingNames,parameters};}
+async function inspectSource(id,editContext){const all=[];let offset=0,meta;do{meta=await invoke('sketch.inspect',{sketchId:id,offset,limit:25,maxBytes:14000},'ReadOnly',editContext);all.push(...meta.items);offset=meta.nextOffset;}while(offset!==null);const constraints=[];if(meta.constraintsAvailable){let cursor=0;do{const page=await invoke('sketch.inspect',{sketchId:id,collection:'constraints',offset:cursor,limit:25,maxBytes:14000},'ReadOnly',editContext);constraints.push(...page.items);cursor=page.nextOffset;}while(cursor!==null);}const source=await api('document');if(source.document.revision!==meta.documentRevision)throw Error('Source changed while reading sketch. Reopen it before editing.');const bindings=Object.fromEntries((source.document.native?.graph.parameters??[]).flatMap(p=>(p.targets??[]).filter(t=>t.kind==='dimension'&&t.sketchId===id).map(t=>[t.constraintId,p.id])));const parameters=(source.document.native?.graph.parameters??[]).filter(p=>p.profile&&(p.definitionId===null||p.definitionId===meta.definitionId||p.definitionId===source.document.native.graph.primaryDefinitionId)),bindingNames=Object.fromEntries(Object.entries(bindings).map(([id,parameterId])=>[id,parameters.find(p=>p.id===parameterId)?.name??parameterId]));const data=source.document.native.graph.features.find(f=>f.id===id).data;
+ const operations=[
+  ...(data.conversions??[]).map(o=>({...o,name:'Convert Entities',kind:'convert',entities:o.entityIds.map(id=>all.find(e=>e.id===id))})),
+  ...all.filter(e=>e.converted&&!(data.conversions??[]).some(o=>o.entityIds.includes(e.id))).map(e=>({id:'legacy-'+e.id,name:'Convert Entities',kind:'convert',entities:[e]})),
+  ...(data.mirrors??[]).map(o=>({...o,name:'Mirror Entities',kind:'transform'})),
+  ...(data.patterns??[]).map(o=>({...o,name:o.mode==='circular'?'Circular Sketch Pattern':'Sketch Pattern',kind:'transform'})),
+  ...all.filter(e=>e.type==='equation-curve').map(e=>({...e,name:'Equation Driven Curve',kind:'equation'}))
+ ];
+ return {...meta,items:all,constraints,editContext,bindings,bindingNames,parameters,operations};}
 async function getDiagnosis(){const key=current?.sketchId+':'+current?.documentRevision;if(key===diagnosisKey)return;if(diagnosing){await diagnosing;if(current&&current.sketchId+':'+current.documentRevision!==diagnosisKey)return getDiagnosis();return;}diagnosing=loadDiagnosis().finally(()=>diagnosing=null);return diagnosing;}
 const solverData=()=>({profile:current.profile,entities:items,constraints:[...(current.constraints??[]),...externalRefs.anchors()]});
 async function loadDiagnosis(){if(!current?.constraintsAvailable)return;const id=current.sketchId,revision=current.documentRevision,ctx=current.editContext;let result;try{result=await solvePreview(solverData());}catch(error){result={...await invoke('sketch.diagnostics',{sketchId:id},'ReadOnly',ctx),entityStates:{},pointStates:{},conflicts:[],lost:[],redundant:[],references:[],previewFallback:true,previewFallbackReason:error.message};for(const projection of ['entities','constraints']){let offset=0;do{const page=await invoke('sketch.diagnostics',{sketchId:id,projection,offset,limit:25,maxBytes:14000},'ReadOnly',ctx);for(const item of page.items)if(projection==='entities'){result.entityStates[item.id]=item.state;if(item.referenceDOF){result.evidence??={};result.evidence.referenceDOF??={};for(const [role,dof]of Object.entries(item.referenceDOF))result.evidence.referenceDOF[item.id+':'+role]=dof;}if(item.coordinates){result.evidence??={};result.evidence.coordinateStates??={};for(const [key,state]of Object.entries(item.coordinates))result.evidence.coordinateStates[item.id+':'+key]=state;}for(const [role,state]of Object.entries(item.points))result.pointStates[item.id+':'+role]=state;}else {if(item.state==='Inconsistent')result.conflicts.push(item.id);if(item.state==='LostReference')result.lost.push(item.id);if(item.state==='RedundantConsistent')result.redundant.push(item.id);if(item.value!==undefined)result.references.push({id:item.id,value:item.value});}offset=page.nextOffset;}while(offset!==null);}}if(current?.sketchId===id&&current.documentRevision===revision){diagnosis=result;diagnosisKey=id+':'+revision;renderDiagnostics();if(!editDraft){renderRelations();renderFields();}draw();}}
@@ -64,7 +72,7 @@ function align({toggle=true,remote=false}={}){if(!current)return;return r.orient
 function world(p){return current.frame.origin.map((n,i)=>n+current.frame.u[i]*p[0]+current.frame.v[i]*p[1]);}
 function fit(){if(!current)return;const ps=items.filter(e=>!e.referenceOnly).flatMap(e=>circular(e)?[[e.center[0]-e.radius,e.center[1]-e.radius],[e.center[0]+e.radius,e.center[1]+e.radius]]:refs(e).map(k=>point(e,k))).map(world);return r.orient({...fitCamera(ps,canvas.width/canvas.height),...normalView(current.frame.normal,{right:current.frame.u})});}
 function coordinate(event){const rect=canvas.getBoundingClientRect(),frame=r.presentedFrame,ray=screenRay(frame?.camera??r.camera,(event.clientX-rect.left)/rect.width,(event.clientY-rect.top)/rect.height,frame?frame.width/frame.height:canvas.width/canvas.height,frame?.projection??r.projection),dot=(a,b)=>a.reduce((s,n,i)=>s+n*b[i],0),den=dot(ray.direction,current.frame.normal);if(Math.abs(den)<1e-8)throw Error('The sketch plane is edge-on. Press F8 to align.');const t=dot(current.frame.origin.map((n,i)=>n-ray.origin[i]),current.frame.normal)/den,q=ray.origin.map((n,i)=>n+t*ray.direction[i]-current.frame.origin[i]);if(t<0)throw Error('The support plane is behind the camera. Press F8 to align.');return [dot(q,current.frame.u),dot(q,current.frame.v)].map(n=>Math.round(n*1e6)/1e6);}
-function draftCancel(){converter.cancel();dimensionUI.cancel();targetEditor.cancel();if(current)renderRelations();previewSequence++;arcStart=arcStartSnap=null;placementPoints=[];previousSpline=upstreamHover=null;marquee=trimStroke=null;transform.cancel();draftPoint=anchorSnap=cursorSnap=null;anchor=hover=base=drag=preview=null;draw();status('Draft cancelled. Stored geometry is unchanged.');}
+function draftCancel(){equationTool.cancel();converter.cancel();dimensionUI.cancel();targetEditor.cancel();if(current)renderRelations();previewSequence++;arcStart=arcStartSnap=null;placementPoints=[];previousSpline=upstreamHover=null;marquee=trimStroke=null;transform.cancel();draftPoint=anchorSnap=cursorSnap=null;anchor=hover=base=drag=preview=null;draw();status('Draft cancelled. Stored geometry is unchanged.');}
 const sketchTools=['select','point','line','circle','rectangle','arc','polygon','spline','control-spline','equation-curve','split','trim','midpoint-line','center-rectangle','three-rectangle','three-circle','three-arc'];
 const toolNames={spline:'Spline','control-spline':'Control Point Spline','equation-curve':'Equation Driven Curve','midpoint-line':'Midpoint Line','center-rectangle':'Center Rectangle','three-rectangle':'3-Point Rectangle','three-circle':'3-Point Circle','three-arc':'3-Point Arc'};
 const multiClick={'control-spline':4,'three-rectangle':3,'three-circle':3,'three-arc':3};
@@ -101,11 +109,13 @@ for(const tool of sketchTools){
   mode=tool;$('model-content').dataset.constructionTool=tool;dimensionUI.cancel();draftCancel();
   for(const x of ribbon.querySelectorAll('[data-sketch-tool]'))x.setAttribute('aria-pressed',String(x===b||x.closest('.ribbon-split')?.contains(b)&&x.parentElement===b.closest('.ribbon-split')));
   for(const option of optionBox.children)option.hidden=option.dataset.toolOption!==mode;
+  if(tool==='equation-curve'){
+   choose(null);window.engineerDock.openPanel('inspector');equationTool.open().catch(error=>status(error.message));return;
+  }
   toolHelp.hidden=tool==='select';inspector.dataset.creation=String(!toolHelp.hidden);
   if(!toolHelp.hidden){
    choose(null);helpTitle.textContent=name;helpText.textContent=instructions[tool];
    window.engineerDock.openPanel('inspector');
-   if(tool==='equation-curve')equationTool.open().catch(error=>status(error.message));
    if(tool==='polygon'){sidesInput.value=polygonSides;sidesInput.focus();sidesInput.select();}
   }
   status(instructions[tool]);
@@ -117,17 +127,21 @@ async function sketchParameters(){
  const definition=graph.features.find(f=>f.id===current?.sketchId)?.definitionId;
  return graph.parameters.filter(p=>!p.definitionId||p.definitionId===definition);
 }
-const equationTool=equationInspector({document,mutate,context:()=>current,parameters:sketchParameters,
- construction:()=>$('edit-sketch-construction').checked,select:id=>{ribbon.querySelector('[data-sketch-tool=select]').click();choose({kind:'component',entityId:id,role:'entity'});},status});
-optionBox.append(equationTool.form);
+const equationTool=equationInspector({document,host:inspector,mutate,context:()=>current,parameters:sketchParameters,
+ construction:()=>$('edit-sketch-construction').checked,select:id=>{ribbon.querySelector('[data-sketch-tool=select]').click();if(id)choose({kind:'component',entityId:id,role:'entity'});},status,
+ onActive:active=>{inspector.dataset.operation=String(active);draw();}});
 const transform=sketchTransforms({document,host:inspector,ribbon,getState:()=>current?{id:current.sketchId,items,context:current.editContext}:null,
  selected:()=>selectionRefs(),selectMode:()=>ribbon.querySelector('[data-sketch-tool=select]').click(),label:ref=>refLabel(ref),mutate,
  parameters:sketchParameters,
  openInspector:()=>window.engineerDock.openPanel('inspector'),redraw:draw,status,onActive:active=>{inspector.dataset.operation=String(active);inspector.hidden=false;document.querySelector('.proof-inspector').hidden=true;}
 });
-function choose(value,{clearModel=true,remote=false,add=false,dimensionInput=false}={}){if(transform.consume(value))return;if(!dimensionInput&&dimensionUI.consume(value))return;if(targetEditor.consume(value)){window.dispatchEvent(new CustomEvent('engineer-local-view-change'));return;}if(add&&value?.kind==='component'){const refs=selectionRefs(),index=refs.findIndex(r=>r.entityId===value.entityId&&r.role===value.role);if(index>=0)refs.splice(index,1);else if(refs.length<16)refs.push({entityId:value.entityId,role:value.role});value=refs.length===1?{kind:'component',...refs[0]}:refs.length?{kind:'components',refs}:null;}if(!remote)window.dispatchEvent(new CustomEvent('engineer-local-view-change'));editDraft=false;selected=value;toolHelp.hidden=mode==='select'||!!value;inspector.dataset.creation=String(!toolHelp.hidden);if(value?.kind==='component')inspectionRefs=[{entityId:value.entityId,role:value.role}];else if(value?.kind==='components')inspectionRefs=structuredClone(value.refs);else if(value===null)inspectionRefs=[];if(clearModel){window.dispatchEvent(new CustomEvent('engineer-sketch-selection',{detail:value}));v.clear().catch(()=>{});document.querySelector('.proof-inspector').hidden=true;inspector.hidden=false;}renderList();draw();}
+function choose(value,{clearModel=true,remote=false,add=false,dimensionInput=false}={}){if(transform.consume(value))return;if(!dimensionInput&&dimensionUI.consume(value))return;if(targetEditor.consume(value)){window.dispatchEvent(new CustomEvent('engineer-local-view-change'));return;}if(add&&value?.kind==='component'){const refs=selectionRefs(),index=refs.findIndex(r=>r.entityId===value.entityId&&r.role===value.role);if(index>=0)refs.splice(index,1);else if(refs.length<16)refs.push({entityId:value.entityId,role:value.role});value=refs.length===1?{kind:'component',...refs[0]}:refs.length?{kind:'components',refs}:null;}if(!remote)window.dispatchEvent(new CustomEvent('engineer-local-view-change'));editDraft=false;selected=value;toolHelp.hidden=mode==='select'||mode==='equation-curve'||!!value;inspector.dataset.creation=String(!toolHelp.hidden);if(value?.kind==='component')inspectionRefs=[{entityId:value.entityId,role:value.role}];else if(value?.kind==='components')inspectionRefs=structuredClone(value.refs);else if(value===null)inspectionRefs=[];if(clearModel){window.dispatchEvent(new CustomEvent('engineer-sketch-selection',{detail:value}));v.clear().catch(()=>{});document.querySelector('.proof-inspector').hidden=true;inspector.hidden=false;}renderList();draw();}
 const selectionRefs=()=>selected?.kind==='components'?selected.refs:selected?.kind==='component'?[{entityId:selected.entityId,role:selected?.role}]:[];
-const manager=createSketchManager({getState:()=>current?{id:current.sketchId,items:items.filter(e=>!e.referenceOnly&&(!e.external||e.converted)),selected}:null,select:(ref,options)=>{
+const manager=createSketchManager({async editOperation(operation){
+ if(operation.kind==='convert')return converter.edit(operation);
+ if(operation.kind==='transform')return transform.edit(operation);
+ ribbon.querySelector('[data-sketch-tool=equation-curve]').click();return equationTool.open(operation);
+},getState:()=>current?{id:current.sketchId,items:items.filter(e=>!e.referenceOnly&&(!e.external||e.converted)),selected,operations:current.operations}:null,select:(ref,options)=>{
  if(mode!=='select')ribbon.querySelector('[data-sketch-tool=select]').click();
  choose(ref,options);
 },hover:ref=>{hover=ref;draw();},remove:entityIds=>mutate('sketch.entities.delete',{sketchId:current.sketchId,entityIds}),construction:async(id,construction)=>{const entity=structuredClone(items.find(e=>e.id===id));entity.construction=construction;await mutate('sketch.entity.update',{sketchId:current.sketchId,entity,unit:'mm'});}});
@@ -139,7 +153,7 @@ function organizeSketchRibbon(){
  const split=(name,alternatives)=>commandMenu(tool(name),alternatives.map(tool));
  const smart=$('sketch-dimension-tool');
  const dimensionMenu=commandMenu(smart,[...ribbon.querySelectorAll('[data-dimension-tool]')],'large');
- ribbon.prepend(sizeCommand($('edit-sketch-cancel'),'small'),sizeCommand($('edit-sketch-new'),'large'),sizeCommand($('edit-sketch-open'),'large'),dimensionMenu,sizeCommand(tool('select'),'large'));
+ ribbon.prepend(sizeCommand($('edit-sketch-new'),'large'),sizeCommand($('edit-sketch-open'),'large'),dimensionMenu,sizeCommand(tool('select'),'large'));
  const tools=$('edit-sketch-tools');
  tools.replaceChildren(commandGrid([
   [split('line',['midpoint-line']),split('rectangle',['center-rectangle','three-rectangle']),split('circle',['three-circle'])],
@@ -149,7 +163,7 @@ function organizeSketchRibbon(){
  const construction=$('edit-sketch-construction'),label=construction.parentElement;
  construction.role='switch';construction.setAttribute('aria-label','Construction');label.className='sketch-construction-control';
  label.replaceChildren(construction);label.insertAdjacentHTML('afterbegin',icon('construction'));label.title='Construction geometry';
- ribbon.append(commandColumn([externalButton,$('sketch-mirror'),commandMenu($('sketch-pattern'),[$('sketch-circular-pattern')],'medium')]));
+ ribbon.append(commandColumn([externalButton,$('sketch-mirror'),commandMenu($('sketch-pattern'),[$('sketch-circular-pattern')],'medium')]),sizeCommand($('edit-sketch-cancel'),'large'));
 }
 organizeSketchRibbon();
 const targetEditor=createSketchTargets({getState:()=>current?{id:current.sketchId,items,constraints:current.constraints,selected,context:current.editContext}:null,mutate,render:()=>{renderRelations();draw();},status,onDraft:active=>editDraft=active,onHover:ref=>{targetHover=ref;draw();}});
@@ -171,19 +185,34 @@ function svg(tag,attributes,parent=$('edit-sketch-canvas')){const n=document.cre
 warmSketchSolver();
 const colors={UnderDefined:'#0000ff',FullyDefined:'#000000',Inconsistent:'#ff0000',LostReference:'#00a000',SingularOrIndeterminate:'#ff0000'};
 function draw(){$('edit-sketch-cancel').disabled=!(current&&(anchor||drag||marquee||trimStroke||mode==='equation-curve'||converter.active||transform.active||dimensionUI.active||editDraft));if(!current||panel.hidden)return;const sourceRefs=selected?.kind==='constraint'?current.constraints.find(c=>c.id===selected.constraintId)?.refs??[]:selectionRefs();const targets=sourceRefs.map(ref=>items.find(e=>e.id===ref.entityId)?.external).filter(Boolean);window.engineerSketchReferences?.(converter.active?converter.selections:v.entities().filter(e=>targets.some(t=>e.kind===t.kind&&e.producerId===t.producerId&&e.role===t.role&&JSON.stringify(e.occurrencePath)===JSON.stringify(t.occurrencePath))).map(e=>e.id));const frame=r.presentedFrame;if(!frame)return;const rect=canvas.getBoundingClientRect(),parent=panel.parentElement.getBoundingClientRect();Object.assign(panel.style,{left:(rect.left-parent.left)+'px',top:(rect.top-parent.top)+'px',width:rect.width+'px',height:rect.height+'px'});const root=$('edit-sketch-canvas');root.replaceChildren();root.setAttribute('viewBox',`0 0 ${frame.width} ${frame.height}`);const scale=frame.width/Math.max(1,rect.width),p=q=>project(world(q),frame.matrix,frame.width,frame.height),activeConstraint=current.constraints?.find(c=>c.id===selected?.constraintId),affected=new Set(activeConstraint?.refs.filter(ref=>ref.role==='entity').map(r=>r.entityId));const hoverConstraint=current.constraints?.find(c=>c.id===relationHover),relatedHover=new Set(hoverConstraint?.refs.filter(ref=>ref.role==='entity').map(r=>r.entityId));
- if(trimStroke){const [a,b]=[trimStroke.start,trimStroke.end].map(p);svg('line',{x1:a[0],y1:a[1],x2:b[0],y2:b[1],stroke:'#ff8000','stroke-width':2*scale,'stroke-dasharray':4*scale},root);}
- const featureSelected=v.selection?.kind==='feature'&&v.selection.producerId===current.sketchId,featureHovered=window.engineerHoveredSource?.()?.id===current.sketchId;const drawOne=(e,draft=false)=>{if(e.referenceOnly||e.external&&!e.converted)return;const active=featureSelected||selected?.entityId===e.id&&selected?.role==='entity'||selectionRefs().some(ref=>ref.entityId===e.id&&ref.role==='entity')||affected.has(e.id),over=featureHovered||relatedHover.has(e.id)||targetHover?.entityId===e.id&&targetHover?.role==='entity'||hover?.entityId===e.id&&hover?.role==='entity',baseColor=colors[diagnosis?.entityStates[e.id]]??'#0000ff',color=draft==='operation'?'#e9bf00':active?'#7979ff':over||draft?'#ff8000':baseColor;if(e.referenceOnly&&!active&&!over&&!selectionRefs().some(ref=>ref.entityId===e.id)&&!activeConstraint?.refs.some(ref=>ref.entityId===e.id)&&!hoverConstraint?.refs.some(ref=>ref.entityId===e.id))return;let seg=[];if(e.type==='line')seg=[[e.a,e.b]];else if(e.type==='rectangle'){const q=rectanglePoints(e.a,e.b,e.corner)??[];seg=q.map((a,i)=>[a,q[(i+1)%4]]);}else if(e.type==='spline')seg=splineSegments(e);else if(e.type==='equation-curve')seg=equationSegments(e);else if(circular(e))seg=circularSegments(e);else if(e.type==='polygon'){const q=polygonPoints(e.center,e.vertex,e.sides);seg=q.map((a,i)=>[a,q[(i+1)%q.length]]);}const d=segmentPath(seg,p),g=svg('g',{'data-sketch-entity':e.id??'draft'});
+ if(trimStroke){svg('polyline',{points:trimStroke.points.map(q=>p(q).slice(0,2).join(',')).join(' '),fill:'none',stroke:'#ff8000','stroke-width':2*scale,'stroke-dasharray':4*scale},root);}
+ const featureSelected=v.selection?.kind==='feature'&&v.selection.producerId===current.sketchId,featureHovered=window.engineerHoveredSource?.()?.id===current.sketchId;const drawOne=(e,draft=false)=>{if(e.referenceOnly||e.external&&!e.converted)return;const active=transform.highlighted.some(ref=>ref.entityId===e.id&&ref.role==='entity')||featureSelected||selected?.entityId===e.id&&selected?.role==='entity'||selectionRefs().some(ref=>ref.entityId===e.id&&ref.role==='entity')||affected.has(e.id),over=featureHovered||relatedHover.has(e.id)||targetHover?.entityId===e.id&&targetHover?.role==='entity'||hover?.entityId===e.id&&hover?.role==='entity',baseColor=colors[diagnosis?.entityStates[e.id]]??'#0000ff',color=draft==='operation'?'#e9bf00':draft==='active-reference'?'#7979ff':active?'#7979ff':over||draft?'#ff8000':baseColor;if(e.referenceOnly&&!active&&!over&&!selectionRefs().some(ref=>ref.entityId===e.id)&&!activeConstraint?.refs.some(ref=>ref.entityId===e.id)&&!hoverConstraint?.refs.some(ref=>ref.entityId===e.id))return;let seg=[];if(e.type==='line')seg=[[e.a,e.b]];else if(e.type==='rectangle'){const q=rectanglePoints(e.a,e.b,e.corner)??[];seg=q.map((a,i)=>[a,q[(i+1)%4]]);}else if(e.type==='spline')seg=splineSegments(e);else if(e.type==='equation-curve')seg=equationSegments(e);else if(circular(e))seg=circularSegments(e);else if(e.type==='polygon'){const q=polygonPoints(e.center,e.vertex,e.sides);seg=q.map((a,i)=>[a,q[(i+1)%q.length]]);}const d=segmentPath(seg,p),g=svg('g',{'data-sketch-entity':e.id??'draft'});
  if(!draft&&e.type==='spline'&&selectionRefs().some(ref=>ref.entityId===e.id))for(const [endpoint,control] of [['a','control1'],['b','control2']]){
   const [a,b]=[p(e[endpoint]),p(e[control])],angle=Math.atan2(b[1]-a[1],b[0]-a[0]),wing=5*scale;
   const tips=[angle-.55,angle+.55].map(theta=>[b[0]-Math.cos(theta)*wing,b[1]-Math.sin(theta)*wing]);
   const role='handle-'+endpoint,selectedHandle=selectionRefs().some(ref=>ref.entityId===e.id&&ref.role===role)||activeConstraint?.refs.some(ref=>ref.entityId===e.id&&ref.role===role);
   svg('path',{d:segmentPath([[a,b],[b,tips[0]],[b,tips[1]]],q=>q),stroke:selectedHandle?'#7979ff':hover?.entityId===e.id&&hover.role===role?'#ff8000':'#657d96',fill:'none','stroke-width':1.5*scale},g);
- }if(d){svg('path',{d,stroke:color,fill:'none','stroke-width':(active?3:1.8)*scale,...(e.construction?{'stroke-dasharray':`${7*scale} ${4*scale}`}:{})},g);if(!draft)svg('path',{d,stroke:'transparent',fill:'none','stroke-width':14*scale,'pointer-events':'stroke','data-sketch-hit':e.id,'data-role':'entity'},g);}if(draft==='operation'&&e.type==='point'){const [cx,cy]=p(e.point);svg('circle',{cx,cy,r:3.5*scale,fill:color},g);}if(!draft)for(const role of refs(e)){if(role.startsWith('control')&&!selectionRefs().some(ref=>ref.entityId===e.id))continue;const a=p(point(e,role)),isSelected=selectionRefs().some(ref=>ref.entityId===e.id&&ref.role===role)||activeConstraint?.refs.some(ref=>ref.entityId===e.id&&ref.role===role),isHover=targetHover?.entityId===e.id&&targetHover?.role===role||hoverConstraint?.refs.some(ref=>ref.entityId===e.id&&ref.role===role)||hover?.entityId===e.id&&hover?.role===role,pc=isSelected||active||featureSelected||affected.has(e.id)?'#7979ff':isHover||featureHovered?'#ff8000':colors[diagnosis?.pointStates?.[e.id+':'+role]]??baseColor;if(e.type!=='point'&&!active&&!over&&!isSelected&&!isHover&&!selectionRefs().some(ref=>ref.entityId===e.id)&&hover?.entityId!==e.id)continue;svg(role==='midpoint'?'rect':'circle',{...(role==='midpoint'?{x:a[0]-3.5*scale,y:a[1]-3.5*scale,width:7*scale,height:7*scale}:{cx:a[0],cy:a[1],r:(isSelected?5:3.5)*scale}),fill:pc,stroke:pc,'stroke-width':scale,'data-sketch-point':e.id,'data-role':role},g);svg('circle',{cx:a[0],cy:a[1],r:8*scale,fill:'transparent','pointer-events':'all','data-sketch-hit':e.id,'data-role':role},g);}};
+ }if(d){svg('path',{d,stroke:color,fill:'none','stroke-width':(active?3:1.8)*scale,...(e.construction?{'stroke-dasharray':`${7*scale} ${4*scale}`}:{})},g);if(!draft)svg('path',{d,stroke:'transparent',fill:'none','stroke-width':14*scale,'pointer-events':'stroke','data-sketch-hit':e.id,'data-role':'entity'},g);}if((draft==='operation'||draft==='active-reference')&&e.type==='point'){const [cx,cy]=p(e.point);svg('circle',{cx,cy,r:3.5*scale,fill:color},g);}if(!draft)for(const role of refs(e)){if(role.startsWith('control')&&!selectionRefs().some(ref=>ref.entityId===e.id))continue;const a=p(point(e,role)),isSelected=selectionRefs().some(ref=>ref.entityId===e.id&&ref.role===role)||activeConstraint?.refs.some(ref=>ref.entityId===e.id&&ref.role===role),isHover=targetHover?.entityId===e.id&&targetHover?.role===role||hoverConstraint?.refs.some(ref=>ref.entityId===e.id&&ref.role===role)||hover?.entityId===e.id&&hover?.role===role,pc=isSelected||active||featureSelected||affected.has(e.id)?'#7979ff':isHover||featureHovered?'#ff8000':colors[diagnosis?.pointStates?.[e.id+':'+role]]??baseColor;if(e.type!=='point'&&!active&&!over&&!isSelected&&!isHover&&!selectionRefs().some(ref=>ref.entityId===e.id)&&hover?.entityId!==e.id)continue;svg(role==='midpoint'?'rect':'circle',{...(role==='midpoint'?{x:a[0]-3.5*scale,y:a[1]-3.5*scale,width:7*scale,height:7*scale}:{cx:a[0],cy:a[1],r:(isSelected?5:3.5)*scale}),fill:pc,stroke:pc,'stroke-width':scale,'data-sketch-point':e.id,'data-role':role},g);svg('circle',{cx:a[0],cy:a[1],r:8*scale,fill:'transparent','pointer-events':'all','data-sketch-hit':e.id,'data-role':role},g);}};
  for(const e of preview??items)drawOne(e);
  for(const e of transform.preview())drawOne(e,'operation');
+ for(const ref of transform.highlighted){
+  const entity=items.find(e=>e.id===ref.entityId);
+  if(!entity)continue;
+  if(ref.role==='entity'){if(entity.referenceOnly)drawOne({...entity,referenceOnly:false,external:undefined},'active-reference');}
+  else{const value=pointAt(items,ref);if(value)drawOne({type:'point',point:value},'active-reference');}
+ }
+ for(const ref of sourceRefs){
+  const entity=items.find(e=>e.id===ref.entityId);
+  if(!entity?.referenceOnly||!['silhouette','sketch'].includes(entity.external?.kind))continue;
+  if(ref.role==='entity')drawOne({...entity,referenceOnly:false,external:undefined},'active-reference');
+  else{const value=pointAt(items,ref);if(value)drawOne({type:'point',point:value},'active-reference');}
+ }
+ for(const geometry of converter.highlighted)drawOne(geometry,'active-reference');
  if(upstreamHover){
   drawOne(upstreamHover,true);
-  if(upstreamHover.type==='point'){const [cx,cy]=p(upstreamHover.point);svg('circle',{cx,cy,r:4*scale,fill:'#ff8000'},root);}
+  const marker=upstreamHover.type==='point'?upstreamHover.point:
+   ['a','b','center'].includes(upstreamHoverRole)?upstreamHover[upstreamHoverRole]:null;
+  if(marker){const [cx,cy]=p(marker);svg('circle',{cx,cy,r:4*scale,fill:'#ff8000'},root);}
  }
  if(marquee?.moved){
   const a=marquee.start,b=marquee.end,x=Math.min(a[0],b[0]),y=Math.min(a[1],b[1]);
@@ -304,9 +333,9 @@ let sourceCache=null;
    if(!eligible())return local;
    const origin=originAt(event),overLocal=!origin&&localHits(event).length>0;
    const kind=picked?.kind??r.kind(picked?.selectionId);
-   if(!overLocal&&!origin&&!['vertex','edge','datum'].includes(kind)){
-    const projected=projectedReferenceAt(event);
-    upstreamHover=projected?.geometry??null;
+   const projected=!overLocal&&!origin?projectedReferenceAt(event):null;
+   if(projectedEndpoint(projected,kind)||projected&&!['vertex','edge','datum'].includes(kind)){
+    upstreamHover=projected?.geometry??null;upstreamHoverRole=projected?.role??null;
     if(projected&&!local.ref&&!event.ctrlKey){
      const {geometry,role,target}=projected,q=coordinate(event),radial=mode==='circle'&&anchor&&role==='entity';
      const parameter=geometry.type!=='point'?nearestParameter(geometry,radial?anchor:q):null;
@@ -364,7 +393,9 @@ let sourceCache=null;
    for(const sketch of scene.sketches??[])if(sketch.id!==current.sketchId)
     for(const entity of sketch.entities)if(['line','point','circle'].includes(entity.type))add({kind:'sketch',definitionId:sketch.definitionId,producerId:sketch.id,role:entity.id,occurrencePath:[sketch.definitionId]});
    for(const model of scene.models??[]){
-    for(const cylinder of model.mesh.cylinders??[])for(const side of [':a',':b'])
+    for(const outline of model.mesh.sketchOutlines??[])
+     add({kind:'silhouette',definitionId:model.definitionId,producerId:model.featureId,role:outline.role,occurrencePath:[model.definitionId]});
+    for(const cylinder of model.mesh.sketchOutlines?[]:model.mesh.cylinders??[])for(const side of [':a',':b'])
      add({kind:'silhouette',definitionId:model.definitionId,producerId:model.featureId,role:cylinder.role+side,occurrencePath:[model.definitionId]});
     for(const edge of model.mesh.edges??[]){
     const normal=edge.curve?.normal;
@@ -378,24 +409,26 @@ let sourceCache=null;
   if(!hit)return null;
   return {...choices.find(item=>item.geometry.id===hit.ref.entityId),role:hit.ref.role};
  }
+ const projectedEndpoint=(projected,kind)=>projected?.target.kind==='silhouette'&&['a','b'].includes(projected.role)&&!['vertex','datum'].includes(kind);
  async function pickExternal(event){
-  const source=await sourceAt(event);
-  if(source&&['vertex','edge','datum'].includes(source.target.kind))return externalRefs.resolve(source.target,source.picked.componentRole);
   const projected=projectedReferenceAt(event);
-  if(projected)return externalRefs.resolve(projected.target,projected.role);
+  let source;
+  try{source=await sourceAt(event);}catch(error){if(!projected||!/LostReference|TransientDisplayOnly|UnsupportedCapability/i.test(error.message))throw error;}
+  const kind=source?.target.kind;
+  if(projectedEndpoint(projected,kind)||projected&&!['vertex','edge','datum'].includes(kind))return externalRefs.resolve(projected.target,projected.role);
   return source?externalRefs.resolve(source.target,source.picked.componentRole):null;
  }
 let hoverSequence=0;
 function probeExternal(event,local){
  const sequence=++hoverSequence;
- const show=geometry=>{if(upstreamHover!==geometry){upstreamHover=geometry;draw();}};
+ const show=(geometry,role=null)=>{if(upstreamHover!==geometry||upstreamHoverRole!==role){upstreamHover=geometry;upstreamHoverRole=role;draw();}};
  if(local){show(null);window.engineerHoverReference?.(0);return;}
  const position=pointerPosition(event);
  Promise.resolve(r.info.state==='ready'?r.pick(...position):r.referencePick?.(...position)).then(pick=>{
   if(sequence!==hoverSequence||!current)return;
   const kind=pick?.kind??r.kind(pick?.selectionId);
-  const projected=['vertex','edge','datum'].includes(kind)?null:projectedReferenceAt(event);
-  show(projected?.geometry??null);
+  const candidate=projectedReferenceAt(event),projected=projectedEndpoint(candidate,kind)||!['vertex','edge','datum'].includes(kind)?candidate:null;
+  show(projected?.geometry??null,projected?.role);
   window.engineerHoverReference?.(projected?0:pick?.selectionId??0);
  }).catch(()=>{});
 }
@@ -407,8 +440,11 @@ document.addEventListener('click',event=>{
  event.preventDefault();event.stopImmediatePropagation();
  try{if(converter.active){converter.pick(item,r.scene.datums.find(d=>d.id===item.id)?.selectionId);return;}const ref=externalRefs.resolve(item);if(ref)choose(ref,{add:event.shiftKey});else status('Choose a vertex, edge, Origin or a reference intersecting the sketch plane.');}catch(error){status(error.message);}
 },true);
-function onDown(event){if(!current||busy||event.button!==0||event.target.closest?.('.sketch-heading'))return;if(event.target!==canvas&&!panel.contains(event.target))return;if(event.altKey||$('proof-mode').value!=='Select')return;event.preventDefault();event.stopImmediatePropagation();canvas.focus({preventScroll:true});if(converter.active){if(r.info.state!=='ready'&&!originAt(event)&&!r.referencePick?.(...pointerPosition(event))){status('Renderer unavailable; no source geometry accepted. Choose a datum from Manager.');return;}sourceAt(event).then(source=>{if(source)converter.pick(source.target,source.picked.selectionId);}).catch(e=>status(e.message));return;}if(mode==='equation-curve')return;if(mode==='trim'&&!localHits(event).some(hit=>hit.ref.role==='entity')){
-  const start=coordinate(event);trimStroke={id:event.pointerId,start,end:start};
+function onDown(event){if(!current||busy||event.button!==0||event.target.closest?.('.sketch-heading'))return;if(event.target!==canvas&&!panel.contains(event.target))return;if(event.altKey||$('proof-mode').value!=='Select')return;event.preventDefault();event.stopImmediatePropagation();canvas.focus({preventScroll:true});if(converter.active){sourceAt(event).then(source=>{
+ if(source&&source.target.kind!=='face')converter.pick(source.target,source.picked.selectionId);
+ else{const projected=projectedReferenceAt(event);if(projected)converter.pick(projected.target);else if(source)converter.pick(source.target,source.picked.selectionId);}
+ }).catch(e=>status(e.message));return;}if(mode==='equation-curve')return;if(mode==='trim'&&!localHits(event).some(hit=>hit.ref.role==='entity')){
+  const start=coordinate(event);trimStroke={id:event.pointerId,points:[start]};draw();
   canvas.setPointerCapture?.(event.pointerId);return;
  }if(mode!=='select'){const owner=current,tool=mode;placeTask=placeTask.then(()=>{if(current===owner&&mode===tool&&!busy)return place(event);}).catch(e=>status(e.message));return;}const target=hit(event);if(!target){
   if(originAt(event)){pickExternal(event).then(ref=>choose(ref,{add:event.shiftKey})).catch(e=>status(e.message));return;}
@@ -418,7 +454,14 @@ function onDown(event){if(!current||busy||event.button!==0||event.target.closest
 async function constrainedPreview(data,drag,ctx){if(!diagnosis?.previewFallback){try{return await solvePreview(data,drag);}catch(error){if(!/unsafe-eval|Content Security Policy|Evaluating a string|worker failed|deadline/i.test(error.message))throw error;if(diagnosis){diagnosis.previewFallback=true;diagnosis.previewFallbackReason=error.message;}}}const started=performance.now(),result=await invoke('sketch.preview',{sketchId:current.sketchId,...drag},'ReadOnly',ctx??current.editContext);fallbackPreviewTimings.push(performance.now()-started);if(fallbackPreviewTimings.length>128)fallbackPreviewTimings.shift();if(result.previewUnavailable)throw Error('This sketch exceeds the interactive preview budget. The source is unchanged.');return result;}
 async function previewDrag(){if(previewTask||!previewTarget||!drag)return;const target=previewTarget;previewTarget=null;const seq=previewSequence,active=drag;previewTask=(async()=>{try{const result=await constrainedPreview(solverData(),{ref:active.ref,target},active.context);if(drag===active&&seq===previewSequence&&result.valid){preview=result.entities;draw();}}catch(e){if(drag===active)status(e.message);}finally{previewTask=null;if(previewTarget&&drag)previewDrag();}})();}
 function onMove(event){if(!current||busy||event.target&&event.target.ownerDocument!==canvas.ownerDocument||event.target.closest?.('.cad-selection-choices,.cad-feature-menu'))return;if(event.target.closest?.('[data-source-id]')){if(upstreamHover){upstreamHover=null;draw();}return;}lastSketchPointer={clientX:event.clientX,clientY:event.clientY,ctrlKey:event.ctrlKey,target:event.target};
- if(trimStroke&&trimStroke.id===event.pointerId){trimStroke.end=coordinate(event);draw();return;}
+ if(trimStroke&&trimStroke.id===event.pointerId){for(const sample of event.getCoalescedEvents?.().length?event.getCoalescedEvents():[event]){
+    const point=coordinate(sample),last=trimStroke.points.at(-1);
+    if(Math.hypot(...point.map((n,i)=>n-last[i]))>1e-5){
+     if(trimStroke.points.length===256)trimStroke.points=trimStroke.points.filter((_,i)=>i%2===0);
+     trimStroke.points.push(point);
+    }
+   }
+   draw();return;}
  if(marquee&&marquee.id===event.pointerId){
   marquee.end=pointerPosition(event);
   marquee.moved||=Math.hypot(...marquee.end.map((n,i)=>n-marquee.start[i]))>4;
@@ -435,9 +478,10 @@ function onMove(event){if(!current||busy||event.target&&event.target.ownerDocume
  }const box=canvas.getBoundingClientRect();if(event.clientX<box.left||event.clientX>box.right||event.clientY<box.top||event.clientY>box.bottom){window.engineerHoverReference?.(0);if(hover){hover=null;draw();}return;}const next=converter.active?null:hit(event);probeExternal(event,next);if(JSON.stringify(next)!==JSON.stringify(hover)){hover=next;draw();}}
 async function onUp(event){
  if(trimStroke&&trimStroke.id===event.pointerId&&event.button===0){
-  const {start}=trimStroke,end=coordinate(event);trimStroke=null;draw();
-  if(Math.hypot(...end.map((n,i)=>n-start[i]))>0.01)
-   await mutate('sketch.trim',{sketchId:current.sketchId,newEntityId:'trim-'+crypto.randomUUID(),stroke:[start,end]});
+  const {points}=trimStroke,end=coordinate(event);trimStroke=null;draw();
+  if(Math.hypot(...end.map((n,i)=>n-points.at(-1)[i]))>1e-5)points.push(end);
+  if(points.length>1)
+   await mutate('sketch.trim',{sketchId:current.sketchId,newEntityId:'trim-'+crypto.randomUUID(),stroke:points});
   return;
  }
  if(marquee&&marquee.id===event.pointerId&&event.button===0){

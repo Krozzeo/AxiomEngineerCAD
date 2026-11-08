@@ -32,3 +32,10 @@ export function operationSelection(document,{title,activate,remove}){
   }
  }};
 }
+
+
+export function operationPanel(document,host,id){
+ const element=document.createElement('section'),heading=document.createElement('h3'),actions=document.createElement('div');
+ element.id=id;element.className='operation-inspector';element.hidden=true;actions.className='operation-inspector-actions';
+ host.prepend(element);return {element,heading,actions};
+}

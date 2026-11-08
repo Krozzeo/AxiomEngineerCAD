@@ -19,6 +19,11 @@ export function externalGeometry(scene,target,frame){
   const occurrences=scene.occurrences.filter(o=>o.featureId===target.producerId&&o.definitionId===target.definitionId&&JSON.stringify(o.path)===JSON.stringify(target.occurrencePath));
   if(occurrences.length!==1)fail('External producer is missing, suppressed or downstream of this sketch.');
   const mesh=scene.models.find(m=>m.definitionId===target.definitionId)?.mesh;
+  if(target.kind==='silhouette'&&target.role.startsWith('outline:')){
+   const geometry=mesh?.sketchOutlines?.find(item=>item.role===target.role);
+   if(!geometry)fail('The exact silhouette no longer resolves on this sketch plane.');
+   const {role,...source}=geometry;return source;
+  }
   if(target.kind==='silhouette'){
    const side=target.role.slice(-2),matches=mesh?.cylinders?.filter(c=>c.role===target.role.slice(0,-2))??[];
    if(matches.length!==1||![':a',':b'].includes(side))fail('The cylindrical silhouette is missing or ambiguous.');

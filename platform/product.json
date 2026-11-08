@@ -3,7 +3,7 @@
   "protocolVersion": 1,
   "productId": "axiom.engineer-cad",
   "displayName": "Axiom Engineer CAD",
-  "productVersion": "0.3.2",
+  "productVersion": "0.3.3",
   "platformApiRange": ">=0.1.0 <0.2.0",
   "projectFormats": [
     {

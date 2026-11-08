@@ -232,3 +232,42 @@ test('a spline handle is an editable line reference for a driving dimension and 
  near(spline.a[1],spline.control1[1]);
  near(Math.abs(spline.a[0]-spline.control1[0]),8);
 });
+
+
+test('exact half-cylinder outline resolves to the expected lateral span on the right sketch',async()=>{
+ const doc=extendedSketchDemo(),sketch=feature(doc);
+ sketch.data.plane={kind:'datum',role:'yz'};
+ const proof=await buildProof(doc,{viewportOnly:true,rollbackAt:sketch.id}),model=proof.scene.models[0];
+ const outline=model.mesh.sketchOutlines.find(e=>e.type==='line');
+ assert.deepEqual([outline.a,outline.b],[[16,0],[16,8]]);
+ const target={kind:'silhouette',role:outline.role,definitionId:model.definitionId,producerId:model.featureId,occurrencePath:[model.definitionId]};
+ const {role,...geometry}=outline;
+ let next=run(doc,'entity.add',{entity:{id:'side-point',type:'point',point:[18,2],construction:false},unit:'mm'});
+ const after=run(next,'constraint.add',{constraint:relation('side-coincidence','coincident',[ref('side-point','point'),ref('side-outline','a')]),
+  externalEntities:[{...geometry,id:'side-outline',referenceOnly:true,external:target}]});
+ const checked=await verifyCommand({before:next,after,normalize:true,requireSolved:true,sketchId:sketch.id});
+ assert.deepEqual(feature(checked.candidate).data.entities.find(e=>e.id==='side-point').point,[16,0]);
+ sketch.data.plane={kind:'datum',role:'xz'};
+ const other=await buildProof(doc,{viewportOnly:true,rollbackAt:sketch.id});
+ assert.equal(other.scene.models[0].mesh.sketchOutlines.length,0);
+});
+
+test('pattern rebuilds after constrained source drag and keeps the copied relationships and IDs',async()=>{
+ let doc=extendedSketchDemo();
+ const add=(id,a,b)=>doc=run(doc,'entity.add',{entity:{id,type:'line',a,b,construction:false},unit:'mm'});
+ add('chain-a',[-60,-40],[-55,-40]);add('chain-b',[-55,-40],[-55,-35]);
+ doc=run(doc,'constraint.add',{constraint:relation('chain-join','coincident',[ref('chain-a','b'),ref('chain-b','a')])});
+ const settings={id:'retained-pattern',entityIds:['chain-a','chain-b'],reference:ref('practice-axis'),mode:'linear',count:2,spacing:8};
+ doc=run(doc,'pattern',settings);
+ const old=feature(doc).data.patterns[0];
+ assert.equal(old.inherited.length,1);
+ const drag={ref:ref('chain-a','a'),target:[-64,-41]};
+ const proposed=run(doc,'drag',drag),checked=await verifyCommand({before:doc,after:proposed,normalize:true,requireSolved:true,sketchId:'extended-practice',drag});
+ const data=feature(checked.candidate).data,lookup=id=>data.entities.find(e=>e.id===id);
+ assert.deepEqual(data.patterns[0].generated,old.generated);
+ near(lookup(old.generated[0]).a[1]-lookup('chain-a').a[1],8);
+ const edited=run(checked.candidate,'pattern',{...settings,replace:true,spacing:14});
+ assert.deepEqual(feature(edited).data.patterns[0].generated,old.generated);
+ const renamed=feature(edited).data.entities.find(e=>e.id===old.generated[0]);
+ near(renamed.a[1]-lookup('chain-a').a[1],14);
+});
