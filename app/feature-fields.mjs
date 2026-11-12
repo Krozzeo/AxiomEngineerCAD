@@ -48,6 +48,7 @@ export function featureFields({document,host,owner,graph,scene,onChange,status,o
  const choices=featureChoices(graph,scene).filter(allowed),tables=[],fields=new Map(),limitPanels=new Map();
  const name=document.createElement('label'),nameInput=document.createElement('input');name.textContent='Name';nameInput.dataset.extrusionName='true';nameInput.value=settings.name;nameInput.maxLength=128;name.append(nameInput);host.append(name);
  const form=settings.form,repeating=form==='repeat',revolve=form==='revolve';if(repeating)owner.depth={};
+ if(repeating&&settings.repeat.kind==='mirror'&&!settings.repeat.reference&&settings.repeat.axis==='y')state.repeat.offsetMm=-settings.repeat.offsetMm;
  function value(key,title,number,unitName,parameterId,onCommit){
   const options=graph.parameters.filter(p=>p.unit===unitName||unitName==='mm'&&p.unitMode==='auto'&&!p.targets?.length).map(p=>({value:p.id,label:p.name,number:unitName==='rad'?p.value*180/Math.PI:p.value,depth:p.value}));
   const field=operationValue(document,{field:key,label:title,options,value:number,id:parameterId,

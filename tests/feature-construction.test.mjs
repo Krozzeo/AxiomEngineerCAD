@@ -91,3 +91,10 @@ test('Referenced datums follow parameters and reject incompatible references wit
  assert.throws(()=>invoke(doc,'reference.set',{featureId:'bad-plane',kind:'plane',name:'Conflicting plane',references:[{target:target('xy'),relation:'coincident',value:0},{target:target('yz'),relation:'parallel',value:0}]}),{code:'ConstraintConflict'});
  assert.equal(JSON.stringify(doc),saved);
 });
+
+test('Legacy Y mirror offsets agree with the explicitly oriented Top reference plane',async()=>{
+ const source=base(),repeat={kind:'mirror',sourceFeatureId:'base',axis:'y',offsetMm:2,angleDeg:90,count:2};
+ const legacy=extrude(source,'mirror','base-sketch','none',{baseFeatureId:'base',form:'repeat',repeat});
+ const referenced=extrude(source,'mirror','base-sketch','none',{baseFeatureId:'base',form:'repeat',repeat:{...repeat,offsetMm:-2,reference:{target:target('xz')}}});
+ assert.deepEqual((await regenerateExtrusions(referenced)).bounds,(await regenerateExtrusions(legacy)).bounds);
+});
