@@ -41,3 +41,19 @@
 .dimension-inspector .sketch-section-heading #sketch-targets-heading{margin-right:auto}
 
 .operation-value-table{width:100%;border-collapse:collapse}
+
+.feature-boolean button,.feature-limit-modes button{display:inline-flex;align-items:center;justify-content:center;width:34px;height:32px;padding:5px;margin:2px;background:#17283a;border:1px solid #405971}
+.feature-boolean button[aria-pressed=true],.feature-limit-modes button[aria-pressed=true]{background:#b6e7ff;color:#0c263a;border-color:#73cfff}
+.feature-boolean svg,.feature-limit-modes svg{width:22px;height:22px}
+[data-limit-side]{border-top:1px solid #34495e;padding:4px 0 12px}
+[data-limit-side] h5{margin:10px 0;font-size:13px}
+#feature-operation-fields .operation-value{display:flex;gap:5px;align-items:center}
+#feature-operation-fields .operation-value>button{flex:none;width:32px;height:32px;padding:5px}
+#feature-operation-fields .operation-selection .search-select{margin-top:5px}
+.feature-build-column{margin-left:auto}
+[data-operations=Features] #cad-cancel-feature{margin-left:auto}
+[data-operations=Features] .feature-build-column{margin-left:12px;min-width:130px}
+.feature-build-column label{display:flex;align-items:center;gap:6px;font-size:11px}
+.feature-build-column select{min-width:90px;max-width:145px;font-size:10px}
+
+.operation-selection-heading{display:flex;gap:8px;align-items:center}.operation-selection-heading h4{flex:1}.operation-selection-heading button{width:28px;height:28px;padding:4px}

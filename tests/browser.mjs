@@ -159,6 +159,7 @@ try {
   {const {verifyInteractionProjectUI}=await import('./browser-sketch-interactions.mjs');await verifyInteractionProjectUI({hub,context,host,evidence,observe,report});}
   {const {verifyRecoveryProjectUI}=await import('./browser-editing-recovery.mjs');await verifyRecoveryProjectUI({hub,context,host,evidence,observe,report});}
   {const {verifyExtendedSketchUI}=await import('./browser-extended-sketch.mjs');await verifyExtendedSketchUI({context,host,observe,evidence,report});}
+  {const {verifyFeatureConstructionUI}=await import('./browser-feature-construction.mjs');await verifyFeatureConstructionUI({context,host,observe,evidence,report});}
   {const {verifyFeatureOperationsUI}=await import('./browser-feature-operations.mjs');await verifyFeatureOperationsUI({context,host,observe,evidence,report});}
   {const {verifyAssistantUI}=await import('./browser-assistant.mjs');await verifyAssistantUI({context,host,observe,evidence});}
   {const {verifyReconstructionUI}=await import('./browser-reconstruction.mjs');await verifyReconstructionUI({context,host,evidence,observe,report});}

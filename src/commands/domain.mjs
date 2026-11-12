@@ -1,3 +1,4 @@
+import {referenceCommand} from '../reference/profile.mjs';
 import {dimensionSources,dimensionIdentity} from '../parameters/dimension-sources.mjs';
 import {renamedDimensionExpressions} from '../parameters/expressions.mjs';
 import {extrusionCommand,EXTRUSION_TYPE} from '../extrusion/profile.mjs';
@@ -30,7 +31,8 @@ export function command(value,name,input){check(value.formatVersion===1,'Incompa
       graph.drawings.push(drawing);
     }
   }
-  else if(name==='cad.feature.enable.v1'){const f=next.native.graph.features.find(f=>f.id===input.featureId);check(f&&['sketch-primitives','sketch-extrusion','geometry-probe'].includes(f.type),'LostReference','Choose an editable sketch or operation.');if(input.enabled)delete f.disabled;else f.disabled=true;}
+  else if(name==='cad.feature.enable.v1'){const f=next.native.graph.features.find(f=>f.id===input.featureId);check(f&&['sketch-primitives','sketch-extrusion','geometry-probe','reference-geometry'].includes(f.type),'LostReference','Choose an editable sketch or operation.');if(input.enabled)delete f.disabled;else f.disabled=true;}
+  else if(name==='cad.reference.set.v1'){referenceCommand(next,input);}
   else if(name.startsWith('cad.extrusion.')){
    const target={kind:'feature',featureId:input.featureId,parameter:'depth'};
    check(!input.depthParameterId||input.replaceDepthBinding,'InvalidInput','A depth driver requires an explicit binding update.');
@@ -79,4 +81,4 @@ function reconstruct(value,svg){
  validate(value);
  return value;
 }
-export function featureContext(value,id){const extrusion=value.native.graph.features.find(f=>f.id===id&&f.type===EXTRUSION_TYPE);if(extrusion)return {id,definitionId:extrusion.definitionId,type:extrusion.type,name:extrusion.data.name,sketchId:extrusion.data.sketchId,operation:extrusion.data.operation,reverse:extrusion.data.reverse,form:extrusion.data.form,axisId:extrusion.data.axisId,angleDeg:extrusion.data.angleDeg,repeat:extrusion.data.repeat,dimensions:{depth:{value:extrusion.data.depthMm,unit:'mm'}},selectors:['top','bottom'].map(role=>({producerId:id,role,kind:'face',kernel:KERNEL})),kernel:KERNEL};const f=featureOf(value,id),s=recipe(f.data.spec);return {id:f.id,definitionId:f.definitionId,type:f.type,scenario:s.scenario,dimensions:Object.fromEntries(['width','height','depth','radius','count'].map(k=>[k,{value:s[k],unit:k==='count'?'scalar':s.unit}])),selectors:['top','bottom'].map(role=>({producerId:f.id,role,kind:'face',kernel:KERNEL})),...(hasIntegration(value)?{drivingParameters:dimensions(value.native.graph),profile:'E0.M7-chain/1'}:{}),kernel:KERNEL};}
+export function featureContext(value,id){const extrusion=value.native.graph.features.find(f=>f.id===id&&f.type===EXTRUSION_TYPE);if(extrusion)return {id,definitionId:extrusion.definitionId,type:extrusion.type,name:extrusion.data.name,sketchId:extrusion.data.sketchId,operation:extrusion.data.operation,reverse:extrusion.data.reverse,form:extrusion.data.form,axisId:extrusion.data.axisId,angleDeg:extrusion.data.angleDeg,repeat:extrusion.data.repeat,axisReference:extrusion.data.axisReference,limits:extrusion.data.limits,baseFeatureId:extrusion.data.baseFeatureId,dimensions:{depth:{value:extrusion.data.depthMm,unit:'mm'}},selectors:['top','bottom'].map(role=>({producerId:id,role,kind:'face',kernel:KERNEL})),kernel:KERNEL};const f=featureOf(value,id),s=recipe(f.data.spec);return {id:f.id,definitionId:f.definitionId,type:f.type,scenario:s.scenario,dimensions:Object.fromEntries(['width','height','depth','radius','count'].map(k=>[k,{value:s[k],unit:k==='count'?'scalar':s.unit}])),selectors:['top','bottom'].map(role=>({producerId:f.id,role,kind:'face',kernel:KERNEL})),...(hasIntegration(value)?{drivingParameters:dimensions(value.native.graph),profile:'E0.M7-chain/1'}:{}),kernel:KERNEL};}

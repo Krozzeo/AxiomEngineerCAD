@@ -1,6 +1,6 @@
-# Engineer handoff - E3.M2 feature operations / 0.3.4 candidate
+# Engineer handoff - E3.M2 feature construction / 0.3.5 candidate
 
-Start with `npm run context`, AGENTS.md, [compact context](docs/PROJECT_CONTEXT.md) and the [integration notes](docs/PRE_E3_ASSISTANT.md). E3.M2 follows the owner’s request to advance alongside sketch corrections.
+Start with `npm run context`, AGENTS.md, [compact context](docs/PROJECT_CONTEXT.md) and the [integration notes](docs/PRE_E3_ASSISTANT.md). Read docs/E3_M2_FEATURE_CONSTRUCTION.md for the current batch. E3.M2 follows the owner’s request to advance alongside sketch corrections.
 
 E2 was owner-accepted, merged and published stable as 0.2.6. E3.M2 is a separate experimental delivery. See [tools and demo](docs/E3_M2_FEATURE_OPERATIONS.md).
 

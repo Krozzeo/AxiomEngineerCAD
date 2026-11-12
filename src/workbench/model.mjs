@@ -1,18 +1,20 @@
+import {referenceDatums} from '../reference/profile.mjs';
 import {check,validate} from '../document.mjs';
 export const FILTERS=['vertex','edge','face','body','instance','feature','datum'];
 export function baseDatums(value){const definitionId=value.native?.graph.primaryDefinitionId??'definition-main';return [
   {id:'datum-origin',kind:'datum',datumType:'point',role:'origin',name:'Origin',originMm:[0,0,0],pointMm:[0,0,0],definitionId,producerId:'reference-frame',occurrencePath:[definitionId]},
   ...[['xy',[0,0,1]],['xz',[0,-1,0]],['yz',[1,0,0]]].map(([role,normal])=>({id:'datum-'+role,kind:'datum',datumType:'plane',role,name:{xy:'Front',xz:'Top',yz:'Right'}[role],originMm:[0,0,0],normal,definitionId,producerId:'reference-frame',occurrencePath:[definitionId]})),
-  ...[['x',[1,0,0]],['y',[0,1,0]],['z',[0,0,1]]].map(([role,direction])=>({id:'datum-'+role,kind:'datum',datumType:'axis',role,name:role.toUpperCase()+' axis',originMm:[0,0,0],direction,definitionId,producerId:'reference-frame',occurrencePath:[definitionId]}))];}
+  ...[['x',[1,0,0]],['y',[0,1,0]],['z',[0,0,1]]].map(([role,direction])=>({id:'datum-'+role,kind:'datum',datumType:'axis',role,name:role.toUpperCase()+' axis',originMm:[0,0,0],direction,definitionId,producerId:'reference-frame',occurrencePath:[definitionId]})),...referenceDatums(value)];}
 export function workbenchItems(value){validate(value);const g=value.native?.graph,main=g?.primaryDefinitionId??'definition-main',ordered=[],seen=new Set(),visit=f=>{if(seen.has(f.id))return;seen.add(f.id);for(const id of f.dependsOn)visit(g.features.find(p=>p.id===id));ordered.push(f);};for(const f of g?.features??[])visit(f);const featureName=f=>['sketch-primitives','sketch-extrusion'].includes(f.type)?f.data.name:({'sketch-proof':'Rectangle sketch','extrude-proof':'Base extrusion','mate-binding-proof':'Cap plane mate','drawing-proof':'Width drawing','spatial-probe':'Assembly solve','datum-reference':'Datum reference'}[f.type]??(f.type==='geometry-probe'?({cut:'Through-hole plate',extrude:f.definitionId===main?'Base solid':'Cap extrusion',revolve:'Revolved solid'}[f.data.spec.scenario]??'Solid feature'):f.id));return [
   {id:main,kind:'definition',name:g?.definitions.find(d=>d.id===main)?.name??value.metadata.name,definitionId:main},
-  ...baseDatums(value),
-  ...ordered.map(f=>({id:f.id,kind:'feature',name:featureName(f),type:f.type,disabled:!!f.disabled,definitionId:f.definitionId,producerId:f.id,role:'result',occurrencePath:[f.definitionId],dependsOn:f.dependsOn})),
+  ...baseDatums(value).filter(d=>!d.referenceFeature),
+  ...ordered.flatMap(f=>f.type==='reference-geometry'?baseDatums(value).filter(d=>d.producerId===f.id):[{id:f.id,kind:'feature',name:featureName(f),type:f.type,disabled:!!f.disabled,definitionId:f.definitionId,producerId:f.id,role:'result',occurrencePath:[f.definitionId],dependsOn:f.dependsOn}]),
   ...(g?.instances??[]).map(i=>({id:i.id,kind:'instance',name:g.definitions.find(d=>d.id===i.definitionId)?.name??i.id,definitionId:i.definitionId,occurrencePath:[i.ownerDefinitionId,i.id],positionMm:i.transform.position})),
   ...(value.assembly?.mates??[]).map(m=>({id:m.id,kind:'mate',name:m.type==='coincident'?'Coincident plane mate':m.id,type:m.type,a:m.a,b:m.b})),
   ...(g?.drawings??[]).map(d=>({id:d.id,kind:'drawing',name:'Retained model drawing',revision:d.revision,sheets:d.sheets.length}))];}
 export function sceneSelections(scene){const records=[];for(const o of scene.occurrences){const mesh=scene.models.find(m=>m.definitionId===o.definitionId).mesh,base={occurrencePath:o.path,definitionId:o.definitionId,producerId:o.featureId};
   records.push({target:o,key:'instanceSelectionId',item:{...base,kind:'instance',role:'occurrence'}},{target:o,key:'bodySelectionId',item:{...base,kind:'body',role:'solid',volumeMm3:mesh.volumeMm3,areaMm2:mesh.areaMm2}},{target:o,key:'featureSelectionId',item:{...base,kind:'feature',role:'result'}});
+  for(const body of mesh.bodies??[]){o.bodySelectionIds??={};records.push({target:o.bodySelectionIds,key:body.role,item:{...base,...body,kind:'body'}});}
   for(const item of [...mesh.faces,...mesh.edges,...(mesh.exactVertices??[])]){const {points,...details}=item;const field={face:'faceSelectionIds',edge:'edgeSelectionIds',vertex:'vertexSelectionIds'}[item.kind];o[field]??={};records.push({target:o[field],key:item.role,item:{...details,...base}});}}
   for(const sketch of scene.sketches??[])records.push({target:sketch,key:'selectionId',item:{kind:'feature',definitionId:sketch.definitionId,producerId:sketch.id,role:'result',occurrencePath:[sketch.definitionId],planeNormal:sketch.frame.normal}});
   for(const datum of scene.datums??[])records.push({target:datum,key:'selectionId',item:datum});return records;}

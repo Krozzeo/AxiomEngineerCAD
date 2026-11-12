@@ -8,8 +8,38 @@ const get=(es,v)=>v.j===null?es[v.i][v.k]:es[v.i][v.k][v.j];
 const set=(es,v,n)=>{if(v.j===null)es[v.i][v.k]=n;else es[v.i][v.k][v.j]=n;};
 function rank(matrix,columns){const m=matrix.map(row=>[...row]),pivots=[];let row=0;const threshold=Math.max(1,...m.flat().map(Math.abs))*TOLERANCES.rankRelative;for(let col=0;col<columns&&row<m.length;col++){let pivot=row;for(let i=row+1;i<m.length;i++)if(Math.abs(m[i][col])>Math.abs(m[pivot][col]))pivot=i;if(Math.abs(m[pivot][col])<=threshold)continue;[m[row],m[pivot]]=[m[pivot],m[row]];const d=m[row][col];for(let j=0;j<columns;j++)m[row][j]/=d;for(let i=0;i<m.length;i++)if(i!==row){const f=m[i][col];for(let j=0;j<columns;j++)m[i][j]-=f*m[row][j];}pivots.push(col);row++;}const free=Array.from({length:columns},(_,i)=>i).filter(i=>!pivots.includes(i)),movable=new Set(free);pivots.forEach((p,i)=>{if(free.some(j=>Math.abs(m[i][j])>threshold))movable.add(p);});const nullspace=free.map(col=>{const vector=Array(columns).fill(0);vector[col]=1;pivots.forEach((p,i)=>vector[p]=-m[i][col]);return vector;});return {rank:row,movable,nullspace};}
 const exactEquations=(es,cs)=>[...equations(es,cs),...es.filter(e=>e.type==='arc').flatMap(e=>[e.a,e.b].map(p=>Math.hypot(p[0]-e.center[0],p[1]-e.center[1])-e.radius))];
-function jacobian(es,cs){const variables=vars(es),initial=exactEquations(es,cs),matrix=initial.map(()=>[]);variables.forEach((v,col)=>{const plus=structuredClone(es),minus=structuredClone(es),n=get(es,v),h=1e-5*Math.max(1,Math.abs(n));set(plus,v,n+h);set(minus,v,n-h);const a=exactEquations(plus,cs),b=exactEquations(minus,cs);for(let i=0;i<a.length;i++)matrix[i][col]=(a[i]-b[i])/(2*h);});return {variables,initial,matrix,...rank(matrix,variables.length)};}
-function mobility(es,cs,system=jacobian(es,cs)){const {variables,initial,...r}=system,pointStates={},referenceDOF={};es.forEach((e,index)=>{for(const role of ['point','a','b','center','control1','control2',...(e.type==='line'?['midpoint']:[])])if(role==='midpoint'||e[role]){const projected=[0,1].map(axis=>r.nullspace.map(vector=>variables.reduce((sum,v,j)=>sum+(v.i===index&&v.j===axis&&(v.k===role||role==='midpoint'&&['a','b'].includes(v.k))?vector[j]*(role==='midpoint'?.5:1):0),0)));referenceDOF[e.id+':'+role]=rank(projected,r.nullspace.length).rank;const mobile=referenceDOF[e.id+':'+role]>0;pointStates[e.id+':'+role]=mobile?'UnderDefined':'FullyDefined';}});return {coordinateStates:Object.fromEntries(variables.map((v,k)=>[es[v.i].id+':'+v.k+(v.j===null?'':':'+v.j),r.movable.has(k)?'UnderDefined':'FullyDefined'])),pointStates,referenceDOF:{...referenceDOF,...Object.fromEntries(es.map((e,i)=>[e.id+':entity',rank(variables.flatMap((v,k)=>v.i===i?[r.nullspace.map(vector=>vector[k])]:[]),r.nullspace.length).rank]))},variables:variables.length,rows:initial.length,rank:r.rank,dof:variables.length-r.rank,maxResidualMm:Math.max(0,...initial.map(Math.abs)),entities:Object.fromEntries(es.map((e,i)=>[e.id,variables.some((v,k)=>v.i===i&&r.movable.has(k))?'UnderDefined':'FullyDefined'])),method:'Independent central-difference constraint Jacobian, reduced elimination and nullspace mobility'};}
+function jacobian(es,cs){
+ const variables=vars(es),groups=[];
+ let row=0;
+ for(const constraint of cs){const initial=equations(es,[constraint]);groups.push({row,initial,entities:new Set(constraint.refs.map(ref=>ref.entityId)),evaluate:entities=>equations(entities,[constraint])});row+=initial.length;}
+ for(const entity of es.filter(e=>e.type==='arc')){
+  const evaluate=entities=>{const arc=entities.find(e=>e.id===entity.id);return [arc.a,arc.b].map(p=>Math.hypot(p[0]-arc.center[0],p[1]-arc.center[1])-arc.radius);};
+  const initial=evaluate(es);groups.push({row,initial,entities:new Set([entity.id]),evaluate});row+=initial.length;
+ }
+ const initial=groups.flatMap(group=>group.initial),matrix=initial.map(()=>Array(variables.length).fill(0));
+ for(const [col,v]of variables.entries()){
+  const affected=groups.filter(group=>group.initial.length&&group.entities.has(es[v.i].id));if(!affected.length)continue;
+  const plus=es.slice(),minus=es.slice();plus[v.i]=structuredClone(es[v.i]);minus[v.i]=structuredClone(es[v.i]);
+  const n=get(es,v),h=1e-5*Math.max(1,Math.abs(n));set(plus,v,n+h);set(minus,v,n-h);
+  for(const group of affected){const a=group.evaluate(plus),b=group.evaluate(minus);for(let i=0;i<a.length;i++)matrix[group.row+i][col]=(a[i]-b[i])/(2*h);}
+ }
+ return {variables,initial,matrix,...rank(matrix,variables.length)};
+}
+function mobility(es,cs,system=jacobian(es,cs)){
+ const {variables,initial,...r}=system,pointStates={},referenceDOF={},byEntity=es.map(()=>[]);
+ variables.forEach((v,index)=>byEntity[v.i].push(index));
+ for(const [index,entity]of es.entries()){
+  const indices=byEntity[index];
+  for(const role of ['point','a','b','center','control1','control2',...(entity.type==='line'?['midpoint']:[])]){
+   if(role!=='midpoint'&&!entity[role])continue;
+   const axes=[0,1].map(axis=>indices.filter(k=>variables[k].j===axis&&(variables[k].k===role||role==='midpoint'&&['a','b'].includes(variables[k].k))));
+   const projected=axes.map(columns=>r.nullspace.map(vector=>columns.reduce((sum,k)=>sum+vector[k]*(role==='midpoint'?.5:1),0)));
+   const key=entity.id+':'+role;referenceDOF[key]=rank(projected,r.nullspace.length).rank;pointStates[key]=referenceDOF[key]?'UnderDefined':'FullyDefined';
+  }
+  referenceDOF[entity.id+':entity']=rank(indices.map(k=>r.nullspace.map(vector=>vector[k])),r.nullspace.length).rank;
+ }
+ return {coordinateStates:Object.fromEntries(variables.map((v,k)=>[es[v.i].id+':'+v.k+(v.j===null?'':':'+v.j),r.movable.has(k)?'UnderDefined':'FullyDefined'])),pointStates,referenceDOF,variables:variables.length,rows:initial.length,rank:r.rank,dof:variables.length-r.rank,maxResidualMm:Math.max(0,...initial.map(Math.abs)),entities:Object.fromEntries(es.map((e,i)=>[e.id,byEntity[i].some(k=>r.movable.has(k))?'UnderDefined':'FullyDefined'])),method:'Independent central-difference constraint Jacobian, reduced elimination and nullspace mobility'};
+}
 function dimensionConflicts(es,cs,system){
  const conflicts=new Set(drivingConflicts(cs,[])),owners=[],blocks=[];let offset=0;
  for(const c of cs.filter(c=>c.driving)){const count=equations(es,[c]).length,indices=Array.from({length:count},(_,i)=>offset+i);for(const index of indices)owners[index]=c.id;blocks.push({c,indices});offset+=count;}

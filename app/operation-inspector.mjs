@@ -17,11 +17,15 @@ export function operationValue(document,{field,label,options=[],value,id,onChang
 }
 
 export function operationSelection(document,{title,activate,remove}){
- const region=document.createElement('section'),table=document.createElement('table'),heading=document.createElement('h4');
+ const region=document.createElement('section'),table=document.createElement('table'),heading=document.createElement('h4'),header=document.createElement('div'),clear=document.createElement('button');
+ let currentRows=[];
  region.className='operation-selection';region.tabIndex=0;heading.textContent=title;
+ header.className='operation-selection-heading';clear.type='button';clear.innerHTML=icon('clear');clear.title='Clear '+title.toLowerCase();clear.setAttribute('aria-label',clear.title);
+ clear.onclick=event=>{event.stopPropagation();for(const row of [...currentRows])remove(row);};header.append(heading,clear);
  table.innerHTML='<tbody></tbody>';table.setAttribute('aria-label',title);
- region.append(heading,table);region.addEventListener('click',activate);region.addEventListener('focus',activate);
+ region.append(header,table);region.addEventListener('click',activate);region.addEventListener('focus',activate);
  return {element:region,paint(rows,active){
+  currentRows=rows;clear.disabled=!rows.length;
   region.classList.toggle('active',active);table.tBodies[0].replaceChildren();
   if(!rows.length)table.tBodies[0].insertRow().insertCell().textContent='Select geometry';
   for(const item of rows){
