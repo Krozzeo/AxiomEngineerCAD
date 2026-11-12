@@ -16,11 +16,11 @@ export function featureChoices(graph,scene){
    const target={kind:'sketch',producerId:feature.id,definitionId:feature.definitionId,role:'result',occurrencePath:[feature.definitionId]};
    push(feature.data.name,target);
    for(const e of feature.data.entities){
-    const base=feature.data.name+' · '+(e.name??e.id);
+    const base=feature.data.name+' Ã‚Â· '+(e.name??e.id);
     const frame=sketch?.frame,world=p=>frame&&p?frame.origin.map((n,i)=>n+frame.u[i]*p[0]+frame.v[i]*p[1]):null;
     if(e.type==='line')push(base,{...target,role:e.id},frame?{kind:'line',origin:world(e.a),direction:unit(vector(world(e.b),world(e.a)))}:null);
     for(const role of e.type==='point'?['point']:e.type==='circle'?['center']:e.type==='line'?['a','b','midpoint']:e.type==='arc'?['a','b','center']:[])
-     push(base+' · '+role,{...target,role:e.id+':'+role},frame?{kind:'point',origin:world(role==='midpoint'?e.a.map((n,i)=>(n+e.b[i])/2):e[role])}:null);
+     push(base+' Ã‚Â· '+role,{...target,role:e.id+':'+role},frame?{kind:'point',origin:world(role==='midpoint'?e.a.map((n,i)=>(n+e.b[i])/2):e[role])}:null);
    }
   }else if(feature.type==='sketch-extrusion')push(feature.data.name,{kind:'feature',producerId:feature.id,definitionId:feature.definitionId,role:'result',occurrencePath:[feature.definitionId]});
  }
@@ -29,11 +29,11 @@ export function featureChoices(graph,scene){
   push('Model body',{...base,kind:'body',role:'solid'});for(const [i,body]of(model.mesh.bodies??[]).entries())push('Body '+(i+1),{...base,kind:'body',role:body.role});
   for(const face of model.mesh.faces??[])if(face.planeNormal&&['ResolvedStable','ResolvedReidentified'].includes(face.resolution)){
    const normal=face.planeNormal,right=Math.abs(normal[0])<.9?[1,0,0]:[0,1,0],u=unit(right.map((n,i)=>n-normal[i]*dot(right,normal)));
-   push('Face · '+face.role,{...base,kind:'face',role:face.role},{kind:'plane',origin:face.centerOfAreaMm,normal,u,v:cross(normal,u)});
+   push('Face Ã‚Â· '+face.role,{...base,kind:'face',role:face.role},{kind:'plane',origin:face.centerOfAreaMm,normal,u,v:cross(normal,u)});
   }
   for(const edge of model.mesh.edges??[])if(edge.points.length===2&&!edge.curve&&!edge.displayHidden&&edge.resolution==='ResolvedStable')
-   push('Edge · '+edge.role,{...base,kind:'edge',role:edge.role},{kind:'line',origin:edge.points[0],direction:unit(vector(edge.points[1],edge.points[0]))});
-  for(const point of model.mesh.exactVertices??[])if(!point.displayHidden&&point.resolution==='ResolvedStable')push('Vertex · '+point.role,{...base,kind:'vertex',role:point.role},{kind:'point',origin:point.pointMm});
+   push('Edge Ã‚Â· '+edge.role,{...base,kind:'edge',role:edge.role},{kind:'line',origin:edge.points[0],direction:unit(vector(edge.points[1],edge.points[0]))});
+  for(const point of model.mesh.exactVertices??[])if(!point.displayHidden&&point.resolution==='ResolvedStable')push('Vertex Ã‚Â· '+point.role,{...base,kind:'vertex',role:point.role},{kind:'point',origin:point.pointMm});
  }
  return choices.map(choice=>({...choice,target:Object.fromEntries(['kind','producerId','definitionId','role','occurrencePath'].map(key=>[key,choice.target[key]])),value:JSON.stringify(Object.fromEntries(['kind','producerId','definitionId','role','occurrencePath'].map(key=>[key,choice.target[key]])))}));
 }
@@ -52,7 +52,7 @@ export function featureFields({document,host,owner,graph,scene,onChange,status,o
   const options=graph.parameters.filter(p=>p.unit===unitName||unitName==='mm'&&p.unitMode==='auto'&&!p.targets?.length).map(p=>({value:p.id,label:p.name,number:unitName==='rad'?p.value*180/Math.PI:p.value,depth:p.value}));
   const field=operationValue(document,{field:key,label:title,options,value:number,id:parameterId,
    onChange:(number,id,focus)=>{if(!Number.isFinite(number)){status('Enter a number or select a parameter.');return;}onCommit(number,id);if(!id)field.control.setLiteral(number);if(focus){field.control.input.focus({preventScroll:true});field.control.input.select();}onChange();},
-   onSource:()=>{const id=field.control.select.value;if(id)window.dispatchEvent(new CustomEvent('engineer-open-parameter',{detail:id}));else if(owner.item&&key==='extrusion-depth-value')window.dispatchEvent(new CustomEvent('engineer-open-dimension-source',{detail:{featureId:owner.item.id,parameter:'depth'}}));else{field.control.input.focus();field.control.input.select();}}
+   onSource:()=>{const id=field.control.select.value;if(owner.item&&key==='extrusion-depth-value')window.dispatchEvent(new CustomEvent('engineer-open-dimension-source',{detail:{parameterId:id||null,featureId:owner.item.id,parameter:'depth'}}));else if(id)window.dispatchEvent(new CustomEvent('engineer-open-parameter',{detail:id}));else{field.control.input.focus();field.control.input.select();}}
   });fields.set(key,field);return field;
  }
  function selection(title,rows,valid,{multiple=false,changed=()=>{}}={}){
@@ -78,14 +78,14 @@ export function featureFields({document,host,owner,graph,scene,onChange,status,o
    const label=document.createElement('label'),relation=document.createElement('select');label.textContent='Relation';
    for(const type of ['coincident','parallel','perpendicular','offset','angle','midplane'])relation.append(new Option(type,type));relation.value=entry?.relation??'coincident';label.append(relation);host.append(label);
    const distance=value('reference-value-'+index,'Distance / angle',entry?.value??0,entry?.relation==='angle'?'rad':'mm',entry?.parameterId,()=>{});host.append(distance.title,distance.row);
-   const update=()=>{distance.title.hidden=distance.row.hidden=!['offset','angle'].includes(relation.value);onChange();};relation.onchange=()=>{distance.control.setOptions(graph.parameters.filter(p=>p.unit===(relation.value==='angle'?'rad':'mm')).map(p=>({value:p.id,label:p.name,number:relation.value==='angle'?p.value*180/Math.PI:p.value})));distance.control.setLiteral(0);update();};table.changed=()=>{const c=table.selected[0],point=c?.geometry?.kind==='point'||c?.target.role.includes(':')||c?.target.role==='origin',planar=c&&plane(c);const allowed=point||referenceKind==='coordinate'?['coincident']:referenceKind==='axis'?['coincident','parallel','perpendicular']:planar?['coincident','parallel','perpendicular','offset','angle','midplane']:['coincident','parallel','perpendicular'];for(const option of relation.options)option.disabled=!allowed.includes(option.value);if(!allowed.includes(relation.value))relation.value='coincident';update();};table.changed();
+   const update=()=>{distance.title.hidden=distance.row.hidden=!['offset','angle'].includes(relation.value);onChange();};relation.onchange=()=>{distance.control.setOptions(graph.parameters.filter(p=>p.unit===(relation.value==='angle'?'rad':'mm')).map(p=>({value:p.id,label:p.name,number:relation.value==='angle'?p.value*180/Math.PI:p.value})));distance.control.setLiteral(0);update();};table.changed=()=>{const c=table.selected[0],point=c?.geometry?.kind==='point'||c?.target.role.includes(':')||c?.target.role==='origin',planar=c&&plane(c);const allowed=point?['coincident']:referenceKind==='coordinate'?['coincident','parallel']:referenceKind==='axis'?['coincident','parallel','perpendicular']:planar?['coincident','parallel','perpendicular','offset','angle','midplane']:['coincident','parallel','perpendicular'];for(const option of relation.options)option.disabled=!allowed.includes(option.value);if(!allowed.includes(relation.value))relation.value='coincident';update();};table.changed();
    referenceTables.push({table,relation,distance});
   }
  }else if(repeating){
   sourceTable=selection('Features',(settings.repeat.sourceFeatureIds??[settings.repeat.sourceFeatureId]).filter(Boolean).map(id=>({target:{producerId:id,kind:'feature',role:'result'}})),c=>c.target.kind==='feature',{multiple:true});
   const old=settings.repeat.reference,axis=settings.repeat.axis??'x';
   axisTable=selection(settings.repeat.kind==='mirror'?'Mirror plane':settings.repeat.kind==='linear'?'Direction':'Axis',old?[old]:[{target:{kind:'datum',producerId:'reference-frame',role:settings.repeat.kind==='mirror'?{x:'yz',y:'xz',z:'xy'}[axis]:axis}}],settings.repeat.kind==='mirror'?plane:line);
-  for(const [key,title,number,units]of [['count','Instances including source',settings.repeat.count,'scalar'],['offsetMm',settings.repeat.kind==='mirror'?'Plane offset (mm)':'Step (mm)',settings.repeat.offsetMm,'mm'],['angleDeg','Angular step (°)',settings.repeat.angleDeg,'rad']]){
+  for(const [key,title,number,units]of [['count','Instances including source',settings.repeat.count,'scalar'],['offsetMm',settings.repeat.kind==='mirror'?'Plane offset (mm)':'Step (mm)',settings.repeat.offsetMm,'mm'],['angleDeg','Angular step (Ã‚Â°)',settings.repeat.angleDeg,'rad']]){
    if(key==='count'&&settings.repeat.kind==='mirror'||key==='angleDeg'&&settings.repeat.kind!=='circular'||key==='offsetMm'&&settings.repeat.kind==='circular')continue;
    const field=value('feature-'+key,title,number,units,settings.repeat[key+'ParameterId'],(n,id)=>{state.repeat[key]=n;if(id)state.repeat[key+'ParameterId']=id;else delete state.repeat[key+'ParameterId'];});
    field.control.input.dataset.featureSetting=key;host.append(field.title,field.row);
@@ -103,7 +103,7 @@ export function featureFields({document,host,owner,graph,scene,onChange,status,o
   for(const side of ['start','end']){
    const region=document.createElement('section'),title=document.createElement('h5'),modes=document.createElement('div');region.dataset.limitSide=side;title.textContent=side==='start'?'From':'To';modes.className='feature-limit-modes';region.append(title,modes);host.append(region);
    const limit=state.limits[side];
-   const field=value(side==='end'?'extrusion-depth-value':'extrusion-start-value',revolve?'Angle (°)':'Value (mm)',limit.value,revolve?'rad':'mm',limit.parameterId??(side==='end'&&!revolve?graph.parameters.find(p=>p.targets?.some(t=>t.featureId===owner.item?.id&&t.parameter==='depth'))?.id:null),(number,id)=>{
+   const field=value(side==='end'?'extrusion-depth-value':'extrusion-start-value',revolve?'Angle (Ã‚Â°)':'Value (mm)',limit.value,revolve?'rad':'mm',limit.parameterId??(side==='end'&&!revolve?graph.parameters.find(p=>p.targets?.some(t=>t.featureId===owner.item?.id&&t.parameter==='depth'))?.id:null),(number,id)=>{
     limit.value=number;if(id)limit.parameterId=id;else delete limit.parameterId;if(side==='end'&&!revolve){state.depthMm=number;owner.depth.depthMm=number;owner.depth.parameterId=id;}limitsChanged=true;
    });
    if(side==='end'){

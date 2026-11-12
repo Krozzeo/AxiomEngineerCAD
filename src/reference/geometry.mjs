@@ -45,6 +45,8 @@ export function constructReference(kind,entries){
  check(kind==='coordinate','InvalidInput','Choose a plane, axis or coordinate system.');
  origin=points[0]?.origin??first.origin;
  const x=unit(lines[0]?.direction??(points[1]?sub(points[1].origin,origin):planes[0]?.u)??[1,0,0]);
+ if(lines[1]&&entries.find(e=>e.geometry===lines[1])?.relation==='parallel')check(Math.abs(dot(x,unit(lines[1].direction)))<1e-7,'ConstraintConflict','The selected coordinate directions must be perpendicular.');
+ if(lines[0]&&planes[0]&&entries.find(e=>e.geometry===planes[0])?.relation==='parallel')check(Math.abs(dot(x,planes[0].normal))<1e-7,'ConstraintConflict','The primary direction must lie in the selected coordinate plane.');
  let y=lines[1]?.direction??(points[2]?sub(points[2].origin,origin):planes[0]?.v)??[0,1,0];y=unit(sub(y,scale(x,dot(x,y))));return {origin,u:x,v:y,normal:cross(x,y)};
 }
 
