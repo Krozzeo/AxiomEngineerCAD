@@ -10,7 +10,7 @@ export async function verifyFeatureConstructionUI({context,host,observe,evidence
  const close=async()=>{const revision=(await sketchDocument(page)).revision;await page.close();await host.manager.execute({operationId:crypto.randomUUID(),action:'close',sessionId:session.sessionId,expectedRevision:revision,decision:'discard'});session=null;};
  const volume=n=>page.waitForFunction(expected=>Math.abs((window.engineerViewport.proof?.exact?.volumeMm3??0)-expected)<1e-4,n);
  try{
-  await open();await volume(14000);
+  await open();await volume(14000);const renderer=await page.evaluate(()=>window.engineerViewport.renderer.info);assert.equal(renderer.state,'ready','Physical Model picking requires a real software or hardware WebGPU renderer: '+JSON.stringify(renderer));report.featureConstructionRenderer={...report.featureConstructionRenderer,info:renderer};
   await page.locator('.ribbon-tabs').getByRole('tab',{name:'Features',exact:true}).click();
   await page.locator('#cad-extrude-sketch').click();
   await page.locator('#feature-operation-editor:not([hidden])').waitFor();
