@@ -148,7 +148,11 @@ try {
     const {verifyFeatureConstructionUI}=await import('./browser-feature-construction.mjs');
     // Keep the no-GPU/failure corpus in its original context. Physical picking
     // requires an actual renderer; CI uses explicitly labelled SwiftShader.
-    const constructionArgs=['--enable-unsafe-webgpu','--use-webgpu-adapter=swiftshader','--disable-gpu-watchdog','--enable-dawn-features=allow_unsafe_apis','--disable-dawn-features=use_dxc','--enable-webgpu-developer-features','--use-gpu-in-tests','--enable-accelerated-2d-canvas',...(process.platform==='linux'?['--enable-features=Vulkan','--use-angle=vulkan','--use-vulkan=swiftshader','--disable-vulkan-surface']:[])];
+    // Linux canvas/shared-image interop needs ANGLE and Dawn to share the
+    // SwiftShader Vulkan instance (Chromium issue 575926500).
+    const constructionArgs=process.platform==='linux'
+      ?['--enable-unsafe-webgpu','--use-angle=swiftshader','--enable-unsafe-swiftshader','--use-vulkan=swiftshader','--enable-features=Vulkan']
+      :['--enable-unsafe-webgpu','--use-webgpu-adapter=swiftshader','--disable-gpu-watchdog','--enable-dawn-features=allow_unsafe_apis','--disable-dawn-features=use_dxc','--enable-webgpu-developer-features','--use-gpu-in-tests','--enable-accelerated-2d-canvas'];
     const softwareBrowser=process.env.ENGINEER_HARDWARE==='1'?null:await chromium.launch({channel:'chromium',headless:true,ignoreDefaultArgs:['--disable-gpu-compositing'],args:constructionArgs});
     try{
       const constructionContext=softwareBrowser?await softwareBrowser.newContext({viewport:{width:1440,height:960}}):context;
