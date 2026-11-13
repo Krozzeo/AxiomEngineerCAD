@@ -144,6 +144,20 @@ try {
   await hub.locator('[data-route="/installations"]').click();
   await hub.getByRole('button',{name:'Load Demos',exact:true}).click();
   await hub.waitForFunction(()=>document.querySelector('.load-demos')?.textContent==='Load Demos');const {seedHistoricalFixtures}=await import('../scripts/acceptance-demo-fixtures.mjs');await seedHistoricalFixtures(host);
+  {
+    const {verifyFeatureConstructionUI}=await import('./browser-feature-construction.mjs');
+    // Keep the no-GPU/failure corpus in its original context. Physical picking
+    // requires an actual renderer; CI uses explicitly labelled SwiftShader.
+    const constructionArgs=['--enable-unsafe-webgpu','--use-webgpu-adapter=swiftshader','--enable-dawn-features=allow_unsafe_apis','--disable-dawn-features=use_dxc','--enable-webgpu-developer-features','--use-gpu-in-tests','--enable-accelerated-2d-canvas'];
+    const softwareBrowser=process.env.ENGINEER_HARDWARE==='1'?null:await chromium.launch({channel:'chromium',headless:true,ignoreDefaultArgs:['--disable-gpu-compositing'],args:constructionArgs});
+    try{
+      const constructionContext=softwareBrowser?await softwareBrowser.newContext({viewport:{width:1440,height:960}}):context;
+      if(softwareBrowser)constructionContext.on('page',observe);
+      report.featureConstructionRenderer={softwareForced:!!softwareBrowser,flags:softwareBrowser?constructionArgs:[]};
+      await verifyFeatureConstructionUI({context:constructionContext,host,observe,evidence,report});
+    }finally{await softwareBrowser?.close();}
+  }
+
   const demoEntry=host.manager.catalog().recents.find(p=>p.name==='E0.M2 Geometry & Sketch Lab');
   assert.ok(demoEntry,'Version-owned demo was not registered');
   const demoDoc=JSON.parse(await readFile(demoEntry.path));assert.equal(demoDoc.experiment.spec.scenario,'cut');
@@ -159,19 +173,6 @@ try {
   {const {verifyInteractionProjectUI}=await import('./browser-sketch-interactions.mjs');await verifyInteractionProjectUI({hub,context,host,evidence,observe,report});}
   {const {verifyRecoveryProjectUI}=await import('./browser-editing-recovery.mjs');await verifyRecoveryProjectUI({hub,context,host,evidence,observe,report});}
   {const {verifyExtendedSketchUI}=await import('./browser-extended-sketch.mjs');await verifyExtendedSketchUI({context,host,observe,evidence,report});}
-  {
-    const {verifyFeatureConstructionUI}=await import('./browser-feature-construction.mjs');
-    // Keep the no-GPU/failure corpus in its original context. Physical picking
-    // requires an actual renderer; CI uses explicitly labelled SwiftShader.
-    const constructionArgs=['--enable-unsafe-webgpu','--use-webgpu-adapter=swiftshader','--enable-dawn-features=allow_unsafe_apis','--disable-dawn-features=use_dxc','--enable-webgpu-developer-features','--use-gpu-in-tests','--enable-accelerated-2d-canvas'];
-    const softwareBrowser=process.env.ENGINEER_HARDWARE==='1'?null:await chromium.launch({channel:'chromium',headless:true,ignoreDefaultArgs:['--disable-gpu-compositing'],args:constructionArgs});
-    try{
-      const constructionContext=softwareBrowser?await softwareBrowser.newContext({viewport:{width:1440,height:960}}):context;
-      if(softwareBrowser)constructionContext.on('page',observe);
-      report.featureConstructionRenderer={softwareForced:!!softwareBrowser,flags:softwareBrowser?constructionArgs:[]};
-      await verifyFeatureConstructionUI({context:constructionContext,host,observe,evidence,report});
-    }finally{await softwareBrowser?.close();}
-  }
   {const {verifyFeatureOperationsUI}=await import('./browser-feature-operations.mjs');await verifyFeatureOperationsUI({context,host,observe,evidence,report});}
   {const {verifyAssistantUI}=await import('./browser-assistant.mjs');await verifyAssistantUI({context,host,observe,evidence});}
   {const {verifyReconstructionUI}=await import('./browser-reconstruction.mjs');await verifyReconstructionUI({context,host,evidence,observe,report});}
