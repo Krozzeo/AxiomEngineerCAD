@@ -1,4 +1,4 @@
-# E3.M2 feature construction — 0.3.5
+# E3.M2 feature construction — 0.3.6
 
 This owner-requested batch refines E3.M2. Owner acceptance of the stage remains separate from publication.
 
@@ -31,3 +31,13 @@ The editor reads one revision-matched document snapshot plus bounded metadata ra
 ## Verification
 
 Focused domain cases cover four booleans, body counts, signed/symmetric/parameter limits, exact contact entry/exit, datum axes, selected angular limits and sketch supports. Browser acceptance constructs an operation from empty tables, applies None and symmetry, creates a referenced plane, uses it for a sketch, cancels a feature and saves/reopens. Historical E3.M1 and E3.M2 fixtures remain acceptance-only. The public release advertises only the current construction demo.
+
+## 0.3.6 construction corrections
+
+An operation stays highlighted in the ribbon until Apply or Cancel, independently of Model selection. The feature inspector is exclusive while constructing; source Selection/Details stays hidden. A new operation or sketch edit cannot replace an active feature draft. Sketch transform, conversion and equation drafts also prevent starting a solid feature.
+
+Geometry tables have no search input: activate the table, then pick compatible geometry from Manager or Model. The active table filters incompatible overlapping candidates. Sketch source picks work in both places. Changing Value or Symmetric Value selects the numeric contents for immediate replacement; Until Selected and Offset from Selected activate their geometry table. Feature values match the adjacent 32px icon controls. Boolean icons use outlined overlapping regions matching the owner's reference.
+
+All relevant committed changes rebuild the preview, including Boolean, sketch source, limit mode, numeric/parameter value, direction and selected reference. Incomplete tables remove the old preview and disable Apply. The exact source model retains its selectable manifest during an operation preview; the ghost layer never writes picking IDs or introduces native references. None is yellow, Unite retains the existing tint, Subtract is red and Intersect orange. Apply, PDF export and provider sharing retain their separate source/review checks.
+
+Until Selected accepts supported datum planes and exact planar model faces; parallel limits, coplanar zero-depth results and other invalid material still reject safely. Regression evidence covers physical Model picks with a ghost over the source, Manager plane selection, source replacement, field focus, exclusive construction, all four colors and existing native/croquis/save workflows.

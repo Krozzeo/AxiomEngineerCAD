@@ -1,6 +1,5 @@
 import {constructReference} from '/reference/geometry.mjs';
 import {operationSelection,operationValue} from './operation-inspector.mjs';
-import {searchSelect} from './search-select.mjs';
 import {icon} from './icons.mjs';
 
 const vector=(a,b)=>a.map((n,i)=>n-b[i]);
@@ -59,10 +58,9 @@ export function featureFields({document,host,owner,graph,scene,onChange,status,o
  function selection(title,rows,valid,{multiple=false,changed=()=>{}}={}){
   const selected=rows.filter(Boolean).map(row=>choices.find(c=>same(c,row))??{...row,label:row.name??row.target.role});
   const table=operationSelection(document,{title,activate:()=>activate(table),remove:item=>{selected.splice(selected.indexOf(item),1);paint();changed();onChange();}});
-  const search=searchSelect({document,field:'feature-selection-'+tables.length,label:'Select '+title.toLowerCase(),options:choices.filter(valid),value:'',onSelect:id=>pick(choices.find(c=>c.value===id),table)});
-  table.element.append(search.element);Object.assign(table,{selected,valid,multiple,changed,search});tables.push(table);host.append(table.element);return table;
+  Object.assign(table,{selected,valid,multiple,changed});tables.push(table);host.append(table.element);return table;
  }
- function activate(table){active=table;for(const t of tables)t.paint(t.selected.map(c=>Object.assign(c,{name:c.label})),t===active);onSelectTable?.();highlight?.(active.selected);}
+ function activate(table){active=table;for(const t of tables)t.paint(t.selected.map(c=>Object.assign(c,{name:c.label})),t===active);onSelectTable?.();highlight?.(active?.selected??[]);}
  function paint(){for(const t of tables)t.paint(t.selected.map(c=>Object.assign(c,{name:c.label})),t===active);highlight?.(active?.selected??[]);}
  function pick(choice,table=active){
   if(!choice||!table||!table.valid(choice)){status('Choose a valid reference for the active table.');return false;}
@@ -121,7 +119,7 @@ export function featureFields({document,host,owner,graph,scene,onChange,status,o
    for(const [mode,label,glyph]of [['value','Value','dimension'],['symmetric','Symmetric Value','mirror'],['next','Until Next','limit-next'],['selected','Until Selected','face'],['offset','Offset from Selected','limit-offset'],['all','Through All','limit-all']]){
     if(mode==='symmetric'&&side==='end')continue;
     const button=document.createElement('button');button.type='button';button.title=label;button.setAttribute('aria-label',label);button.dataset.limitMode=mode;button.innerHTML=icon(glyph);button.disabled=['next','all'].includes(mode)&&!settings.baseFeatureId;
-    button.onclick=()=>{limit.mode=mode;limitsChanged=true;update();onChange();};modes.append(button);
+    button.onclick=()=>{limit.mode=mode;limitsChanged=true;update();if(['selected','offset'].includes(mode)){activate(table);table.element.focus({preventScroll:true});}else if(['value','symmetric'].includes(mode)){activate(null);field.control.input.focus({preventScroll:true});field.control.input.select();}else activate(null);onChange();};modes.append(button);
    }
    limitPanels.set(side,region);update();Object.assign(region,{table,field,update});
   }
@@ -144,6 +142,10 @@ export function featureFields({document,host,owner,graph,scene,onChange,status,o
   if(!revolve){input.replaceDepthBinding=true;const id=limitPanels.get('end').field.control.select.value;if(id&&state.limits.end.mode==='value'&&state.limits.start.mode==='value'&&state.limits.start.value===0)input.depthParameterId=id;}
   return input;
  }
- activate(tables.find(t=>!t.selected.length&&!t.element.hidden)??tables[0]);
- return {read,pick,choices,refreshScene(scene){const next=featureChoices(graph,scene).filter(allowed);if(JSON.stringify(next)===JSON.stringify(choices))return;choices.splice(0,choices.length,...next);for(const table of tables)table.search.setOptions(choices.filter(table.valid));paint();},preview(){if(!referenceKind)return null;const entries=read().references;return {kind:referenceKind,frame:constructReference(referenceKind,entries.map(e=>({...e,value:e.parameterId?(graph.parameters.find(p=>p.id===e.parameterId)?.value??0)*(e.relation==='angle'?180/Math.PI:1):e.value,geometry:referenceTables.find(r=>r.table.selected.some(c=>same(c,e)))?.table.selected[0].geometry})))};},cancel(){highlight?.([]);},focus(){const field=fields.get('extrusion-depth-value');if(field&&!field.row.hidden){field.control.input.focus({preventScroll:true});field.control.input.select();}}};
+ activate(sourceTable??tables.find(t=>!t.selected.length&&!t.element.hidden)??tables[0]);
+ function choiceFor(target){
+  return choices.find(c=>active?.valid(c)&&c.target.producerId===target.producerId&&c.target.role===target.role&&(c.target.kind===target.kind||target.kind==='feature'&&c.target.kind==='sketch'&&c.target.role==='result'))
+   ??(repeating&&active===sourceTable?choices.find(c=>active.valid(c)&&c.target.producerId===target.producerId&&c.target.kind==='feature'&&['body','face','edge','vertex'].includes(target.kind)):null);
+ }
+ return {read,pick,choices,accepts:target=>!!choiceFor(target),pickTarget(target){const choice=choiceFor(target);return choice?pick(choice):false;},refreshScene(scene){const next=featureChoices(graph,scene).filter(allowed);if(JSON.stringify(next)===JSON.stringify(choices))return;choices.splice(0,choices.length,...next);for(const table of tables)for(let i=0;i<table.selected.length;i++){const fresh=choices.find(c=>same(c,table.selected[i]));if(fresh)table.selected[i]=fresh;}paint();},preview(){if(!referenceKind)return null;const entries=read().references;return {kind:referenceKind,frame:constructReference(referenceKind,entries.map(e=>({...e,value:e.parameterId?(graph.parameters.find(p=>p.id===e.parameterId)?.value??0)*(e.relation==='angle'?180/Math.PI:1):e.value,geometry:referenceTables.find(r=>r.table.selected.some(c=>same(c,e)))?.table.selected[0].geometry})))};},cancel(){highlight?.([]);},focus(){const field=fields.get('extrusion-depth-value');if(field&&!field.row.hidden){field.control.input.focus({preventScroll:true});field.control.input.select();}}};
 }

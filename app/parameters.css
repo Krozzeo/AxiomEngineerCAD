@@ -57,3 +57,13 @@
 .feature-build-column select{min-width:90px;max-width:145px;font-size:10px}
 
 .operation-selection-heading{display:flex;gap:8px;align-items:center}.operation-selection-heading h4{flex:1}.operation-selection-heading button{width:28px;height:28px;padding:4px}
+
+/* Operation state is independent of the selected model entity. */
+.operation-page button[data-feature-kind][aria-pressed=true]{background:#c5e8fa;color:#123044;border-color:#74c7ec;box-shadow:inset 0 0 0 1px #74c7ec}
+body.constructing-feature #inspector-content>:not(#feature-operation-editor){display:none!important}
+.operation-inspector .operation-value-table{margin:0;height:32px}
+.operation-inspector .operation-value-table td{height:30px;padding:0}
+.operation-inspector .operation-value-table input,.operation-inspector .operation-value-table input:focus{box-sizing:border-box;height:30px;min-height:0;padding:5px 9px;font-size:14px}
+#feature-operation-fields input[data-extrusion-name]{box-sizing:border-box;height:32px;min-height:0;padding:5px 9px}
+
+.operation-inspector .operation-value>button{box-sizing:border-box;flex:none;width:32px;height:32px;padding:5px}

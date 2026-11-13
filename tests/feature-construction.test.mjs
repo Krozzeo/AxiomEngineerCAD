@@ -98,3 +98,14 @@ test('Legacy Y mirror offsets agree with the explicitly oriented Top reference p
  const referenced=extrude(source,'mirror','base-sketch','none',{baseFeatureId:'base',form:'repeat',repeat:{...repeat,offsetMm:-2,reference:{target:target('xz')}}});
  assert.deepEqual((await regenerateExtrusions(referenced)).bounds,(await regenerateExtrusions(legacy)).bounds);
 });
+
+
+test('Until Selected accepts datum and exact planar face limits in either extrusion direction',async()=>{
+ let doc=sketch(base(),'limited',[2,2],[4,4]);
+ doc=invoke(doc,'reference.set',{featureId:'above',kind:'plane',name:'Above',references:[{target:target('xy'),relation:'offset',value:20}]});
+ const end=reference=>({start:value(0),end:{mode:'selected',value:0,reference}});
+ const result=await regenerateExtrusions(extrude(doc,'limited-solid','limited','none',{baseFeatureId:'base',limits:end({target:{...target('plane'),producerId:'above'}})}));near(result.volumeMm3,1080);
+ const face=await regenerateExtrusions(extrude(doc,'limited-solid','limited','none',{baseFeatureId:'base',limits:end({target:{kind:'face',producerId:'base',definitionId:'definition-main',role:'top',occurrencePath:['definition-main']}})}));near(face.volumeMm3,1040);
+ doc=invoke(doc,'reference.set',{featureId:'below',kind:'plane',name:'Below',references:[{target:target('xy'),relation:'offset',value:-5}]});
+ const reverse=await regenerateExtrusions(extrude(doc,'limited-solid','limited','none',{baseFeatureId:'base',reverse:true,limits:end({target:{...target('plane'),producerId:'below'}})}));near(reverse.volumeMm3,1020);
+});

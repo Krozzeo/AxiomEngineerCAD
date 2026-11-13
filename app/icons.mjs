@@ -29,4 +29,9 @@ Object.assign(paths,{
  'dim-diameter':'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18M6 18L18 6M6 15v3h3M15 6h3v3'
 });
 paths['constraint-equation-tangent']=paths['constraint-tangent'];
-export function icon(name){return paths[name]?`<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="${paths[name]}" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`:`<img src="/icons/${name}.svg" width="18" height="18" alt="">`;}
+export function icon(name){
+ if(['boolean-unite','boolean-subtract','boolean-intersect'].includes(name)){
+  const region={'boolean-unite':'M2 2H15V7H22V21H9V23H2Z','boolean-subtract':'M2 2H15V7H9V21H15V23H2Z','boolean-intersect':'M9 7H15V21H9Z'}[name];
+  return `<svg viewBox="0 0 24 25" width="18" height="18" aria-hidden="true"><path d="${region}" fill="#96cf50"/><path d="M2 2H15V23H2ZM9 7H22V21H9Z" fill="none" stroke="#fff" stroke-width="1.2"/></svg>`;
+ }
+ return paths[name]?`<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="${paths[name]}" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`:`<img src="/icons/${name}.svg" width="18" height="18" alt="">`;}

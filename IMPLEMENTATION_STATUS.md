@@ -1,6 +1,6 @@
 # Engineer implementation status
 
-Current candidate: **0.3.5 / E3.M2 feature construction**. See [workflow and verification](docs/E3_M2_FEATURE_CONSTRUCTION.md). The 0.2.6 stable delivery is indexed in PROJECT_STATE.
+Current candidate: **0.3.6 / E3.M2 feature construction**. 0.3.6 corrects construction state, direct picking, automatic limit focus and Boolean preview presentation. See [workflow and verification](docs/E3_M2_FEATURE_CONSTRUCTION.md). The 0.2.6 stable delivery is indexed in PROJECT_STATE.
 
 Previous CAD: **0.1.8 / E1.M5 sketch interactions — delivered for owner review**, source `4f38a0e6ccc2f4e1dfd331beaa2d20b4352501d5` / PR16. Exact Windows/Linux acceptance, immutable experimental publication and actual public Platform installation passed. Owner acceptance remains pending. `docs/PROJECT_STATE.json` is the compact delivery/evidence index; no E2 progression, main merge or stable release is claimed.
 

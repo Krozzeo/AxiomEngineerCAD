@@ -8,7 +8,7 @@
   },
   "milestone": {
     "current": "E3.M2",
-    "status": "0.3.5 E3.M2 feature construction candidate",
+    "status": "0.3.6 E3.M2 feature construction corrections candidate",
     "ownerAcceptance": "pending",
     "next": "Owner reviews E3.M2 feature operations before E3.M3"
   },
@@ -37,9 +37,9 @@
     "deliveryGate": "docs/MILESTONE_DELIVERY.md"
   },
   "candidate": {
-    "version": "0.3.5",
+    "version": "0.3.6",
     "branch": "engineer/e3-m1-sketch-breadth",
-    "status": "Shared feature construction, four booleans, multibody material, referenced limits and datums, and sketch latency improvements"
+    "status": "Exclusive highlighted construction, direct geometry picking, automatic limit focus, compact values and Boolean preview colors"
   },
   "previousDelivered": {
     "version": "0.2.5",
@@ -72,12 +72,13 @@
     "verification": "Windows/Linux: 232 tests each, browser and independent PDF acceptance. Public Platform 0.1.13 install/activate/launch and focused Chrome/NVIDIA sketch/save/reopen passed; broader public legacy/PDF run stopped on a harness precondition and is not claimed passed."
   },
   "lastExperimental": {
-    "version": "0.3.4",
-    "commit": "4a2cdbd27bba76463df1bdb328edccb5b0c53feb",
+    "version": "0.3.5",
+    "commit": "116d094a8133b8f287d1d15100b4ffa74e8fb7bd",
     "pullRequest": 19,
-    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-19-4a2cdbd27bba76463df1bdb328edccb5b0c53feb",
-    "acceptanceRun": 42496982582,
-    "publicationRun": 42497845035,
-    "verification": "Windows/Linux acceptance passed. Actual Platform ZIP install, hardware browser demo, save/reopen passed with official connector metadata because anonymous discovery was rate-limited."
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-19-116d094a8133b8f287d1d15100b4ffa74e8fb7bd",
+    "acceptanceRun": 43314246566,
+    "publicationRun": 43315792883,
+    "artifactSha256": "c0101c1ae503cdf70bb0c645f2ca3fbb3fbc36cbaf837b1e39bdea8fa184db0e",
+    "verification": "Exact Windows/Linux acceptance passed. Public Platform 0.1.13 discovery/download/install/activate/launch, Chrome/NVIDIA construction and historical sketch/feature regressions passed. Owner reported construction UX corrections for the next batch."
   }
 }

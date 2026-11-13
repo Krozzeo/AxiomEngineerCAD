@@ -19,6 +19,43 @@ export async function verifyFeatureConstructionUI({context,host,observe,evidence
   assert.match(await source.textContent(),/Select geometry/);
   await page.locator('[data-source-id=limit-practice]').click();
   await source.getByRole('table').getByText('limit-practice',{exact:true}).waitFor();
+  assert.equal(await source.locator('.search-select').count(),0,'Geometry tables use direct picking only.');
+  const highlight=await page.locator('#cad-extrude-sketch').evaluate(b=>({bg:getComputedStyle(b).backgroundColor,color:getComputedStyle(b).color}));
+  assert.equal(highlight.bg,'rgb(197, 232, 250)');assert.equal(highlight.color,'rgb(18, 48, 68)');
+  const sourceDocument=await sketchDocument(page);
+  await page.locator('[data-source-id=limit-practice]').dblclick();
+  assert.equal(await page.evaluate(()=>window.engineerSketch.view()),null,'Sketch editing must not replace a feature draft.');
+  await page.locator('#cad-feature-revolve').click();
+  assert.equal(await page.locator('#cad-extrude-sketch').getAttribute('aria-pressed'),'true');
+  assert.equal(await page.locator('#cad-feature-revolve').getAttribute('aria-pressed'),'false');
+  assert.deepEqual(await sketchDocument(page),sourceDocument);
+  assert.equal(await page.locator('.proof-inspector').isVisible(),false);
+  const end=form.locator('[data-limit-side=end]'),until=end.getByRole('button',{name:'Until Selected',exact:true});
+  await until.click();
+  const target=end.locator('.operation-selection');assert.match(await target.getAttribute('class'),/active/);
+  await page.locator('[data-source-id=raised-plane]').click();
+  await target.getByRole('table').getByText('Raised plane · 20 mm',{exact:true}).waitFor();
+  await page.waitForFunction(()=>window.engineerViewport.proof?.preview&&Math.abs(window.engineerViewport.proof.exact.volumeMm3-14360)<1e-5);
+  const pickPoint=async point=>page.evaluate(w=>{const r=window.engineerViewport.renderer,c=r.canvas,b=c.getBoundingClientRect(),m=r.presentedFrame.matrix,a=Array.from({length:4},(_,i)=>m[i]*w[0]+m[i+4]*w[1]+m[i+8]*w[2]+m[i+12]);return {x:b.x+(a[0]/a[3]+1)*b.width/2,y:b.y+(1-a[1]/a[3])*b.height/2};},point);
+  const face=await pickPoint([22,20,10]);await page.mouse.click(face.x,face.y);
+  await target.getByRole('table').getByText(/Face ·/).waitFor();
+  await page.waitForFunction(()=>window.engineerViewport.proof?.preview&&Math.abs(window.engineerViewport.proof.exact.volumeMm3-14000)<1e-5);
+  assert.equal(await page.locator('.proof-inspector').isVisible(),false);
+  await end.getByRole('button',{name:'Value',exact:true}).click();
+  assert.equal(await page.locator('#extrusion-depth-value').evaluate(i=>document.activeElement===i&&i.selectionStart===0&&i.selectionEnd===i.value.length),true);
+  await page.locator('#extrusion-depth-value').fill('5');await page.locator('#extrusion-depth-value').press('Enter');
+  // Every material mode rebuilds the tool layer, retaining exact baseline picks.
+  for(const [mode,kind]of [['none','none'],['cut','subtract'],['intersect','intersect'],['add','unite']]){
+   await page.locator('[data-feature-boolean='+mode+']').click();
+   await page.waitForFunction(kind=>window.engineerViewport.proof?.preview&&window.engineerViewport.renderer.scene.previewLayers?.[0]?.kind===kind,kind);if(evidence)await page.screenshot({path:join(evidence,'feature-preview-'+kind+'.png')});
+  }
+  assert.deepEqual(await page.evaluate(()=>window.engineerViewport.renderer.errors),[]);
+  const size=await page.locator('#extrusion-depth-value').evaluate(i=>({input:i.getBoundingClientRect().height,button:i.closest('.operation-value').querySelector('button').getBoundingClientRect().height}));
+  assert.ok(Math.abs(size.input-size.button)<=2,JSON.stringify(size));
+  // Select a visible sketch from Model, with an explicit source-table target.
+  await source.getByRole('button',{name:'Clear sketch',exact:true}).click();await source.getByRole('table').getByText('Select geometry',{exact:true}).waitFor();await page.waitForFunction(()=>window.engineerViewport.proof?.preview===false);assert.equal(await form.getByRole('button',{name:'Apply',exact:true}).isDisabled(),true);await source.click();const outline=await pickPoint([11,8,0]);await page.mouse.click(outline.x,outline.y);
+  await source.getByRole('table').getByText('limit-practice',{exact:true}).waitFor();
+  assert.equal(await page.locator('.proof-inspector').isVisible(),false);
   await page.locator('[data-feature-boolean=none]').click();
   const start=form.locator('[data-limit-side=start]');await start.getByRole('button',{name:'Symmetric Value',exact:true}).click();
   await page.locator('#extrusion-start-value').fill('2');await page.locator('#extrusion-start-value').press('Enter');
@@ -70,6 +107,6 @@ export async function verifyFeatureConstructionUI({context,host,observe,evidence
   const saved=page.waitForResponse(r=>r.url().endsWith('/v1/save'));await page.locator('#save').click();assert.equal((await saved).status(),200);
   await close();await open();await volume(14144);
   assert.equal((await sketchDocument(page)).native.graph.features.find(f=>f.id===created.id).data.references[0].value,7);
-  report.featureConstruction={passed:true,openWithoutSelection:true,sharedSelectionTables:true,booleanNone:true,symmetricLimit:true,referencePlane:true,newSketchOnReference:true,cancelFeature:true,rapidLines:12,provisionalBeforeDelayedResponse:true,independentUndo:true,invalidQueuedEntityPreservesSource:true,inputDurationMs,saveReopen:true};
+  report.featureConstruction={passed:true,openWithoutSelection:true,sharedSelectionTables:true,activeRibbonStyle:true,directModelAndManagerPicking:true,selectedLimits:true,automaticFieldFocus:true,exclusiveConstruction:true,booleanPreviewPalette:true,compactValueFields:true,booleanNone:true,symmetricLimit:true,referencePlane:true,newSketchOnReference:true,cancelFeature:true,rapidLines:12,provisionalBeforeDelayedResponse:true,independentUndo:true,invalidQueuedEntityPreservesSource:true,inputDurationMs,saveReopen:true};
  }catch(error){console.error('Feature construction state',await page?.evaluate(()=>({hint:document.querySelector('#wb-hint')?.textContent,proof:document.querySelector('#proof-status')?.textContent,version:document.querySelector('.stage')?.textContent,fields:document.querySelector('#feature-operation-fields')?.textContent?.slice(0,250)})));if(evidence)await page?.screenshot({path:join(evidence,'feature-construction-failure.png')}).catch(()=>{});throw error;}finally{if(session)await close().catch(()=>page?.close().catch(()=>{}));}
 }
