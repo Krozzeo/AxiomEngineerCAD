@@ -67,3 +67,17 @@ body.constructing-feature #inspector-content>:not(#feature-operation-editor){dis
 #feature-operation-fields input[data-extrusion-name]{box-sizing:border-box;height:32px;min-height:0;padding:5px 9px}
 
 .operation-inspector .operation-value>button{box-sizing:border-box;flex:none;width:32px;height:32px;padding:5px}
+
+#feature-operation-fields .feature-section{margin:14px 0 0;padding:12px 0 0;border-top:1px solid #405971}
+#feature-operation-fields .feature-source-selection{border-top:0;margin-top:10px;padding-top:0}
+#feature-operation-fields .feature-section>h4,#feature-operation-fields .feature-boolean>h4,#feature-operation-fields .feature-preview-toggle>h4{font-size:17px;font-weight:700;letter-spacing:.2px;color:#ecf4ff;margin:0 0 10px}
+#feature-operation-fields .feature-boolean,#feature-operation-fields .feature-preview-toggle{display:flex;align-items:center;gap:4px}
+#feature-operation-fields .feature-boolean>h4,#feature-operation-fields .feature-preview-toggle>h4{margin:0 auto 0 0}
+#feature-operation-fields [data-limit-side]{border:0;padding:8px 0}
+.feature-limit-heading{display:flex;align-items:center;justify-content:space-between;gap:6px}
+#feature-operation-fields .feature-limit-heading h5{font-size:14px;font-weight:600;margin:0}
+.feature-limit-modes{display:flex;flex-wrap:wrap;justify-content:flex-end}
+#feature-operation-fields .feature-source-selection .operation-selection-heading h4{font-size:13px;font-weight:600}
+
+#feature-operation-fields .feature-limit-modes{flex-wrap:nowrap;gap:2px}
+#feature-operation-fields .feature-limit-modes button{flex:none;width:28px;height:28px;margin:0;padding:3px}

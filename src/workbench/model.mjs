@@ -1,6 +1,6 @@
 import {referenceDatums} from '../reference/profile.mjs';
 import {check,validate} from '../document.mjs';
-export const FILTERS=['vertex','edge','face','body','instance','feature','datum'];
+export const FILTERS=['vertex','edge','face','body','instance','feature','datum','sketch'];
 export function baseDatums(value){const definitionId=value.native?.graph.primaryDefinitionId??'definition-main';return [
   {id:'datum-origin',kind:'datum',datumType:'point',role:'origin',name:'Origin',originMm:[0,0,0],pointMm:[0,0,0],definitionId,producerId:'reference-frame',occurrencePath:[definitionId]},
   ...[['xy',[0,0,1]],['xz',[0,-1,0]],['yz',[1,0,0]]].map(([role,normal])=>({id:'datum-'+role,kind:'datum',datumType:'plane',role,name:{xy:'Front',xz:'Top',yz:'Right'}[role],originMm:[0,0,0],normal,definitionId,producerId:'reference-frame',occurrencePath:[definitionId]})),
@@ -17,5 +17,6 @@ export function sceneSelections(scene){const records=[];for(const o of scene.occ
   for(const body of mesh.bodies??[]){o.bodySelectionIds??={};records.push({target:o.bodySelectionIds,key:body.role,item:{...base,...body,kind:'body'}});}
   for(const item of [...mesh.faces,...mesh.edges,...(mesh.exactVertices??[])]){const {points,...details}=item;const field={face:'faceSelectionIds',edge:'edgeSelectionIds',vertex:'vertexSelectionIds'}[item.kind];o[field]??={};records.push({target:o[field],key:item.role,item:{...details,...base}});}}
   for(const sketch of scene.sketches??[])records.push({target:sketch,key:'selectionId',item:{kind:'feature',definitionId:sketch.definitionId,producerId:sketch.id,role:'result',occurrencePath:[sketch.definitionId],planeNormal:sketch.frame.normal}});
+  for(const sketch of scene.sketches??[])for(const entity of sketch.entities.filter(e=>e.type==='line'))records.push({target:entity,key:'selectionId',item:{kind:'sketch',definitionId:sketch.definitionId,producerId:sketch.id,role:entity.id,occurrencePath:[sketch.definitionId],resolution:'ResolvedStable'}});
   for(const datum of scene.datums??[])records.push({target:datum,key:'selectionId',item:datum});return records;}
 export function resolveSceneSelection(scene,target){const hits=sceneSelections(scene).map(r=>r.item).filter(s=>s.kind===target.kind&&s.definitionId===target.definitionId&&s.producerId===target.producerId&&s.role===target.role&&JSON.stringify(s.occurrencePath)===JSON.stringify(target.occurrencePath));check(hits.length===1,hits.length?'AmbiguousReference':'LostReference','Selection does not identify one supported exact entity in this occurrence.');return {...hits[0],canonicalUnit:'mm',frame:'definition-local',resolution:hits[0].resolution??'ResolvedStable'};}

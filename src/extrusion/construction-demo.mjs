@@ -20,5 +20,7 @@ export function featureConstructionDemo(){
  run('reference.set',{featureId:'datum-axis',kind:'axis',name:'Reference Z axis',references:[{target:datum('xy'),relation:'perpendicular',value:0}]});
  const corner=document.native.graph.features.find(f=>f.id==='satellite-profile').data.entities[0];
  run('reference.set',{featureId:'satellite-frame',kind:'coordinate',name:'Satellite coordinate system',references:[{target:{kind:'sketch',producerId:'satellite-profile',role:corner.id+':a',definitionId:'definition-main',occurrencePath:['definition-main']},relation:'coincident',value:0},{target:datum('x'),relation:'parallel',value:0},{target:datum('y'),relation:'parallel',value:0}]});
+ sketch('revolve-practice',[70,0],[74,5]);
+ run('sketch.entity.add',{sketchId:'revolve-practice',unit:'mm',entity:{id:'practice-axis',type:'line',construction:true,a:[65,-8],b:[65,12]}});
  return document;
 }

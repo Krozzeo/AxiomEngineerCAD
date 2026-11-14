@@ -41,14 +41,19 @@ export function operationSpan(data,graph,frame,base,resolve,profile,contact){
   const normal=scale(frame.normal,data.reverse?-1:1),den=dot(geometry.normal,normal);
   check(Math.abs(den)>1e-8,'InvalidGeometry','The selected limit is parallel to the extrusion direction.');
   const origin=add(geometry.origin,scale(geometry.normal,offset));
-  const center=dot(sub(origin,frame.origin),geometry.normal)/den;
-  clips.push({side,plane:{...geometry,origin},offset:0});
-  // Start with an enclosing prism. The exact plane trims every point of a tilted end face.
-  return center+direction*extent;
+  const sample=p=>dot(sub(origin,add(frame.origin,add(scale(frame.u,p[0]),scale(frame.v,p[1])))),geometry.normal)/den;
+  const ranges=[profile.outer,...profile.holes].flatMap(loop=>loop.kind==='circle'?[loop]:loop.kind==='curved'?loop.edges.flatMap(e=>e.type==='arc'?[{kind:'circle',center:e.center,radius:e.radius},{points:[e.a,e.b]}]:[{points:[e.a,e.b]}]):[loop]).flatMap(loop=>{
+   if(loop.kind!=='circle')return loop.points.map(sample);
+   const middle=sample(loop.center),radius=loop.radius*Math.hypot(dot(frame.u,geometry.normal),dot(frame.v,geometry.normal))/Math.abs(den);return [middle-radius,middle+radius];
+  });
+  clips.push({side,plane:{...geometry,origin},offset:0,minimum:Math.min(...ranges),maximum:Math.max(...ranges)});
+  return sample(profile.centroid);
  };
- const start=value(settings.start,'start'),end=value(settings.end,'end');
- check(end>start+1e-6&&(!revolve||end-start<=360+1e-7),'InvalidGeometry','End must be after start and the sweep cannot exceed 360°.');
- return {start,end,clips};
+ const from=value(settings.start,'start'),to=value(settings.end,'end'),inverted=to<from;
+ check(Math.abs(to-from)>1e-6&&(!revolve||Math.abs(to-from)<=360+1e-7),'InvalidGeometry','Limits must enclose positive material and the sweep cannot exceed 360°.');
+ if(inverted)for(const clip of clips)clip.side=clip.side==='start'?'end':'start';
+ const lower=clips.find(c=>c.side==='start'),upper=clips.find(c=>c.side==='end');
+ return {start:lower?lower.minimum-1:Math.min(from,to),end:upper?upper.maximum+1:Math.max(from,to),clips};
 }
 export function trimTool(shape,span,frame,reverse,retain){
  const direction=scale(frame.normal,reverse?-1:1),positions=solid=>solid.edges.flatMap(edge=>[edge.startPoint.toTuple(),edge.endPoint.toTuple()]).map(p=>dot(sub(p,frame.origin),direction));

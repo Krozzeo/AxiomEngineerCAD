@@ -77,21 +77,21 @@ let previewTimer=null,previewSequence=0,previewChain=Promise.resolve();
   throw Error('The previous preview is still stopping. Try updating Depth again.');
  }
  async function stopOperationPreview(){clearTimeout(previewTimer);previewSequence++;return previewRequestsInFlight.settle(retirePreview);}
- function operationInput({draft=false}={}){
- const fields=editing.fields.read({draft});
- return {...(editing.create?{...editing.input}:{featureId:editing.item.id}),...fields};
+ function operationInput({draft=false,preview=false}={}){
+ const fields=editing.fields.read({draft,preview});
+ const input={...(editing.create?{...editing.input}:{featureId:editing.item.id}),...fields};if(input.axisReference&&!fields.axisId)delete input.axisId;return input;
 }
 
 function schedulePreview(){
  clearTimeout(previewTimer);const sequence=++previewSequence,owner=editing;
- if(previewRequestsInFlight.closing||!owner?.depth)return;let incomplete=null;try{owner.fields.read();}catch(error){incomplete=error;}$('feature-operation-form').querySelector('button[type=submit]').disabled=!!incomplete;
+ if(previewRequestsInFlight.closing||!owner?.depth)return;let incomplete=null;try{owner.fields.read();}catch(error){incomplete=error;}$('feature-operation-form').querySelector('button[type=submit]').disabled=true;
  const active=()=>editing===owner&&sequence===previewSequence&&!previewRequestsInFlight.closing;
  previewTimer=setTimeout(()=>{
   previewRequestsInFlight.run(()=>{
    const task=previewChain.then(async()=>{
     if(!active())return;
-    const options=!incomplete&&$('feature-operation-preview').checked
-      ?{previewOperation:{name:owner.create?'cad.extrusion.create.v1':'cad.extrusion.update.v1',inputs:operationInput()}}
+    const options=!incomplete
+      ?{previewOperation:{name:owner.create?'cad.extrusion.create.v1':'cad.extrusion.update.v1',inputs:operationInput({preview:true})}}
       :{operationEditId:owner.item?.id};
     for(let attempt=0;active();attempt++){
      await retirePreview();if(!active())return;
@@ -116,7 +116,7 @@ function schedulePreview(){
   const owner=editing,{document:source}=await api('document');if(editing!==owner)return;
   if(!owner.create)owner.data={...source.native.graph.features.find(f=>f.id===owner.item.id).data,...data,depthMm:data.dimensions?.depth.value??data.depthMm};
   owner.fields=featureFields({document,host:$('feature-operation-fields'),owner,graph:source.native.graph,scene:v.renderer.scene,onChange:schedulePreview,status:notify,highlight:selectedReferences});
-  const label=document.createElement('label'),preview=document.createElement('input');label.className='feature-preview-toggle';preview.type='checkbox';preview.id='feature-operation-preview';preview.checked=true;label.append(preview,document.createTextNode(' Preview'));$('feature-operation-fields').append(label);
+  const label=document.createElement('label'),preview=document.createElement('input'),heading=document.createElement('h4');label.className='feature-section feature-preview-toggle';label.dataset.featureSection='preview';heading.textContent='Preview';preview.type='checkbox';preview.id='feature-operation-preview';preview.checked=true;label.append(heading,preview);$('feature-operation-fields').append(label);
   const kind=owner.referenceKind??(data.form==='repeat'?data.repeat.kind:data.form==='revolve'?'revolve':'extrude');highlightFeature(kind);featureHeading.textContent=kind==='extrude'?'Extrude':kind==='revolve'?'Revolve':kind==='mirror'?'Mirror Feature':kind==='linear'?'Linear Feature Pattern':'Circular Feature Pattern';
   requestAnimationFrame(()=>{if(editing===owner&&!editor.hidden)owner.fields.focus();});
  }
@@ -132,7 +132,7 @@ function schedulePreview(){
   if(!editing?.fields||!event.detail)return;const selected=event.detail;
   if(editing.fields.pickTarget(selected)){event.stopImmediatePropagation();document.querySelector('.proof-inspector').hidden=true;editor.hidden=false;}
  },true);
-$('feature-operation-fields').addEventListener('change',schedulePreview);
+$('feature-operation-fields').addEventListener('change',event=>{if(event.target.matches('[data-extrusion-name],#feature-operation-preview'))schedulePreview();});
 $('feature-operation-form').addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.target.closest('button')){event.preventDefault();event.stopPropagation();if(event.target.id!=='extrusion-depth-value')schedulePreview();}});
 function cancelOperation(event){if(!editing)return;if(event.type==='keydown'&&event.key!=='Escape')return;event.preventDefault();event.stopImmediatePropagation();$('feature-operation-done').click();}
 document.addEventListener('keydown',cancelOperation,true);v.renderer.canvas.parentElement.addEventListener('contextmenu',cancelOperation,true);
@@ -147,7 +147,12 @@ function paintReferencePreview(){
  if(preview.kind==='coordinate')for(const [i,direction]of [frame.u,frame.v,frame.normal].entries())segment(frame.origin,frame.origin.map((n,k)=>n+direction[k]*extent),['#e74848','#32bd5b','#3279ed'][i]);
  else for(const [a,b]of datumSegments({datumType:preview.kind,originMm:frame.origin,normal:frame.normal,u:frame.u,direction:frame.normal},extent))segment(a,b);
 }
-window.addEventListener('engineer-proof-built',()=>editing?.fields?.refreshScene(v.renderer.scene));
+window.engineerOperationPreviewVisible=()=>!editing?.fields||!!$('feature-operation-preview')?.checked;
+window.addEventListener('engineer-proof-built',event=>{
+ const owner=editing;if(!owner?.fields)return;let signature;try{signature=JSON.stringify(operationInput({preview:true}));}catch{}owner.fields.refreshScene(v.renderer.scene);
+ const info=event.detail.operationState;if(!info||info.featureId!==(owner.item?.id??owner.input?.featureId))return;
+ try{if(info.inputSignature!==signature)return;owner.fields.setOperationState(info);$('feature-operation-form').querySelector('button[type=submit]').disabled=false;}catch{}
+});
 for(const event of ['engineer-camera-presented','engineer-proof-built','resize'])window.addEventListener(event,paintReferencePreview);
 const featuresRibbon=document.querySelector('[data-operations=Features]');
 async function beginFeature(kind,title){
@@ -161,7 +166,7 @@ async function beginFeature(kind,title){
  const sketch=g.features.find(f=>f.id===(seed?.data.sketchId??selectedId)&&f.type==='sketch-primitives');
  if(window.engineerSketch.view())await window.engineerSketch.exit();
  const input={featureId:'extrusion-'+crypto.randomUUID(),sketchId:sketch?.id??'',name:title+' '+(features.length+1),depthMm:10,reverse:false,operation:seed?(['new-body','none'].includes(seed.data.operation)?'none':seed.data.operation):tip?'add':'new-body',...(tip?{baseFeatureId:tip.id}:{})};
- if(revolve)Object.assign(input,{form:'revolve',axisId:sketch?.data.entities.find(e=>e.type==='line'&&e.construction)?.id??'',angleDeg:360});
+ if(revolve)Object.assign(input,{form:'revolve',...(sketch?.data.entities.find(e=>e.type==='line'&&e.construction)?{axisId:sketch.data.entities.find(e=>e.type==='line'&&e.construction).id}:{}),angleDeg:360});
  if(repeating)Object.assign(input,{form:'repeat',repeat:{kind,sourceFeatureId:seed?.id??'',axis:'x',count:kind==='mirror'?2:3,offsetMm:kind==='mirror'?0:10,angleDeg:90}});
  editing={create:true,ctx:await context(),input};window.engineerOperationFeature=sketch?.id??null;
  window.dispatchEvent(new CustomEvent('engineer-feature-edit-changed'));

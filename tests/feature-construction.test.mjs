@@ -5,6 +5,8 @@ import {upgrade} from '../src/native/schema.mjs';
 import {command} from '../src/commands/domain.mjs';
 import {regenerateExtrusions} from '../src/extrusion/kernel.mjs';
 import {referenceDatums} from '../src/reference/profile.mjs';
+import {buildOperationPreview} from '../src/proof/operation-preview.mjs';
+import {buildProof} from '../src/proof/kernel.mjs';
 import {planeFrame} from '../src/sketch/profile.mjs';
 
 const invoke=(doc,name,input)=>command(doc,'cad.'+name+'.v1',input);
@@ -108,4 +110,66 @@ test('Until Selected accepts datum and exact planar face limits in either extrus
  const face=await regenerateExtrusions(extrude(doc,'limited-solid','limited','none',{baseFeatureId:'base',limits:end({target:{kind:'face',producerId:'base',definitionId:'definition-main',role:'top',occurrencePath:['definition-main']}})}));near(face.volumeMm3,1040);
  doc=invoke(doc,'reference.set',{featureId:'below',kind:'plane',name:'Below',references:[{target:target('xy'),relation:'offset',value:-5}]});
  const reverse=await regenerateExtrusions(extrude(doc,'limited-solid','limited','none',{baseFeatureId:'base',reverse:true,limits:end({target:{...target('plane'),producerId:'below'}})}));near(reverse.volumeMm3,1020);
+});
+
+
+test('Reversed numeric, parameter and selected-plane boundaries enclose the same exact material',async()=>{
+ let doc=sketch(base(),'range',[2,2],[4,4]);
+ const make=limits=>extrude(doc,'range-solid','range','none',{baseFeatureId:'base',limits});
+ for(const reverse of [false,true]){
+  const bounds={start:value(10),end:value(-10)},normal={start:value(-10),end:value(10)};
+  const a=await regenerateExtrusions(invoke(make(bounds),'extrusion.update',{featureId:'range-solid',name:'Range',depthMm:10,reverse}));
+  const b=await regenerateExtrusions(invoke(make(normal),'extrusion.update',{featureId:'range-solid',name:'Range',depthMm:10,reverse}));near(a.volumeMm3,1080);assert.deepEqual(a.bounds,b.bounds);
+ }
+ doc=invoke(doc,'reference.set',{featureId:'range-plane',kind:'plane',name:'Range plane',references:[{target:target('xy'),relation:'offset',value:-5}]});
+ const reference={target:{...target('plane'),producerId:'range-plane'}};
+ const a=await regenerateExtrusions(make({start:value(10),end:{mode:'selected',value:0,reference}}));
+ const b=await regenerateExtrusions(make({start:{mode:'selected',value:0,reference},end:value(10)}));near(a.volumeMm3,1060);assert.deepEqual(a.bounds,b.bounds);
+ const offset=await regenerateExtrusions(make({start:value(10),end:{mode:'offset',value:2,reference}}));near(offset.volumeMm3,1052);
+ doc=invoke(doc,'parameter.set',{parameter:{id:'negative-end',definitionId:null,name:'NegativeEnd',unit:'mm',expression:'-5 mm',description:''}});
+ const driven=await regenerateExtrusions(make({start:value(10),end:{mode:'value',value:999,parameterId:'negative-end'}}));near(driven.volumeMm3,1060);
+ const face=role=>({mode:'selected',value:0,reference:{target:{kind:'face',producerId:'base',definitionId:'definition-main',role,occurrencePath:['definition-main']}}});
+ near((await regenerateExtrusions(make({start:face('top'),end:face('bottom')}))).volumeMm3,1040);
+ doc=invoke(doc,'reference.set',{featureId:'tilted-range',kind:'plane',name:'Tilted range',references:[{target:target('xy'),relation:'angle',value:30}]});
+ const plane=referenceDatums(doc).find(d=>d.id==='tilted-range'),z=(plane.normal.reduce((sum,n,i)=>sum+n*plane.originMm[i],0)-3*plane.normal[0]-3*plane.normal[1])/plane.normal[2];
+ const tilted={mode:'selected',value:0,reference:{target:{...target('plane'),producerId:'tilted-range'}}};
+ near((await regenerateExtrusions(make({start:value(10),end:tilted}))).volumeMm3,1000+4*Math.abs(10-z));
+
+});
+
+test('Preview chooses None only when the requested exact Boolean is unavailable; native commands remain strict',async()=>{
+ const doc=sketch(base(),'probe',[2,2],[4,4]),snapshot=JSON.stringify(doc);
+ for(const operation of ['add','cut','intersect']){
+  const inputs={featureId:'probe-solid',sketchId:'probe',name:'Probe',operation,baseFeatureId:'base',depthMm:10,reverse:false,limits:{start:value(30),end:value(40)}};
+  const candidate=invoke(doc,'extrusion.create',inputs),previewOperation={name:'cad.extrusion.create.v1',inputs};
+  await assert.rejects(regenerateExtrusions(candidate),{code:'InvalidGeometry'});
+  const p=await buildOperationPreview({document:candidate,sourceDocument:doc,previewOperation});near(p.exact.volumeMm3,1040);assert.equal(p.operationState.effectiveOperation,'none');assert.deepEqual(p.operationState.available,{none:true,add:false,cut:false,intersect:false});assert.equal(p.scene.previewLayers[0].kind,'none');
+  inputs.limits={start:value(0),end:value(5)};
+  const restored=await buildOperationPreview({document:invoke(doc,'extrusion.create',inputs),sourceDocument:doc,previewOperation});assert.equal(restored.operationState.effectiveOperation,operation);assert.equal(restored.operationState.available[operation],true);
+ }
+ assert.equal(JSON.stringify(doc),snapshot);
+});
+
+test('An edited operation exposes the previous model for exact face references, including offset limits',async()=>{
+ let doc=extrude(sketch(base(),'edited',[2,2],[4,4]),'edited-solid','edited','none',{baseFeatureId:'base'});
+ for(const mode of ['selected','offset']){
+  const inputs={featureId:'edited-solid',name:'Edited',depthMm:10,reverse:false,limits:{start:value(0),end:{mode,value:mode==='offset'?2:0,reference:{target:{kind:'face',producerId:'base',definitionId:'definition-main',role:'top',occurrencePath:['definition-main']}}}}};
+  const p=await buildOperationPreview({document:invoke(doc,'extrusion.update',inputs),sourceDocument:doc,previewOperation:{name:'cad.extrusion.update.v1',inputs},rollbackAt:'edited-solid'});
+  assert.equal(p.scene.models[0].featureId,'base');near(p.exact.volumeMm3,mode==='offset'?1048:1040);near(p.scene.models[0].mesh.volumeMm3,1000);
+ }
+ const source=await buildProof(doc,{viewportOnly:true,rollbackAt:'edited-solid',beforeOperation:true});assert.equal(source.scene.models[0].featureId,'base');
+});
+
+
+test('The actual Boolean and its remembered editing preference persist independently without relaxing native validation',async()=>{
+ const source=sketch(base(),'remember',[2,2],[4,4]),saved=extrude(source,'remember-solid','remember','none',{baseFeatureId:'base',booleanPreference:'cut',limits:{start:value(30),end:value(40)}});
+ const restored=JSON.parse(JSON.stringify(saved)),feature=restored.native.graph.features.find(f=>f.id==='remember-solid');assert.equal(feature.data.operation,'none');assert.equal(feature.data.booleanPreference,'cut');near((await regenerateExtrusions(restored)).volumeMm3,1040);
+ const explicit=invoke(restored,'extrusion.update',{featureId:'remember-solid',name:'Changed',depthMm:10,reverse:false,operation:'add'});assert.equal(explicit.native.graph.features.find(f=>f.id==='remember-solid').data.booleanPreference,'add');await assert.rejects(regenerateExtrusions(explicit),{code:'InvalidGeometry'});
+});
+
+test('Reversed angular limits preserve a valid sweep and its analytical volume',async()=>{
+ const doc=sketch(upgrade(blank('Angular limits')),'angular',[10,0],[15,5]);const reference={target:target('y')};
+ for(const limits of [{start:value(90),end:value(-90)},{start:value(-90),end:value(90)}]){
+  const result=await regenerateExtrusions(extrude(doc,'revolved','angular','new-body',{form:'revolve',axisReference:reference,angleDeg:360,limits}));near(result.volumeMm3,25*12.5*Math.PI);
+ }
 });

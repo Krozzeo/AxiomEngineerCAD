@@ -41,11 +41,13 @@ const reference=choice=>({target:structuredClone(choice.target),...(choice.geome
 
 export function featureFields({document,host,owner,graph,scene,onChange,status,onSelectTable,highlight}){
  const settings=structuredClone(owner.create?owner.input:owner.data),referenceKind=owner.referenceKind;
- const state={...settings,limits:structuredClone(settings.limits??{start:{mode:'value',value:0},end:{mode:'value',value:settings.form==='revolve'?settings.angleDeg:settings.depthMm}})};
+ const state={...settings,operation:settings.baseFeatureId?(settings.booleanPreference??settings.operation):settings.operation,limits:structuredClone(settings.limits??{start:{mode:'value',value:0},end:{mode:'value',value:settings.form==='revolve'?settings.angleDeg:settings.depthMm}})};
+ let booleanAvailable=settings.booleanPreference&&settings.operation==='none'&&settings.booleanPreference!=='none'?{none:true,add:false,cut:false,intersect:false}:null;const effectiveOperation=()=>booleanAvailable&&!booleanAvailable[state.operation]?'none':state.operation;
  let active=null,limitsChanged=!!settings.limits;
  const editIndex=owner.item?graph.features.findIndex(f=>f.id===owner.item.id):-1,allowed=c=>c.target.producerId==='reference-frame'||editIndex<0||graph.features.findIndex(f=>f.id===c.target.producerId)<editIndex;
  const choices=featureChoices(graph,scene).filter(allowed),tables=[],fields=new Map(),limitPanels=new Map();
  const name=document.createElement('label'),nameInput=document.createElement('input');name.textContent='Name';nameInput.dataset.extrusionName='true';nameInput.value=settings.name;nameInput.maxLength=128;name.append(nameInput);host.append(name);
+ const selectionRegion=document.createElement('section'),selectionHeading=document.createElement('h4');selectionRegion.className='feature-section feature-source-selection';selectionRegion.dataset.featureSection='selection';selectionHeading.textContent='Selection';selectionRegion.append(selectionHeading);host.append(selectionRegion);
  const form=settings.form,repeating=form==='repeat',revolve=form==='revolve';if(repeating)owner.depth={};
  if(repeating&&settings.repeat.kind==='mirror'&&!settings.repeat.reference&&settings.repeat.axis==='y')state.repeat.offsetMm=-settings.repeat.offsetMm;
  function value(key,title,number,unitName,parameterId,onCommit){
@@ -58,7 +60,7 @@ export function featureFields({document,host,owner,graph,scene,onChange,status,o
  function selection(title,rows,valid,{multiple=false,changed=()=>{}}={}){
   const selected=rows.filter(Boolean).map(row=>choices.find(c=>same(c,row))??{...row,label:row.name??row.target.role});
   const table=operationSelection(document,{title,activate:()=>activate(table),remove:item=>{selected.splice(selected.indexOf(item),1);paint();changed();onChange();}});
-  Object.assign(table,{selected,valid,multiple,changed});tables.push(table);host.append(table.element);return table;
+  Object.assign(table,{selected,valid,multiple,changed});tables.push(table);selectionRegion.append(table.element);return table;
  }
  function activate(table){active=table;for(const t of tables)t.paint(t.selected.map(c=>Object.assign(c,{name:c.label})),t===active);onSelectTable?.();highlight?.(active?.selected??[]);}
  function paint(){for(const t of tables)t.paint(t.selected.map(c=>Object.assign(c,{name:c.label})),t===active);highlight?.(active?.selected??[]);}
@@ -75,8 +77,8 @@ export function featureFields({document,host,owner,graph,scene,onChange,status,o
   for(let index=0;index<3;index++){
    const entry=settings.references?.[index],table=selection('Reference '+(index+1),entry?[entry]:[],c=>c.target.kind!=='body'&&c.target.kind!=='feature'&&c.target.role!=='result');
    const label=document.createElement('label'),relation=document.createElement('select');label.textContent='Relation';
-   for(const type of ['coincident','parallel','perpendicular','offset','angle','midplane'])relation.append(new Option(type,type));relation.value=entry?.relation??'coincident';label.append(relation);host.append(label);
-   const distance=value('reference-value-'+index,'Distance / angle',entry?.value??0,entry?.relation==='angle'?'rad':'mm',entry?.parameterId,()=>{});host.append(distance.title,distance.row);
+   for(const type of ['coincident','parallel','perpendicular','offset','angle','midplane'])relation.append(new Option(type,type));relation.value=entry?.relation??'coincident';label.append(relation);selectionRegion.append(label);
+   const distance=value('reference-value-'+index,'Distance / angle',entry?.value??0,entry?.relation==='angle'?'rad':'mm',entry?.parameterId,()=>{});selectionRegion.append(distance.title,distance.row);
    const update=()=>{distance.title.hidden=distance.row.hidden=!['offset','angle'].includes(relation.value);onChange();};relation.onchange=()=>{distance.control.setOptions(graph.parameters.filter(p=>p.unit===(relation.value==='angle'?'rad':'mm')).map(p=>({value:p.id,label:p.name,number:relation.value==='angle'?p.value*180/Math.PI:p.value})));distance.control.setLiteral(0);update();};table.changed=()=>{const c=table.selected[0],point=c?.geometry?.kind==='point'||c?.target.role.includes(':')||c?.target.role==='origin',planar=c&&plane(c);const allowed=point?['coincident']:referenceKind==='coordinate'?['coincident','parallel']:referenceKind==='axis'?['coincident','parallel','perpendicular']:planar?['coincident','parallel','perpendicular','offset','angle','midplane']:['coincident','parallel','perpendicular'];for(const option of relation.options)option.disabled=!allowed.includes(option.value);if(!allowed.includes(relation.value))relation.value='coincident';update();};table.changed();
    referenceTables.push({table,relation,distance});
   }
@@ -92,15 +94,15 @@ export function featureFields({document,host,owner,graph,scene,onChange,status,o
  }else{
   sourceTable=selection('Sketch',[settings.sketchId?{target:{kind:'sketch',producerId:settings.sketchId,role:'result'}}:null],c=>c.target.kind==='sketch'&&c.target.role==='result');
   if(revolve)axisTable=selection('Axis',settings.axisReference?[settings.axisReference]:settings.axisId?[{target:{kind:'sketch',producerId:settings.sketchId,role:settings.axisId}}]:[],line);
-  const boolean=document.createElement('section'),heading=document.createElement('h4');heading.textContent='Boolean';boolean.className='feature-boolean';boolean.append(heading);
+  const boolean=document.createElement('section'),heading=document.createElement('h4');heading.textContent='Boolean';boolean.className='feature-section feature-boolean';boolean.dataset.featureSection='boolean';boolean.append(heading);
   for(const [mode,title,glyph]of [['none','None','boolean-none'],['add','Unite','boolean-unite'],['cut','Subtract','boolean-subtract'],['intersect','Intersect','boolean-intersect']]){
    const button=document.createElement('button');button.type='button';button.title=title;button.setAttribute('aria-label',title);button.dataset.featureBoolean=mode;button.innerHTML=icon(glyph);
-   button.disabled=!settings.baseFeatureId&&mode!=='none';button.setAttribute('aria-pressed',String((state.operation==='new-body'?'none':state.operation)===mode));
-   button.onclick=()=>{state.operation=mode==='none'&&!settings.baseFeatureId?'new-body':mode;for(const b of boolean.querySelectorAll('button'))b.setAttribute('aria-pressed',String(b===button));onChange();};boolean.append(button);
+   button.disabled=mode!=='none'&&(!settings.baseFeatureId||booleanAvailable?.[mode]===false);button.setAttribute('aria-pressed',String((effectiveOperation()==='new-body'?'none':effectiveOperation())===mode));
+   button.onclick=()=>{state.operation=mode==='none'&&!settings.baseFeatureId?'new-body':mode;paintBoolean();onChange();};boolean.append(button);
   }host.append(boolean);
-  const limitsTitle=document.createElement('h4');limitsTitle.textContent='Limits';host.append(limitsTitle);
+  const limitsBlock=document.createElement('section'),limitsTitle=document.createElement('h4');limitsBlock.className='feature-section';limitsBlock.dataset.featureSection='limits';limitsTitle.textContent='Limits';limitsBlock.append(limitsTitle);host.append(limitsBlock);
   for(const side of ['start','end']){
-   const region=document.createElement('section'),title=document.createElement('h5'),modes=document.createElement('div');region.dataset.limitSide=side;title.textContent=side==='start'?'From':'To';modes.className='feature-limit-modes';region.append(title,modes);host.append(region);
+   const region=document.createElement('section'),title=document.createElement('h5'),modes=document.createElement('div');region.dataset.limitSide=side;title.textContent=side==='start'?'From':'To';modes.className='feature-limit-modes';const heading=document.createElement('div');heading.className='feature-limit-heading';heading.append(title,modes);region.append(heading);limitsBlock.append(region);
    const limit=state.limits[side];
    const field=value(side==='end'?'extrusion-depth-value':'extrusion-start-value',revolve?'Angle (°)':'Value (mm)',limit.value,revolve?'rad':'mm',limit.parameterId??(side==='end'&&!revolve?graph.parameters.find(p=>p.targets?.some(t=>t.featureId===owner.item?.id&&t.parameter==='depth'))?.id:null),(number,id)=>{
     limit.value=number;if(id)limit.parameterId=id;else delete limit.parameterId;if(side==='end'&&!revolve){state.depthMm=number;owner.depth.depthMm=number;owner.depth.parameterId=id;}limitsChanged=true;
@@ -126,13 +128,14 @@ export function featureFields({document,host,owner,graph,scene,onChange,status,o
   limitPanels.get('start').update();
  }
  function readNumber(field){const text=field.control.input.value.trim();if(field.control.select.value)return null;if(text&&!Number.isNaN(Number(text)))return Number(text);throw Error('Select a parameter or enter a numeric value.');}
- function read({draft=false}={}){
+ function read({draft=false,preview=false}={}){
   if(referenceKind)return {featureId:settings.featureId??owner.item?.id??settings.id,name:nameInput.value,kind:referenceKind,...(owner.item?{replace:true}:{}),references:referenceTables.filter(({table})=>table.selected.length).map(({table,relation,distance})=>({...reference(table.selected[0]),relation:relation.value,value:readNumber(distance)??0,...(distance.control.select.value?{parameterId:distance.control.select.value}:{})}))};
   if(!sourceTable.selected.length)throw Error('Select '+(repeating?'one or more features.':'a source sketch.'));
   const selected=sourceTable.selected[0],sketchId=repeating?graph.features.find(f=>f.id===selected.target.producerId).data.sketchId:selected.target.producerId;
-  const input={name:nameInput.value,sketchId,depthMm:state.depthMm,reverse:state.reverse,operation:state.operation,...(settings.baseFeatureId?{baseFeatureId:settings.baseFeatureId}:{})};
+  const input={name:nameInput.value,sketchId,depthMm:Math.max(.001,Math.abs(state.depthMm??10)),reverse:state.reverse,operation:preview?state.operation:effectiveOperation(),...(settings.baseFeatureId?{baseFeatureId:settings.baseFeatureId}:{})};
   if(repeating){if(!axisTable.selected.length)throw Error('Select the operation reference.');if(owner.create){const source=graph.features.find(f=>f.id===selected.target.producerId);input.operation=['new-body','none'].includes(source.data.operation)?'none':source.data.operation;}input.repeat={...state.repeat,sourceFeatureId:selected.target.producerId,sourceFeatureIds:sourceTable.selected.map(c=>c.target.producerId),reference:reference(axisTable.selected[0])};return input;}
-  if(revolve){if(!axisTable.selected.length)throw Error('Select a revolution axis.');input.axisReference=reference(axisTable.selected[0]);input.axisId=settings.axisId??axisTable.selected[0].target.role;input.angleDeg=state.angleDeg;}
+  input.booleanPreference=state.operation==='new-body'?'none':state.operation;
+  if(revolve){if(!axisTable.selected.length)throw Error('Select a revolution axis.');input.axisReference=reference(axisTable.selected[0]);if(axisTable.selected[0].target.kind==='sketch')input.axisId=axisTable.selected[0].target.role;input.angleDeg=state.angleDeg;}
   for(const [side,region]of limitPanels){
    const limit=state.limits[side];
    if(draft&&['value','symmetric','offset'].includes(limit.mode)){const n=readNumber(region.field);if(n!==null&&n!==limit.value){limit.value=n;limitsChanged=true;}}
@@ -147,5 +150,6 @@ export function featureFields({document,host,owner,graph,scene,onChange,status,o
   return choices.find(c=>active?.valid(c)&&c.target.producerId===target.producerId&&c.target.role===target.role&&(c.target.kind===target.kind||target.kind==='feature'&&c.target.kind==='sketch'&&c.target.role==='result'))
    ??(repeating&&active===sourceTable?choices.find(c=>active.valid(c)&&c.target.producerId===target.producerId&&c.target.kind==='feature'&&['body','face','edge','vertex'].includes(target.kind)):null);
  }
- return {read,pick,choices,accepts:target=>!!choiceFor(target),pickTarget(target){const choice=choiceFor(target);return choice?pick(choice):false;},refreshScene(scene){const next=featureChoices(graph,scene).filter(allowed);if(JSON.stringify(next)===JSON.stringify(choices))return;choices.splice(0,choices.length,...next);for(const table of tables)for(let i=0;i<table.selected.length;i++){const fresh=choices.find(c=>same(c,table.selected[i]));if(fresh)table.selected[i]=fresh;}paint();},preview(){if(!referenceKind)return null;const entries=read().references;return {kind:referenceKind,frame:constructReference(referenceKind,entries.map(e=>({...e,value:e.parameterId?(graph.parameters.find(p=>p.id===e.parameterId)?.value??0)*(e.relation==='angle'?180/Math.PI:1):e.value,geometry:referenceTables.find(r=>r.table.selected.some(c=>same(c,e)))?.table.selected[0].geometry})))};},cancel(){highlight?.([]);},focus(){const field=fields.get('extrusion-depth-value');if(field&&!field.row.hidden){field.control.input.focus({preventScroll:true});field.control.input.select();}}};
+ function paintBoolean(){for(const button of host.querySelectorAll('[data-feature-boolean]')){const mode=button.dataset.featureBoolean;button.disabled=mode!=='none'&&(!settings.baseFeatureId||booleanAvailable?.[mode]===false);button.setAttribute('aria-pressed',String((effectiveOperation()==='new-body'?'none':effectiveOperation())===mode));}}
+ return {setOperationState(info){booleanAvailable=info.available??null;paintBoolean();},read,pick,choices,accepts:target=>!!choiceFor(target),pickTarget(target){const choice=choiceFor(target);return choice?pick(choice):false;},refreshScene(scene){const next=featureChoices(graph,scene).filter(allowed);if(JSON.stringify(next)===JSON.stringify(choices))return;choices.splice(0,choices.length,...next);for(const table of tables)for(let i=0;i<table.selected.length;i++){const fresh=choices.find(c=>same(c,table.selected[i]));if(fresh)table.selected[i]=fresh;}paint();},preview(){if(!referenceKind)return null;const entries=read().references;return {kind:referenceKind,frame:constructReference(referenceKind,entries.map(e=>({...e,value:e.parameterId?(graph.parameters.find(p=>p.id===e.parameterId)?.value??0)*(e.relation==='angle'?180/Math.PI:1):e.value,geometry:referenceTables.find(r=>r.table.selected.some(c=>same(c,e)))?.table.selected[0].geometry})))};},cancel(){highlight?.([]);},focus(){const field=fields.get('extrusion-depth-value');if(field&&!field.row.hidden){field.control.input.focus({preventScroll:true});field.control.input.select();}}};
 }

@@ -1,4 +1,4 @@
-# E3.M2 feature construction — 0.3.6
+# E3.M2 feature construction — 0.3.7
 
 This owner-requested batch refines E3.M2. Owner acceptance of the stage remains separate from publication.
 
@@ -45,3 +45,17 @@ Until Selected accepts supported datum planes and exact planar model faces; para
 Physical feature picking in CI uses the complete pinned Playwright Chromium with an explicitly labelled SwiftShader context, following [Chromium’s WebGPU test configuration](https://chromium.googlesource.com/chromium/src/+/main/third_party/blink/web_tests/FlagSpecificConfig). The headless-shell no-GPU corpus remains separate. Public-install verification uses actual Chrome/NVIDIA without forced software rendering. An unavailable renderer is an explicit failure for the physical construction suite.
 
 Linux software canvas tests use the shared ANGLE/Dawn Vulkan configuration reported for [Chromium issue 575926500](https://issues.chromium.org/issues/575926500); forcing a separate WebGPU fallback adapter caused device loss without validation errors. These switches belong only to the acceptance harness, and do not change production browser settings.
+
+## 0.3.7 edited limits, Boolean applicability and revolution axes
+
+Selection groups the source Sketch/Axis tables. Boolean and From/To controls share their heading line. Only the main Boolean, Limits and Preview sections have separators; nested limit rows do not. Section headings use stronger type. Reference and pattern selection tables share the same grouping and analytic line picking where applicable.
+
+During solid editing, the selectable scene is the native history immediately before that operation; the active result is a display-only ghost and downstream features stay rolled back. For the first solid there is no previous body, only source sketches and datums. Turning Preview off hides the ghost; the read-only candidate still evaluates exact geometry and applicability. No ghost receives selection IDs. Until Selected and Offset from Selected therefore pick faces owned by an earlier producer, without a self-dependency. The original source remains unchanged until Apply.
+
+From and To are material boundaries whose numeric order may be reversed, for extrusion and angular sweeps. Selected planes and offsets are assigned to their physical lower/upper side, then trim the exact tool; profile-enclosing ranges cover tilted limits. Zero thickness and sweeps exceeding 360 degrees still reject. Numeric extrusion cap identity follows the physical lower/upper cap, retaining reference semantics when bound order changes.
+
+Read-only previews evaluate exact tool/base intersection and joining capability. When the preferred Boolean cannot produce its valid material result, the candidate uses None, disables unavailable modes and preserves the preference. Returning to valid contact restores that choice. Face-touching Unite is distinguished from positive-volume overlap needed by Subtract/Intersect, and an empty subtraction remains unavailable. Apply records the actual explicit operation and an optional `booleanPreference` editing hint. The hint survives save/reopen and re-edit; it does not silently change an already saved Boolean during unrelated regeneration. Direct semantic commands retain strict Boolean validation. Older strict readers may reject the new optional source field.
+
+Revolve uses `axisReference` for datum axes, straight model edges and analytic sketch lines. A legacy `axisId` is sent only for a sketch line and is never an empty string. Model sketch-line picks resolve through the current server-owned manifest; they are offered when an active construction table accepts them, preserving normal whole-sketch selection otherwise. The axis must still lie in the profile plane and the profile cannot cross it.
+
+The demo now includes **revolve-practice** and its construction line **practice-axis**. Try an empty Revolve, choose its source and Axis table, and pick a datum, a straight model edge or the construction line in Model. For reversed Extrude limits use limit-practice with None, From 10 and To -10: the material total is 14,720 mm³. For automatic fallback move both bounds above the model, then return them to overlap; the original Boolean is restored. Regression coverage includes the edited-face and offset paths, persisted preference, reversed angular bounds, all three axis sources, explicit Apply and unchanged source during previews.
