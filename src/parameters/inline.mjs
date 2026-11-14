@@ -1,0 +1,11 @@
+import {createHash} from 'node:crypto';
+import {parameterCommand} from './profile.mjs';
+import {targetField,setField} from './feature-fields.mjs';
+import {check} from '../errors.mjs';
+export function applyInlineExpressions(value,featureId,entries=[]){const g=value.native.graph,f=g.features.find(f=>f.id===featureId);check(Array.isArray(entries)&&entries.length<=16,'InvalidInput','At most sixteen operation expressions.');const seen=new Set();for(const entry of entries){const field=targetField(g,{featureId,parameter:entry.parameter});check(field&&!seen.has(entry.parameter),'InvalidInput','Choose a unique supported operation field.');seen.add(entry.parameter);const suffix=createHash('sha256').update(featureId+':'+entry.parameter).digest('hex').slice(0,24),id='expression-'+suffix;
+ const old=g.parameters.find(p=>p.id===id),base=('Formula_'+f.data.name+'_'+entry.parameter).normalize('NFKD').replace(/[^A-Za-z_0-9]/g,'_').slice(0,56),name=old?.name??(g.parameters.some(p=>p.definitionId===f.definitionId&&p.name===base)?base+'_'+suffix.slice(0,6):base);
+ parameterCommand(value,'cad.parameter.set.v1',{parameter:{id,name,definitionId:f.definitionId,unit:'auto',expression:entry.expression,description:'Operation expression: '+f.data.name+' / '+entry.parameter}});
+ parameterCommand(value,'cad.parameter.bind.v1',{parameterId:id,target:{kind:'feature',featureId,parameter:field.parameter},enabled:true});
+}return value;}
+
+export function applyDimensionExpression(value,sketchId,constraintId,expression){const g=value.native.graph,f=g.features.find(f=>f.id===sketchId),c=f?.data.constraints.find(c=>c.id===constraintId);check(c?.driving,'InvalidInput','An expression requires a driving dimension.');const suffix=createHash('sha256').update(sketchId+':'+constraintId).digest('hex').slice(0,24),id='dimension-expression-'+suffix,old=g.parameters.find(p=>p.id===id),name=old?.name??('Formula_'+f.data.name+'_'+(c.name??constraintId)).replace(/[^A-Za-z_0-9]/g,'_').slice(0,50)+'_'+suffix.slice(0,6);parameterCommand(value,'cad.parameter.set.v1',{parameter:{id,name,definitionId:f.definitionId,unit:'auto',expression,description:'Dimension expression: '+f.data.name+' / '+(c.name??constraintId)}});parameterCommand(value,'cad.parameter.bind.v1',{parameterId:id,target:{kind:'dimension',sketchId,constraintId},enabled:true});return value;}

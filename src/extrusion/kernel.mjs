@@ -67,7 +67,14 @@ export async function regenerateExtrusions(value,{includeMesh=false,includeToolM
   check(Number.isFinite(amount)&&amount>0,'InvalidGeometry','Choose a positive finishing amount.');
   const geometry=exactReferenceGeometry(base.shape,{native:true}),members=[];
   for(const reference of spec.references){check(reference.target.producerId===feature.data.baseFeatureId,'LostReference','Choose edges of the immediately preceding model.');const edge=geometry.edges.find(e=>e.role===reference.target.role);check(edge?.resolution==='ResolvedStable'&&!edge.displayHidden,'LostReference','A finishing edge is lost, ambiguous or not supported.');members.push(...geometry.nativeEdges.get(edge.role));}
-  let shape;try{shape=retain(base.shape[spec.kind](amount,finder=>finder.inList(members)));}catch{check(false,'InvalidGeometry','The selected finishing amount cannot be built on these edges. Reduce it or choose different edges.');}
+  let shape;try{if(spec.kind==='chamfer'&&spec.mode){
+   const distance2=spec.distance2ParameterId?graph.parameters.find(p=>p.id===spec.distance2ParameterId).value:spec.distance2Mm,angle=spec.angleParameterId?graph.parameters.find(p=>p.id===spec.angleParameterId).value*180/Math.PI:spec.angleDeg;
+   check(distance2>0&&angle>0&&angle<90,'InvalidGeometry','Chamfer distances must be positive and angle must be between 0 and 90°.');
+   shape=retain(base.shape.chamfer(edge=>{if(!members.some(e=>e.isSame(edge)))return 0;
+    const faces=base.shape.faces.filter(face=>face.edges.some(e=>e.isSame(edge))).sort((a,b)=>JSON.stringify([a.center.toTuple(),a.geomType]).localeCompare(JSON.stringify([b.center.toTuple(),b.geomType])));
+    check(faces.length===2,'InvalidGeometry','A directed chamfer requires two unambiguous adjacent faces.');const face=faces[spec.reverse?1:0],selectedFace=finder=>finder.inList([face]);return spec.mode==='two-distances'?{distances:[amount,distance2],selectedFace}:{distance:amount,angle,selectedFace};
+   }));
+  }else shape=retain(base.shape[spec.kind](amount,finder=>finder.inList(members)));}catch{check(false,'InvalidGeometry','The selected finishing amount cannot be built on these edges. Reduce it or choose different edges.');}
   validateSolid(shape);check(shape.solids.length===base.shape.solids.length,'InvalidGeometry','Finishing must preserve the body count.');
   const before=cad.measureVolume(base.shape),volume=cad.measureVolume(shape);check(Math.abs(before-volume)>EPS,'InvalidGeometry','Finishing must change material.');
   const removed=retain(base.shape.cut(shape)),added=retain(shape.cut(base.shape)),layers=[];

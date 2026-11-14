@@ -1,3 +1,4 @@
+import {dependencyDemo,DEPENDENCY_DEMO} from '../src/parameters/dependency-demo.mjs';
 import {finishingDemo,FINISHING_DEMO} from '../src/extrusion/finishing-demo.mjs';
 import {featureConstructionDemo,FEATURE_CONSTRUCTION_DEMO} from '../src/extrusion/construction-demo.mjs';
 import {featureOperationsDemo,E3_FEATURE_DEMO} from '../src/extrusion/feature-demo.mjs';
@@ -109,6 +110,7 @@ export class EngineerAdapter {
       check((await readdir(destination)).length===0,'projectBusy','Demos require a fresh empty destination.');
       const projects=[];let nativePaths;if(p.demoIds.some(id=>id.startsWith('e0-m4-')||id==='e0-m5-review')){const docs=await nativeDemo();nativePaths={};for(const [id,key,folderName]of [['e0-m4-source','source','E0-M4-Source'],['e0-m4-native','consumer','E0-M4-Native']]){const folder=join(destination,folderName);await mkdir(folder);const path=join(folder,FILENAME);await atomicJson(path,docs[key]);nativePaths[id]=path;}if(p.demoIds.includes('e0-m5-review')){const folder=join(destination,'E0-M5-Review');await mkdir(folder);const path=join(folder,FILENAME);await atomicJson(path,await reviewDemo(docs.consumer));nativePaths['e0-m5-review']=path;}}
       for(const demoId of p.demoIds){
+        if(demoId===DEPENDENCY_DEMO.id){const folder=join(destination,'E3-M4-Dependency-Workbench');await mkdir(folder);const path=join(folder,FILENAME),value=await dependencyDemo();await runWorker('native-verify',{document:value});await atomicJson(path,value);projects.push({demoId,path,...await this.detect(path)});continue;}
         if(demoId===FINISHING_DEMO.id){const folder=join(destination,'E3-M3-Finishing-Bracket');await mkdir(folder);const path=join(folder,FILENAME),value=await finishingDemo();await runWorker('native-verify',{document:value});await atomicJson(path,value);projects.push({demoId,path,...await this.detect(path)});continue;}
         if(demoId===FEATURE_CONSTRUCTION_DEMO.id){
           const folder=join(destination,'E3-M2-Feature-Construction');await mkdir(folder);

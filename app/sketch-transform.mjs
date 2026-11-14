@@ -10,9 +10,9 @@ export function sketchTransforms({document,host,ribbon,getState,selected,selectM
  const values=document.createElement('div'),reverse=document.createElement('button'),independent=document.createElement('input'),independentLabel=document.createElement('label');
  independent.type='checkbox';independentLabel.append(independent,document.createTextNode(' Independent'));
  reverse.type='button';reverse.innerHTML=icon('rotate');reverse.setAttribute('aria-label','Reverse direction');reverse.title='Reverse direction';
- let draft=null,working=false;
- const sources=operationSelection(document,{title:'Entities',activate:()=>selectTable(0),remove:ref=>{draft.sources=draft.sources.filter(r=>!same(r,ref));paint();}});
- const target=operationSelection(document,{title:'Reference',activate:()=>selectTable(1),remove:()=>{draft.target=null;paint();}});
+ let draft=null,working=false,hoveredRow=null;const hover=ref=>{hoveredRow=ref;redraw();};
+ const sources=operationSelection(document,{title:'Entities',hover,activate:()=>selectTable(0),remove:ref=>{draft.sources=draft.sources.filter(r=>!same(r,ref));paint();}});
+ const target=operationSelection(document,{title:'Reference',hover,activate:()=>selectTable(1),remove:()=>{draft.target=null;paint();}});
  const apply=document.createElement('button'),cancelButton=document.createElement('button');
  apply.type=cancelButton.type='button';apply.textContent='Apply';cancelButton.textContent='Cancel';actions.append(apply,cancelButton);
  panel.append(heading,sources.element,target.element,values,actions);
@@ -34,7 +34,7 @@ export function sketchTransforms({document,host,ribbon,getState,selected,selectM
  function exceedsCapacity(){return draft.mode!=='mirror'&&(draft.count-1)*draft.sources.length>MAX_SKETCH_ENTITIES-getState().items.length+(draft.previous??0);}
  function cancel(){
   if(!draft||working)return;
-  draft=null;panel.hidden=true;for(const button of buttons.values())button.setAttribute('aria-pressed','false');
+  draft=null;hoveredRow=null;panel.hidden=true;for(const button of buttons.values())button.setAttribute('aria-pressed','false');
   onActive(false);redraw();
  }
  async function open(mode,operation=null){
@@ -63,7 +63,7 @@ export function sketchTransforms({document,host,ribbon,getState,selected,selectM
    for(const [key,unit,caption] of [['count','scalar','Count'],['spacing',mode==='circular'?'rad':'mm',mode==='circular'?'Angular spacing (°)':'Spacing (mm)']]){
     const choices=available.filter(p=>p.unit===unit).map(p=>({value:p.id,label:p.name,number:unit==='rad'?p.value*180/Math.PI:p.value}));
     const driver=choices.find(choice=>choice.value===draft[key+'ParameterId']);if(driver)draft[key]=driver.number;
-    const field=operationValue(document,{field:'sketch-pattern-'+key,label:caption,options:choices,value:draft[key],id:draft[key+'ParameterId'],emptyMessage:false,
+    const field=operationValue(document,{field:'sketch-pattern-'+key,label:caption,options:choices,parameters:available,unit,definitionId:getState().context?.definitionId??'definition-main',value:draft[key],id:draft[key+'ParameterId'],emptyMessage:false,onExpression:expression=>{draft.expressions??={};if(expression)draft.expressions[key]=expression;else delete draft.expressions[key];},
      onChange:(n,id,focus)=>{
       if(!Number.isFinite(n)||(key==='count'?(!Number.isSafeInteger(n)||n<2):n<=0)){status('Enter a supported '+caption.toLowerCase()+'.');field.control.setLiteral(draft[key]);return;}
       draft[key]=n;draft[key+'ParameterId']=id;if(!id)field.control.setLiteral(n);if(focus)field.control.input.select();paint();
@@ -89,7 +89,7 @@ export function sketchTransforms({document,host,ribbon,getState,selected,selectM
   working=true;paint();
   try{
    if(mode==='mirror')await mutate('sketch.mirror',{...fields,axisId:target.entityId},context);
-   else await mutate('sketch.pattern',{...fields,mode,count,spacing:mode==='circular'?spacing*Math.PI/180:spacing,distribution,reverse,reference:target,
+   else await mutate('sketch.pattern',{...fields,...(!independent.checked&&draft.expressions?{valueExpressions:Object.entries(draft.expressions).map(([key,expression])=>({parameter:'pattern.'+id+'.'+key,expression}))}:{}),mode,count,spacing:mode==='circular'?spacing*Math.PI/180:spacing,distribution,reverse,reference:target,
     ...(countParameterId?{countParameterId}:{}),...(spacingParameterId?{spacingParameterId}:{})},context);
    working=false;cancel();
   }catch(error){working=false;paint();status(error.message);}
@@ -101,7 +101,7 @@ export function sketchTransforms({document,host,ribbon,getState,selected,selectM
    event.preventDefault();selectTable(draft.table?0:1);(draft.table?target:sources).element.focus();
   }
  },true);
- return {get active(){return !!draft;},get highlighted(){return draft?(draft.table===0?draft.sources:draft.target?[draft.target]:[]):[];},edit:operation=>open(operation.mode??'mirror',operation),cancel,consume(value){
+ return {get active(){return !!draft;},get highlighted(){return hoveredRow?[hoveredRow]:draft?(draft.table===0?draft.sources:draft.target?[draft.target]:[]):[];},edit:operation=>open(operation.mode??'mirror',operation),cancel,consume(value){
   if(!draft)return false;if(working||!value)return true;
   const refs=value.kind==='components'?value.refs:[value];
   for(const ref of refs){

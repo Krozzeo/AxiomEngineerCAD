@@ -1,8 +1,8 @@
-# Engineer handoff — E3.M3 finishing / 0.3.9 candidate
+# Engineer handoff — E3.M4 dependencies / 0.3.10 candidate
 
-0.3.8 was publicly installed and verified at f08ddc04d980b8b5ccb15d2ba203bef74d8a64b4. The owner requested M3 with dynamic references and pattern refinements. Read docs/E3_M3_FINISHING.md for source versions, exact witness extraction, bounded construction semantics and manual verification.
+0.3.9 was publicly installed and verified at 2bab5cdb3ce89cbe32001dbe6ad1478a41cd89cb. The owner requested M4 with functions, chamfer modes and selection-table feedback. Read docs/E3_M4_DEPENDENCIES.md for semantics, compatibility, tests and manual checks. Main/stable remain 0.2.6.
 
-Start with `npm run context`, AGENTS.md, [compact context](docs/PROJECT_CONTEXT.md) and the [integration notes](docs/PRE_E3_ASSISTANT.md). Read docs/E3_M3_FINISHING.md for the current batch. E3.M2 construction remains a retained regression fixture.
+Start with `npm run context`, AGENTS.md, [compact context](docs/PROJECT_CONTEXT.md) and the [integration notes](docs/PRE_E3_ASSISTANT.md). Read docs/E3_M4_DEPENDENCIES.md for the current batch. E3.M2 construction remains a retained regression fixture.
 
 E2 was owner-accepted, merged and published stable as 0.2.6. E3.M2 is a separate experimental delivery. See [tools and demo](docs/E3_M2_FEATURE_OPERATIONS.md).
 

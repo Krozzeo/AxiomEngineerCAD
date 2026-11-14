@@ -42,7 +42,7 @@ export async function verifyFeatureConstructionUI({context,host,observe,evidence
   await page.waitForFunction(()=>window.engineerViewport.proof?.preview&&Math.abs(window.engineerViewport.proof.exact.volumeMm3-14360)<1e-5);
   const pickPoint=async point=>page.evaluate(w=>{const r=window.engineerViewport.renderer,c=r.canvas,b=c.getBoundingClientRect(),m=r.presentedFrame.matrix,a=Array.from({length:4},(_,i)=>m[i]*w[0]+m[i+4]*w[1]+m[i+8]*w[2]+m[i+12]);return {x:b.x+(a[0]/a[3]+1)*b.width/2,y:b.y+(1-a[1]/a[3])*b.height/2};},point);
   const face=await pickPoint([22,20,10]);await page.mouse.click(face.x,face.y);
-  await target.getByRole('table').getByText(/Face ·/).waitFor();
+  await target.getByRole('table').getByText(/^Face$/).waitFor();
   await page.waitForFunction(()=>window.engineerViewport.proof?.preview&&Math.abs(window.engineerViewport.proof.exact.volumeMm3-14000)<1e-5);
   assert.equal(await page.locator('.proof-inspector').isVisible(),false);
   await end.getByRole('button',{name:'Value',exact:true}).click();

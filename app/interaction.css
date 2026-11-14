@@ -29,3 +29,5 @@
 .command-ribbon .ribbon-options button{height:26px!important;display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:6px;padding:3px 6px;font-size:11px;white-space:nowrap}
 
 .command-ribbon .ribbon-options button svg,.command-ribbon .ribbon-options button img{width:16px;height:16px}
+
+.operation-selection tbody tr:hover{background:#28587d;color:#fff}

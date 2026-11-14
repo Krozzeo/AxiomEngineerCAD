@@ -53,7 +53,7 @@ export async function verifyFeatureRefinementsUI({context,host,observe,evidence,
   await page.locator('[data-source-id="'+edited.id+'"]').dblclick();await current({});
   assert.equal(await page.evaluate(()=>window.engineerViewport.renderer.scene.models[0].featureId),'unite-bridge');
   await number('start',0);await mode('end','Until Selected').click();await page.waitForFunction(()=>window.engineerViewport.proof?.preview===false);
-  await clickWorld([22,20,10]);await table('To reference').getByRole('table').getByText(/Face ·/).waitFor();await current({endMode:'selected'});
+  await clickWorld([22,20,10]);await table('To reference').getByRole('table').getByText(/^Face$/).waitFor();await current({endMode:'selected'});
   await mode('end','Offset from Selected').click();await number('end',2);await current({endMode:'offset',end:2});
   assert.ok(Math.abs(await page.evaluate(()=>window.engineerViewport.proof.exact.volumeMm3)-14432)<1e-5);
   await sketchCommit(page,()=>apply.click());const updated=(await sketchDocument(page)).native.graph.features.find(f=>f.id===edited.id);assert.equal(updated.data.limits.end.reference.target.producerId,'unite-bridge');assert.equal(updated.data.limits.end.mode,'offset');
@@ -61,7 +61,7 @@ export async function verifyFeatureRefinementsUI({context,host,observe,evidence,
 
   // A Model sketch line is a selectable analytic axis, alongside B-Rep edges.
   await page.locator('#cad-feature-revolve').click();await table('Sketch').click();await page.locator('[data-source-id=revolve-practice]').click();await table('Axis').click();await page.locator('[data-source-id=datum-y]').click();await page.locator('[data-feature-boolean=none]').click();await current({operation:'none'});
-  await page.evaluate(()=>window.engineerViewport.renderer.normal([0,0,-1]));await page.locator('#proof-filter').selectOption('edge');await page.locator('.ribbon-tabs').getByRole('tab',{name:'Features',exact:true}).click();await table('Axis').click();await clickWorld([0,15,0]);await table('Axis').getByRole('table').getByText(/Edge ·/).waitFor();await current({operation:'none'});
+  await page.evaluate(()=>window.engineerViewport.renderer.normal([0,0,-1]));await page.locator('#proof-filter').selectOption('edge');await page.locator('.ribbon-tabs').getByRole('tab',{name:'Features',exact:true}).click();await table('Axis').click();await clickWorld([0,15,0]);await table('Axis').getByRole('table').getByText(/^Edge$/).waitFor();await current({operation:'none'});
   await page.locator('#proof-filter').selectOption('auto');await page.locator('.ribbon-tabs').getByRole('tab',{name:'Features',exact:true}).click();await table('Axis').click();await clickWorld([65,8,0]);await table('Axis').getByRole('table').getByText(/practice-axis/).waitFor();await current({operation:'none'});
   const axisInput=await page.evaluate(()=>JSON.parse(window.engineerViewport.proof.operationState.inputSignature));assert.equal(axisInput.axisReference.target.kind,'sketch');assert.equal(axisInput.axisId,'practice-axis');
   await sketchCommit(page,()=>apply.click());

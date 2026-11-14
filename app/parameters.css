@@ -81,3 +81,5 @@ body.constructing-feature #inspector-content>:not(#feature-operation-editor){dis
 
 #feature-operation-fields .feature-limit-modes{flex-wrap:nowrap;gap:2px}
 #feature-operation-fields .feature-limit-modes button{flex:none;width:28px;height:28px;margin:0;padding:3px}
+
+.parameter-completion-menu .formula-function,.search-select-menu .formula-function{background:#174c80;color:#e5f2ff}.parameter-completion-menu .formula-function:hover,.search-select-menu .formula-function:hover,.search-select-menu .formula-function[aria-selected=true]{background:#2677bc}

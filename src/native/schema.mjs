@@ -1,3 +1,4 @@
+import {validateDependencyGraph} from '../parameters/dependencies.mjs';
 import {REFERENCE_TYPE,validateReference} from '../reference/profile.mjs';
 import {EXTRUSION_TYPE,validateExtrusion} from '../extrusion/profile.mjs';
 import {validateParameter,evaluatedGraph} from '../parameters/profile.mjs';
@@ -60,7 +61,7 @@ export function validateGraph(g,{documentId,versions=[],depth=0,ancestors=[]}={}
   }
   for(const s of g.sources){check(keys(s,['id','filename','bytes','sha256','base64','translator','fidelity'])&&text(s.filename)&&!/[\\/:]/.test(s.filename)&&Number.isSafeInteger(s.bytes)&&s.bytes>=0&&s.bytes<=32768&&typeof s.base64==='string'&&s.base64.length<=44000&&keys(s.translator,['id','version'])&&text(s.translator.id)&&text(s.translator.version)&&text(s.fidelity,512),'InvalidNativeGraph','Invalid preserved source attachment.');const data=Buffer.from(s.base64,'base64');check(data.length===s.bytes&&data.toString('base64')===s.base64&&hash(data)===s.sha256,'IntegrityError','Source attachment checksum mismatch.');}
   check(g.features.filter(f=>f.type===SKETCH_TYPE).length<=16,'ResourceLimit','At most sixteen editable sketches.');for(const f of g.features)if(f.type===SKETCH_TYPE)validateSketch(f,g,ids);
-  evaluatedGraph(g);validateIntegration(g);occurrencePaths(g);return g;
+  evaluatedGraph(g);validateDependencyGraph({graph:g});validateIntegration(g);occurrencePaths(g);return g;
 }
 export function validateContent(c,{depth=0,ancestors=[]}={}){
   check(keys(c,['documentId','metadata','graph','experiment','assembly','provenance','localVersions','verification'])&&docId(c.documentId)&&compatible(c.provenance),'incompatibleVersion','Historical runtime/schema profile is unsupported. Original content preserved.');validateMetadata(c.metadata);
