@@ -17,7 +17,12 @@ export async function verifyOperationUX({context,host,observe,evidence,report}){
   assert.equal(await page.locator('[data-coordinate-system=datum-origin]').getAttribute('open'),'');
   await features();
   const first=await page.locator('[data-operations=Features]').evaluate(r=>r.firstElementChild.contains(document.querySelector('#proof-build')));assert.equal(first,true);
-  await page.locator('[data-source-id=revolve-practice]').click();await page.locator('#cad-extrude-sketch').click();
+  // Hold startup after the source snapshot: a physical input during opening must not disappear.
+  let startupSeen,releaseStartup,startupFinished,startupDeadline,heldStartup=false;const startupDone=new Promise(r=>startupFinished=r),startupGate=new Promise(r=>releaseStartup=r),startupArrived=new Promise(r=>startupSeen=r);
+  const holdStartup=async route=>{if(heldStartup){await route.continue();return;}heldStartup=true;const response=await route.fetch({headers:{...route.request().headers(),Origin:new URL(page.url()).origin}}),body=await response.body();assert.equal(response.status(),200);startupSeen();await startupGate;try{await route.fulfill({response,body});}finally{startupFinished();}};
+  await page.route('**/v1/cad/context',holdStartup);
+  try{await page.locator('#cad-extrude-sketch').click();await Promise.race([startupArrived,new Promise((_,reject)=>startupDeadline=setTimeout(()=>reject(Error('No startup context acknowledgement to delay')),10000))]);await page.locator('[data-source-id=revolve-practice]').click();}finally{clearTimeout(startupDeadline);releaseStartup();await startupDone;await page.unroute('**/v1/cad/context',holdStartup);}
+
   await table('Sketch').getByText('revolve-practice',{exact:true}).waitFor();
   await page.locator('#cad-feature-revolve').click();await table('Axis').waitFor();await page.waitForFunction(()=>document.querySelector('#feature-operation-editor>h3')?.textContent==='Revolve');
   assert.match(await table('Axis').getAttribute('class'),/active/);await table('Sketch').getByText('revolve-practice',{exact:true}).waitFor();
@@ -69,7 +74,7 @@ export async function verifyOperationUX({context,host,observe,evidence,report}){
   const front=await page.evaluate(async p=>{const r=window.engineerViewport.renderer;return (await r.pick(p[0],p[1])).selectionId;},hidden.pixel);assert.equal(front,hidden.id,'Through-depth feedback must not modify picking IDs.');
   if(evidence)await page.screenshot({path:join(evidence,'operation-ux-coordinate-contours.png')});
   assert.deepEqual(await page.evaluate(()=>window.engineerViewport.renderer.errors),[]);
-  report.operationUX={passed:true,selectionButtonsActivate:true,toggleAndSwitch:true,compatibleSelectionTransfer:true,revolveClamp:true,automaticAxisTable:true,unlabelledLimitValues:true,buildControlsLeft:true,typedReferenceRelations:true,automaticReferenceAdvance:true,absolutePlanesAndAxes:true,coordinateChildren:true,childDelete:true,parentDelete:true,coordinatePlaneSupport:true,sketchToolsResetAndGated:true,occludedHoverAndSelectionPixels:true,pickIdsUnchanged:true};
- }catch(error){console.error('Operation UX state',await page?.evaluate(()=>({hint:document.querySelector('#wb-hint')?.textContent,fields:document.querySelector('#feature-operation-fields')?.textContent,heading:document.querySelector('#feature-operation-editor>h3')?.textContent})).catch(()=>null));if(evidence&&page)await page.screenshot({path:join(evidence,'operation-ux-failure.png')}).catch(()=>{});throw error;}
+  report.operationUX={passed:true,selectionButtonsActivate:true,startupSelectionPreserved:true,toggleAndSwitch:true,compatibleSelectionTransfer:true,revolveClamp:true,automaticAxisTable:true,unlabelledLimitValues:true,buildControlsLeft:true,typedReferenceRelations:true,automaticReferenceAdvance:true,absolutePlanesAndAxes:true,coordinateChildren:true,childDelete:true,parentDelete:true,coordinatePlaneSupport:true,sketchToolsResetAndGated:true,occludedHoverAndSelectionPixels:true,pickIdsUnchanged:true};
+ }catch(error){console.error('Operation UX state',await page?.evaluate(()=>({hint:document.querySelector('#wb-hint')?.textContent,fields:document.querySelector('#feature-operation-fields')?.textContent,heading:document.querySelector('#feature-operation-editor>h3')?.textContent,lifecycle:window.engineerOperationPreviewState?.()})).catch(()=>null));if(evidence&&page)await page.screenshot({path:join(evidence,'operation-ux-failure.png')}).catch(()=>{});throw error;}
  finally{if(session)await close('discard');}
 }

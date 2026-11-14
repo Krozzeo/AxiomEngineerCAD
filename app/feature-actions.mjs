@@ -17,17 +17,17 @@ const menu=document.createElement('div');menu.className='cad-feature-menu';menu.
 const {element:editor,heading:featureHeading,actions:featureActions}=operationPanel(document,$('inspector-content'),'feature-operation-editor');
 const featureForm=document.createElement('form');featureForm.id='feature-operation-form';featureForm.innerHTML='<div id="feature-operation-fields"></div>';
 featureActions.innerHTML='<button type="submit">Apply</button><button type="button" id="feature-operation-done">Cancel</button>';featureForm.append(featureActions);editor.append(featureHeading,featureForm);
-let editing=null,historyBusy=false,operationBusy=false,operationStarting=false,constructionKind=null,carriedSelections=null;
+let editing=null,historyBusy=false,operationBusy=false,operationStarting=false,constructionKind=null,carriedSelections=null,pendingConstructionPicks=[],startingSelection=null;
 window.engineerFeatureConstruction=()=>!!editing||operationStarting||operationBusy;
-window.engineerOperationAcceptsId=id=>{if(!editing?.fields)return true;const target=v.entities().find(e=>e.id===id);return !!target&&editing.fields.accepts(target);};
+window.engineerOperationAcceptsId=id=>{if(operationStarting||!editing?.fields)return true;const target=v.entities().find(e=>e.id===id);return !!target&&editing.fields.accepts(target);};
 async function startFeature(kind,action,{toggle=false}={}){
  if(operationBusy||operationStarting)return;
  if(window.engineerSketch?.operationActive)throw Error('Finish the sketch operation before starting a feature.');
- operationStarting=true;
+ operationStarting=true;pendingConstructionPicks=[];startingSelection={sourceId:window.engineerSketch?.view()?.id??v.selection?.producerId??deleteSourceSelection?.id,target:v.selection??deleteSourceSelection};
  try{
   if(editing){const same=constructionKind===kind;carriedSelections=editing.fields?.selections();highlightFeature(toggle&&same?null:kind);await closeFeature({nextKind:toggle&&same?null:kind});if(toggle&&same)return;}
   highlightFeature(kind);$('cad-cancel-feature').disabled=true;return await action();
- }finally{carriedSelections=null;operationStarting=false;if(!editing)highlightFeature(null);else $('cad-cancel-feature').disabled=false;}
+ }finally{carriedSelections=null;startingSelection=null;operationStarting=false;const picks=pendingConstructionPicks.splice(0);if(editing?.fields)for(const target of picks)editing.fields.pickTarget(target);if(!editing)highlightFeature(null);else $('cad-cancel-feature').disabled=false;}
 }
 async function edit(item){if(item.type==='sketch-primitives')return window.engineerSketch.open(item.id);return startFeature(item.referenceFeature?(item.datumType==='point'?'coordinate':item.datumType):'extrude',()=>editSource(item));}
 window.engineerOperationRollback=()=>editing?.item&&(editing.item.type==='sketch-extrusion'||editing.referenceKind)?editing.item.id:null;
@@ -74,7 +74,7 @@ document.addEventListener('keydown',run(async event=>{if(editing?.fields)return;
 
 const previewRequestsInFlight=previewRequests();
 let previewTimer=null,previewSequence=0,previewChain=Promise.resolve();
-window.engineerOperationPreviewState=()=>({pending:previewRequestsInFlight.pending,closing:previewRequestsInFlight.closing,sequence:previewSequence,operationBusy,operationStarting});
+window.engineerOperationPreviewState=()=>({pending:previewRequestsInFlight.pending,closing:previewRequestsInFlight.closing,sequence:previewSequence,operationBusy,operationStarting,pendingSelections:pendingConstructionPicks.length});
  async function retirePreview(){
   let state=await api('proof/status');if(state.job?.state!=='running')return;
   const id=state.job.id;if(state.job.previewHash)await api('proof/cancel',{operationId:crypto.randomUUID()});
@@ -126,14 +126,16 @@ function schedulePreview(){
  }
  async function closeFeature({nextKind=null}={}){await stopOperationPreview();editor.hidden=true;editing?.fields?.cancel();editing=null;highlightFeature(nextKind);window.engineerOperationFeature=null;window.dispatchEvent(new CustomEvent('engineer-feature-edit-changed'));document.querySelector('.proof-inspector').hidden=false;await v.build({reuseCurrent:true});}
  document.addEventListener('click',event=>{
-  if(!editing?.fields)return;const node=event.target.closest?.('[data-source-id]');if(!node)return;
+  if(!editing?.fields&&!operationStarting)return;const node=event.target.closest?.('[data-source-id]');if(!node)return;
   const item=window.engineerSourceItems?.().find(i=>i.id===node.dataset.sourceId);if(!item)return;
   const target={...item,kind:item.type==='sketch-primitives'?'sketch':item.kind,role:item.type==='sketch-primitives'?'result':item.role};
+  if(operationStarting){pendingConstructionPicks.push(target);event.preventDefault();event.stopImmediatePropagation();document.querySelector('.proof-inspector').hidden=true;return;}
   const choice=editing.fields.choices.find(c=>c.target.producerId===target.producerId&&c.target.kind===target.kind&&c.target.role===target.role);
   if(choice){event.preventDefault();event.stopImmediatePropagation();editing.fields.pick(choice);}
  },true);
  window.addEventListener('engineer-selection-changed',event=>{
-  if(!editing?.fields||!event.detail)return;const selected=event.detail;
+  if(!event.detail||!editing?.fields&&!operationStarting)return;const selected=event.detail;
+  if(operationStarting){pendingConstructionPicks.push(selected);event.stopImmediatePropagation();document.querySelector('.proof-inspector').hidden=true;return;}
   if(editing.fields.pickTarget(selected)){event.stopImmediatePropagation();document.querySelector('.proof-inspector').hidden=true;editor.hidden=false;}
  },true);
 $('feature-operation-fields').addEventListener('change',event=>{if(event.target.matches('[data-extrusion-name],#feature-operation-preview'))schedulePreview();});
@@ -163,7 +165,7 @@ async function beginFeature(kind,title){
  await stopOperationPreview();
  const {document:source}=await api('document'),g=source.native?.graph;
  if(!g)throw Error('Convert this study first.');
- const selectedId=window.engineerSketch.view()?.id??v.selection?.producerId??deleteSourceSelection?.id;
+ const selectedId=startingSelection?startingSelection.sourceId:window.engineerSketch.view()?.id??v.selection?.producerId??deleteSourceSelection?.id;
  const features=g.features.filter(f=>f.type==='sketch-extrusion'),tip=features.find(f=>!features.some(x=>x.data.baseFeatureId===f.id));
  const repeating=['mirror','linear','circular'].includes(kind),revolve=kind==='revolve';
  const seed=repeating?features.find(f=>f.id===selectedId):null;
@@ -185,7 +187,7 @@ async function beginReference(kind,item=null){
  editing={create:!previous,item:previous?{...item,id:previous.id}:null,referenceKind:kind,ctx:await context(),input,data:input};window.engineerOperationFeature=previous?.id??null;window.dispatchEvent(new CustomEvent('engineer-feature-edit-changed'));
  $('feature-operation-fields').replaceChildren();editor.hidden=false;document.querySelector('.proof-inspector').hidden=true;$('edit-sketch-inspector').hidden=true;
  editing.fields=featureFields({document,host:$('feature-operation-fields'),owner:editing,graph:source.native.graph,scene:v.renderer.scene,onChange:paintReferencePreview,status:notify,highlight:selectedReferences});
- editing.fields.restoreSelections(carriedSelections);featureHeading.textContent={plane:'Reference Plane',axis:'Reference Axis',coordinate:'Coordinate System'}[kind];highlightFeature(kind);if(!previous){const selected=v.selection??deleteSourceSelection,choice=editing.fields.choices.find(c=>c.target.producerId===selected?.producerId&&c.target.role===selected?.role&&c.target.kind===selected?.kind);if(choice)editing.fields.pick(choice);}$('feature-operation-form').querySelector('button[type=submit]').disabled=false;window.engineerDock.openPanel('inspector');
+ editing.fields.restoreSelections(carriedSelections);featureHeading.textContent={plane:'Reference Plane',axis:'Reference Axis',coordinate:'Coordinate System'}[kind];highlightFeature(kind);if(!previous&&!carriedSelections?.some(row=>row.title.startsWith('Reference ')&&row.selected.length)){const selected=startingSelection?startingSelection.target:v.selection??deleteSourceSelection,choice=editing.fields.choices.find(c=>c.target.producerId===selected?.producerId&&c.target.role===selected?.role&&c.target.kind===selected?.kind);if(choice)editing.fields.pick(choice);}$('feature-operation-form').querySelector('button[type=submit]').disabled=false;window.engineerDock.openPanel('inspector');
 }
 const featureButtons=[['extrude','Extrude','extrude'],['revolve','Revolve','revolve'],['mirror','Mirror Feature','mirror'],['linear','Linear Feature Pattern','pattern'],['circular','Circular Feature Pattern','circular-pattern'],['plane','Reference Plane','plane'],['axis','Reference Axis','axis'],['coordinate','Coordinate System','origin']].map(([kind,title,glyph])=>{
  const b=document.createElement('button');b.type='button';b.id=kind==='extrude'?'cad-extrude-sketch':'cad-feature-'+kind;b.dataset.featureKind=kind;b.dataset.commandSize=['extrude','revolve'].includes(kind)?'large':'medium';b.innerHTML=icon(glyph)+'<span>'+title+'</span>';
