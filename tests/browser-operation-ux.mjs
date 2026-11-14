@@ -49,7 +49,7 @@ export async function verifyOperationUX({context,host,observe,evidence,report}){
   assert.equal(await group.getAttribute('open'),null);await group.locator('.coordinate-toggle').click();assert.equal(await group.locator(':scope > button[data-source-id]').count(),6);
   if(evidence)await page.screenshot({path:join(evidence,'coordinate-tree-expanded.png')});
   await page.locator('[data-source-id="'+cs.id+'-x"]').click();await page.locator('#proof-canvas').focus();await sketchCommit(page,()=>page.keyboard.press('Delete'));
-  assert.equal(await group.locator(':scope > button[data-source-id]').count(),5);assert.equal((await sketchDocument(page)).native.graph.features.find(f=>f.id===cs.id).data.deletedRoles[0],'x');
+  await page.locator('[data-source-id="'+cs.id+'-x"]').waitFor({state:'detached'});assert.equal(await group.locator(':scope > button[data-source-id]').count(),5);assert.equal((await sketchDocument(page)).native.graph.features.find(f=>f.id===cs.id).data.deletedRoles[0],'x');
   // The child plane is a real support, not just a tree entry.
   await page.locator('[data-source-id="'+cs.id+'-xy"]').click({button:'right'});await page.getByRole('menuitem',{name:'New Sketch',exact:true}).click();await page.locator('#new-sketch-create').click();await page.waitForFunction(()=>!!window.engineerSketch.view());await sketchSettled(page);
   const supportId=await page.evaluate(()=>window.engineerSketch.view().id);assert.equal((await sketchDocument(page)).native.graph.features.find(f=>f.id===supportId).data.plane.producerId,cs.id);
@@ -57,7 +57,7 @@ export async function verifyOperationUX({context,host,observe,evidence,report}){
   assert.equal(await page.locator('[data-sketch-tool=line]').isDisabled(),true);assert.equal(await page.locator('[data-sketch-tool=line]').getAttribute('aria-pressed'),'false');assert.equal(await page.locator('#sketch-dimension-tool').isDisabled(),true);
   await page.locator('[data-source-id="'+supportId+'"]').click();await page.locator('#proof-canvas').focus();await sketchCommit(page,()=>page.keyboard.press('Delete'));
   await page.locator('[data-source-id="'+cs.id+'"]').click();await page.locator('#proof-canvas').focus();await sketchCommit(page,()=>page.keyboard.press('Delete'));
-  assert.equal(await page.locator('[data-coordinate-system="'+cs.id+'"]').count(),0);assert.equal((await sketchDocument(page)).native.graph.features.some(f=>f.id===cs.id),false);
+  assert.equal((await sketchDocument(page)).native.graph.features.some(f=>f.id===cs.id),false);await page.locator('[data-coordinate-system="'+cs.id+'"]').waitFor({state:'detached'});
 
   // A truly occluded exact edge must be colored, without changing the frontmost ID.
   await page.locator('#wb-clear').click();await page.locator('#proof-canvas').press('0');await page.waitForFunction(()=>!window.engineerViewport.renderer.animating);

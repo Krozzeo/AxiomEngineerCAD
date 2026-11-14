@@ -74,6 +74,7 @@ document.addEventListener('keydown',run(async event=>{if(editing?.fields)return;
 
 const previewRequestsInFlight=previewRequests();
 let previewTimer=null,previewSequence=0,previewChain=Promise.resolve();
+window.engineerOperationPreviewState=()=>({pending:previewRequestsInFlight.pending,closing:previewRequestsInFlight.closing,sequence:previewSequence,operationBusy,operationStarting});
  async function retirePreview(){
   let state=await api('proof/status');if(state.job?.state!=='running')return;
   const id=state.job.id;if(state.job.previewHash)await api('proof/cancel',{operationId:crypto.randomUUID()});
