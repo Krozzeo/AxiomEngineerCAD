@@ -11,7 +11,7 @@ import {apiReference} from './api-reference.mjs';
 import {formatAiHistory} from '../../app/assistant-history-format.mjs';
 
 const writable=new Set(['cad.drawing.layout.set.v1','cad.drawing.reconstruct.v1','cad.extrusion.create.v1','cad.extrusion.update.v1','cad.feature.update.v1','cad.parameter.set.v1','cad.sketch.create.v1','cad.sketch.entity.add.v1','cad.sketch.entity.update.v1','cad.sketch.constraint.add.v1','cad.sketch.polygon.v1','cad.sketch.split.v1','cad.sketch.trim.v1','cad.sketch.mirror.v1','cad.sketch.pattern.v1']);
-const readable=new Set(['cad.entities.list.v1','cad.feature.inspect.v1','cad.parameter.inspect.v1','cad.dependency.inspect.v1','cad.parameter.impact.v1','cad.sketch.inspect.v1','cad.selection.inspect.v1','cad.drawing.evidence.inspect.v1']);
+const readable=new Set(['cad.entities.list.v1','cad.feature.inspect.v1','cad.step.analyze.v1','cad.parameter.inspect.v1','cad.dependency.inspect.v1','cad.parameter.impact.v1','cad.sketch.inspect.v1','cad.selection.inspect.v1','cad.drawing.evidence.inspect.v1']);
 const functionTool=(name,description,properties)=>({type:'function',name,description,strict:true,
   parameters:{type:'object',additionalProperties:false,properties,required:Object.keys(properties)}});
 const string={type:'string'};
@@ -270,7 +270,7 @@ export class CadAssistant {
         if(this.pending){Object.assign(this.pending.history,{status:'superseded',completedAt:new Date().toISOString()});this.pending=null;}
         const share=input.share===true;
         this.add('user',input.text,share);
-        const allowed=['model','drawing','history','inspector','parameters','properties','activity','diagnostics','api','assistant'];
+        const allowed=['model','drawing','history','inspector','parameters','dependencies','properties','activity','diagnostics','api','assistant'];
         const tabs=Array.isArray(input.tabs)?input.tabs.filter(tab=>allowed.includes(tab)):[];
         const context={tabs,focus:allowed.includes(input.focus)?input.focus:null,share};
         if(share){

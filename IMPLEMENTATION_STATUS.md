@@ -1,6 +1,9 @@
 # Engineer implementation status
 
-Current candidate: **0.3.10 / E3.M4 parameter and feature dependency diagnostics**. Full typed operation-field queries/bindings, causal dependent/source traces at working or retained versions, read-only source impact and typed rejection, exact Undo/Redo; safe formula catalogue with shared blue function autocomplete; directed distance/angle and two-distance chamfer; short selection labels and physical row hover. See [scope and verification](docs/E3_M4_DEPENDENCIES.md). Exact frozen CI and actual public installation remain required before delivery.
+Current batch: **0.3.11 / E3.M5 STEP interoperability**, plus the standalone Bottom Dependencies panel driven by Parameter Manager selection. E3.M4/0.3.10 was delivered publicly and accepted by the owner. Read [M5 scope and demo checks](docs/E3_M5_INTEROPERABILITY.md). Complete exact-head acceptance/public installation are required; owner M5 acceptance is pending. Main/stable remain 0.2.6.
+
+
+Previous M4 implementation: **0.3.10 / E3.M4 parameter and feature dependency diagnostics**. Full typed operation-field queries/bindings, causal dependent/source traces at working or retained versions, read-only source impact and typed rejection, exact Undo/Redo; safe formula catalogue with shared blue function autocomplete; directed distance/angle and two-distance chamfer; short selection labels and physical row hover. See [scope and verification](docs/E3_M4_DEPENDENCIES.md). M4 exact CI and public installation passed; owner accepted.
 
 Previous delivery: **0.3.9 / E3.M3**, 315 native tests, full Windows/Linux/browser/PDF and actual public Platform/Chrome/NVIDIA acceptance passed. PROJECT_STATE indexes immutable delivery. Main/stable remain 0.2.6.
 
@@ -20,7 +23,8 @@ Development process: compact verified context, focused diagnosis and non-duplica
 | E1.M5 | Exact extrusion 0.1.6 and editing recovery 0.1.7 delivered;0.1.8 delivered for owner review |
 | E2 | Closed; owner-accepted stable 0.2.6 |
 | E3.M1–M3 | Experimental deliveries through 0.3.9 |
-| E3.M4 | Current 0.3.10 candidate |
+| E3.M4 | Owner accepted 0.3.10 |
+| E3.M5 | Current 0.3.11 candidate; exact bounded STEP + standalone Dependencies |
 | E3.M5–E6 | Planned; not completed |
 
 ## Historical E1 changes and evidence

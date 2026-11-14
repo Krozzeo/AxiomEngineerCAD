@@ -1,8 +1,11 @@
-# Engineer handoff — E3.M4 dependencies / 0.3.10 candidate
+# Engineer handoff — E3.M5 STEP / 0.3.11 candidate
+
+Current batch: **0.3.11 / E3.M5 STEP interoperability**, plus the standalone Bottom Dependencies panel driven by Parameter Manager selection. E3.M4/0.3.10 was delivered publicly and accepted by the owner. Read [M5 scope and demo checks](docs/E3_M5_INTEROPERABILITY.md). Complete exact-head acceptance/public installation are required; owner M5 acceptance is pending. Main/stable remain 0.2.6.
+
 
 0.3.9 was publicly installed and verified at 2bab5cdb3ce89cbe32001dbe6ad1478a41cd89cb. The owner requested M4 with functions, chamfer modes and selection-table feedback. Read docs/E3_M4_DEPENDENCIES.md for semantics, compatibility, tests and manual checks. Main/stable remain 0.2.6.
 
-Start with `npm run context`, AGENTS.md, [compact context](docs/PROJECT_CONTEXT.md) and the [integration notes](docs/PRE_E3_ASSISTANT.md). Read docs/E3_M4_DEPENDENCIES.md for the current batch. E3.M2 construction remains a retained regression fixture.
+Start with `npm run context`, AGENTS.md, [compact context](docs/PROJECT_CONTEXT.md) and the [integration notes](docs/PRE_E3_ASSISTANT.md). Read docs/E3_M5_INTEROPERABILITY.md for the current batch. E3.M2 construction remains a retained regression fixture.
 
 E2 was owner-accepted, merged and published stable as 0.2.6. E3.M2 is a separate experimental delivery. See [tools and demo](docs/E3_M2_FEATURE_OPERATIONS.md).
 

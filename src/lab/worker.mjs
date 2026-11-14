@@ -1,3 +1,4 @@
+import {readStep,prepareStepImport,exportStepDocument} from '../step/exchange.mjs';
 import {buildOperationPreview} from '../proof/operation-preview.mjs';
 import {regenerateExtrusions} from '../extrusion/kernel.mjs';
 import {geometryExperiment} from './kernel.mjs';
@@ -17,7 +18,10 @@ import {resolveSceneSelection,baseDatums} from '../workbench/model.mjs';
 process.on('message',async message=>{
   try{
     let result;
-    if(message.kind==='geometry')result=await geometryExperiment(message.payload.spec,{includeStep:!!message.payload.includeStep});
+    if(message.kind==='step-analyze'){const r=await readStep(message.payload.source,{orientation:message.payload.orientation});result={translation:r.report};r.shape.delete();}
+    else if(message.kind==='step-import'){const prepared=await prepareStepImport(message.payload.before,message.payload.input);result={...(await verifyCommand({before:message.payload.before,after:prepared.document})),candidate:prepared.document,translation:prepared.translation};}
+    else if(message.kind==='step-export')result=await exportStepDocument(message.payload.document,message.payload.input);
+    else if(message.kind==='geometry')result=await geometryExperiment(message.payload.spec,{includeStep:!!message.payload.includeStep});
     else if(message.kind==='suite')result=await runSuite();
     else if(message.kind==='sketch')result=await solveSketch(message.payload.primitives??sketchFixture(message.payload.fixture),{drag:message.payload.drag});
     else if(message.kind==='parametric-sketch')result=await solveParametric(message.payload.data,{drag:message.payload.drag});

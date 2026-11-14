@@ -1,10 +1,13 @@
 # Compact Engineer context
 
+Current batch: **0.3.11 / E3.M5 STEP interoperability**, plus the standalone Bottom Dependencies panel driven by Parameter Manager selection. E3.M4/0.3.10 was delivered publicly and accepted by the owner. Read [M5 scope and demo checks](E3_M5_INTEROPERABILITY.md). Complete exact-head acceptance/public installation are required; owner M5 acceptance is pending. Main/stable remain 0.2.6.
+
+
 Start with `npm run context`. `PROJECT_STATE.json` records the reviewed Master hash (UTF-8 with CRLF normalized to LF) and last immutable delivery. A matching hash permits targeted reading under AGENTS1; a mismatch requires full design review. The Master remains authoritative. A brief is navigation, never proof of implementation.
 
 Platform owns generic local lifecycle, credentials and shared AI/review SDK. Engineer owns exact geometry, sketch solving, native history, assemblies, drawings and semantic CAD operations. Source mutations share revision-checked commands; GPU triangles and pixel IDs never establish native identity. Keep immutable builds/user files and human authorization boundaries intact.
 
-E0/E1 established the exact native foundation and editable parts; E2 is closed as 0.2.6 stable. E3.M1–M3 were delivered experimentally through 0.3.9, including exact public Platform installation. The owner requested M4 with formula, selection-table and chamfer refinements. The 0.3.10 candidate adds typed feature-field binding, causal dependency traces and source impact at working/retained versions, safe functions/autocomplete, two directed chamfer modes and per-row Model feedback. Read [current M4 scope](E3_M4_DEPENDENCIES.md); M3 finishing remains a historical fixture. Owner acceptance remains separate from experimental delivery.
+E0/E1 established the exact native foundation; E2 is closed as 0.2.6 stable. E3.M1–M4 are delivered and owner-accepted through 0.3.10. E3.M5 adds bounded exact STEP import/export, original source and translation reports, independent native CAD round trips, imported-face native additions and a standalone selection-driven Dependencies panel. Historical tests use explicit fixtures outside the production demo catalog.
 
 Current implemented bounds include part-local extrusion/revolution histories, exact boolean operations and feature transforms, typed sketch constraints/equations, referenced planes/axes/coordinate systems, inline Parameter Manager, docking and separate windows. Conservative geometry witnesses require explicit repair when their source disappears. Existing documents retain their sign and face-refinement semantics. Older strict readers reject new source extensions. General assemblies, broad drawing generation and a general nonlinear 3D datum constraint solver remain outside this batch.
 

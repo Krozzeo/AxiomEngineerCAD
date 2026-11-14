@@ -158,6 +158,7 @@ try {
       const constructionContext=softwareBrowser?await softwareBrowser.newContext({viewport:{width:1440,height:960}}):context;
       if(softwareBrowser)constructionContext.on('page',observe);
       report.featureConstructionRenderer={softwareForced:!!softwareBrowser,flags:softwareBrowser?constructionArgs:[]};
+      const {verifyM5UI}=await import('./browser-e3-m5.mjs');await verifyM5UI({context:constructionContext,host,observe,evidence,report});
       const {verifyM4UI}=await import('./browser-m4.mjs');await verifyM4UI({context:constructionContext,host,observe,evidence,report});
       const {verifyM3UI}=await import('./browser-m3.mjs');await verifyM3UI({context:constructionContext,host,observe,evidence,report});
       const {verifyOperationUX}=await import('./browser-operation-ux.mjs');await verifyOperationUX({context:constructionContext,host,observe,evidence,report});

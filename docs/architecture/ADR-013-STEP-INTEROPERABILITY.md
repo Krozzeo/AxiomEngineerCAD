@@ -1,0 +1,11 @@
+# ADR-013 — Bounded exact STEP interoperability
+
+Status: Experimenting / E3.M5 owner review candidate. No kernel or MVP scope replacement. Requirement: exact STEP import/export, source preservation, independent round-trip and safe failure.
+
+Use the accepted pinned OCCT Wasm reader/writer in existing killable worker/transaction boundaries. Preserve original source/hash and translation metadata in step-import; canonical coordinates are mm, preserving placement by default. Import builds exact B-Rep, not mesh reconstruction. A flattened solid set is supported, with unavailable assembly/history semantics explicitly marked. Do not fabricate sketches or original operations. See E3_M5_INTEROPERABILITY.md for bounds, units/orientation, migration and human/agent authority.
+
+Alternatives: mesh-only exchange loses exact curves and is rejected. Replacing the production kernel or shipping a native Python runtime is unnecessary. QA uses an independently bound native OCCT 7.9.3 via pinned cadquery-ocp-novtk 7.9.3.1.1; it is not a different geometric algorithm family, so shared-kernel defects remain possible. Analytical volume/position fixtures complement that comparison.
+
+Evidence: original independent block/MM/INCH, drilled plate and horizontal cylinder/CM fixtures; invalid open shell; four-unit native roundtrip; ten independently parsed exports; source integrity, exact face-supported native boss and direct chamfer; cancellation/timeout/revision/atomicity and isolated review tests; actual browser downloads and authenticated detached dependency selection. Final Windows/Linux and public installation evidence is recorded by delivery artifacts.
+
+Product legal notices and replaceable LGPL OCCT artifacts remain unchanged; replicad is MIT. QA bindings are installed only in CI/local QA, not packaged, and model fixtures are original MIT. Primary upstream STEP semantics: https://github.com/Open-Cascade-SAS/OCCT/blob/master/dox/user_guides/step/step.md . QA package: https://pypi.org/project/cadquery-ocp-novtk/7.9.3.1.1/ . Original source, immutable previous releases and native project backups provide rollback; old strict readers reject the new STEP feature rather than dropping data. Owner signoff pending.

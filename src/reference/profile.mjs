@@ -33,7 +33,7 @@ export function referenceGeometry(graph,target,modelGeometry=null,seen=new Set()
   if(['circle','arc'].includes(entity.type)){const a=entity.type==='arc'?entity.a:[entity.center[0]+entity.radius,entity.center[1]],b=entity.type==='arc'?entity.b:a;return {kind:'circle',origin:world(entity.center),normal:f.normal,direction:f.normal,radius:entity.radius,a:world(a),b:world(b),point:world(entity.type==='arc'?arcPoint(entity,.5):a),full:entity.type==='circle'};}
   check(entity.type==='line','InvalidGeometry','Select an analytic line or circular reference.');return {kind:'line',origin:world(entity.a),a:world(entity.a),b:world(entity.b),direction:unit(sub(world(entity.b),world(entity.a)))};
  }
- check(feature.type==='sketch-extrusion'&&modelGeometry,'LostReference','Select an exact model face, straight edge or vertex.');
+ check(['sketch-extrusion','step-import'].includes(feature.type)&&modelGeometry,'LostReference','Select an exact model face, straight edge or vertex.');
  return structuredClone(modelGeometry);
 }
 export function validateReference(feature,graph){

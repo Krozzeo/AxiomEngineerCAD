@@ -43,6 +43,12 @@ jobs:
         run: python scripts/verify-vector-pdf.py test-results --proposal
       - name: Independently verify the reconstructed part PDF
         run: python scripts/verify-vector-pdf.py test-results --reconstruction
+      - name: Install independent native CAD QA reader
+        run: python -m pip install --disable-pip-version-check -r scripts/qa-step-requirements.txt
+      - name: Export exact STEP interoperability corpus
+        run: node scripts/export-step-qa.mjs
+      - name: Verify STEP in independent native CAD reader
+        run: python scripts/verify-step.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:

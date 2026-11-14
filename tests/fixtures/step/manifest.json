@@ -1,0 +1,89 @@
+{
+  "generator": "Original MIT fixtures built through cadquery-ocp-novtk 7.9.3.1.1 / native OCCT 7.9.3",
+  "cases": [
+    {
+      "name": "block-mm",
+      "file": "block-mm.step",
+      "fileUnit": "MM",
+      "volumeMm3": 6000,
+      "boundsMm": [
+        [
+          2,
+          3,
+          4
+        ],
+        [
+          12,
+          23,
+          34
+        ]
+      ],
+      "solids": 1
+    },
+    {
+      "name": "block-inch",
+      "file": "block-inch.step",
+      "fileUnit": "INCH",
+      "volumeMm3": 6000,
+      "boundsMm": [
+        [
+          2,
+          3,
+          4
+        ],
+        [
+          12,
+          23,
+          34
+        ]
+      ],
+      "solids": 1
+    },
+    {
+      "name": "drilled-plate",
+      "file": "drilled-plate.step",
+      "fileUnit": "MM",
+      "volumeMm3": 9373.805328941535,
+      "boundsMm": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          40,
+          30,
+          8
+        ]
+      ],
+      "solids": 1
+    },
+    {
+      "name": "x-cylinder",
+      "file": "x-cylinder.step",
+      "fileUnit": "CM",
+      "volumeMm3": 942.4777960769379,
+      "boundsMm": [
+        [
+          40,
+          -5,
+          -5
+        ],
+        [
+          52,
+          5,
+          5
+        ]
+      ],
+      "solids": 1
+    },
+    {
+      "name": "open-shell",
+      "file": "open-shell.step",
+      "fileUnit": "MM",
+      "volumeMm3": null,
+      "boundsMm": null,
+      "solids": 0
+    }
+  ]
+}
