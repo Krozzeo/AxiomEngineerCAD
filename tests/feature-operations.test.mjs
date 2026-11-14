@@ -1,0 +1,30 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {featureOperationsDemo} from '../src/extrusion/feature-demo.mjs';
+import {regenerateExtrusions} from '../src/extrusion/kernel.mjs';
+import {command} from '../src/commands/domain.mjs';
+import {verifyCommand} from '../src/commands/worker.mjs';
+export const initialFeatureVolume=Math.PI*(8**2*26+35**2*6-4*2**2*6-(8**2-6**2)*4);
+const near=(actual,expected)=>assert.ok(Math.abs(actual-expected)<1e-5,actual+' differs from '+expected);
+const update=(doc,id,fields)=>command(doc,'cad.extrusion.update.v1',{featureId:id,name:doc.native.graph.features.find(f=>f.id===id).data.name,depthMm:6,reverse:false,...fields});
+test('E3.M2 shaft, flange, cut and three repeat modes match the independent material-volume oracle',async()=>{
+ const doc=featureOperationsDemo(),result=await regenerateExtrusions(doc);
+ near(result.volumeMm3,initialFeatureVolume);
+ assert.equal(result.featureEvidence.length,7);
+ const settings=doc.native.graph.features.find(f=>f.id==='linear-holes').data.repeat;
+ const changed=update(doc,'linear-holes',{repeat:{...settings,count:3}});
+ near((await regenerateExtrusions(changed)).volumeMm3,initialFeatureVolume-Math.PI*2**2*6);
+ const outcome=await verifyCommand({before:doc,after:changed,normalize:true,requireSolved:true});
+ assert.equal(outcome.valid,true);
+ assert.equal(outcome.candidate.native.graph.features.find(f=>f.id==='linear-holes').data.repeat.sourceFeatureId,'first-hole');
+});
+test('E3.M2 rejects invalid axes, lost repeats and cuts missing their material',async()=>{
+ const doc=featureOperationsDemo(),unchanged=structuredClone(doc);
+ assert.throws(()=>update(doc,'shaft-revolve',{axisId:'missing'}),{code:'InvalidGeometry'});
+ const cut=doc.native.graph.features.find(f=>f.id==='first-hole');
+ const sketch=doc.native.graph.features.find(f=>f.id===cut.data.sketchId);
+ const moved=command(doc,'cad.sketch.entity.update.v1',{sketchId:sketch.id,unit:'mm',entity:{...sketch.data.entities[0],center:[100,0]}});
+ await assert.rejects(regenerateExtrusions(moved),{code:'InvalidGeometry'});
+ assert.throws(()=>command(doc,'cad.feature.delete.v1',{featureId:'first-hole'}),{code:'LostReference'});
+ assert.deepEqual(doc,unchanged);
+});

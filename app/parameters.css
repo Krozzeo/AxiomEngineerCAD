@@ -41,3 +41,45 @@
 .dimension-inspector .sketch-section-heading #sketch-targets-heading{margin-right:auto}
 
 .operation-value-table{width:100%;border-collapse:collapse}
+
+.feature-boolean button,.feature-limit-modes button{display:inline-flex;align-items:center;justify-content:center;width:34px;height:32px;padding:5px;margin:2px;background:#17283a;border:1px solid #405971}
+.feature-boolean button[aria-pressed=true],.feature-limit-modes button[aria-pressed=true]{background:#b6e7ff;color:#0c263a;border-color:#73cfff}
+.feature-boolean svg,.feature-limit-modes svg{width:22px;height:22px}
+[data-limit-side]{border-top:1px solid #34495e;padding:4px 0 12px}
+[data-limit-side] h5{margin:10px 0;font-size:13px}
+#feature-operation-fields .operation-value{display:flex;gap:5px;align-items:center}
+#feature-operation-fields .operation-value>button{flex:none;width:32px;height:32px;padding:5px}
+#feature-operation-fields .operation-selection .search-select{margin-top:5px}
+.feature-build-column{margin-left:auto}
+[data-operations=Features] #cad-cancel-feature{margin-left:auto}
+[data-operations=Features] .feature-build-column{margin-left:12px;min-width:130px}
+.feature-build-column label{display:flex;align-items:center;gap:6px;font-size:11px}
+.feature-build-column select{min-width:90px;max-width:145px;font-size:10px}
+
+.operation-selection-heading{display:flex;gap:8px;align-items:center}.operation-selection-heading h4{flex:1}.operation-selection-heading button{width:28px;height:28px;padding:4px}
+
+/* Operation state is independent of the selected model entity. */
+.operation-page button[data-feature-kind][aria-pressed=true]{background:#c5e8fa;color:#123044;border-color:#74c7ec;box-shadow:inset 0 0 0 1px #74c7ec}
+body.constructing-feature #inspector-content>:not(#feature-operation-editor){display:none!important}
+.operation-inspector .operation-value-table{margin:0;height:32px}
+.operation-inspector .operation-value-table td{height:30px;padding:0}
+.operation-inspector .operation-value-table input,.operation-inspector .operation-value-table input:focus{box-sizing:border-box;height:30px;min-height:0;padding:5px 9px;font-size:14px}
+#feature-operation-fields input[data-extrusion-name]{box-sizing:border-box;height:32px;min-height:0;padding:5px 9px}
+
+.operation-inspector .operation-value>button{box-sizing:border-box;flex:none;width:32px;height:32px;padding:5px}
+
+#feature-operation-fields .feature-section{margin:14px 0 0;padding:12px 0 0;border-top:1px solid #405971}
+#feature-operation-fields .feature-source-selection{border-top:0;margin-top:10px;padding-top:0}
+#feature-operation-fields .feature-section>h4,#feature-operation-fields .feature-boolean>h4,#feature-operation-fields .feature-preview-toggle>h4{font-size:17px;font-weight:700;letter-spacing:.2px;color:#ecf4ff;margin:0 0 10px}
+#feature-operation-fields .feature-boolean,#feature-operation-fields .feature-preview-toggle{display:flex;align-items:center;gap:4px}
+#feature-operation-fields .feature-boolean>h4,#feature-operation-fields .feature-preview-toggle>h4{margin:0 auto 0 0}
+#feature-operation-fields [data-limit-side]{border:0;padding:8px 0}
+.feature-limit-heading{display:flex;align-items:center;justify-content:space-between;gap:6px}
+#feature-operation-fields .feature-limit-heading h5{font-size:14px;font-weight:600;margin:0}
+.feature-limit-modes{display:flex;flex-wrap:wrap;justify-content:flex-end}
+#feature-operation-fields .feature-source-selection .operation-selection-heading h4{font-size:13px;font-weight:600}
+
+#feature-operation-fields .feature-limit-modes{flex-wrap:nowrap;gap:2px}
+#feature-operation-fields .feature-limit-modes button{flex:none;width:28px;height:28px;margin:0;padding:3px}
+
+.parameter-completion-menu .formula-function,.search-select-menu .formula-function{background:#174c80;color:#e5f2ff}.parameter-completion-menu .formula-function:hover,.search-select-menu .formula-function:hover,.search-select-menu .formula-function[aria-selected=true]{background:#2677bc}

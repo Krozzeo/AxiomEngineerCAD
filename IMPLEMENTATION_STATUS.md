@@ -1,8 +1,8 @@
 # Engineer implementation status
 
-Current candidate: **0.2.6 / E2 stabilization**. See [workflow and verification](docs/PRE_E3_ASSISTANT.md). The verified 0.2.5 delivery is indexed in PROJECT_STATE.
+Current candidate: **0.3.10 / E3.M4 parameter and feature dependency diagnostics**. Full typed operation-field queries/bindings, causal dependent/source traces at working or retained versions, read-only source impact and typed rejection, exact Undo/Redo; safe formula catalogue with shared blue function autocomplete; directed distance/angle and two-distance chamfer; short selection labels and physical row hover. See [scope and verification](docs/E3_M4_DEPENDENCIES.md). Exact frozen CI and actual public installation remain required before delivery.
 
-Previous CAD: **0.1.8 / E1.M5 sketch interactions — delivered for owner review**, source `4f38a0e6ccc2f4e1dfd331beaa2d20b4352501d5` / PR16. Exact Windows/Linux acceptance, immutable experimental publication and actual public Platform installation passed. Owner acceptance remains pending. `docs/PROJECT_STATE.json` is the compact delivery/evidence index; no E2 progression, main merge or stable release is claimed.
+Previous delivery: **0.3.9 / E3.M3**, 315 native tests, full Windows/Linux/browser/PDF and actual public Platform/Chrome/NVIDIA acceptance passed. PROJECT_STATE indexes immutable delivery. Main/stable remain 0.2.6.
 
 Development process: compact verified context, focused diagnosis and non-duplicated exact-head PR/main CI were integrated in main through PR17 at `60a5ceb42be30fd82bb33263799a67706653be64` with owner authorization. See `docs/DEVELOPMENT_WORKFLOW.md`.
 
@@ -18,9 +18,12 @@ Development process: compact verified context, focused diagnosis and non-duplica
 | E1.M3 | Parametric sketch editing delivered 0.1.4 |
 | E1.M4 | Parameters/expressions delivered 0.1.5 |
 | E1.M5 | Exact extrusion 0.1.6 and editing recovery 0.1.7 delivered;0.1.8 delivered for owner review |
-| E2–E6 | Planned; not completed |
+| E2 | Closed; owner-accepted stable 0.2.6 |
+| E3.M1–M3 | Experimental deliveries through 0.3.9 |
+| E3.M4 | Current 0.3.10 candidate |
+| E3.M5–E6 | Planned; not completed |
 
-## Current changes and evidence
+## Historical E1 changes and evidence
 
 See the [requirement/test map](docs/milestones/E1_M5_UX_0_1_8.md), [plan](docs/milestones/E1_M5_UX_0_1_8_PLAN.md) and [ADR025](docs/architecture/ADR-025-SKETCH-INTERACTION-AND-PLANAR-SUPPORT.md).
 

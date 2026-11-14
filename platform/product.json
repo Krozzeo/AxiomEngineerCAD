@@ -3,7 +3,7 @@
   "protocolVersion": 1,
   "productId": "axiom.engineer-cad",
   "displayName": "Axiom Engineer CAD",
-  "productVersion": "0.2.6",
+  "productVersion": "0.3.10",
   "platformApiRange": ">=0.1.0 <0.2.0",
   "projectFormats": [
     {
@@ -25,8 +25,8 @@
   ],
   "demos": [
     {
-      "id": "e2-m4-drawing-reconstruction",
-      "name": "E2.M4 Drawing Reconstruction"
+      "id": "e3-m4-dependency-workbench",
+      "name": "E3.M4 Dependency Workbench"
     }
   ],
   "launch": {

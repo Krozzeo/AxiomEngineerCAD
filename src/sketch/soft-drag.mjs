@@ -1,6 +1,21 @@
+// Only connected relations can influence an interactive drag.
+export function dragComponent(data,ref){
+ const links=new Map();
+ for(const constraint of data.constraints)if(constraint.driving)for(const participant of constraint.refs){
+  const list=links.get(participant.entityId)??[];list.push(constraint);links.set(participant.entityId,list);
+ }
+ const entities=new Set([ref.entityId]),constraints=new Set();
+ for(const id of entities)for(const constraint of links.get(id)??[]){
+  if(constraints.has(constraint))continue;
+  constraints.add(constraint);
+  for(const participant of constraint.refs)entities.add(participant.entityId);
+ }
+ return {...data,entities:data.entities.filter(entity=>entities.has(entity.id)),constraints:[...constraints]};
+}
+
 // Pointer goals are projected into permitted motion; only exact solver results can escape.
 export async function solveSoftDrag(data,drag,{solve,jacobian,pointAt,derivedId,residuals,check}){
- check(drag?.ref&&Array.isArray(drag.target)&&drag.target.length===2&&drag.target.every(n=>Number.isFinite(n)&&Math.abs(n)<=1000),'InvalidInput','Invalid bounded drag target.');const e=data.entities.find(e=>e.id===drag.ref.entityId);check(e,'LostReference','Drag participant is missing.');const ref=drag.ref.role==='entity'?{entityId:e.id,role:e.type==='line'?'midpoint':e.type==='circle'?'center':'point'}:drag.ref;const radial=ref.role==='circumference'&&e.type==='circle',offset=radial?drag.target.map((n,i)=>n-e.center[i]):null,magnitude=radial?Math.hypot(...offset):0,direction=radial?(magnitude>1e-9?offset.map(n=>n/magnitude):[1,0]):null;
+ check(drag?.ref&&Array.isArray(drag.target)&&drag.target.length===2&&drag.target.every(n=>Number.isFinite(n)&&Math.abs(n)<=1000),'InvalidInput','Invalid bounded drag target.');const e=data.entities.find(e=>e.id===drag.ref.entityId);check(e,'LostReference','Drag participant is missing.');const ref=drag.ref.role==='entity'?{entityId:e.id,role:e.type==='line'?'midpoint':['circle','arc'].includes(e.type)?'center':e.type==='spline'?'a':'point'}:drag.ref;const radial=ref.role==='circumference'&&e.type==='circle',offset=radial?drag.target.map((n,i)=>n-e.center[i]):null,magnitude=radial?Math.hypot(...offset):0,direction=radial?(magnitude>1e-9?offset.map(n=>n/magnitude):[1,0]):null;
  const atRef=es=>{if(!radial)return pointAt(es,ref);const circle=es.find(x=>x.id===ref.entityId);return circle.center.map((n,i)=>n+direction[i]*circle.radius);};
  check(atRef(data.entities),'LostReference','Choose a draggable semantic point or segment.');const original=await solve(data);if(!original.valid)return original;
  let held=e.type==='line'&&['a','b'].includes(ref.role)?{entityId:e.id,role:ref.role==='a'?'b':'a'}:null;let temporary=held?{id:derivedId('drag-hold',e.id,held.role),type:'fixed',refs:[held],driving:true,value:[...pointAt(data.entities,held)]}:null;let cs=temporary?[...data.constraints,temporary]:data.constraints;

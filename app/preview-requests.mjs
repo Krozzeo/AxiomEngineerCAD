@@ -4,6 +4,7 @@ export function previewRequests(){
  const pending=new Set();let closing=null;
  return {
   get closing(){return !!closing;},
+  get pending(){return pending.size;},
   run(action){
    if(closing)return Promise.resolve();
    const request=Promise.resolve().then(action);pending.add(request);

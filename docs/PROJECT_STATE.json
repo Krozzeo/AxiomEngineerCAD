@@ -7,20 +7,20 @@
     "sha256": "9c2f3857a4a7f1156b1c10b82d2e76680604393b7f5799081f6fd22694502de6"
   },
   "milestone": {
-    "current": "E2.M4",
-    "status": "E2 owner accepted; 0.2.6 stable candidate",
-    "ownerAcceptance": "Accepted",
-    "next": "E3.M1 after 0.2.6 stable publication"
+    "current": "E3.M4",
+    "status": "0.3.10 parameter/feature dependency diagnostics candidate",
+    "ownerAcceptance": "pending",
+    "next": "Owner reviews E3.M4 before E3.M5 STEP interoperability"
   },
   "lastDelivered": {
-    "version": "0.2.5",
-    "commit": "b8bd3c7b99cb0d7a4a8db208608389b78237c1b7",
+    "version": "0.2.6",
+    "commit": "21842a0a4c1e8843e3091afbfa4f7731ee13bdfa",
     "pullRequest": 18,
-    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-18-b8bd3c7b99cb0d7a4a8db208608389b78237c1b7",
-    "acceptanceRun": 42384834832,
-    "publicationRun": 42385651870,
-    "artifactSha256": "266e6cb581df1e9cc5eb31be93a4bf464a1d15c2187e6077ce80aa1e77448da0",
-    "verification": "Windows and Ubuntu acceptance, public Platform installation and UI review. Owner verified live SVG reconstruction and model-to-drawing; exported A4 landscape with two views and 48 and 12 mm dimensions."
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/v0.2.6",
+    "acceptanceRun": 42399474320,
+    "publicationRun": 42400464406,
+    "artifactSha256": "31e653ebfa0f25ee929618fa367640b38f5e78aa858aeb023e521dff9832b30c",
+    "verification": "Owner accepted E2. Windows and Ubuntu exact main acceptance passed. Stable 0.2.6 published and independently installed from the public Platform 0.1.13 catalog, including assistant and PDF regression."
   },
   "constraints": [
     "MASTER_DESIGN is intent; implementation requires code and matching evidence.",
@@ -33,23 +33,23 @@
     "implementation": "IMPLEMENTATION_STATUS.md",
     "handoff": "AI_HANDOFF.md",
     "architecture": "docs/architecture/ADR_REGISTER.md",
-    "currentCadScope": "docs/PRE_E3_ASSISTANT.md",
+    "currentCadScope": "docs/E3_M4_DEPENDENCIES.md",
     "deliveryGate": "docs/MILESTONE_DELIVERY.md"
   },
   "candidate": {
-    "version": "0.2.6",
-    "branch": "engineer/sketch-navigation-0.1.9",
-    "status": "Automatic preview, direct human Apply and assistant task history"
+    "version": "0.3.10",
+    "branch": "engineer/e3-m1-sketch-breadth",
+    "status": "Typed dependency traces, source update impact and version-aware diagnostics, safe formula catalogue/autocomplete, directed chamfer modes and selection-row feedback"
   },
   "previousDelivered": {
-    "version": "0.2.4",
-    "commit": "7e7ac7a0d9fb9df053fbb1030568213d2aeb9b24",
+    "version": "0.2.5",
+    "commit": "b8bd3c7b99cb0d7a4a8db208608389b78237c1b7",
     "pullRequest": 18,
-    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-18-7e7ac7a0d9fb9df053fbb1030568213d2aeb9b24",
-    "acceptanceRun": 42375654846,
-    "publicationRun": 42377082141,
-    "artifactSha256": "3499c5dacaa0b7d8bb205ae31102229ff1a6779d324f48f27ae2832e8abfd719",
-    "verification": "Windows and Ubuntu acceptance. Public Platform 0.1.13 installation, synthetic assistant review, exact reconstruction and independent vector PDF verified."
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-18-b8bd3c7b99cb0d7a4a8db208608389b78237c1b7",
+    "acceptanceRun": 42384834832,
+    "publicationRun": 42385651870,
+    "artifactSha256": "266e6cb581df1e9cc5eb31be93a4bf464a1d15c2187e6077ce80aa1e77448da0",
+    "verification": "Windows and Ubuntu acceptance, public Platform installation and UI review. Owner verified live SVG reconstruction and model-to-drawing; exported A4 landscape with two views and 48 and 12 mm dimensions."
   },
   "earlierDelivered": {
     "version": "0.1.8",
@@ -70,5 +70,25 @@
     "publicationRun": 41747175501,
     "artifactSha256": "031eb7725bdab240899daaaecbdbc4476de08d0099d8ef9be54958e8f968e5c5",
     "verification": "Windows/Linux: 232 tests each, browser and independent PDF acceptance. Public Platform 0.1.13 install/activate/launch and focused Chrome/NVIDIA sketch/save/reopen passed; broader public legacy/PDF run stopped on a harness precondition and is not claimed passed."
+  },
+  "lastExperimental": {
+    "version": "0.3.9",
+    "commit": "2bab5cdb3ce89cbe32001dbe6ad1478a41cd89cb",
+    "pullRequest": 19,
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-19-2bab5cdb3ce89cbe32001dbe6ad1478a41cd89cb",
+    "acceptanceRun": 43612580145,
+    "publicationRun": 43613632054,
+    "artifactSha256": "a5c12a1db49373547cae6f43b10a25ab8c7f20f8a202fb03473dbea53350ef3f",
+    "verification": "315 native tests, full Windows/Linux/browser/independent PDF acceptance; actual public Platform 0.1.13 install and Chrome/NVIDIA M3 and retained regressions passed."
+  },
+  "previousExperimental": {
+    "version": "0.3.8",
+    "commit": "f08ddc04d980b8b5ccb15d2ba203bef74d8a64b4",
+    "pullRequest": 19,
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-19-f08ddc04d980b8b5ccb15d2ba203bef74d8a64b4",
+    "acceptanceRun": 43548330423,
+    "publicationRun": 43549149921,
+    "artifactSha256": "a882132e8b29053cea0e72096a515282a52935de51ec88e27df8cec55e896032",
+    "verification": "300 native tests, complete Windows/Linux/browser/independent PDF and actual public Platform 0.1.13 installation plus Chrome/NVIDIA operation/reference/contour/save/reopen suites passed."
   }
 }

@@ -5,9 +5,9 @@ export class OperationPreview{
  constructor(device){this.device=device;}
  set(layers=[]){
   this.clear();const faces=[],edges=[];
-  for(const layer of layers){const mesh=layer.mesh,occurrence={position:layer.position,quaternion:layer.quaternion};
-   for(const i of mesh.triangles)faces.push(...world(mesh.vertices.slice(i*3,i*3+3),occurrence),...rotate(mesh.normals.slice(i*3,i*3+3),occurrence.quaternion),0,3,0);
-   for(const edge of mesh.edges.filter(e=>!e.displayHidden))for(let i=1;i<edge.points.length;i++)for(const p of [edge.points[i-1],edge.points[i]])edges.push(...world(p,occurrence),0,0,1,0,4,0);
+  for(const layer of layers){const style=({unite:0,none:1,subtract:2,intersect:3,addition:0})[layer.kind]??0,mesh=layer.mesh,occurrence={position:layer.position,quaternion:layer.quaternion};
+   for(const i of mesh.triangles)faces.push(...world(mesh.vertices.slice(i*3,i*3+3),occurrence),...rotate(mesh.normals.slice(i*3,i*3+3),occurrence.quaternion),0,3+style*2,0);
+   for(const edge of mesh.edges.filter(e=>!e.displayHidden))for(let i=1;i<edge.points.length;i++)for(const p of [edge.points[i-1],edge.points[i]])edges.push(...world(p,occurrence),0,0,1,0,4+style*2,0);
   }
   const upload=values=>{const data=new Float32Array(values),buffer=this.device.createBuffer({size:Math.max(36,data.byteLength),usage:GPUBufferUsage.VERTEX|GPUBufferUsage.COPY_DST});this.device.queue.writeBuffer(buffer,0,data);return buffer;};
   this.faces=upload(faces);this.edges=upload(edges);this.faceCount=faces.length/9;this.edgeCount=edges.length/9;

@@ -144,6 +144,28 @@ try {
   await hub.locator('[data-route="/installations"]').click();
   await hub.getByRole('button',{name:'Load Demos',exact:true}).click();
   await hub.waitForFunction(()=>document.querySelector('.load-demos')?.textContent==='Load Demos');const {seedHistoricalFixtures}=await import('../scripts/acceptance-demo-fixtures.mjs');await seedHistoricalFixtures(host);
+  {
+    const {verifyFeatureConstructionUI}=await import('./browser-feature-construction.mjs');
+    // Keep the no-GPU/failure corpus in its original context. Physical picking
+    // requires an actual renderer; CI uses explicitly labelled SwiftShader.
+    // Linux canvas/shared-image interop needs ANGLE and Dawn to share the
+    // SwiftShader Vulkan instance (Chromium issue 575926500).
+    const constructionArgs=process.platform==='linux'
+      ?['--enable-unsafe-webgpu','--use-angle=swiftshader','--enable-unsafe-swiftshader','--use-vulkan=swiftshader','--enable-features=Vulkan']
+      :['--enable-unsafe-webgpu','--use-webgpu-adapter=swiftshader','--disable-gpu-watchdog','--enable-dawn-features=allow_unsafe_apis','--disable-dawn-features=use_dxc','--enable-webgpu-developer-features','--use-gpu-in-tests','--enable-accelerated-2d-canvas'];
+    const softwareBrowser=process.env.ENGINEER_HARDWARE==='1'?null:await chromium.launch({channel:'chromium',headless:true,ignoreDefaultArgs:['--disable-gpu-compositing'],args:constructionArgs});
+    try{
+      const constructionContext=softwareBrowser?await softwareBrowser.newContext({viewport:{width:1440,height:960}}):context;
+      if(softwareBrowser)constructionContext.on('page',observe);
+      report.featureConstructionRenderer={softwareForced:!!softwareBrowser,flags:softwareBrowser?constructionArgs:[]};
+      const {verifyM4UI}=await import('./browser-m4.mjs');await verifyM4UI({context:constructionContext,host,observe,evidence,report});
+      const {verifyM3UI}=await import('./browser-m3.mjs');await verifyM3UI({context:constructionContext,host,observe,evidence,report});
+      const {verifyOperationUX}=await import('./browser-operation-ux.mjs');await verifyOperationUX({context:constructionContext,host,observe,evidence,report});
+      const {verifyFeatureRefinementsUI}=await import('./browser-feature-refinements.mjs');await verifyFeatureRefinementsUI({context:constructionContext,host,observe,evidence,report});
+      await verifyFeatureConstructionUI({context:constructionContext,host,observe,evidence,report});
+    }finally{await softwareBrowser?.close();}
+  }
+
   const demoEntry=host.manager.catalog().recents.find(p=>p.name==='E0.M2 Geometry & Sketch Lab');
   assert.ok(demoEntry,'Version-owned demo was not registered');
   const demoDoc=JSON.parse(await readFile(demoEntry.path));assert.equal(demoDoc.experiment.spec.scenario,'cut');
@@ -158,6 +180,8 @@ try {
   {const row=hub.locator('#project-rows tr').filter({hasText:'E2.M3 Drawing Proposal'});await row.getByRole('button',{name:'Open E2.M3 Drawing Proposal',exact:true}).click();await row.getByText('Active · saved',{exact:true}).waitFor();const openedId=await row.getAttribute('data-session-id'),opened=host.manager.catalog().sessions.find(s=>s.sessionId===openedId),p=await context.newPage();observe(p);await p.goto(opened.editorUrl);await p.locator('body[data-sketch-ready=true]').waitFor();await p.waitForFunction(()=>window.engineerViewport?.proof?.exact?.volumeMm3>0);const {verifyM5SketchUI,verifyM5ParameterUI,verifyM5ExtrusionUI,verifyM5SeparatedParameters}=await import('./browser-m5.mjs');await verifyM5SketchUI({page:p,evidence,report});await verifyM5ParameterUI({page:p,evidence,report});await verifyM5ExtrusionUI({page:p,evidence,report});await verifyM5SeparatedParameters({page:p,evidence,report});await waitEditorIdle(p);const {sketchDocument}=await import('./browser-sketch.mjs'),closing=await sketchDocument(p);p.on('dialog',d=>d.accept());await p.close();await host.manager.execute({operationId:crypto.randomUUID(),action:'close',sessionId:opened.sessionId,expectedRevision:closing.revision,decision:'discard'});const origin=new URL(opened.editorUrl).origin;for(const owned of context.pages())if(owned.frames().some(f=>f.url().startsWith(origin+'/'))){owned.on('dialog',d=>d.accept());await owned.close();}}
   {const {verifyInteractionProjectUI}=await import('./browser-sketch-interactions.mjs');await verifyInteractionProjectUI({hub,context,host,evidence,observe,report});}
   {const {verifyRecoveryProjectUI}=await import('./browser-editing-recovery.mjs');await verifyRecoveryProjectUI({hub,context,host,evidence,observe,report});}
+  {const {verifyExtendedSketchUI}=await import('./browser-extended-sketch.mjs');await verifyExtendedSketchUI({context,host,observe,evidence,report});}
+  {const {verifyFeatureOperationsUI}=await import('./browser-feature-operations.mjs');await verifyFeatureOperationsUI({context,host,observe,evidence,report});}
   {const {verifyAssistantUI}=await import('./browser-assistant.mjs');await verifyAssistantUI({context,host,observe,evidence});}
   {const {verifyReconstructionUI}=await import('./browser-reconstruction.mjs');await verifyReconstructionUI({context,host,evidence,observe,report});}
   {const {verifyConsolidationProjectUI}=await import('./browser-consolidation.mjs');await verifyConsolidationProjectUI({context,host,evidence,observe,report});}

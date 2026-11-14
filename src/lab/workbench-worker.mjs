@@ -3,7 +3,8 @@ import {fileURLToPath} from 'node:url';
 import {randomUUID} from 'node:crypto';
 import {check} from '../errors.mjs';
 // One process per document, shared by mutually exclusive command/proof jobs.
-// No shape/proof cache: every job still performs its actual requested verification.
+// Content-hashed numerical evidence is reusable within this document process.
+// Every mutation still validates its source, changed constraints and resulting geometry.
 export class WorkbenchWorker{
  constructor({idleMs=30000}={}){check(Number.isSafeInteger(idleMs)&&idleMs>=50&&idleMs<=30000,'InvalidInput','Worker idle expiry must be between 50 ms and 30 seconds.');this.idleMs=idleMs;this.child=null;this.active=null;this.idle=null;this.closed=false;}
  run(kind,payload,{signal,timeoutMs=20000}={}){

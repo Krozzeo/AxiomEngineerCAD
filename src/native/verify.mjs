@@ -13,7 +13,8 @@ import {geometryExperiment} from '../lab/kernel.mjs';
 import {solveAssembly} from '../assembly/solver.mjs';
 import {hasIntegration} from '../integration/profile.mjs';
 import {regenerateIntegration} from '../integration/engine.mjs';
-export async function verifyNative(value,{rollbackAt=null}={}){validate(value);check(value.formatVersion===1,'incompatibleVersion','Convert this document to native v1 first.');const body=contentOf(value),seen=new Set();let geometry=null,assembly=null,operations=0;const budget=()=>check(++operations<=32,'ResourceLimit','Native verification exceeds 32 geometry/solver operations.');
+const verifiedCache=new Map();
+export async function verifyNative(value,{rollbackAt=null}={}){validate(value);const cacheKey=hash(contentOf(value))+':'+(rollbackAt??'');if(verifiedCache.has(cacheKey))return structuredClone(verifiedCache.get(cacheKey));check(value.formatVersion===1,'incompatibleVersion','Convert this document to native v1 first.');const body=contentOf(value),seen=new Set();let geometry=null,assembly=null,operations=0;const budget=()=>check(++operations<=32,'ResourceLimit','Native verification exceeds 32 geometry/solver operations.');
   async function verify(c,working=false){const h=hash(c);if(seen.has(h))return;check(seen.size<32,'ResourceLimit','Native validation closure exceeds 32 contents.');seen.add(h);const sourceContent=c;c=executionContent(c,{rollbackAt:working?rollbackAt:null});
     for(const f of c.graph.features)if(f.selector)check(['ResolvedStable','ResolvedReidentified'].includes(f.selector.state),f.selector.state,'Repair unresolved feature selector before versioning.');
     let g=null,a=null;const featureEvidence=[],integrated=hasIntegration(c);if(integrated){budget();budget();budget();budget();const r=await regenerateIntegration(c);g={volumeMm3:r.exact.volumeMm3,areaMm2:r.exact.areaMm2,reference:r.exact.reference.state};a={status:r.assembly.status,dof:r.assembly.remainingDOF};featureEvidence.push({id:'sketch-main',status:r.sketch.status,dof:r.sketch.remainingDOF},{id:'extrude-base',volumeMm3:r.trace.extrusion.volumeMm3},{id:'feature-geometry',reference:r.exact.reference.state},{id:'mate-binding',zMm:r.trace.mate.position[2],dof:r.assembly.remainingDOF},{id:'drawing-binding',widthMm:r.trace.drawing.widthMm});}
@@ -28,5 +29,5 @@ export async function verifyNative(value,{rollbackAt=null}={}){validate(value);c
     for(const d of c.graph.dependencies)await verify(d.snapshot);for(const v of c.localVersions)await verify(v.content);
     return {geometry:g,assembly:a,featureEvidence};
   }
-  const result=await verify(body,true);({geometry,assembly}=result);return {valid:true,inputHash:hash(body),geometry,assembly,featureEvidence:result.featureEvidence,contentsChecked:seen.size};
+  const result=await verify(body,true);({geometry,assembly}=result);const evidence={valid:true,inputHash:hash(body),geometry,assembly,featureEvidence:result.featureEvidence,contentsChecked:seen.size};if(verifiedCache.size>=32)verifiedCache.delete(verifiedCache.keys().next().value);verifiedCache.set(cacheKey,structuredClone(evidence));return evidence;
 }
