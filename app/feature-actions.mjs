@@ -87,7 +87,6 @@ function schedulePreview(){
  if(previewRequestsInFlight.closing||!owner?.depth)return;let incomplete=null;try{owner.fields.read();}catch(error){incomplete=error;}$('feature-operation-form').querySelector('button[type=submit]').disabled=true;
  const active=()=>editing===owner&&sequence===previewSequence&&!previewRequestsInFlight.closing;
  previewTimer=setTimeout(()=>{
-  previewRequestsInFlight.run(()=>{
    const task=previewChain.then(async()=>{
     if(!active())return;
     const options=!incomplete
@@ -95,7 +94,7 @@ function schedulePreview(){
       :{operationEditId:owner.item?.id};
     for(let attempt=0;active();attempt++){
      await retirePreview();if(!active())return;
-     try{await v.build({...options,reuseCurrent:!!incomplete});if(incomplete&&active())notify(incomplete.message);return;}
+     try{await previewRequestsInFlight.run(()=>v.build({...options,reuseCurrent:!!incomplete}));if(incomplete&&active())notify(incomplete.message);return;}
      catch(error){
       if(!error.message.startsWith('projectBusy:')||attempt===9)throw error;
       // A competing model build can start after the status read.
@@ -103,8 +102,7 @@ function schedulePreview(){
      }
     }
    });
-   previewChain=task.catch(error=>{if(active())notify('Preview: '+error.message);});return previewChain;
-  });
+   previewChain=task.catch(error=>{if(active())notify('Preview: '+error.message);});
  },16);
  }
  function highlightFeature(kind){document.body.classList.toggle('constructing-feature',!!kind);const cancel=$('cad-cancel-feature');if(cancel)cancel.disabled=!kind;for(const b of featureButtons)b.setAttribute('aria-pressed',String(b.dataset.featureKind===kind));paintReferencePreview();}
