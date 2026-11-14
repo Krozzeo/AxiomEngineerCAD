@@ -1,3 +1,4 @@
+import {patternDistribution} from './pattern-controls.mjs';
 import {operationPanel,operationSelection,operationValue} from './operation-inspector.mjs';
 import {sketchTransform,transformSketchEntity,patternStep,MAX_SKETCH_ENTITIES} from '/curves.mjs';
 import {pointAt,splineHandleRoles} from '/relation-kinds.mjs';
@@ -57,16 +58,7 @@ export function sketchTransforms({document,host,ribbon,getState,selected,selectM
   panel.hidden=false;onActive(true);openInspector();paint();(draft.table?target:sources).element.focus({preventScroll:true});
   if(mode!=='mirror'){
    const available=await parameters();if(draft!==active)return;
-   const distribution=document.createElement('div');distribution.className='pattern-distribution';
-   const captions=mode==='circular'?['Angular spacing between instances','Total angular range']:['Spacing between instances','Total distance'];
-   for(const [index,key] of ['step','total'].entries()){
-    const button=document.createElement('button');button.type='button';button.dataset.distribution=key;
-    button.innerHTML=icon(mode==='circular'?(index?'arc':'rotate'):(index?'dimension':'pattern'));
-    button.title=captions[index];button.setAttribute('aria-label',button.title);
-    button.setAttribute('aria-pressed',String(draft.distribution===key));
-    button.onclick=()=>{draft.distribution=key;for(const option of distribution.children)option.setAttribute('aria-pressed',String(option===button));paint();};
-    distribution.append(button);
-   }
+   const distribution=patternDistribution(document,{mode,value:draft.distribution,onChange:key=>{draft.distribution=key;paint();}});
    values.append(reverse,distribution);
    for(const [key,unit,caption] of [['count','scalar','Count'],['spacing',mode==='circular'?'rad':'mm',mode==='circular'?'Angular spacing (°)':'Spacing (mm)']]){
     const choices=available.filter(p=>p.unit===unit).map(p=>({value:p.id,label:p.name,number:unit==='rad'?p.value*180/Math.PI:p.value}));

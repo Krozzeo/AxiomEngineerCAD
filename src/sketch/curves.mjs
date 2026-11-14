@@ -139,7 +139,7 @@ export function rectanglePoints(a,b,third){
 export const MAX_SKETCH_ENTITIES=1024;
 export function patternStep(mode,distribution,spacing,count){
  if(distribution!=='total')return spacing;
- const fullTurn=mode==='circular'&&Math.abs(spacing-2*Math.PI)<1e-9;
+ const fullTurn=mode==='circular'&&Math.abs(Math.abs(spacing)-2*Math.PI)<1e-9;
  return spacing/(fullTurn?count:count-1);
 }
 

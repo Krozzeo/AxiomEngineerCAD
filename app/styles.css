@@ -18,3 +18,5 @@
 #wb-tree-items .coordinate-toggle{width:18px;min-width:18px;height:24px;padding:0;border:0;background:transparent;flex-shrink:0}
 #wb-tree-items details>summary .wb-tree-node{flex:1;min-width:0}
 #wb-tree-items details>.wb-tree-node{padding-left:30px}
+
+.reference-orientation{display:grid;grid-template-columns:repeat(4,32px);gap:5px;margin-bottom:10px}.reference-orientation button{width:32px;height:32px;padding:4px}.reference-orientation button[aria-pressed=true]{background:#285676;border-color:#52bdec}

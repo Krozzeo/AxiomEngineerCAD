@@ -1,8 +1,8 @@
-# Engineer handoff - E3.M2 feature construction / 0.3.8 candidate
+# Engineer handoff — E3.M3 finishing / 0.3.9 candidate
 
-0.3.8 refines shared operation transitions and focus, reference definition methods/relations, coordinate child identity/deletion and GPU contour visibility. 0.3.7 delivery passed exact-head Windows/Linux/PDF and actual public Platform installation. Read the current construction guide before changing these invariants.
+0.3.8 was publicly installed and verified at f08ddc04d980b8b5ccb15d2ba203bef74d8a64b4. The owner requested M3 with dynamic references and pattern refinements. Read docs/E3_M3_FINISHING.md for source versions, exact witness extraction, bounded construction semantics and manual verification.
 
-Start with `npm run context`, AGENTS.md, [compact context](docs/PROJECT_CONTEXT.md) and the [integration notes](docs/PRE_E3_ASSISTANT.md). Read docs/E3_M2_FEATURE_CONSTRUCTION.md for the current batch. E3.M2 follows the owner’s request to advance alongside sketch corrections.
+Start with `npm run context`, AGENTS.md, [compact context](docs/PROJECT_CONTEXT.md) and the [integration notes](docs/PRE_E3_ASSISTANT.md). Read docs/E3_M3_FINISHING.md for the current batch. E3.M2 construction remains a retained regression fixture.
 
 E2 was owner-accepted, merged and published stable as 0.2.6. E3.M2 is a separate experimental delivery. See [tools and demo](docs/E3_M2_FEATURE_OPERATIONS.md).
 

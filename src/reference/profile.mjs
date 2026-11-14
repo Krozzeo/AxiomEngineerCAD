@@ -1,8 +1,10 @@
+import {arcPoint} from '../sketch/curves.mjs';
 import {check} from '../errors.mjs';
 import {planeFrame} from '../sketch/profile.mjs';
 import {constructReference,datumGeometry,add,sub,unit} from './geometry.mjs';
 
 export const REFERENCE_TYPE='reference-geometry';
+export function referenceSuppressed(graph,id,seen=new Set()){if(seen.has(id))return true;const f=graph.features.find(f=>f.id===id);return !!f&&(!!f.disabled||f.dependsOn.some(parent=>referenceSuppressed(graph,parent,new Set([...seen,id]))));}
 export function referenceParameter(graph,entry){const p=graph.parameters.find(p=>p.id===entry.parameterId);check(p&&p.unit===(entry.relation==='angle'?'rad':'mm'),'InvalidUnits','Reference parameter has incompatible units.');return p.value*(entry.relation==='angle'?180/Math.PI:1);}
 export function referenceGeometry(graph,target,modelGeometry=null,seen=new Set()){
  check(target&&target.definitionId===graph.primaryDefinitionId&&target.occurrencePath?.length===1&&target.occurrencePath[0]===target.definitionId,'LostReference','Select a reference in the current part.');
@@ -13,7 +15,7 @@ export function referenceGeometry(graph,target,modelGeometry=null,seen=new Set()
   check(!(feature.data.deletedRoles??[]).includes(target.role),'LostReference','The selected coordinate child was deleted.');
   check(!seen.has(feature.id),'InvalidNativeGraph','Reference construction contains a cycle.');seen=new Set([...seen,feature.id]);
   const entries=feature.data.references.map(e=>({...e,value:e.parameterId?referenceParameter(graph,e):e.value,geometry:referenceGeometry(graph,e.target,e.geometry,seen)}));
-  const frame=constructReference(feature.data.kind,entries);
+  const frame=constructReference(feature.data.kind,entries,feature.data.orientation);
   if(feature.data.kind==='axis')return {kind:'line',origin:frame.origin,direction:frame.normal};
   if(feature.data.kind==='plane')return {kind:'plane',...frame};
   if(['xy','xz','yz'].includes(target.role)){const indices={xy:['u','v','normal'],xz:['u','normal','v'],yz:['v','normal','u']}[target.role];const u=frame[indices[0]],v=frame[indices[1]];return {kind:'plane',origin:frame.origin,u,v,normal:[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]]};}
@@ -24,40 +26,45 @@ export function referenceGeometry(graph,target,modelGeometry=null,seen=new Set()
   const [id,role]=target.role.split(':'),entity=feature.data.entities.find(e=>e.id===id),f=planeFrame(feature,graph);
   check(entity,'LostReference','The selected sketch entity no longer exists.');
   const world=p=>f.origin.map((n,i)=>n+f.u[i]*p[0]+f.v[i]*p[1]);
-  if(role||entity.type==='point'||entity.type==='circle'){
+  if(role||entity.type==='point'){
    const p=role==='center'?entity.center:role==='midpoint'?entity.a.map((n,i)=>(n+entity.b[i])/2):entity[role??(entity.type==='point'?'point':'center')];
    check(p,'InvalidGeometry','Select an endpoint, center or sketch point.');return {kind:'point',origin:world(p)};
   }
-  check(entity.type==='line','InvalidGeometry','A straight reference requires a line.');return {kind:'line',origin:world(entity.a),direction:unit(sub(world(entity.b),world(entity.a)))};
+  if(['circle','arc'].includes(entity.type)){const a=entity.type==='arc'?entity.a:[entity.center[0]+entity.radius,entity.center[1]],b=entity.type==='arc'?entity.b:a;return {kind:'circle',origin:world(entity.center),normal:f.normal,direction:f.normal,radius:entity.radius,a:world(a),b:world(b),point:world(entity.type==='arc'?arcPoint(entity,.5):a),full:entity.type==='circle'};}
+  check(entity.type==='line','InvalidGeometry','Select an analytic line or circular reference.');return {kind:'line',origin:world(entity.a),a:world(entity.a),b:world(entity.b),direction:unit(sub(world(entity.b),world(entity.a)))};
  }
  check(feature.type==='sketch-extrusion'&&modelGeometry,'LostReference','Select an exact model face, straight edge or vertex.');
  return structuredClone(modelGeometry);
 }
 export function validateReference(feature,graph){
  const d=feature.data;
- check(['E3-reference/1','E3-reference/2'].includes(d?.profile)&&['plane','axis','coordinate'].includes(d.kind)&&typeof d.name==='string'&&d.name.length>0&&d.name.length<=128&&Array.isArray(d.references)&&d.references.length>0&&d.references.length<=3,'InvalidInput','Invalid reference construction.');
- check(!d.deletedRoles||d.profile==='E3-reference/2'&&d.kind==='coordinate'&&Array.isArray(d.deletedRoles)&&new Set(d.deletedRoles).size===d.deletedRoles.length&&d.deletedRoles.every(role=>['x','y','z','xy','xz','yz'].includes(role)),'InvalidInput','Invalid deleted coordinate children.');
- for(const entry of d.references)check(['coincident','parallel','perpendicular','offset','angle','midplane'].includes(entry.relation)&&Number.isFinite(entry.value),'InvalidInput','Invalid reference relation.');
+ check(['E3-reference/1','E3-reference/2','E3-reference/3'].includes(d?.profile)&&['plane','axis','coordinate'].includes(d.kind)&&typeof d.name==='string'&&d.name.length>0&&d.name.length<=128&&Array.isArray(d.references)&&d.references.length>0&&d.references.length<=3,'InvalidInput','Invalid reference construction.');
+ check(!d.deletedRoles||['E3-reference/2','E3-reference/3'].includes(d.profile)&&d.kind==='coordinate'&&Array.isArray(d.deletedRoles)&&new Set(d.deletedRoles).size===d.deletedRoles.length&&d.deletedRoles.every(role=>['x','y','z','xy','xz','yz'].includes(role)),'InvalidInput','Invalid deleted coordinate children.');
+ for(const entry of d.references)check(['coincident','parallel','perpendicular','offset','angle','midplane','midpoint','endpoint-a','endpoint-b','center','tangent'].includes(entry.relation)&&Number.isFinite(entry.value),'InvalidInput','Invalid reference relation.');
  if(d.definitionMode){
-  check(d.profile==='E3-reference/2'&&['references',...(d.kind==='coordinate'?['origin']:['x','y','z'])].includes(d.definitionMode),'InvalidInput','Invalid reference definition method.');
+  check(['E3-reference/2','E3-reference/3'].includes(d.profile)&&['references',...(d.kind==='coordinate'?['origin']:['x','y','z'])].includes(d.definitionMode),'InvalidInput','Invalid reference definition method.');
   if(d.definitionMode!=='references'){const role=d.kind==='plane'?{x:'yz',y:'xz',z:'xy'}[d.definitionMode]:d.definitionMode,e=d.references[0];check(d.references.length===1&&e.target.kind==='datum'&&e.target.producerId==='reference-frame'&&e.target.role===role&&e.relation==='coincident'&&e.value===0&&!e.parameterId,'InvalidInput','Absolute definitions must use the canonical world frame.');}
  }
+ if(d.orientation)check(d.profile==='E3-reference/3'&&d.kind==='coordinate'&&['x','y','z'].includes(d.orientation.primaryAxis)&&typeof d.orientation.reverse==='boolean'&&Number.isInteger(d.orientation.quarterTurns)&&d.orientation.quarterTurns>=0&&d.orientation.quarterTurns<=3,'InvalidInput','Invalid coordinate directions.');
+ for(const e of d.references){check(e.angleAxis===undefined||['u','v'].includes(e.angleAxis),'InvalidInput','Invalid plane rotation axis.');if(e.geometry){const g=e.geometry,vec=v=>Array.isArray(v)&&v.length===3&&v.every(Number.isFinite);check(['point','line','plane','circle','cylinder','cone','sphere','surface'].includes(g.kind)&&vec(g.origin)&&['normal','direction','u','v','a','b','point'].every(k=>g[k]===undefined||vec(g[k]))&&(!['circle','cylinder','sphere'].includes(g.kind)||Number.isFinite(g.radius)&&g.radius>0)&& (g.kind!=='cone'||Number.isFinite(g.halfAngle)&&Math.abs(g.halfAngle)>1e-9&&Math.abs(g.halfAngle)<Math.PI/2),'InvalidGeometry','Invalid exact reference geometry.');if(g.kind==='line'&&['midpoint','endpoint-a','endpoint-b'].includes(e.relation))check(vec(g.a)&&vec(g.b),'InvalidGeometry','Endpoint and midpoint references require exact line endpoints.');}}
  const dependencies=[...new Set(d.references.map(e=>e.target.producerId).filter(id=>id!=='reference-frame'))];
  check(feature.dependsOn.length===dependencies.length&&dependencies.every(id=>feature.dependsOn.includes(id)),'InvalidNativeGraph','Reference dependencies must identify every selected producer.');
- referenceGeometry(graph,{producerId:feature.id,definitionId:feature.definitionId,role:d.kind,occurrencePath:[feature.definitionId]});
+ if(!referenceSuppressed(graph,feature.id))referenceGeometry(graph,{producerId:feature.id,definitionId:feature.definitionId,role:d.kind,occurrencePath:[feature.definitionId]});
 }
 export function referenceCommand(value,input){
  const graph=value.native.graph,old=graph.features.find(f=>f.id===input.featureId);
  check(!old||old.type===REFERENCE_TYPE&&input.replace,'InvalidInput','Reference identity already exists.');
- const feature={id:input.featureId,definitionId:graph.primaryDefinitionId,type:REFERENCE_TYPE,parameterIds:[...new Set(input.references.map(e=>e.parameterId).filter(Boolean))],
+ const feature={...(old?.disabled?{disabled:true}:{}),id:input.featureId,definitionId:graph.primaryDefinitionId,type:REFERENCE_TYPE,parameterIds:[...new Set(input.references.map(e=>e.parameterId).filter(Boolean))],
   dependsOn:[...new Set(input.references.map(e=>e.target.producerId).filter(id=>id!=='reference-frame'))],
-  data:{profile:input.definitionMode?'E3-reference/2':old?.data.profile??'E3-reference/1',kind:input.kind,name:input.name,...(input.definitionMode?{definitionMode:input.definitionMode}:{}),references:structuredClone(input.references),...(old?.data.deletedRoles?{deletedRoles:[...old.data.deletedRoles]}:{})}};
+  data:{profile:input.orientation||input.references.some(e=>e.angleAxis||['midpoint','endpoint-a','endpoint-b','center','tangent'].includes(e.relation)||['circle','cylinder','cone','sphere','surface'].includes(e.geometry?.kind))?'E3-reference/3':input.definitionMode?'E3-reference/2':old?.data.profile??'E3-reference/1',kind:input.kind,name:input.name,...(input.orientation?{orientation:structuredClone(input.orientation)}:{}),...(input.definitionMode?{definitionMode:input.definitionMode}:{}),references:structuredClone(input.references),...(old?.data.deletedRoles?{deletedRoles:[...old.data.deletedRoles]}:{})}};
+ if(input.kind==='plane'&&feature.data.references.some(e=>e.relation==='midplane')){const ps=feature.data.references.filter(e=>referenceGeometry(graph,e.target,e.geometry).kind==='plane');check(ps.length===2&&ps.every(e=>['midplane','coincident','parallel'].includes(e.relation)),'ConstraintConflict','Midplane is one shared relation between two planes.');for(const e of ps)e.relation='midplane';}
+ if(input.kind==='coordinate'){const points=feature.data.references.filter(e=>referenceGeometry(graph,e.target,e.geometry).kind==='point');if(points.length>1&&points.some(e=>e.relation==='midpoint'))for(const e of points)e.relation='midpoint';}
  if(old)graph.features[graph.features.indexOf(old)]=feature;else graph.features.push(feature);
  validateReference(feature,graph);
 }
 export function referenceDatums(value){
  const graph=value.native?.graph??value.graph;if(!graph)return [];
- return graph.features.filter(f=>f.type===REFERENCE_TYPE&&!f.disabled).flatMap(f=>{
+ return graph.features.filter(f=>f.type===REFERENCE_TYPE&&!referenceSuppressed(graph,f.id)).flatMap(f=>{
   const base={kind:'datum',definitionId:f.definitionId,producerId:f.id,occurrencePath:[f.definitionId],referenceFeature:true};
   const geometry=referenceGeometry(graph,{...base,role:f.data.kind});
   if(f.data.kind==='coordinate')return [{...base,id:f.id,role:'origin',datumType:'point',coordinateSystem:true,name:f.data.name,originMm:geometry.origin,pointMm:geometry.origin,coordinateFrame:[geometry.frame.u,geometry.frame.v,geometry.frame.normal]},...['x','y','z','xy','xz','yz'].filter(role=>!(f.data.deletedRoles??[]).includes(role)).map(role=>{const g=referenceGeometry(graph,{...base,role});return {...base,id:f.id+'-'+role,parentId:f.id,role,datumType:g.kind==='line'?'axis':'plane',name:{x:'X axis',y:'Y axis',z:'Z axis',xy:'Front',xz:'Top',yz:'Right'}[role],originMm:g.origin,...(g.kind==='line'?{direction:g.direction}:{normal:g.normal,u:g.u,planeFrame:{origin:g.origin,u:g.u,v:g.v,normal:g.normal}})};})];

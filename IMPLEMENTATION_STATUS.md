@@ -1,6 +1,6 @@
 # Engineer implementation status
 
-Current candidate: **0.3.8 / E3.M2 feature construction**. 0.3.8 adds operation switching/toggling, automatic selection focus, absolute references, relation buttons, collapsible coordinate children and through-model selection contours. 0.3.7 passed exact Windows/Linux acceptance and public Platform installation; see PROJECT_STATE for immutable evidence. See [workflow and verification](docs/E3_M2_FEATURE_CONSTRUCTION.md). The 0.2.6 stable delivery is indexed in PROJECT_STATE.
+Current candidate: **0.3.9 / E3.M3 finishing and multibody handling**. Bounded exact fillet/chamfer, shared parameter/selection/preview editing, suppression and safe reordering, curved reference families and inferred/shared relations, coordinate directions and pattern spacing/Booleans. See [scope and verification](docs/E3_M3_FINISHING.md). Public 0.3.8 evidence is indexed in PROJECT_STATE; current local evidence is not publication acceptance.
 
 Previous CAD: **0.1.8 / E1.M5 sketch interactions — delivered for owner review**, source `4f38a0e6ccc2f4e1dfd331beaa2d20b4352501d5` / PR16. Exact Windows/Linux acceptance, immutable experimental publication and actual public Platform installation passed. Owner acceptance remains pending. `docs/PROJECT_STATE.json` is the compact delivery/evidence index; no E2 progression, main merge or stable release is claimed.
 

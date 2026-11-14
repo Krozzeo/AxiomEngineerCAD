@@ -10,6 +10,7 @@ const producers=new Map([
 ]);
 async function extrusion(document,operation,state){
  const result=await regenerateExtrusions(document,{featureId:operation.inputs.featureId,includeToolMesh:true,previewBooleanFeatureId:operation.inputs.featureId});
+ if(result.finishingLayers)return result.finishingLayers.map((layer,index)=>({id:operation.inputs.featureId+'-'+index,kind:layer.kind,mesh:layer.mesh,position:[0,0,0],quaternion:[0,0,0,1]}));
  return [{id:operation.inputs.featureId,kind:({add:'unite',cut:'subtract',intersect:'intersect',none:'none','new-body':'none'})[state?.effectiveOperation??document.native.graph.features.find(f=>f.id===operation.inputs.featureId).data.operation],mesh:result.toolMesh,position:[0,0,0],quaternion:[0,0,0,1]}];
 }
 export async function buildOperationPreview({document,sourceDocument,previewOperation,rollbackAt=null}){

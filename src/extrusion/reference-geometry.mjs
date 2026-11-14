@@ -2,7 +2,7 @@ import {circleWitness,closedCircularBoundary} from '../sketch/curve-witness.mjs'
 import {createHash} from 'node:crypto';
 const rounded=v=>Array.isArray(v)?v.map(rounded):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,rounded(v[k])])):typeof v==='number'?Math.round(v*1e9)/1e9:v;
 const digest=value=>createHash('sha256').update(JSON.stringify(rounded(value))).digest('hex');
-export function exactReferenceGeometry(shape){
+export function exactReferenceGeometry(shape,{native=false}={}){
  const faces=shape.faces,adjacent=new Map();
  for(const face of faces)for(const edge of face.edges){const id=edge.hashCode;if(!adjacent.has(id))adjacent.set(id,[]);adjacent.get(id).push(face);}
  const internal=edge=>{if(edge.geomType!=='LINE')return false;const fs=adjacent.get(edge.hashCode)??[];
@@ -40,5 +40,5 @@ export function exactReferenceGeometry(shape){
   const role='cylinder:'+digest(bounds.map(edge=>edge.role));
   cylinders.set(role,{role,a:a.centerMm,b:b.centerMm,direction,radius:a.radiusMm});
  }
- return {cylinders:[...cylinders.values()],edges:edges.map(({_members,_endpoints,...edge})=>edge),exactVertices:[...vertices.values()],faceEdgeRoles};
+ return {...(native?{nativeEdges:new Map(edges.map(e=>[e.role,shape.edges.filter(edge=>e._members.includes(edge.hashCode))]))}:{}),cylinders:[...cylinders.values()],edges:edges.map(({_members,_endpoints,...edge})=>edge),exactVertices:[...vertices.values()],faceEdgeRoles};
 }
