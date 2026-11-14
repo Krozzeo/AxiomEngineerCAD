@@ -37,4 +37,7 @@ export function completeExpression(input,options){
   [...menu.children].forEach((button,i)=>button.setAttribute('aria-selected',String(i===index)));
  });
  input.addEventListener('blur',close);
+ document.addEventListener('pointerdown',event=>{if(event.target!==input&&!menu.contains(event.target))close();},true);
+ document.defaultView.addEventListener('resize',close);
+ return {close};
 }

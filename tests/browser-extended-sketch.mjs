@@ -70,7 +70,7 @@ export async function verifyExtendedSketchUI({context,host,evidence,observe,repo
     await tool('select');
     await page.locator('#sketch-manager-tab').click();
     await page.locator('[data-sketch-operation="'+equation.id+'"]').dblclick();
-    await page.locator('.sketch-equation-form').getByLabel('f(x)',{exact:true}).fill('x');
+    await page.locator('.sketch-equation-form').getByLabel('f(x)',{exact:true}).fill('x');assert.equal(await page.locator('.parameter-completion-menu').count(),0,'A complete curve variable must not open XOR/XNOR suggestions over Apply.');
     await sketchCommit(page,()=>page.locator('.sketch-equation-form').getByRole('button',{name:'Apply'}).click());
     assert.equal((await practice()).entities.find(e=>e.id===equation.id).recipe.first,'x');
     await selectSketchComponent(page,'practice-circle');await page.locator('#sketch-pattern').click();

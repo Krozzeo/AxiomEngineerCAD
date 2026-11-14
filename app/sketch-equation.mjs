@@ -10,17 +10,17 @@ export function equationInspector({document,host,mutate,context,parameters,const
  for(const [value,label] of [['x','y = f(x)'],['y','x = f(y)'],['z','Transverse coordinate = f(z)'],['parametric','x(t), y(t)']])mode.append(new Option(label,value));
  form.append(mode);
  let available=[];
- const fields={};
+ const fields={},completions=[];
  for(const [key,caption,value]of [['start','Start','-10'],['end','End','10'],['first','f(x)','x^2 / 10'],['second','y(t)','t^2 / 10']]){
   const label=document.createElement('label'),input=document.createElement('input');
   label.textContent=caption;input.value=value;input.type='text';input.autocomplete='off';input.required=key!=='second';input.maxLength=512;
   label.append(input);form.append(label);fields[key]={label,input};
-  completeExpression(input,prefix=>available.map(p=>prefix.includes('.')?(p.definitionId===null?'doc.':'local.')+p.name:p.name));
+  completions.push(completeExpression(input,prefix=>[...available.map(p=>prefix.includes('.')?(p.definitionId===null?'doc.':'local.')+p.name:p.name),...(['first','second'].includes(key)?[mode.value==='parametric'?'t':mode.value]:[])]));
  }
  const apply=document.createElement('button'),cancelButton=document.createElement('button');
  apply.textContent='Apply';cancelButton.type='button';cancelButton.textContent='Cancel';
  cancelButton.onclick=()=>{cancel();select(null);};actions.append(apply,cancelButton);form.append(actions);
- function cancel(){if(panel.hidden)return;epoch++;panel.hidden=true;editing=null;onActive(false);}
+ function cancel(){if(panel.hidden)return;epoch++;for(const completion of completions)completion.close();panel.hidden=true;editing=null;onActive(false);}
  mode.onchange=()=>{
   fields.second.label.hidden=mode.value!=='parametric';
   fields.first.label.firstChild.textContent=mode.value==='parametric'?'x(t)':'f('+mode.value+')';
