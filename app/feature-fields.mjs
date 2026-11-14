@@ -99,7 +99,7 @@ export function featureFields({document,host,owner,graph,scene,onChange,status,o
    const relation={value:entry?.relation??'coincident'},buttons=[];
    const distance=value('reference-value-'+index,'Distance / angle',entry?.value??0,entry?.relation==='angle'?'rad':'mm',entry?.parameterId,()=>{});selectionRegion.append(distance.title,distance.row);
    for(const type of ['coincident','parallel','perpendicular','offset','angle','midplane']){
-    const b=document.createElement('button');b.type='button';b.title=type[0].toUpperCase()+type.slice(1);b.setAttribute('aria-label',b.title);b.dataset.referenceRelation=type;b.innerHTML=icon(['coincident','parallel','perpendicular','angle'].includes(type)?'constraint-'+type:'reference-'+type);
+    const b=document.createElement('button');b.type='button';b.title=type[0].toUpperCase()+type.slice(1);b.setAttribute('aria-label',b.title);b.dataset.referenceRelation=type;b.innerHTML=icon(type==='angle'?'dim-angle':['coincident','parallel','perpendicular'].includes(type)?'constraint-'+type:'reference-'+type);
     b.onclick=()=>{relation.value=type;distance.control.setOptions(graph.parameters.filter(p=>p.unit===(type==='angle'?'rad':'mm')).map(p=>({value:p.id,label:p.name,number:type==='angle'?p.value*180/Math.PI:p.value})));distance.control.setLiteral(0);refreshRelations();onChange();if(!distance.row.hidden){distance.control.input.focus();distance.control.input.select();}};relations.append(b);buttons.push(b);
    }
    table.changed=()=>refreshRelations();referenceTables.push({table,relation,distance,buttons});

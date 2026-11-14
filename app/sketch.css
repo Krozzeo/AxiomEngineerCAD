@@ -29,7 +29,7 @@
 .operation-inspector{padding:4px}
 .operation-selection{margin:5px 0;border:1px solid #405872;border-radius:4px;padding:5px;cursor:pointer}
 .operation-selection.active{border-color:#69b9f3;background:#1d3850}
-.operation-selection h4{margin:0 0 4px}.operation-selection table{width:100%}
+.operation-selection h4{margin:0 0 4px}.operation-selection table{width:100%;table-layout:fixed}.operation-selection td{overflow-wrap:anywhere}.operation-selection td:last-child:not(:first-child){width:28px}
 .operation-selection button{padding:2px!important}.operation-inspector-actions{display:flex;gap:6px;margin:8px 0}
 
 .operation-page[data-operations=Sketch] button[aria-pressed=true],.operation-inspector button[aria-pressed=true]{background:#c5e8fa;color:#123044}
