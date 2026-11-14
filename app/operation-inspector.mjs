@@ -21,7 +21,7 @@ export function operationSelection(document,{title,activate,remove}){
  let currentRows=[];
  region.className='operation-selection';region.tabIndex=0;heading.textContent=title;
  header.className='operation-selection-heading';clear.type='button';clear.innerHTML=icon('clear');clear.title='Clear '+title.toLowerCase();clear.setAttribute('aria-label',clear.title);
- clear.onclick=event=>{event.stopPropagation();for(const row of [...currentRows])remove(row);};header.append(heading,clear);
+ clear.onclick=event=>{event.stopPropagation();activate();for(const row of [...currentRows])remove(row);};header.append(heading,clear);
  table.innerHTML='<tbody></tbody>';table.setAttribute('aria-label',title);
  region.append(header,table);region.addEventListener('click',activate);region.addEventListener('focus',activate);
  return {element:region,paint(rows,active){
@@ -31,7 +31,7 @@ export function operationSelection(document,{title,activate,remove}){
   for(const item of rows){
    const row=table.tBodies[0].insertRow();row.insertCell().textContent=item.name;
    const button=document.createElement('button');button.type='button';button.innerHTML=icon('delete');
-   button.setAttribute('aria-label','Remove '+item.name);button.onclick=event=>{event.stopPropagation();remove(item);};
+   button.setAttribute('aria-label','Remove '+item.name);button.onclick=event=>{event.stopPropagation();activate();remove(item);};
    row.insertCell().append(button);
   }
  }};

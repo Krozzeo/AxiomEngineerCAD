@@ -158,6 +158,7 @@ try {
       const constructionContext=softwareBrowser?await softwareBrowser.newContext({viewport:{width:1440,height:960}}):context;
       if(softwareBrowser)constructionContext.on('page',observe);
       report.featureConstructionRenderer={softwareForced:!!softwareBrowser,flags:softwareBrowser?constructionArgs:[]};
+      const {verifyOperationUX}=await import('./browser-operation-ux.mjs');await verifyOperationUX({context:constructionContext,host,observe,evidence,report});
       const {verifyFeatureRefinementsUI}=await import('./browser-feature-refinements.mjs');await verifyFeatureRefinementsUI({context:constructionContext,host,observe,evidence,report});
       await verifyFeatureConstructionUI({context:constructionContext,host,observe,evidence,report});
     }finally{await softwareBrowser?.close();}

@@ -17,13 +17,17 @@ const menu=document.createElement('div');menu.className='cad-feature-menu';menu.
 const {element:editor,heading:featureHeading,actions:featureActions}=operationPanel(document,$('inspector-content'),'feature-operation-editor');
 const featureForm=document.createElement('form');featureForm.id='feature-operation-form';featureForm.innerHTML='<div id="feature-operation-fields"></div>';
 featureActions.innerHTML='<button type="submit">Apply</button><button type="button" id="feature-operation-done">Cancel</button>';featureForm.append(featureActions);editor.append(featureHeading,featureForm);
-let editing=null,historyBusy=false,operationBusy=false,operationStarting=false;
+let editing=null,historyBusy=false,operationBusy=false,operationStarting=false,constructionKind=null,carriedSelections=null;
 window.engineerFeatureConstruction=()=>!!editing||operationStarting||operationBusy;
 window.engineerOperationAcceptsId=id=>{if(!editing?.fields)return true;const target=v.entities().find(e=>e.id===id);return !!target&&editing.fields.accepts(target);};
-async function startFeature(kind,action){
- if(window.engineerFeatureConstruction()||window.engineerSketch?.operationActive)throw Error('Apply or cancel the current operation before starting another operation or editing a sketch.');
- operationStarting=true;highlightFeature(kind);$('cad-cancel-feature').disabled=true;
- try{return await action();}finally{operationStarting=false;if(!editing)highlightFeature(null);else $('cad-cancel-feature').disabled=false;}
+async function startFeature(kind,action,{toggle=false}={}){
+ if(operationBusy||operationStarting)return;
+ if(window.engineerSketch?.operationActive)throw Error('Finish the sketch operation before starting a feature.');
+ operationStarting=true;
+ try{
+  if(editing){const same=constructionKind===kind;carriedSelections=editing.fields?.selections();highlightFeature(toggle&&same?null:kind);await closeFeature({nextKind:toggle&&same?null:kind});if(toggle&&same)return;}
+  highlightFeature(kind);$('cad-cancel-feature').disabled=true;return await action();
+ }finally{carriedSelections=null;operationStarting=false;if(!editing)highlightFeature(null);else $('cad-cancel-feature').disabled=false;}
 }
 async function edit(item){if(item.type==='sketch-primitives')return window.engineerSketch.open(item.id);return startFeature(item.referenceFeature?(item.datumType==='point'?'coordinate':item.datumType):'extrude',()=>editSource(item));}
 window.engineerOperationRollback=()=>editing?.item&&(editing.item.type==='sketch-extrusion'||editing.referenceKind)?editing.item.id:null;
@@ -51,7 +55,7 @@ async function refreshSourcePresentation(){
   }
  }
 }
-async function deleteSource(item){if(item.referenceFeature){await mutate('feature.delete',{featureId:item.producerId});await refreshSourcePresentation();return;}const freezeHidden=(v.renderer.scene?.occurrences.length&&!v.renderer.showDatums?(window.engineerSourceItems?.()??[]).filter(i=>i.kind==='datum'&&(visibility.get(i.id)??'default')==='default').map(i=>({id:i.id,state:'hide'})):[]);if(item.kind==='datum'){await changeVisibility([{id:item.id,state:'delete'}]);await v.clear();notify('Reference display entry removed. View → Restore reference entries restores the canonical frame. Sketch supports retain their definition frame.');return;}if(item.kind!=='feature')throw Error('This item is not an editable feature. Delete dependent features before removing source structure.');if(window.engineerSketch.view()?.id===item.id)await window.engineerSketch.exit({build:false});await mutate(item.type==='sketch-primitives'?'sketch.delete':'feature.delete',item.type==='sketch-primitives'?{sketchId:item.id}:{featureId:item.id});if(freezeHidden.length)await changeVisibility(freezeHidden);await refreshSourcePresentation();}
+async function deleteSource(item){if(item.referenceFeature){await mutate('feature.delete',{featureId:item.producerId,...(item.parentId?{referenceRole:item.role}:{})});await refreshSourcePresentation();return;}const freezeHidden=(v.renderer.scene?.occurrences.length&&!v.renderer.showDatums?(window.engineerSourceItems?.()??[]).filter(i=>i.kind==='datum'&&(visibility.get(i.id)??'default')==='default').map(i=>({id:i.id,state:'hide'})):[]);if(item.kind==='datum'){await changeVisibility([item,...(item.coordinateSystem?(window.engineerSourceItems?.()??[]).filter(i=>i.parentId===item.id):[])].map(i=>({id:i.id,state:'delete'}))); await v.clear();notify('Reference display entry removed. View → Restore reference entries restores the canonical frame. Sketch supports retain their definition frame.');return;}if(item.kind!=='feature')throw Error('This item is not an editable feature. Delete dependent features before removing source structure.');if(window.engineerSketch.view()?.id===item.id)await window.engineerSketch.exit({build:false});await mutate(item.type==='sketch-primitives'?'sketch.delete':'feature.delete',item.type==='sketch-primitives'?{sketchId:item.id}:{featureId:item.id});if(freezeHidden.length)await changeVisibility(freezeHidden);await refreshSourcePresentation();}
 window.engineerDeleteSource=deleteSource;
 function show(event,item){event.preventDefault();menu.hidden=true;if(window.engineerFeatureRolledBack?.(item.id))return;const owner=event.target.ownerDocument,view=owner.defaultView;if(menu.ownerDocument!==owner)owner.body.append(menu);menu.replaceChildren();const add=(label,glyph,fn)=>{const b=document.createElement('button');b.setAttribute('role','menuitem');b.innerHTML=icon(glyph)+'<span></span>';b.querySelector('span').textContent=label;b.addEventListener('click',run(async()=>{menu.hidden=true;await fn();}));menu.append(b);};if(item.referenceFeature)add('Edit','edit',()=>edit(item));if(item.kind==='datum'&&item.datumType==='plane')add('New Sketch','sketch',()=>window.engineerSketch.newSketch(item));if(['sketch-primitives','geometry-probe','sketch-extrusion'].includes(item.type))add('Edit','edit',()=>edit(item));if(item.kind==='datum'||item.type==='sketch-primitives'){add((visibility.get(item.id)??(item.type==='sketch-primitives'?'reveal':'default'))==='reveal'?'Hide':'Reveal',(visibility.get(item.id)??(item.type==='sketch-primitives'?'reveal':'default'))==='reveal'?'hide':'reveal',()=>{return changeVisibility([{id:item.id,state:(visibility.get(item.id)??(item.type==='sketch-primitives'?'reveal':'default'))==='reveal'?'hide':'reveal'}]);});}
  if(item.kind==='feature'&&['sketch-primitives','sketch-extrusion','geometry-probe'].includes(item.type))add(item.disabled?'Enable':'Disable',item.disabled?'enable':'disable',async()=>{await mutate('feature.enable',{featureId:item.id,enabled:!!item.disabled});await refreshSourcePresentation();});
@@ -65,7 +69,7 @@ async function history(action){if(historyBusy)return;historyBusy=true;top.datase
 document.addEventListener('keydown',run(event=>{if((event.ctrlKey||event.metaKey)&&['z','y'].includes(event.key.toLowerCase())){if(event.target.closest?.('input,textarea')&&!event.target.readOnly)return;event.preventDefault();return history(event.key.toLowerCase()==='y'?'redo':'undo');}}));
 const view=document.querySelector('.wb-menubar details:nth-child(3) .wb-menu'),restore=document.createElement('button');restore.textContent='Restore reference entries';restore.addEventListener('click',run(async()=>{const changes=[...visibility].filter(([,state])=>state==='delete').map(([id])=>({id,state:'default'}));if(changes.length)await changeVisibility(changes);}));view.append(restore);window.addEventListener('engineer-document-changed',()=>updateHistory().catch(()=>{}));setInterval(()=>updateHistory().catch(()=>{}),800);for(const button of Object.values(buttons))button.disabled=true;top.disabled=true;await updateHistory().catch(error=>notify('History connection unavailable. Reload the editor to reconnect. '+error.message));try{applyVisibility(await api('ui/visibility'));}catch(error){notify(error.message);}
 
-let deleteSourceSelection=null;window.addEventListener('engineer-feature-selected',event=>deleteSourceSelection=event.detail);window.addEventListener('engineer-sketch-selection',()=>deleteSourceSelection=null);window.addEventListener('engineer-selection-changed',event=>{if(!event.detail)return;const value=event.detail;deleteSourceSelection=window.engineerSourceItems?.().find(i=>i.id===value.producerId||value.kind==='datum'&&i.kind==='datum'&&i.role===value.role)??null;});
+let deleteSourceSelection=null;window.addEventListener('engineer-feature-selected',event=>deleteSourceSelection=event.detail);window.addEventListener('engineer-sketch-selection',()=>deleteSourceSelection=null);window.addEventListener('engineer-selection-changed',event=>{if(!event.detail)return;const value=event.detail;deleteSourceSelection=window.engineerSourceItems?.().find(i=>value.kind==='datum'?i.kind==='datum'&&i.producerId===value.producerId&&i.role===value.role:i.id===value.producerId)??null;});
 document.addEventListener('keydown',run(async event=>{if(editing?.fields)return;if(event.key!=='Delete'||event.target.closest?.('input,textarea,select,[contenteditable=true]'))return;const sketch=window.engineerSketch;if(sketch?.view()?.selected){event.preventDefault();return sketch.removeSelection();}if(deleteSourceSelection){event.preventDefault();await deleteSource(deleteSourceSelection);deleteSourceSelection=null;}}));
 
 const previewRequestsInFlight=previewRequests();
@@ -105,7 +109,7 @@ function schedulePreview(){
    previewChain=task.catch(error=>{if(active())notify('Preview: '+error.message);});
  },16);
  }
- function highlightFeature(kind){document.body.classList.toggle('constructing-feature',!!kind);const cancel=$('cad-cancel-feature');if(cancel)cancel.disabled=!kind;for(const b of featureButtons)b.setAttribute('aria-pressed',String(b.dataset.featureKind===kind));paintReferencePreview();}
+ function highlightFeature(kind){constructionKind=kind;document.body.classList.toggle('constructing-feature',!!kind);const cancel=$('cad-cancel-feature');if(cancel)cancel.disabled=!kind;for(const b of featureButtons)b.setAttribute('aria-pressed',String(b.dataset.featureKind===kind));paintReferencePreview();}
  function selectedReferences(rows){
   const ids=rows.flatMap(row=>row.target.kind==='sketch'&&row.target.role!=='result'?['sketch:'+row.target.role.split(':')[0]]:v.entities().filter(e=>e.producerId===row.target.producerId&&(row.target.kind==='feature'||e.role===row.target.role)&&e.kind===(row.target.kind==='sketch'?'feature':row.target.kind)).map(e=>e.id));
   window.engineerSketchReferences?.(ids);
@@ -114,11 +118,12 @@ function schedulePreview(){
   const owner=editing,{document:source}=await api('document');if(editing!==owner)return;
   if(!owner.create)owner.data={...source.native.graph.features.find(f=>f.id===owner.item.id).data,...data,depthMm:data.dimensions?.depth.value??data.depthMm};
   owner.fields=featureFields({document,host:$('feature-operation-fields'),owner,graph:source.native.graph,scene:v.renderer.scene,onChange:schedulePreview,status:notify,highlight:selectedReferences});
+  owner.fields.restoreSelections(carriedSelections);
   const label=document.createElement('label'),preview=document.createElement('input'),heading=document.createElement('h4');label.className='feature-section feature-preview-toggle';label.dataset.featureSection='preview';heading.textContent='Preview';preview.type='checkbox';preview.id='feature-operation-preview';preview.checked=true;label.append(heading,preview);$('feature-operation-fields').append(label);
   const kind=owner.referenceKind??(data.form==='repeat'?data.repeat.kind:data.form==='revolve'?'revolve':'extrude');highlightFeature(kind);featureHeading.textContent=kind==='extrude'?'Extrude':kind==='revolve'?'Revolve':kind==='mirror'?'Mirror Feature':kind==='linear'?'Linear Feature Pattern':'Circular Feature Pattern';
   requestAnimationFrame(()=>{if(editing===owner&&!editor.hidden)owner.fields.focus();});
  }
- async function closeFeature(){await stopOperationPreview();editor.hidden=true;editing?.fields?.cancel();editing=null;highlightFeature(null);window.engineerOperationFeature=null;window.dispatchEvent(new CustomEvent('engineer-feature-edit-changed'));document.querySelector('.proof-inspector').hidden=false;await v.build({reuseCurrent:true});}
+ async function closeFeature({nextKind=null}={}){await stopOperationPreview();editor.hidden=true;editing?.fields?.cancel();editing=null;highlightFeature(nextKind);window.engineerOperationFeature=null;window.dispatchEvent(new CustomEvent('engineer-feature-edit-changed'));document.querySelector('.proof-inspector').hidden=false;await v.build({reuseCurrent:true});}
  document.addEventListener('click',event=>{
   if(!editing?.fields)return;const node=event.target.closest?.('[data-source-id]');if(!node)return;
   const item=window.engineerSourceItems?.().find(i=>i.id===node.dataset.sourceId);if(!item)return;
@@ -175,19 +180,19 @@ async function beginFeature(kind,title){
 async function beginReference(kind,item=null){
  await stopOperationPreview();const {document:source}=await api('document');
  const previous=item?source.native.graph.features.find(f=>f.id===item.producerId):null;
- const input=previous?{...previous.data,featureId:previous.id}:{featureId:'reference-'+crypto.randomUUID(),name:({plane:'Reference plane',axis:'Reference axis',coordinate:'Coordinate system'}[kind]),references:[]};
+ kind=previous?.data.kind??kind;const input=previous?{...previous.data,featureId:previous.id}:{featureId:'reference-'+crypto.randomUUID(),name:({plane:'Reference plane',axis:'Reference axis',coordinate:'Coordinate system'}[kind]),references:[]};
  editing={create:!previous,item:previous?{...item,id:previous.id}:null,referenceKind:kind,ctx:await context(),input,data:input};window.engineerOperationFeature=previous?.id??null;window.dispatchEvent(new CustomEvent('engineer-feature-edit-changed'));
  $('feature-operation-fields').replaceChildren();editor.hidden=false;document.querySelector('.proof-inspector').hidden=true;$('edit-sketch-inspector').hidden=true;
  editing.fields=featureFields({document,host:$('feature-operation-fields'),owner:editing,graph:source.native.graph,scene:v.renderer.scene,onChange:paintReferencePreview,status:notify,highlight:selectedReferences});
- featureHeading.textContent={plane:'Reference Plane',axis:'Reference Axis',coordinate:'Coordinate System'}[kind];highlightFeature(kind);if(!previous){const selected=v.selection??deleteSourceSelection,choice=editing.fields.choices.find(c=>c.target.producerId===selected?.producerId&&c.target.role===selected?.role&&c.target.kind===selected?.kind);if(choice)editing.fields.pick(choice);}$('feature-operation-form').querySelector('button[type=submit]').disabled=false;window.engineerDock.openPanel('inspector');
+ editing.fields.restoreSelections(carriedSelections);featureHeading.textContent={plane:'Reference Plane',axis:'Reference Axis',coordinate:'Coordinate System'}[kind];highlightFeature(kind);if(!previous){const selected=v.selection??deleteSourceSelection,choice=editing.fields.choices.find(c=>c.target.producerId===selected?.producerId&&c.target.role===selected?.role&&c.target.kind===selected?.kind);if(choice)editing.fields.pick(choice);}$('feature-operation-form').querySelector('button[type=submit]').disabled=false;window.engineerDock.openPanel('inspector');
 }
 const featureButtons=[['extrude','Extrude','extrude'],['revolve','Revolve','revolve'],['mirror','Mirror Feature','mirror'],['linear','Linear Feature Pattern','pattern'],['circular','Circular Feature Pattern','circular-pattern'],['plane','Reference Plane','plane'],['axis','Reference Axis','axis'],['coordinate','Coordinate System','origin']].map(([kind,title,glyph])=>{
  const b=document.createElement('button');b.type='button';b.id=kind==='extrude'?'cad-extrude-sketch':'cad-feature-'+kind;b.dataset.featureKind=kind;b.dataset.commandSize=['extrude','revolve'].includes(kind)?'large':'medium';b.innerHTML=icon(glyph)+'<span>'+title+'</span>';
- b.onclick=run(()=>startFeature(kind,()=>['plane','axis','coordinate'].includes(kind)?beginReference(kind):beginFeature(kind,title)));return b;
+ b.onclick=run(()=>startFeature(kind,()=>['plane','axis','coordinate'].includes(kind)?beginReference(kind):beginFeature(kind,title),{toggle:true}));return b;
 });
 const cancelFeature=document.createElement('button');cancelFeature.type='button';cancelFeature.id='cad-cancel-feature';cancelFeature.dataset.commandSize='large';cancelFeature.disabled=true;cancelFeature.innerHTML=icon('close')+'<span>Cancel feature</span>';cancelFeature.onclick=run(closeFeature);
 $('proof-build').innerHTML=icon('feature')+'<span>Build from model</span>';$('proof-cancel').innerHTML=icon('close')+'<span>Cancel build</span>';
 const buildColumn=commandColumn(['proof-build','proof-cancel','proof-source'].map(id=>$(id)?.closest('label')??$(id)));
 buildColumn.classList.add('feature-build-column');const sourceLabel=buildColumn.querySelector('#proof-source')?.closest('label');sourceLabel?.insertAdjacentHTML('afterbegin',icon('history'));sourceLabel?.setAttribute('data-command-size','medium');
 featuresRibbon.prepend(featureButtons[0],featureButtons[1],commandColumn(featureButtons.slice(2,5)),commandColumn(featureButtons.slice(5)));
-featuresRibbon.append(cancelFeature,buildColumn);
+featuresRibbon.prepend(buildColumn);featuresRibbon.append(cancelFeature);

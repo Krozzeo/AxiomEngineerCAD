@@ -1,6 +1,6 @@
-# Engineer handoff - E3.M2 feature construction / 0.3.7 candidate
+# Engineer handoff - E3.M2 feature construction / 0.3.8 candidate
 
-0.3.7 adds edited-operation source context, unordered material limits, exact Boolean applicability with a persistent editing preference, and analytic sketch-axis picking; see the current construction guide for state/picking/preview invariants.
+0.3.8 refines shared operation transitions and focus, reference definition methods/relations, coordinate child identity/deletion and GPU contour visibility. 0.3.7 delivery passed exact-head Windows/Linux/PDF and actual public Platform installation. Read the current construction guide before changing these invariants.
 
 Start with `npm run context`, AGENTS.md, [compact context](docs/PROJECT_CONTEXT.md) and the [integration notes](docs/PRE_E3_ASSISTANT.md). Read docs/E3_M2_FEATURE_CONSTRUCTION.md for the current batch. E3.M2 follows the owner’s request to advance alongside sketch corrections.
 

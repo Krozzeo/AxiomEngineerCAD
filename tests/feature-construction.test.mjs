@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {blank} from '../src/document.mjs';
+import {blank,validate} from '../src/document.mjs';
 import {upgrade} from '../src/native/schema.mjs';
 import {command} from '../src/commands/domain.mjs';
 import {regenerateExtrusions} from '../src/extrusion/kernel.mjs';
@@ -172,4 +172,49 @@ test('Reversed angular limits preserve a valid sweep and its analytical volume',
  for(const limits of [{start:value(90),end:value(-90)},{start:value(-90),end:value(90)}]){
   const result=await regenerateExtrusions(extrude(doc,'revolved','angular','new-body',{form:'revolve',axisReference:reference,angleDeg:360,limits}));near(result.volumeMm3,25*12.5*Math.PI);
  }
+});
+
+
+test('Coordinate children include the local principal planes and can be removed independently',()=>{
+ let doc=upgrade(blank('Coordinate children'));
+ doc=invoke(doc,'reference.set',{featureId:'cs',name:'Local frame',kind:'coordinate',references:[{target:target('origin'),relation:'coincident',value:0}]});
+ let datums=referenceDatums(doc);assert.equal(datums.length,7);assert.equal(datums.filter(d=>d.parentId==='cs').length,6);
+ assert.deepEqual(datums.find(d=>d.role==='xy').normal,[0,0,1]);assert.deepEqual(datums.find(d=>d.role==='xz').normal,[0,-1,0]);assert.deepEqual(datums.find(d=>d.role==='yz').normal,[1,0,0]);
+ doc=invoke(doc,'feature.delete',{featureId:'cs',referenceRole:'x'});datums=referenceDatums(doc);
+ assert.equal(datums.some(d=>d.role==='x'),false);assert.equal(datums.length,6);assert.equal(doc.native.graph.features.find(f=>f.id==='cs').data.profile,'E3-reference/2');doc=JSON.parse(JSON.stringify(doc));validate(doc);assert.equal(referenceDatums(doc).length,6);assert.equal(doc.native.graph.features.some(f=>f.id==='cs'),true);
+ doc=invoke(doc,'reference.set',{featureId:'cs',replace:true,name:'Renamed frame',kind:'coordinate',references:[{target:target('origin'),relation:'coincident',value:0}]});
+ assert.equal(referenceDatums(doc).some(d=>d.role==='x'),false,'Editing the parent must not resurrect a deleted child.');
+ doc=invoke(doc,'feature.delete',{featureId:'cs'});assert.equal(referenceDatums(doc).length,0);
+});
+
+test('Coordinate child deletion rejects actual dependents without removing siblings',()=>{
+ let doc=upgrade(blank('Dependent coordinate plane'));
+ doc=invoke(doc,'reference.set',{featureId:'cs',name:'Local frame',kind:'coordinate',references:[{target:target('origin'),relation:'coincident',value:0}]});
+ doc=sketch(doc,'on-child',[0,0],[10,10],{kind:'datum',producerId:'cs',role:'xy'});
+ const before=structuredClone(doc);
+ assert.throws(()=>invoke(doc,'feature.delete',{featureId:'cs',referenceRole:'xy'}),e=>e.code==='LostReference');
+ assert.throws(()=>invoke(doc,'feature.delete',{featureId:'cs'}),e=>e.code==='LostReference');assert.deepEqual(doc,before);
+ doc=invoke(doc,'feature.delete',{featureId:'cs',referenceRole:'x'});assert.ok(referenceDatums(doc).some(d=>d.role==='xy'));
+});
+
+test('Absolute reference presets preserve world axes and planes through exact regeneration',async()=>{
+ let doc=upgrade(blank('Absolute planes'));
+ for(const [axis,role,normal]of [['x','yz',[1,0,0]],['y','xz',[0,-1,0]],['z','xy',[0,0,1]]]){
+  doc=invoke(doc,'reference.set',{featureId:'plane-'+axis,name:'Absolute '+axis,kind:'plane',references:[{target:target(role),relation:'coincident',value:0}]});
+  doc=invoke(doc,'reference.set',{featureId:'axis-'+axis,name:'Absolute '+axis,kind:'axis',references:[{target:target(axis),relation:'coincident',value:0}]});
+  assert.deepEqual(referenceDatums(doc).find(d=>d.id==='plane-'+axis).normal,normal);
+  assert.deepEqual(referenceDatums(doc).find(d=>d.id==='axis-'+axis).direction,['x','y','z'].map(k=>k===axis?1:0));
+ }
+ doc=sketch(doc,'profile',[0,0],[10,10],{kind:'datum',producerId:'plane-x',role:'plane'});
+ near((await regenerateExtrusions(extrude(doc,'solid','profile'))).volumeMm3,1000);
+});
+
+
+test('Reference definition methods are explicit and cannot masquerade as absolute world presets',()=>{
+ let doc=upgrade(blank('Definition methods'));
+ doc=invoke(doc,'reference.set',{featureId:'absolute',name:'Absolute X',kind:'plane',definitionMode:'x',references:[{target:target('yz'),relation:'coincident',value:0}]});
+ const data=doc.native.graph.features.find(f=>f.id==='absolute').data;assert.equal(data.definitionMode,'x');assert.equal(data.profile,'E3-reference/2');
+ assert.throws(()=>invoke(doc,'reference.set',{featureId:'invalid',name:'Wrong preset',kind:'plane',definitionMode:'x',references:[{target:target('xy'),relation:'coincident',value:0}]}),e=>e.code==='InvalidInput');
+ doc=invoke(doc,'reference.set',{featureId:'by-refs',name:'Front by references',kind:'plane',definitionMode:'references',references:[{target:target('xy'),relation:'coincident',value:0}]});
+ assert.equal(doc.native.graph.features.at(-1).data.definitionMode,'references');
 });

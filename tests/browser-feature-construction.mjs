@@ -26,8 +26,12 @@ export async function verifyFeatureConstructionUI({context,host,observe,evidence
   await page.locator('[data-source-id=limit-practice]').dblclick();
   assert.equal(await page.evaluate(()=>window.engineerSketch.view()),null,'Sketch editing must not replace a feature draft.');
   await page.locator('#cad-feature-revolve').click();
-  assert.equal(await page.locator('#cad-extrude-sketch').getAttribute('aria-pressed'),'true');
-  assert.equal(await page.locator('#cad-feature-revolve').getAttribute('aria-pressed'),'false');
+  await form.getByRole('table',{name:'Axis',exact:true}).waitFor();
+  assert.equal(await page.locator('#cad-extrude-sketch').getAttribute('aria-pressed'),'false');
+  assert.equal(await page.locator('#cad-feature-revolve').getAttribute('aria-pressed'),'true');
+  await form.getByRole('table',{name:'Sketch',exact:true}).getByText('limit-practice',{exact:true}).waitFor();
+  await page.locator('#cad-extrude-sketch').click();
+  await page.waitForFunction(()=>document.querySelector('#feature-operation-editor>h3')?.textContent==='Extrude');
   assert.deepEqual(await sketchDocument(page),sourceDocument);
   assert.equal(await page.locator('.proof-inspector').isVisible(),false);
   const end=form.locator('[data-limit-side=end]'),until=end.getByRole('button',{name:'Until Selected',exact:true});
@@ -64,8 +68,7 @@ export async function verifyFeatureConstructionUI({context,host,observe,evidence
   await volume(14144);assert.equal(await page.evaluate(()=>window.engineerViewport.proof.exact.validity.solids),2);
   await page.locator('#cad-feature-plane').click();
   await page.locator('[data-source-id=datum-xy]').click();
-  const relations=form.locator('select').filter({has:page.locator('option[value=offset]')});
-  await relations.first().selectOption('offset');
+  await form.locator('.reference-relations').first().getByRole('button',{name:'Offset',exact:true}).click();
   await page.locator('#reference-value-0').fill('7');await page.locator('#reference-value-0').press('Enter');
   await sketchCommit(page,()=>form.getByRole('button',{name:'Apply',exact:true}).click());
   const created=(await sketchDocument(page)).native.graph.features.filter(f=>f.type==='reference-geometry').at(-1);assert.equal(created.data.references[0].value,7);

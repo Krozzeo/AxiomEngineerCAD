@@ -8,7 +8,7 @@
   },
   "milestone": {
     "current": "E3.M2",
-    "status": "0.3.7 E3.M2 edited limits and revolution axes candidate",
+    "status": "0.3.8 E3.M2 operation transitions and reference hierarchy candidate",
     "ownerAcceptance": "pending",
     "next": "Owner reviews E3.M2 feature operations before E3.M3"
   },
@@ -37,9 +37,9 @@
     "deliveryGate": "docs/MILESTONE_DELIVERY.md"
   },
   "candidate": {
-    "version": "0.3.7",
+    "version": "0.3.8",
     "branch": "engineer/e3-m1-sketch-breadth",
-    "status": "Previous-history face picking, unordered limits, exact Boolean fallback with remembered preference, inline section headers and sketch-line revolve axes"
+    "status": "Shared construction transitions, selection focus, absolute datum presets, typed relation icons, coordinate children and through-model contours"
   },
   "previousDelivered": {
     "version": "0.2.5",
@@ -72,6 +72,16 @@
     "verification": "Windows/Linux: 232 tests each, browser and independent PDF acceptance. Public Platform 0.1.13 install/activate/launch and focused Chrome/NVIDIA sketch/save/reopen passed; broader public legacy/PDF run stopped on a harness precondition and is not claimed passed."
   },
   "lastExperimental": {
+    "version": "0.3.7",
+    "commit": "7e8d062e6e8eca03923d6d9140ff9b0ca8cd15bf",
+    "pullRequest": 19,
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-19-7e8d062e6e8eca03923d6d9140ff9b0ca8cd15bf",
+    "acceptanceRun": 43533166480,
+    "publicationRun": 43534286400,
+    "artifactSha256": "a3259fa0c8d5a67696ce651bff7e713a2233b8fd32d88beb3ab185d0e90a4b29",
+    "verification": "296 native tests, complete Windows/Linux browser and independent PDF acceptance passed. Actual public Platform 0.1.13 discovery/install/activate/launch and Chrome/NVIDIA refinements, solid/sketch and save/reopen passed. Owner acceptance pending."
+  },
+  "previousExperimental": {
     "version": "0.3.6",
     "commit": "867907e787fe8c26de35174ea5aa7bfc634e62fc",
     "pullRequest": 19,
