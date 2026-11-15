@@ -26,7 +26,7 @@ An ADR records a real choice, never a speculative implementation claim. Each dec
 | [ADR-010](ADR-010-EXACT-VECTOR-PROOF.md) | Vector drawings and exact HLR | Independent view/dimension/reference PDF output checks | E0.M6 | E0 measured baseline accepted by owner Go |
 | [ADR-011](ADR-011-LOCAL-EXPOSURE-PROOF.md) | Engineering-data external exposure default | Local/restricted/full, audit, offline and permission-denial tests | E0.M5–M6 | E0 measured baseline accepted by owner Go |
 | [ADR-012](ADR-012-INTEGRATED-E0-GATE.md) | E0 integrated foundation go/no-go | Entire authoritative sketch→model→mate→drawing→proposed-edit slice | E0.M7 | Owner Go recorded; broad remaining risks tracked |
-| ADR-013 | STEP import/export bounded supported subset | Geometry/structure, units, invalid input, source preservation and licensing | E3.M5 | Pending |
+| [ADR-013](ADR-013-STEP-INTEROPERABILITY.md) | STEP import/export bounded supported subset | Geometry/structure, units, invalid input, source preservation and licensing | E3.M5 | Experimenting / 0.3.11 owner review candidate |
 | ADR-014 | Provider/model-supported AI cohorts | Independent vector/raster and hosted/local capability matrix | E2/E5 | Pending |
 
 ## Suggested record format
@@ -60,3 +60,5 @@ References: [Master §21](../../MASTER_DESIGN.md#21-risks-experiments-and-archit
 - [ADR026 - Operation layers and sketch selection](ADR-026-OPERATION-LAYERS-AND-SKETCH-SELECTION.md): owner-requested 0.1.11 refinement, focused numerical/human UI verification; exact delivery and owner acceptance are separate.
 
 - [ADR027 - Extrusion refinement and sketch references](ADR-027-EXTRUSION-REFINEMENT-AND-SKETCH-REFERENCES.md): E1.M5 consolidation, preserving legacy source identities and atomically binding operation depth.
+
+- [ADR028 — Production acceptance and exchange](ADR-028-PRODUCTION-EXCHANGE.md): E3.M6 candidate; native copies, explicit STEP protocols and nominal material/mass.

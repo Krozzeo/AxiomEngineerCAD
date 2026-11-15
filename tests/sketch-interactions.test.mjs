@@ -80,7 +80,8 @@ test('equal redundant driving dimensions remain numerically consistent but expos
 
 test('every exact planar side of the native extrusion supports a sketch; forged and changed face witnesses fail without retargeting',async()=>{
  let v=await extrusionDemo();const original=structuredClone(v),shape=await regenerateExtrusions(v),sides=shape.faces.filter(f=>f.role.startsWith('planar:'));
- assert.equal(sides.length,4);assert.ok(shape.faces.some(f=>!f.planeNormal));assert.ok(shape.faces.filter(f=>!f.planeNormal).every(f=>f.resolution==='TransientDisplayOnly'&&!f.planeFrame),'The cylindrical hole stays unsupported as a sketch plane');
+ assert.equal(sides.length,4);assert.ok(shape.faces.some(f=>!f.planeNormal));assert.ok(shape.faces.filter(f=>!f.planeNormal).every(f=>f.resolution==='ResolvedStable'&&f.referenceGeometry?.kind==='cylinder'&&!f.planeFrame),'The exact cylindrical witness is selectable but is not itself a sketch plane');
+ for(const face of shape.faces.filter(f=>!f.planeNormal))assert.throws(()=>command(v,'cad.sketch.create.v1',{sketchId:'curved-invalid',definitionId:'definition-main',name:'Curved support',profile:'E1.M5-sketch/1',plane:{kind:'face',producerId:'extrusion-plate',role:face.role}}),e=>e.code==='LostReference');
  for(const [i,face]of sides.entries()){
   assert.equal(face.resolution,'ResolvedStable');const frame=face.planeFrame;assert.ok(frame.normal.some(n=>Math.abs(n)>.99));
   const axes=frame.origin.map((n,k)=>Math.abs(frame.normal[k])>.99?n:null).filter(n=>n!==null);assert.ok(axes.some(n=>[0,30,40].some(expected=>Math.abs(n-expected)<1e-7)));

@@ -2,7 +2,7 @@ import {circleWitness,closedCircularBoundary} from '../sketch/curve-witness.mjs'
 import {createHash} from 'node:crypto';
 const rounded=v=>Array.isArray(v)?v.map(rounded):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,rounded(v[k])])):typeof v==='number'?Math.round(v*1e9)/1e9:v;
 const digest=value=>createHash('sha256').update(JSON.stringify(rounded(value))).digest('hex');
-export function exactReferenceGeometry(shape){
+export function exactReferenceGeometry(shape,{native=false}={}){
  const faces=shape.faces,adjacent=new Map();
  for(const face of faces)for(const edge of face.edges){const id=edge.hashCode;if(!adjacent.has(id))adjacent.set(id,[]);adjacent.get(id).push(face);}
  const internal=edge=>{if(edge.geomType!=='LINE')return false;const fs=adjacent.get(edge.hashCode)??[];
@@ -14,8 +14,8 @@ export function exactReferenceGeometry(shape){
  };
  let edges=shape.edges.map((edge,i)=>{
   const line=edge.geomType==='LINE',points=Array.from({length:line?2:65},(_,j)=>edge.pointAt(j/(line?1:64)).toTuple()),ends=[edge.startPoint.toTuple(),edge.endPoint.toTuple()];
-  const circle=edge.geomType==='CIRCLE'&&Math.hypot(...ends[0].map((x,k)=>x-ends[1][k]))<1e-7;
-  const witness=line?{type:'line',ends:ends.map(rounded).sort((a,b)=>JSON.stringify(a).localeCompare(JSON.stringify(b)))}:circle?{type:'circle',bounds:edge.boundingBox.bounds,length:edge.length}:null;
+  const circular=edge.geomType==='CIRCLE',circle=circular&&Math.hypot(...ends[0].map((x,k)=>x-ends[1][k]))<1e-7;
+  const witness=line?{type:'line',ends:ends.map(rounded).sort((a,b)=>JSON.stringify(a).localeCompare(JSON.stringify(b)))}:circle?{type:'circle',bounds:edge.boundingBox.bounds,length:edge.length}:circular?{type:'arc',ends:ends.map(rounded).sort((a,b)=>JSON.stringify(a).localeCompare(JSON.stringify(b))),mid:rounded(points[32])}:null;
   return {_members:[edge.hashCode],_endpoints:ends,kind:'edge',role:witness?'edge:'+digest(witness):'transient-edge-'+i,resolution:witness?'ResolvedStable':'TransientDisplayOnly',lengthMm:edge.length,points,...(internal(edge)?{displayHidden:true}:{}),...(edge.geomType==='CIRCLE'?{curve:circleWitness(points),bounds:edge.boundingBox.bounds}:{})};
  });
  // A circular boundary can consist of several exact B-Rep arcs. Accept the
@@ -29,5 +29,16 @@ export function exactReferenceGeometry(shape){
   .flatMap(e=>e._endpoints.map(digest)));
  const vertices=new Map();for(const edge of shape.edges)for(const p of [edge.startPoint.toTuple(),edge.endPoint.toTuple()]){const role='vertex:'+digest(p);if(!vertices.has(role))vertices.set(role,{kind:'vertex',role,resolution:'ResolvedStable',pointMm:p,...(!visibleVertices.has(digest(p))?{displayHidden:true}:{})});}
  const faceEdgeRoles=Object.fromEntries(shape.faces.map(face=>[face.hashCode,edges.filter(e=>face.edges.some(edge=>e._members.includes(edge.hashCode))).map(e=>e.role)]));
- return {edges:edges.map(({_members,_endpoints,...edge})=>edge),exactVertices:[...vertices.values()],faceEdgeRoles};
+ const cylinders=new Map();
+ for(const face of faces.filter(face=>face.geomType==='CYLINDRE')){
+  const bounds=edges.filter(edge=>edge.curve?.full&&edge.resolution==='ResolvedStable'&&faceEdgeRoles[face.hashCode].includes(edge.role)).sort((a,b)=>a.role.localeCompare(b.role));
+  if(bounds.length!==2)continue;
+  const [a,b]=bounds.map(edge=>edge.curve),delta=b.centerMm.map((n,i)=>n-a.centerMm[i]),length=Math.hypot(...delta);
+  if(length<1e-7||Math.abs(a.radiusMm-b.radiusMm)>1e-7)continue;
+  const direction=delta.map(n=>n/length);
+  if([a,b].some(circle=>Math.abs(direction.reduce((sum,n,i)=>sum+n*circle.normal[i],0))<1-1e-7))continue;
+  const role='cylinder:'+digest(bounds.map(edge=>edge.role));
+  cylinders.set(role,{role,a:a.centerMm,b:b.centerMm,direction,radius:a.radiusMm});
+ }
+ return {...(native?{nativeEdges:new Map(edges.map(e=>[e.role,shape.edges.filter(edge=>e._members.includes(edge.hashCode))]))}:{}),cylinders:[...cylinders.values()],edges:edges.map(({_members,_endpoints,...edge})=>edge),exactVertices:[...vertices.values()],faceEdgeRoles};
 }

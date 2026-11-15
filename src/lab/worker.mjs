@@ -1,3 +1,5 @@
+import {importNative} from '../native/exchange.mjs';
+import {readStep,prepareStepImport,exportStepDocument} from '../step/exchange.mjs';
 import {buildOperationPreview} from '../proof/operation-preview.mjs';
 import {regenerateExtrusions} from '../extrusion/kernel.mjs';
 import {geometryExperiment} from './kernel.mjs';
@@ -17,7 +19,11 @@ import {resolveSceneSelection,baseDatums} from '../workbench/model.mjs';
 process.on('message',async message=>{
   try{
     let result;
-    if(message.kind==='geometry')result=await geometryExperiment(message.payload.spec,{includeStep:!!message.payload.includeStep});
+    if(message.kind==='step-analyze'){const r=await readStep(message.payload.source,{orientation:message.payload.orientation,missingUnit:message.payload.missingUnit});result={translation:r.report};r.shape.delete();}
+    else if(message.kind==='native-import'){const candidate=await importNative(message.payload.before,message.payload.input.text);result={...(await verifyCommand({before:message.payload.before,after:candidate})),candidate};}
+    else if(message.kind==='step-import'){const prepared=await prepareStepImport(message.payload.before,message.payload.input);result={...(await verifyCommand({before:message.payload.before,after:prepared.document})),candidate:prepared.document,translation:prepared.translation};}
+    else if(message.kind==='step-export')result=await exportStepDocument(message.payload.document,message.payload.input);
+    else if(message.kind==='geometry')result=await geometryExperiment(message.payload.spec,{includeStep:!!message.payload.includeStep});
     else if(message.kind==='suite')result=await runSuite();
     else if(message.kind==='sketch')result=await solveSketch(message.payload.primitives??sketchFixture(message.payload.fixture),{drag:message.payload.drag});
     else if(message.kind==='parametric-sketch')result=await solveParametric(message.payload.data,{drag:message.payload.drag});
@@ -26,7 +32,7 @@ process.on('message',async message=>{
     else if(message.kind==='native-verify')result=await verifyNative(message.payload.document);
     else if(message.kind==='command-validate')result=await verifyCommand(message.payload);
     else if(message.kind==='drawing-proof'&&message.payload.previewOperation)result=await buildOperationPreview(message.payload);
-    else if(message.kind==='drawing-proof')result=await buildProof(message.payload.document,{versionId:message.payload.versionId,viewportOnly:message.payload.viewportOnly,rollbackAt:message.payload.rollbackAt});
+    else if(message.kind==='drawing-proof')result=await buildProof(message.payload.document,{versionId:message.payload.versionId,viewportOnly:message.payload.viewportOnly,rollbackAt:message.payload.rollbackAt,beforeOperation:message.payload.beforeOperation});
     else if(message.kind==='selection-inspect'){validate(message.payload.document);const proof=message.payload.target.kind==='datum'?{scene:{models:[],occurrences:[],datums:baseDatums(message.payload.document)}}:await buildProof(message.payload.document,{viewportOnly:true,rollbackAt:message.payload.rollbackAt});result={...resolveSceneSelection(proof.scene,message.payload.target),source:{documentId:message.payload.document.documentId,revision:message.payload.document.revision,contentHash:hash(message.payload.document),creator:PROVENANCE.creator},authority:message.payload.target.kind==='datum'?'canonical definition reference frame':'exact supported B-Rep role'};if(message.payload.capture)result=captureSelection(proof.scene,result);}
     else if(message.kind==='extrusion-geometry'){result=await regenerateExtrusions(message.payload.document,{featureId:message.payload.featureId});check(!message.payload.requireFace||['ResolvedStable','ResolvedReidentified'].includes(result.reference.state),result.reference.state,'The extrusion end cap is not a uniquely surviving exact face.');}
     else if(message.kind==='integrated-geometry')result=(await regenerateIntegration(message.payload.document)).exact;

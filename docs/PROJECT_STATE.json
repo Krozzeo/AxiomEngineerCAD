@@ -7,20 +7,20 @@
     "sha256": "9c2f3857a4a7f1156b1c10b82d2e76680604393b7f5799081f6fd22694502de6"
   },
   "milestone": {
-    "current": "E2.M4",
-    "status": "E2 owner accepted; 0.2.6 stable candidate",
-    "ownerAcceptance": "Accepted",
-    "next": "E3.M1 after 0.2.6 stable publication"
+    "current": "E3.M6",
+    "status": "0.3.13 corrected E3 stable candidate; owner authorized main integration and E4.M1 start",
+    "ownerAcceptance": "Owner requested corrected stable integration and advancement; delivery gates pending",
+    "next": "After corrected stable delivery, E4.M1 definitions, instances, hierarchy and in-place part modeling"
   },
   "lastDelivered": {
-    "version": "0.2.5",
-    "commit": "b8bd3c7b99cb0d7a4a8db208608389b78237c1b7",
+    "version": "0.2.6",
+    "commit": "21842a0a4c1e8843e3091afbfa4f7731ee13bdfa",
     "pullRequest": 18,
-    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-18-b8bd3c7b99cb0d7a4a8db208608389b78237c1b7",
-    "acceptanceRun": 42384834832,
-    "publicationRun": 42385651870,
-    "artifactSha256": "266e6cb581df1e9cc5eb31be93a4bf464a1d15c2187e6077ce80aa1e77448da0",
-    "verification": "Windows and Ubuntu acceptance, public Platform installation and UI review. Owner verified live SVG reconstruction and model-to-drawing; exported A4 landscape with two views and 48 and 12 mm dimensions."
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/v0.2.6",
+    "acceptanceRun": 42399474320,
+    "publicationRun": 42400464406,
+    "artifactSha256": "31e653ebfa0f25ee929618fa367640b38f5e78aa858aeb023e521dff9832b30c",
+    "verification": "Owner accepted E2. Windows and Ubuntu exact main acceptance passed. Stable 0.2.6 published and independently installed from the public Platform 0.1.13 catalog, including assistant and PDF regression."
   },
   "constraints": [
     "MASTER_DESIGN is intent; implementation requires code and matching evidence.",
@@ -33,23 +33,23 @@
     "implementation": "IMPLEMENTATION_STATUS.md",
     "handoff": "AI_HANDOFF.md",
     "architecture": "docs/architecture/ADR_REGISTER.md",
-    "currentCadScope": "docs/PRE_E3_ASSISTANT.md",
+    "currentCadScope": "docs/E3_M6_PRODUCTION.md",
     "deliveryGate": "docs/MILESTONE_DELIVERY.md"
   },
   "candidate": {
-    "version": "0.2.6",
-    "branch": "engineer/sketch-navigation-0.1.9",
-    "status": "Automatic preview, direct human Apply and assistant task history"
+    "version": "0.3.13",
+    "branch": "engineer/e3-m1-sketch-breadth",
+    "status": "Right Import/Export panels, explicit missing STEP units, positive density and View navigation; stable integration authorized, exact CI pending"
   },
   "previousDelivered": {
-    "version": "0.2.4",
-    "commit": "7e7ac7a0d9fb9df053fbb1030568213d2aeb9b24",
+    "version": "0.2.5",
+    "commit": "b8bd3c7b99cb0d7a4a8db208608389b78237c1b7",
     "pullRequest": 18,
-    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-18-7e7ac7a0d9fb9df053fbb1030568213d2aeb9b24",
-    "acceptanceRun": 42375654846,
-    "publicationRun": 42377082141,
-    "artifactSha256": "3499c5dacaa0b7d8bb205ae31102229ff1a6779d324f48f27ae2832e8abfd719",
-    "verification": "Windows and Ubuntu acceptance. Public Platform 0.1.13 installation, synthetic assistant review, exact reconstruction and independent vector PDF verified."
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-18-b8bd3c7b99cb0d7a4a8db208608389b78237c1b7",
+    "acceptanceRun": 42384834832,
+    "publicationRun": 42385651870,
+    "artifactSha256": "266e6cb581df1e9cc5eb31be93a4bf464a1d15c2187e6077ce80aa1e77448da0",
+    "verification": "Windows and Ubuntu acceptance, public Platform installation and UI review. Owner verified live SVG reconstruction and model-to-drawing; exported A4 landscape with two views and 48 and 12 mm dimensions."
   },
   "earlierDelivered": {
     "version": "0.1.8",
@@ -70,5 +70,36 @@
     "publicationRun": 41747175501,
     "artifactSha256": "031eb7725bdab240899daaaecbdbc4476de08d0099d8ef9be54958e8f968e5c5",
     "verification": "Windows/Linux: 232 tests each, browser and independent PDF acceptance. Public Platform 0.1.13 install/activate/launch and focused Chrome/NVIDIA sketch/save/reopen passed; broader public legacy/PDF run stopped on a harness precondition and is not claimed passed."
+  },
+  "lastExperimental": {
+    "version": "0.3.11",
+    "commit": "53baf1cabb01c5be7644c3b0c8be114fd389a445",
+    "pullRequest": 19,
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-19-53baf1cabb01c5be7644c3b0c8be114fd389a445",
+    "acceptanceRun": 43669216570,
+    "publicationRun": 43670192980,
+    "artifactSha256": "184f9e0fb9635df8fc60804f4ce9b8389dd6b29ff51a13b29b47d1fa9416863a",
+    "artifactBytes": 100295104,
+    "verification": "330 native tests, full Windows/Linux/browser/PDF/STEP and actual public Platform/Chrome/NVIDIA passed. Owner subsequently reported fresh-project import failure; corrected in M6 candidate."
+  },
+  "previousExperimental": {
+    "version": "0.3.10",
+    "commit": "bd74ce9e634d4da0e0e3a39ddb3bfa2793514674",
+    "pullRequest": 19,
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-19-bd74ce9e634d4da0e0e3a39ddb3bfa2793514674",
+    "acceptanceRun": 43635553295,
+    "publicationRun": 43636874866,
+    "artifactSha256": "d522d11ff28c7c857d10b7f30b334054faada8eb86e63240155d96f270afcea4",
+    "verification": "Complete exact-head Windows/Linux/native/browser/PDF and actual public Platform 0.1.13 Chrome/NVIDIA passed. Owner accepted M4: Todo perfecto."
+  },
+  "recentExperimentalDelivery": {
+    "version": "0.3.12",
+    "commit": "a6f9fd3e804c4f0294f673cd561559884c6b0bbe",
+    "pullRequest": 19,
+    "acceptanceRun": 43720075678,
+    "publicationRun": 43721538995,
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-19-a6f9fd3e804c4f0294f673cd561559884c6b0bbe",
+    "artifactSha256": "8b92cd952bfc7efb4441c124f0d0aa5a5e3cbc11307bc869c1d0d913cc3b0493",
+    "verification": "Windows/Linux 336 tests each, full browser/PDF/36 independent STEP cases and actual public Platform 0.1.13 Chrome/NVIDIA installation passed."
   }
 }

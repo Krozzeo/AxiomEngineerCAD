@@ -4,6 +4,7 @@ import {mkdtemp,mkdir,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {resolve,join} from 'node:path';
 import {startHost} from '../node_modules/axiom-platform/services/local-host/server.mjs';
+import {historicalDemoCatalog,seedHistoricalFixtures} from '../scripts/acceptance-demo-fixtures.mjs';
 import {http} from './helpers.mjs';
 
 test('Platform assistant plans, builds an isolated CAD branch and keeps Apply human-only',async t=>{
@@ -44,9 +45,7 @@ test('Platform assistant plans, builds an isolated CAD branch and keeps Apply hu
   await host.startup;
   await host.manager.account.connect('synthetic-test-only');
   host.manager.ai.verified=true;host.manager.ai.defaults={model:'gpt-5.6-luna',reasoning:'medium'};
-  const item=host.manager.catalog().installations.find(i=>i.productId==='axiom.engineer-cad');
-  await host.manager.installations({action:'load-demos',installationId:item.id});
-  for(const job of host.manager.demoJobs.jobs.values())await job.flight;
+  await seedHistoricalFixtures(host,undefined,historicalDemoCatalog.filter(d=>d.id==='e2-m4-drawing-reconstruction'));
   const demo=host.manager.catalog().recents.find(i=>i.name==='E2.M4 Drawing Reconstruction');
   const session=await host.manager.execute({operationId:crypto.randomUUID(),action:'open',productId:demo.productId,path:demo.path});
   const request=async(path,input)=>{const r=await http(session.editorUrl,path,input);assert.equal(r.status,200,JSON.stringify(r.value));return r.value;};

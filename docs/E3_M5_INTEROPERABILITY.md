@@ -1,0 +1,28 @@
+# E3.M5 — STEP interoperability and Dependencies panel
+
+Candidate 0.3.11, PR19. E3.M4 owner acceptance recorded: “Todo perfecto”. M5 acceptance is pending; publication requires complete exact-head Windows/Linux/native/browser/PDF/STEP QA and actual public Platform installation. Main/stable stay 0.2.6.
+
+## Manual demo checks
+
+Load Demos advertises only **E3.M5 STEP Interoperability**. Existing user projects and historical regression fixtures are preserved. Open the demo: an independently generated imported 40 × 30 × 8 mm plate with a radius-3 bore has a native radius-4, height-4 added boss. Exact initial volume is 9600 − 8π mm³, one solid. Original imported operations/sketches are unavailable, explicitly reported. The added boss/profile are ordinary editable Engineer history.
+
+1. Open Parameter Manager. Select BossHeight: the closed Dependencies panel stays closed. Click Trace dependencies: it opens/focuses Bottom and selects that exact row. Select BossRadius: Dependencies follows without another button. Escape or selection outside the table clears its results. No old subpanel remains.
+2. Preview update impact opens/focuses the same panel and selects the row. A draft changes diagnostics without changing MAIN; Apply/Enter performs ordinary validated editing. Direction and retained-version controls remain in Dependencies. Detach/reposition/reopen the panel; parameter selection and clearing continue across authenticated windows. Slow replies cannot restore a cleared or superseded selection.
+3. Change BossHeight to 6 mm: volume becomes 9600 + 24π mm³. Undo/Redo, save and reopen. Original STEP text/hash stay unchanged.
+4. File → Download imported STEP source: its exact UTF-8 source is retained. File → Export STEP: choose MM, CM, M or INCH. The downloaded exact B-Rep retains world coordinates; native history stays in the Engineer project.
+5. File → Import STEP: choose a bounded self-contained file, name and orientation, then Analyze and preview. Inspect source units, mm translation, volume, solid count and explicit history warning. Only imported material is ghosted; existing geometry retains its display. Only Apply commits. Cancel/Escape restores MAIN. Malformed files and surface-only shells fail without writes.
+6. Import the downloaded source or another supported part. Imported closed bodies become separate material in the part. Select exact planar faces for new native sketches/extrusions or use supported finishing/references. Import is not an inference of original dimensions or feature history. Existing imported solids can be selected, suppressed/deleted, restored through Undo, saved and reopened.
+
+## Profile and authority
+
+E3-STEP/1 uses the unchanged pinned replicad 1.2.0 / replicad-opencascadejs 1.1.0 exact OCCT reader/writer in cancellable deadline-bound workers. Files are UTF-8 Part21, at most 512 KiB; 1–16 closed solids, 512 faces, 1024 edges, 32 roots, 25000 records and coordinates within ±10000 mm. Open surfaces and external linked files are rejected. Export is bounded to 1 MiB. Missing explicit units fail; geometry/placement/unit conversion is native OCCT work, not a text-parser approximation. Optional orientation rotates ±90° about X; default preserves coordinates. Assembly roots are flattened geometry, with an explicit warning; no editable assembly hierarchy, colors/materials or original constraints are claimed.
+
+Source text, SHA256, name, orientation and translation report persist in the native feature. Every regeneration checks source integrity and retained metrics. Existing strict readers reject the new feature extension. Imported-face witnesses use the existing conservative exact identity system and fail when no unique supported face survives; no universal topology naming claim. Finishing/3 allows null sketch for an imported material base, without inventing a sketch. Drawing generation from arbitrary imported geometry remains unsupported and explicitly refuses rather than inventing dimensions.
+
+Tools: step.analyze (read), step.import (MAIN human or isolated LocalProposal), step.export and step.download (human-only). Export bytes remain private to the job; bounded base64 download chunks avoid exceeding semantic receipt limits. Existing revision checks, proposal review pagination, Apply authority and atomic Save are unchanged. Larger source diffs remain subject to existing review limits. Cancellation targets matching job identity; late results do not commit.
+
+## Evidence and independent QA
+
+`tests/m5-step.test.mjs` and `tests/m5-step-commands.test.mjs` cover independent input fixtures, units/placements/orientation, exact native supports/finishing, exports, malformed/open surfaces, forged hashes/reports, genuine isolated previews, revision/permissions, cancellation/timeouts, Undo/Redo and human-reviewed proposal Apply. `tests/browser-e3-m5.mjs` exercises actual UI, Downloads, detached Dependencies, deselection and delayed reads, native boss edits, padded >32 KiB import, Cancel, Undo/Redo and save/reopen. Retained M4/M3 and full existing acceptance remain required.
+
+Original MIT fixtures are generated with QA-only cadquery-ocp-novtk 7.9.3.1.1 / native OCCT 7.9.3, independently of the product Wasm bridge. `scripts/export-step-qa.mjs` emits ten MM/INCH exports, including the modified native boss. `scripts/verify-step.py` reads them independently and checks SHA256/size, BRepCheck validity, solid count, volume, area, mass center and bounds, with max(1e-6 absolute, 1e-8 relative) tolerances. QA packages are pinned in scripts/qa-step-requirements.txt and are not distributed in the product. See ADR013. Final exact-head CI/publication/install evidence belongs to immutable delivery artifacts, not a self-referential source commit.

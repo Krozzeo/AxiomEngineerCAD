@@ -8,3 +8,15 @@
 .proof-workbench{margin-bottom:22px;padding-bottom:22px;border-bottom:1px solid #344958}.proof-heading{display:flex;justify-content:space-between;align-items:center;gap:15px}.proof-heading h2{font-size:23px;margin:8px 0}.proof-heading .eyebrow{margin:0}.proof-heading>span{font-size:12px;color:#80d9c1}.proof-toolbar{display:flex;flex-wrap:wrap;align-items:end;gap:8px;margin:14px 0}.proof-toolbar label{margin:0;display:flex;flex-direction:column;gap:5px}.proof-toolbar select{font:inherit;padding:9px;background:#162635;color:#e4eef8;border:1px solid #4b6076;border-radius:5px}.proof-toolbar input{max-width:180px}.proof-grid{display:grid;grid-template-columns:minmax(0,1fr) 190px;border:1px solid #415468;border-radius:6px;overflow:hidden}.proof-grid canvas{width:100%;height:auto;display:block;touch-action:none}.proof-grid [hidden]{display:none}.proof-inspector{padding:12px;background:#172330;overflow-wrap:anywhere}.proof-inspector pre{font-size:10px;white-space:pre-wrap}.proof-grid>div{min-width:0;background:#e5eef5}#proof-sheet{max-height:650px;overflow:auto}#proof-sheet svg{display:block;width:100%;height:auto}#proof-status{font-size:12px;color:#b0d2d8}#proof-sharing{white-space:pre-wrap;overflow-wrap:anywhere;max-height:300px;overflow:auto}#review-lab>summary{padding:16px 0;font-weight:600;cursor:pointer}#proof-diagnostics{white-space:pre-wrap;font-size:11px}@media(max-width:1200px){.proof-grid{grid-template-columns:1fr}.proof-inspector{border-top:1px solid #415468}}
 
 .integrated-workbench{padding-bottom:20px;margin-bottom:20px;border-bottom:1px solid #415468}.integrated-workbench[hidden]{display:none}.integrated-workbench pre{white-space:pre-wrap;max-height:400px;overflow:auto}.integrated-workbench .lab-metrics strong{font-size:13px;letter-spacing:0}#integration-status{color:#9be0c7}
+
+/* Shared reference construction and coordinate hierarchy. */
+.reference-definition-modes,.reference-relations{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 12px}
+.reference-definition-modes button,.reference-relations button{width:32px;height:32px;display:grid;place-items:center;padding:5px}
+.reference-definition-modes button[aria-pressed=true],.reference-relations button[aria-pressed=true]{background:#285676;border-color:#52bdec;color:#e7f7ff}
+.reference-definition-modes span{font-weight:700;font-size:16px}
+#wb-tree-items details>summary{display:flex;align-items:center;list-style:none;cursor:pointer}
+#wb-tree-items .coordinate-toggle{width:18px;min-width:18px;height:24px;padding:0;border:0;background:transparent;flex-shrink:0}
+#wb-tree-items details>summary .wb-tree-node{flex:1;min-width:0}
+#wb-tree-items details>.wb-tree-node{padding-left:30px}
+
+.reference-orientation{display:grid;grid-template-columns:repeat(4,32px);gap:5px;margin-bottom:10px}.reference-orientation button{width:32px;height:32px;padding:4px}.reference-orientation button[aria-pressed=true]{background:#285676;border-color:#52bdec}

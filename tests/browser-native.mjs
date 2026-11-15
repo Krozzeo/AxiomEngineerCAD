@@ -5,7 +5,23 @@ import {join,dirname} from 'node:path';
 export async function verifyNativeUI({hub,context,host,evidence,observe,report}){
   const name='E0.M4 Native Version Lab',sourceName='E0.M4 Source Plate';
   const open=async name=>{const row=hub.locator('#project-rows tr').filter({hasText:name});await row.getByRole('button',{name:'Open '+name,exact:true}).click();await row.getByText(/^(Active · saved|Unsaved changes)$/).waitFor();const sid=await row.getAttribute('data-session-id'),session=host.manager.catalog().sessions.find(s=>s.sessionId===sid),page=await context.newPage();observe(page);await page.goto((session.editorUrl).replace('/#','/?workspace=labs#'));await waitEditorIdle(page);await page.locator('#native-lab > summary').click();await page.locator('#native-status').filter({hasText:/Native v1 ready|Recovery required/}).waitFor();return {page,row,session};};
-  const close=async(item,name)=>{await waitEditorIdle(item.page);item.page.on('dialog',d=>d.accept());await item.page.close();await item.row.getByRole('button',{name:'Close '+name,exact:true}).click();await hub.locator('#close-dialog').getByRole('button',{name:'Save and close',exact:true}).click();await item.row.getByText('Closed',{exact:true}).waitFor();};
+  const close=async(item,name)=>{
+    await waitEditorIdle(item.page);
+    item.page.on('dialog',d=>d.accept());await item.page.close();
+    const dialog=hub.locator('#close-dialog');
+    for(let attempt=0;;attempt++){
+      await item.row.getByRole('button',{name:'Close '+name,exact:true}).click();
+      const request=hub.waitForResponse(response=>response.url().endsWith('/v1/sessions')&&response.request().postDataJSON()?.action==='close');
+      await dialog.getByRole('button',{name:'Save and close',exact:true}).click();
+      const result=await request;
+      if(result.ok())break;
+      const body=await result.text();
+      assert.ok(attempt<9&&/projectBusy/i.test(body),'Hub could not close the native session: '+body);
+      await dialog.getByRole('button',{name:'Cancel',exact:true}).click();
+      await hub.waitForTimeout(200);
+    }
+    await item.row.getByText('Closed',{exact:true}).waitFor();
+  };
   const save=async page=>{const response=page.waitForResponse(r=>r.url().endsWith('/v1/save'));await page.locator('#save').click();assert.equal((await response).status(),200);};
   const verify=async(page,candidate=false)=>{await waitEditorIdle(page);await page.locator(candidate?'#native-check-candidate':'#native-verify').click();await page.locator('#native-status').filter({hasText:'Validation passed'}).waitFor();};
   const entry=host.manager.catalog().recents.find(r=>r.name===name);assert.ok(entry);assert.ok(host.manager.catalog().recents.find(r=>r.name===sourceName));let consumer=await open(name),p=consumer.page;

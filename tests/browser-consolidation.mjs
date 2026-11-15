@@ -115,8 +115,8 @@ export async function verifyConsolidationProjectUI({context,host,evidence,observ
  await p.locator('[data-source-id=extrusion-plate]').dblclick();
  const rolledBack=preview=>p.waitForFunction(({padSketchId,preview})=>{
   const proof=window.engineerViewport.proof;
-  return proof?.operationEditId==='extrusion-plate'&&proof.preview===preview&&
-   proof.scene.occurrences[0]?.featureId==='extrusion-plate'&&!proof.scene.sketches.some(s=>s.id===padSketchId);
+  return proof?.operationEditId==='extrusion-plate'&&proof.preview===true&&
+   proof.scene.occurrences.length===0&&(window.engineerViewport.renderer.scene.previewLayers?.length??0)===(preview?1:0)&&!proof.scene.sketches.some(s=>s.id===padSketchId);
  },{padSketchId,preview});
  await rolledBack(true);
  assert.equal(await downstream.getAttribute('aria-disabled'),'true');
