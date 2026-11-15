@@ -7,20 +7,26 @@
     "sha256": "9c2f3857a4a7f1156b1c10b82d2e76680604393b7f5799081f6fd22694502de6"
   },
   "milestone": {
-    "current": "E3.M6",
-    "status": "0.3.13 corrected E3 stable candidate; owner authorized main integration and E4.M1 start",
-    "ownerAcceptance": "Owner requested corrected stable integration and advancement; delivery gates pending",
-    "next": "After corrected stable delivery, E4.M1 definitions, instances, hierarchy and in-place part modeling"
+    "current": "E4.M1",
+    "status": "First native hierarchy block started; not a completed or installable milestone",
+    "ownerAcceptance": "in development; no completed M1 requested for acceptance",
+    "next": "Definition-local exact regeneration and verification, semantic commands, Components UI and in-place editing, then actual demo/acceptance"
   },
   "lastDelivered": {
-    "version": "0.2.6",
-    "commit": "21842a0a4c1e8843e3091afbfa4f7731ee13bdfa",
-    "pullRequest": 18,
-    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/v0.2.6",
-    "acceptanceRun": 42399474320,
-    "publicationRun": 42400464406,
-    "artifactSha256": "31e653ebfa0f25ee929618fa367640b38f5e78aa858aeb023e521dff9832b30c",
-    "verification": "Owner accepted E2. Windows and Ubuntu exact main acceptance passed. Stable 0.2.6 published and independently installed from the public Platform 0.1.13 catalog, including assistant and PDF regression."
+    "version": "0.3.13",
+    "commit": "861e6ff936c77fb3a4eba1d8cdd8239d151c5f73",
+    "pullRequest": 21,
+    "pullRequests": [
+      19,
+      20,
+      21
+    ],
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/v0.3.13",
+    "acceptanceRun": 43760510442,
+    "publicationRun": 43761813724,
+    "artifactBytes": 100318549,
+    "artifactSha256": "30b1c79c5dc3439ffdb26e2c7619ecdd08ea6f0e5d07938070ff1655ea7bac3d",
+    "verification": "Owner authorized corrected stable main integration and E4 start. Exact main Windows/Linux 338 native tests each, full browser/PDF/36 independent STEP cases passed. Public Platform 0.1.13 discovery/download/hash/install/activation, Chrome157/NVIDIA, 496 packaged source files matched (455 Windows line-ending normalization only), current M6 plus retained M5/M4/M3/feature/sketch and separate-window regressions passed with zero page errors. No completed M1 or manufacturing release claimed."
   },
   "constraints": [
     "MASTER_DESIGN is intent; implementation requires code and matching evidence.",
@@ -33,14 +39,10 @@
     "implementation": "IMPLEMENTATION_STATUS.md",
     "handoff": "AI_HANDOFF.md",
     "architecture": "docs/architecture/ADR_REGISTER.md",
-    "currentCadScope": "docs/E3_M6_PRODUCTION.md",
+    "currentCadScope": "docs/E4_M1_COMPONENTS.md",
     "deliveryGate": "docs/MILESTONE_DELIVERY.md"
   },
-  "candidate": {
-    "version": "0.3.13",
-    "branch": "engineer/e3-m1-sketch-breadth",
-    "status": "Right Import/Export panels, explicit missing STEP units, positive density and View navigation; stable integration authorized, exact CI pending"
-  },
+  "candidate": null,
   "previousDelivered": {
     "version": "0.2.5",
     "commit": "b8bd3c7b99cb0d7a4a8db208608389b78237c1b7",
@@ -101,5 +103,33 @@
     "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-19-a6f9fd3e804c4f0294f673cd561559884c6b0bbe",
     "artifactSha256": "8b92cd952bfc7efb4441c124f0d0aa5a5e3cbc11307bc869c1d0d913cc3b0493",
     "verification": "Windows/Linux 336 tests each, full browser/PDF/36 independent STEP cases and actual public Platform 0.1.13 Chrome/NVIDIA installation passed."
+  },
+  "mainIntegration": {
+    "version": "0.3.13",
+    "commit": "861e6ff936c77fb3a4eba1d8cdd8239d151c5f73",
+    "pullRequests": [
+      19,
+      20,
+      21
+    ],
+    "mainAcceptanceRun": 43760510442,
+    "status": "stable 0.3.13 published and publicly installed/validated",
+    "publicationRun": 43761813724
+  },
+  "development": {
+    "branch": "engineer/e4-m1-components",
+    "firstBlockCommit": "297c086",
+    "scope": "Validated structural hierarchy library; no completed M1, component UI or M1 release claimed",
+    "nativeTests": 341
+  },
+  "previousStableDelivered": {
+    "version": "0.2.6",
+    "commit": "21842a0a4c1e8843e3091afbfa4f7731ee13bdfa",
+    "pullRequest": 18,
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/v0.2.6",
+    "acceptanceRun": 42399474320,
+    "publicationRun": 42400464406,
+    "artifactSha256": "31e653ebfa0f25ee929618fa367640b38f5e78aa858aeb023e521dff9832b30c",
+    "verification": "Owner accepted E2. Windows and Ubuntu exact main acceptance passed. Stable 0.2.6 published and independently installed from the public Platform 0.1.13 catalog, including assistant and PDF regression."
   }
 }

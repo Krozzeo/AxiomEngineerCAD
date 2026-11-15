@@ -6,7 +6,7 @@ This is a development start, not a completed or installable M1 delivery. Next: d
 
 Acceptance for the first block must exercise repeated definitions and nested quaternion placement against analytic coordinates, invalid-cycle rollback, independent instance removal, and unchanged retained snapshot hashes. No UI or exact assembly-modeling acceptance is claimed by this draft.
 
-Base: main 94411d99cc91c850ae9bf553248dd98a569e1a16 (0.3.13). Work branch: engineer/e4-m1-components. No M1 installation or milestone completion is claimed.
+Base: main 861e6ff936c77fb3a4eba1d8cdd8239d151c5f73 (0.3.13). Work branch: engineer/e4-m1-components. No M1 installation or milestone completion is claimed.
 
 ## Current evidence and next integration points
 
@@ -15,3 +15,5 @@ The first block passes three analytic native tests and the complete local 341-te
 `src/components/hierarchy.mjs` composes quaternion placements, expands occurrence paths and offers validated draft definition/instance create, move/reparent and remove operations. It reuses the native1 graph and the accepted spatial quaternion math. Repeated definitions remain shared; removing an instance preserves its reusable definition. Cycles, duplicate IDs, missing definitions and non-unit rigid transforms reject without source mutation. Retained version bytes/hashes are preserved.
 
 Next integration must address the existing primary-part guards in sketch/extrusion/reference validation, definition-local exact regeneration and verification, occurrence-aware model scene/selection, revision-checked semantic commands and in-place editor context. Do not simply remove the guards and feed all definitions into the existing part history. The old geometry-probe viewport supports only bounded direct local occurrences and is not evidence of nested parametric part modeling. Parameter scope, rollback, source references and immutable effective snapshots must remain coherent. Complete the Components tree/ribbon/Inspector, real edit-and-repeat demo and negative/recovery paths before declaring M1 delivered.
+
+The corrected base is now publicly validated stable 0.3.13 (main 861e6ff936c77fb3a4eba1d8cdd8239d151c5f73; main acceptance 43760510442, publication 43761813724). First hierarchy source commit: 297c086. The exact native library passed its three focused cases plus the complete 341-test local native suite; no M1 UI/GPU or assembled B-Rep acceptance is claimed. The later startup-timeout-only local attempt, its passing focused check and unchanged full rerun are preserved in external delivery evidence.
