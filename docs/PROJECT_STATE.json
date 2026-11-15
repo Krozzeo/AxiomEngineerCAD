@@ -7,10 +7,10 @@
     "sha256": "9c2f3857a4a7f1156b1c10b82d2e76680604393b7f5799081f6fd22694502de6"
   },
   "milestone": {
-    "current": "E3.M5",
-    "status": "0.3.11 STEP interoperability and selection-driven Dependencies candidate",
+    "current": "E3.M6",
+    "status": "0.3.12 production acceptance plus fresh-project exchange and reference visibility corrections",
     "ownerAcceptance": "pending",
-    "next": "Owner reviews E3.M5; E3.M4 accepted"
+    "next": "Owner reviews E3 closure before E4; M5 fresh-project regression included in M6"
   },
   "lastDelivered": {
     "version": "0.2.6",
@@ -33,13 +33,13 @@
     "implementation": "IMPLEMENTATION_STATUS.md",
     "handoff": "AI_HANDOFF.md",
     "architecture": "docs/architecture/ADR_REGISTER.md",
-    "currentCadScope": "docs/E3_M5_INTEROPERABILITY.md",
+    "currentCadScope": "docs/E3_M6_PRODUCTION.md",
     "deliveryGate": "docs/MILESTONE_DELIVERY.md"
   },
   "candidate": {
-    "version": "0.3.11",
+    "version": "0.3.12",
     "branch": "engineer/e3-m1-sketch-breadth",
-    "status": "Exact bounded STEP import/export, independent native reader QA, preserved original source, imported-face native features, docked selection-driven Dependencies"
+    "status": "Production part, nominal material/mass, performance/recovery/snapshots; generic native/STEP import-export with AP203/AP214/AP242; corrected datum defaults"
   },
   "previousDelivered": {
     "version": "0.2.5",
@@ -72,6 +72,17 @@
     "verification": "Windows/Linux: 232 tests each, browser and independent PDF acceptance. Public Platform 0.1.13 install/activate/launch and focused Chrome/NVIDIA sketch/save/reopen passed; broader public legacy/PDF run stopped on a harness precondition and is not claimed passed."
   },
   "lastExperimental": {
+    "version": "0.3.11",
+    "commit": "53baf1cabb01c5be7644c3b0c8be114fd389a445",
+    "pullRequest": 19,
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-19-53baf1cabb01c5be7644c3b0c8be114fd389a445",
+    "acceptanceRun": 43669216570,
+    "publicationRun": 43670192980,
+    "artifactSha256": "184f9e0fb9635df8fc60804f4ce9b8389dd6b29ff51a13b29b47d1fa9416863a",
+    "artifactBytes": 100295104,
+    "verification": "330 native tests, full Windows/Linux/browser/PDF/STEP and actual public Platform/Chrome/NVIDIA passed. Owner subsequently reported fresh-project import failure; corrected in M6 candidate."
+  },
+  "previousExperimental": {
     "version": "0.3.10",
     "commit": "bd74ce9e634d4da0e0e3a39ddb3bfa2793514674",
     "pullRequest": 19,
@@ -80,15 +91,5 @@
     "publicationRun": 43636874866,
     "artifactSha256": "d522d11ff28c7c857d10b7f30b334054faada8eb86e63240155d96f270afcea4",
     "verification": "Complete exact-head Windows/Linux/native/browser/PDF and actual public Platform 0.1.13 Chrome/NVIDIA passed. Owner accepted M4: Todo perfecto."
-  },
-  "previousExperimental": {
-    "version": "0.3.9",
-    "commit": "2bab5cdb3ce89cbe32001dbe6ad1478a41cd89cb",
-    "pullRequest": 19,
-    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-19-2bab5cdb3ce89cbe32001dbe6ad1478a41cd89cb",
-    "acceptanceRun": 43612580145,
-    "publicationRun": 43613632054,
-    "artifactSha256": "a5c12a1db49373547cae6f43b10a25ab8c7f20f8a202fb03473dbea53350ef3f",
-    "verification": "315 native tests, full Windows/Linux/browser/independent PDF acceptance; actual public Platform 0.1.13 install and Chrome/NVIDIA M3 and retained regressions passed."
   }
 }

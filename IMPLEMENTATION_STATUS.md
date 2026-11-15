@@ -1,6 +1,8 @@
 # Engineer implementation status
 
-Current batch: **0.3.11 / E3.M5 STEP interoperability**, plus the standalone Bottom Dependencies panel driven by Parameter Manager selection. E3.M4/0.3.10 was delivered publicly and accepted by the owner. Read [M5 scope and demo checks](docs/E3_M5_INTEROPERABILITY.md). Complete exact-head acceptance/public installation are required; owner M5 acceptance is pending. Main/stable remain 0.2.6.
+Current batch: **0.3.12 / E3.M6**, with fresh-project STEP correction, generic native/STEP Import/Export, actual AP203/AP214/AP242 selection, semantic reference visibility, production material/mass and recovery/performance acceptance. Read docs/E3_M6_PRODUCTION.md. M5 was delivered publicly; owner reported its fresh-project import regression. M6/E3 owner review is pending. Main/stable remain 0.2.6.
+
+Previous batch: **0.3.11 / E3.M5 STEP interoperability**, plus the standalone Bottom Dependencies panel driven by Parameter Manager selection. E3.M4/0.3.10 was delivered publicly and accepted by the owner. Read [M5 scope and demo checks](docs/E3_M5_INTEROPERABILITY.md). Complete exact-head acceptance/public installation are required; owner M5 acceptance is pending. Main/stable remain 0.2.6.
 
 
 Previous M4 implementation: **0.3.10 / E3.M4 parameter and feature dependency diagnostics**. Full typed operation-field queries/bindings, causal dependent/source traces at working or retained versions, read-only source impact and typed rejection, exact Undo/Redo; safe formula catalogue with shared blue function autocomplete; directed distance/angle and two-distance chamfer; short selection labels and physical row hover. See [scope and verification](docs/E3_M4_DEPENDENCIES.md). M4 exact CI and public installation passed; owner accepted.

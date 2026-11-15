@@ -7,3 +7,5 @@ export function datumSegments(datum,extent){
  const points=[[-1,-1],[1,-1],[1,1],[-1,1]].map(([a,b])=>world(u.map((x,i)=>(x*a+v[i]*b)*extent)));
  return points.map((p,i)=>[p,points[(i+1)%4]]);
 }
+
+export function datumDefaultVisible(d){return d.role==='origin'||!!d.referenceFeature&&!d.parentId;}

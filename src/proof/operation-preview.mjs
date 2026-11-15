@@ -1,3 +1,4 @@
+import {importNative} from '../native/exchange.mjs';
 import {prepareStepImport} from '../step/exchange.mjs';
 import {buildProof} from './kernel.mjs';
 import {regenerateExtrusions} from '../extrusion/kernel.mjs';
@@ -15,6 +16,7 @@ async function extrusion(document,operation,state){
  return [{id:operation.inputs.featureId,kind:({add:'unite',cut:'subtract',intersect:'intersect',none:'none','new-body':'none'})[state?.effectiveOperation??document.native.graph.features.find(f=>f.id===operation.inputs.featureId).data.operation],mesh:result.toolMesh,position:[0,0,0],quaternion:[0,0,0,1]}];
 }
 export async function buildOperationPreview({document,sourceDocument,previewOperation,rollbackAt=null}){
+ if(previewOperation.name==='cad.document.import.v1'){const value=await importNative(document,previewOperation.inputs.text),candidate=await buildProof(value,{viewportOnly:true});return {...candidate,translation:{format:'native',features:value.native.graph.features.length},operationState:{featureId:previewOperation.inputs.importId,inputSignature:JSON.stringify(previewOperation.inputs)}};}
  if(previewOperation.name==='cad.step.import.v1'){const prepared=await prepareStepImport(document,previewOperation.inputs),candidate=await buildProof(prepared.document,{viewportOnly:true}),base=await buildProof(sourceDocument,{viewportOnly:true}),native=await regenerateExtrusions(prepared.document,{featureId:previewOperation.inputs.featureId,includeToolMesh:true});return {...candidate,translation:prepared.translation,operationState:{featureId:previewOperation.inputs.featureId,inputSignature:JSON.stringify(previewOperation.inputs)},sourceInputHash:base.inputHash,scene:{...base.scene,previewLayers:[{id:previewOperation.inputs.featureId,kind:'none',mesh:native.toolMesh,position:[0,0,0],quaternion:[0,0,0,1]}]}};}
  const produce=producers.get(previewOperation.name);
  check(produce,'UnsupportedCapability','This operation has no exact preview producer.');

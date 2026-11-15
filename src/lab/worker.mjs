@@ -1,3 +1,4 @@
+import {importNative} from '../native/exchange.mjs';
 import {readStep,prepareStepImport,exportStepDocument} from '../step/exchange.mjs';
 import {buildOperationPreview} from '../proof/operation-preview.mjs';
 import {regenerateExtrusions} from '../extrusion/kernel.mjs';
@@ -19,6 +20,7 @@ process.on('message',async message=>{
   try{
     let result;
     if(message.kind==='step-analyze'){const r=await readStep(message.payload.source,{orientation:message.payload.orientation});result={translation:r.report};r.shape.delete();}
+    else if(message.kind==='native-import'){const candidate=await importNative(message.payload.before,message.payload.input.text);result={...(await verifyCommand({before:message.payload.before,after:candidate})),candidate};}
     else if(message.kind==='step-import'){const prepared=await prepareStepImport(message.payload.before,message.payload.input);result={...(await verifyCommand({before:message.payload.before,after:prepared.document})),candidate:prepared.document,translation:prepared.translation};}
     else if(message.kind==='step-export')result=await exportStepDocument(message.payload.document,message.payload.input);
     else if(message.kind==='geometry')result=await geometryExperiment(message.payload.spec,{includeStep:!!message.payload.includeStep});

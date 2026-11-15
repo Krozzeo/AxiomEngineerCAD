@@ -60,3 +60,5 @@ References: [Master §21](../../MASTER_DESIGN.md#21-risks-experiments-and-archit
 - [ADR026 - Operation layers and sketch selection](ADR-026-OPERATION-LAYERS-AND-SKETCH-SELECTION.md): owner-requested 0.1.11 refinement, focused numerical/human UI verification; exact delivery and owner acceptance are separate.
 
 - [ADR027 - Extrusion refinement and sketch references](ADR-027-EXTRUSION-REFINEMENT-AND-SKETCH-REFERENCES.md): E1.M5 consolidation, preserving legacy source identities and atomically binding operation depth.
+
+- [ADR028 — Production acceptance and exchange](ADR-028-PRODUCTION-EXCHANGE.md): E3.M6 candidate; native copies, explicit STEP protocols and nominal material/mass.

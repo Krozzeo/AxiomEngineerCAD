@@ -1,6 +1,8 @@
 # Compact Engineer context
 
-Current batch: **0.3.11 / E3.M5 STEP interoperability**, plus the standalone Bottom Dependencies panel driven by Parameter Manager selection. E3.M4/0.3.10 was delivered publicly and accepted by the owner. Read [M5 scope and demo checks](E3_M5_INTEROPERABILITY.md). Complete exact-head acceptance/public installation are required; owner M5 acceptance is pending. Main/stable remain 0.2.6.
+Current batch: **0.3.12 / E3.M6**, with fresh-project STEP correction, generic native/STEP Import/Export, actual AP203/AP214/AP242 selection, semantic reference visibility, production material/mass and recovery/performance acceptance. Read E3_M6_PRODUCTION.md. M5 was delivered publicly; owner reported its fresh-project import regression. M6/E3 owner review is pending. Main/stable remain 0.2.6.
+
+Previous batch: **0.3.11 / E3.M5 STEP interoperability**, plus the standalone Bottom Dependencies panel driven by Parameter Manager selection. E3.M4/0.3.10 was delivered publicly and accepted by the owner. Read [M5 scope and demo checks](E3_M5_INTEROPERABILITY.md). Complete exact-head acceptance/public installation are required; owner M5 acceptance is pending. Main/stable remain 0.2.6.
 
 
 Start with `npm run context`. `PROJECT_STATE.json` records the reviewed Master hash (UTF-8 with CRLF normalized to LF) and last immutable delivery. A matching hash permits targeted reading under AGENTS1; a mismatch requires full design review. The Master remains authoritative. A brief is navigation, never proof of implementation.
