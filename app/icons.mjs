@@ -30,6 +30,7 @@ Object.assign(paths,{
 });
 paths['constraint-equation-tangent']=paths['constraint-tangent'];
 export function icon(name){
+ if(name==='open')name='folder-open';
  if(['boolean-unite','boolean-subtract','boolean-intersect'].includes(name)){
   const region={'boolean-unite':'M2 2H15V7H22V21H9V23H2Z','boolean-subtract':'M2 2H15V7H9V21H15V23H2Z','boolean-intersect':'M9 7H15V21H9Z'}[name];
   return `<svg viewBox="0 0 24 25" width="18" height="18" aria-hidden="true"><path d="${region}" fill="#96cf50"/><path d="M2 2H15V23H2ZM9 7H22V21H9Z" fill="none" stroke="#fff" stroke-width="1.2"/></svg>`;
