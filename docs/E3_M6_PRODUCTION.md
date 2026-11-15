@@ -1,6 +1,6 @@
 # E3.M6 — Production part acceptance and exchange corrections
 
-Candidate 0.3.12, PR19. Main/stable stay 0.2.6. E3 closure and M6 owner acceptance remain pending. This is a reviewable CAD part acceptance profile, not a manufacturing release or general assembly implementation.
+Correction candidate 0.3.13, PR19. The owner authorized E3 stable integration and E4.M1 start. Main remains 0.2.6 until this candidate passes the complete delivery gates. This is a reviewable CAD part acceptance profile, not a manufacturing release or general assembly implementation.
 
 ## Owner corrections and root cause
 
@@ -33,3 +33,11 @@ Initial exact volume: 16272 − 6/√3 + 291π mm³. At DesignSize 30: 16308 −
 `scripts/measure-production.mjs` records five warm regenerations, three fresh-process native validations and worker lifetime peak RSS. Profile budgets: warm p95 < 5000 ms; cold p95 < 20000 ms, retaining the actual worker deadline. Initial local Windows/Node24.21 measurements: warm p95 292.6 ms; cold p95 1068.5 ms; peak RSS about 247 MB. CI measurements are stored per OS; these are environment-specific measurements, not universal hardware promises or an OS memory quota.
 
 Final exact-head CI, immutable publication and actual public Platform installation evidence belongs in delivery artifacts and PR metadata. This source report does not claim those gates passed before they run.
+
+## 0.3.13 exchange and material correction
+
+File → Import/Export and Panels → Import/Export open or focus the same persistent dock panels, default Right. They can be moved/separated through the existing dock controls; Model remains visible during preview. Closing Import cancels/drains its pending preview before restoring the working model. Original imported STEP download is a switch in Export, with a source chooser, preserving exact original bytes. File Import and Document properties share their Panels icons. Navigation and its existing CAD/trackpad control/help moved from Tools to View ribbon.
+
+STEP metadata accepts arbitrary whitespace around nested unit/schema lists. If a 3D geometric representation has no explicit length unit, Analyze asks for MM/CM/M/INCH. A subsequent Analyze uses a translation-only representation context with exact SI/conversion-based length units. Original source bytes/hash are unchanged. The explicit choice is retained on the import feature and in its translation report and replayed during regeneration. A choice cannot override existing declared units. Complex entities preserve STEP alphabetical component order. Native tests verify known analytic volume at each scale, persisted choice and replay; actual browser tests verify the prompt, disabled Apply before choice, read-only preview and cancellation. No claim is made about the owner's unavailable SolidWorks file.
+
+Material density accepts positive finite integers and fractions (`step=any`), with explicit English errors for empty/zero/negative values. The old artificial 100000 upper bound is removed from UI/command/native validation consistently. Apply is serialized while running. UI acceptance includes 100, 0.125, 1000001 and the demo's 2700 kg/m³; invalid inputs preserve the committed document.

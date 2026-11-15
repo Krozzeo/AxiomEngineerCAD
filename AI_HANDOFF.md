@@ -1,6 +1,6 @@
 # Engineer handoff — E3.M5 STEP / 0.3.11 candidate
 
-Current batch: **0.3.12 / E3.M6**, with fresh-project STEP correction, generic native/STEP Import/Export, actual AP203/AP214/AP242 selection, semantic reference visibility, production material/mass and recovery/performance acceptance. Read docs/E3_M6_PRODUCTION.md. M5 was delivered publicly; owner reported its fresh-project import regression. M6/E3 owner review is pending. Main/stable remain 0.2.6.
+Current batch: **0.3.13 / E3 closure corrections**. Owner explicitly authorized corrected stable integration into main, followed by E4.M1. Import/Export are Right dock panels; missing STEP units require an explicit retained source-unit choice, valid spaced metadata is recognized; positive finite material density accepts integers/fractions with English validation; Navigation is in the View ribbon. Read docs/E3_M6_PRODUCTION.md. Exact-head PR/main CI, stable publication and real public installation remain delivery gates; none are claimed by this source update. E4.M1 has not yet been implemented.
 
 Previous batch: **0.3.11 / E3.M5 STEP interoperability**, plus the standalone Bottom Dependencies panel driven by Parameter Manager selection. E3.M4/0.3.10 was delivered publicly and accepted by the owner. Read [M5 scope and demo checks](docs/E3_M5_INTEROPERABILITY.md). Complete exact-head acceptance/public installation are required; owner M5 acceptance is pending. Main/stable remain 0.2.6.
 

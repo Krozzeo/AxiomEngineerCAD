@@ -270,7 +270,7 @@ export class CadAssistant {
         if(this.pending){Object.assign(this.pending.history,{status:'superseded',completedAt:new Date().toISOString()});this.pending=null;}
         const share=input.share===true;
         this.add('user',input.text,share);
-        const allowed=['model','drawing','history','inspector','parameters','dependencies','properties','activity','diagnostics','api','assistant'];
+        const allowed=['model','drawing','history','inspector','parameters','dependencies','properties','activity','diagnostics','api','assistant','import','export'];
         const tabs=Array.isArray(input.tabs)?input.tabs.filter(tab=>allowed.includes(tab)):[];
         const context={tabs,focus:allowed.includes(input.focus)?input.focus:null,share};
         if(share){
