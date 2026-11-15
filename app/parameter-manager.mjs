@@ -28,7 +28,7 @@ async function diagnostics(graph,ctx){
 }
 async function refresh({force=false,revision=null}={}){
  if(loading){await refreshTask;if(force||revision!==null&&editContext?.expectedDocumentRevision!==revision)return refresh({force});return;}
- if(draft&&!force){message('Your row draft is preserved. Press Enter to validate it or Escape to discard it.');return;}
+ if(draft&&!force){if(panel.querySelector('.parameter-footer').dataset.status!=='error')message('Your row draft is preserved. Press Enter to validate it or Escape to discard it.');return;}
  loading=true;panel.inert=true;panel.setAttribute('aria-busy','true');refreshTask=(async()=>{try{
   const source=await api('document'),ctx=await context(),next=await Promise.all(['parameters','dimensions','features','constraints'].map(c=>read(c,ctx)));
   if(panel.getBoundingClientRect().width)await diagnostics(source.document.native?.graph,ctx);
