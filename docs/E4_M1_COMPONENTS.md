@@ -1,19 +1,35 @@
-# E4.M1 implementation start
+# E4.M1 — shared components and in-place modeling
 
-The owner authorized starting E4.M1 after the corrected E3 stable delivery. This first native block reuses native1 definitions/instances rather than cloning B-Rep per occurrence. A component hierarchy composes local rigid placements into occurrence-world frames and keeps authoritative geometry identities. Draft graph mutations clone working state and run complete structural validation before returning; immutable versions/publications are never rewritten. Existing native cycle, identity, placement and occurrence expansion bounds remain authoritative.
+Candidate 0.4.0 reuses the native1 graph. This source implements the M1 scope; complete exact-head acceptance and public experimental installation are mandatory before reporting delivery. Owner acceptance is separate. Main/stable remains 0.3.13.
 
-This is a development start, not a completed or installable M1 delivery. Next: definition-local feature validation/regeneration, revision-checked semantic commands, shared-definition geometry consumers, in-place context routing, Components Manager/ribbon controls, actual picking/editing, historical snapshot numerical checks, demo, exact Windows/Linux/browser acceptance and public experimental installation. E4.M2 mates and E4.M4 publication policies remain separate milestones.
+## Delivered behavior in the candidate
 
-Acceptance for the first block must exercise repeated definitions and nested quaternion placement against analytic coordinates, invalid-cycle rollback, independent instance removal, and unchanged retained snapshot hashes. No UI or exact assembly-modeling acceptance is claimed by this draft.
+A definition owns one parametric feature history; each instance owns its own rigid placement and owner definition. Repeated assembly groups expand into distinct occurrence paths with composed quaternion transforms. Each reachable definition regenerates once for the display; geometry, sketch and datum picks retain their complete occurrence path. One shared part edit updates every instance without cloning authoritative geometry. Unrelated definitions and retained immutable versions remain unchanged.
 
-Base: main 861e6ff936c77fb3a4eba1d8cdd8239d151c5f73 (0.3.13). Work branch: engineer/e4-m1-components. No M1 installation or milestone completion is claimed.
+The existing sketch, feature, reference and material reducers execute in a transient definition context and restore the document root before returning. Exact regeneration filters the owned feature history; global parameters and their expressions are retained. Validation remains global, including IDs, feature ownership, cycles, normalized quaternions and dependency/version integrity. Edit rollback suppresses later features only in the edited definition. Operation previews use exact tool geometry positioned at every shared occurrence, while the rest of the assembly stays visible.
 
-## Current evidence and next integration points
+Revision-checked tools: `component.inspect`, `component.definition.create/remove`, `component.instance.insert/update/remove`. Model mutations retain existing human/agent authority, isolated proposals, numerical verification, atomic commit, history/undo and reviewed Apply. Agents cannot mutate MAIN or apply their own proposals. Removing an instance retains its definition; deleting the root or an in-use definition is refused.
 
-The first block passes three analytic native tests and the complete local 341-test native suite on Windows/Node24.21 (54.2 s). This is structural/domain evidence only. It does not establish assembled B-Rep, GPU picking, in-place editing or user UI completion.
+## Demo review
 
-`src/components/hierarchy.mjs` composes quaternion placements, expands occurrence paths and offers validated draft definition/instance create, move/reparent and remove operations. It reuses the native1 graph and the accepted spatial quaternion math. Repeated definitions remain shared; removing an instance preserves its reusable definition. Cycles, duplicate IDs, missing definitions and non-unit rigid transforms reject without source mutation. Retained version bytes/hashes are preserved.
+1. Load **E4.M1 Shared Components** from the experimental installation. Model shows a base, two pins in repeated nested groups and an independent stop. Only this demo is advertised; historical fixtures remain in acceptance tooling.
+2. Open Manager / Components. Expand the repeated Pin groups. Each contains an occurrence of Shared pin, backed by one definition.
+3. Double click a Shared pin occurrence, or select it and choose Assembly / Edit component. Features now shows that definition. The context button changes to Exit component.
+4. Double click the pin extrusion, change Depth and press Enter. The preview appears at both shared pin positions. Apply updates both pins; the independent stop/base stay unchanged.
+5. Double click the pin sketch. Its plane/camera and pointer coordinates use the selected occurrence placement. Other components remain visible; only this part's downstream geometry rolls back. Create/edit sketch entities, then Exit Sketch and Exit component.
+6. Assembly / Insert or manage components opens the component Inspector. Choose a definition and owner, position and XYZ rotation, then Insert instance. No feature geometry is copied. Select an existing occurrence in Components to update its local placement, reparent or remove it.
+7. Create a Part or Assembly group definition by name, insert it, enter it and create a sketch/extrusion using the normal tools. Unused definitions remain listed and reusable. Delete unused definition refuses one that still has consumers.
+8. Undo/Redo component changes, Save, close/reopen, and inspect retained Versions. The old saved snapshot preserves its prior geometry/hierarchy.
 
-Next integration must address the existing primary-part guards in sketch/extrusion/reference validation, definition-local exact regeneration and verification, occurrence-aware model scene/selection, revision-checked semantic commands and in-place editor context. Do not simply remove the guards and feed all definitions into the existing part history. The old geometry-probe viewport supports only bounded direct local occurrences and is not evidence of nested parametric part modeling. Parameter scope, rollback, source references and immutable effective snapshots must remain coherent. Complete the Components tree/ribbon/Inspector, real edit-and-repeat demo and negative/recovery paths before declaring M1 delivered.
+Placement fields are local to the selected owner. Moving a shared group instance affects only its subtree occurrence. Editing the group definition's child placements affects every occurrence of that group.
 
-The corrected base is now publicly validated stable 0.3.13 (main 861e6ff936c77fb3a4eba1d8cdd8239d151c5f73; main acceptance 43760510442, publication 43761813724). First hierarchy source commit: 297c086. The exact native library passed its three focused cases plus the complete 341-test local native suite; no M1 UI/GPU or assembled B-Rep acceptance is claimed. The later startup-timeout-only local attempt, its passing focused check and unchanged full rerun are preserved in external delivery evidence.
+## Evidence and boundaries
+
+`tests/e4-components-start.test.mjs`: analytic nested quaternion composition, independent placement/removal, cycle/identity/transform rejection and immutable snapshot preservation.
+`tests/e4-components-modeling.test.mjs`: actual B-Rep volumes for two shared nested occurrences and an unrelated part, exact shared edit/preview, semantic paths, definition-local rollback and retained snapshot hashes.
+`tests/e4-components-commands.test.mjs`: registered revision-checked commands, agent MAIN denial, atomic cycle rejection, read-only occurrence paging and undo without persisted-file mutation.
+`tests/browser-e4-m1.mjs`: actual current demo through the Platform/editor, two-occurrence exact preview, Apply, in-place sketch world frame with other parts visible, reuse/placement insertion and screenshot.
+
+Native1 resource bounds remain explicit and fail safely. This milestone adds local in-document sharing and grouping. Mates follow E4.M2; cross-component associative references and published Latest/Pinned consumers are not enabled by this in-place context. Assembly physical/interference checks and assembly drawing/export are later scope. Existing supported part drawings and historical foundation fixtures retain their previous paths. No manufacturing-release claim is made.
+
+Final acceptance/release run IDs, immutable ZIP hash and actual public install/GPU proof belong in the delivery artifact tied to the accepted commit, avoiding a documentation-only rebuild after acceptance.

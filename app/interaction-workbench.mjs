@@ -84,3 +84,5 @@ document.addEventListener('keydown',event=>{if(['F6','F7'].includes(event.key)&&
 canvas.addEventListener('dblclick',async event=>{if(event.button!==0||window.engineerSketch?.view()||!v.proof)return;const rect=canvas.getBoundingClientRect(),hit=await r.pick((event.clientX-rect.left)*canvas.width/rect.width,(event.clientY-rect.top)*canvas.height/rect.height),sketch=r.scene?.sketches?.find(s=>s.selectionId===hit.selectionId);if(sketch)window.engineerSketch.open(sketch.id).catch(error=>{$('wb-hint').textContent=error.message;});});
 
 window.engineerSketchReferences=ids=>{const key=ids.join(',');if(r.sketchReferenceKey===key)return;r.sketchReferenceKey=key;r.sketchReferenceIds=ids;paint();};
+
+await import('./components-workbench.mjs');

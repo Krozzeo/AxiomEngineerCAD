@@ -1,7 +1,7 @@
 import {isSolidFeature,STEP_TYPE} from '../step/profile.mjs';
 import {check} from '../errors.mjs';
 export const EXTRUSION_TYPE='sketch-extrusion',EXTRUSION_PROFILE='E1.M5-extrusion/1';
-export const hasExtrusions=value=>(value.native?.graph??value.graph)?.features.some(isSolidFeature)??false;
+export const hasExtrusions=value=>(value.native?.graph??value.graph)?.features.some(f=>isSolidFeature(f)&&f.definitionId===(value.native?.graph??value.graph).primaryDefinitionId)??false;
 export const combines=operation=>['add','cut','intersect','none'].includes(operation);
 export function extrusionDependencies(data){
  const targets=[data.axisReference?.target,data.repeat?.reference?.target,data.limits?.start.reference?.target,data.limits?.end?.reference?.target].filter(Boolean);

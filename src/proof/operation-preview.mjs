@@ -1,3 +1,5 @@
+import {definitionContent} from '../components/context.mjs';
+import {componentTree} from '../components/hierarchy.mjs';
 import {importNative} from '../native/exchange.mjs';
 import {prepareStepImport} from '../step/exchange.mjs';
 import {buildProof} from './kernel.mjs';
@@ -10,10 +12,11 @@ import {check} from '../errors.mjs';
 const producers=new Map([
  ['cad.extrusion.create.v1',extrusion],['cad.extrusion.update.v1',extrusion]
 ]);
-async function extrusion(document,operation,state){
- const result=await regenerateExtrusions(document,{featureId:operation.inputs.featureId,includeToolMesh:true,previewBooleanFeatureId:operation.inputs.featureId});
- if(result.finishingLayers)return result.finishingLayers.map((layer,index)=>({id:operation.inputs.featureId+'-'+index,kind:layer.kind,mesh:layer.mesh,position:[0,0,0],quaternion:[0,0,0,1]}));
- return [{id:operation.inputs.featureId,kind:({add:'unite',cut:'subtract',intersect:'intersect',none:'none','new-body':'none'})[state?.effectiveOperation??document.native.graph.features.find(f=>f.id===operation.inputs.featureId).data.operation],mesh:result.toolMesh,position:[0,0,0],quaternion:[0,0,0,1]}];
+async function extrusion(document,operation,state,rollbackAt){
+ const definitionId=document.native.graph.features.find(f=>f.id===operation.inputs.featureId).definitionId,scoped=definitionContent(document,definitionId);const result=await regenerateExtrusions(executionContent(scoped,{rollbackAt}),{featureId:operation.inputs.featureId,includeToolMesh:true,previewBooleanFeatureId:operation.inputs.featureId});
+ const placements=[],walk=n=>{if(n.definitionId===definitionId)placements.push(n.placement);n.children.forEach(walk);};walk(componentTree(document));
+ if(result.finishingLayers)return placements.flatMap(p=>result.finishingLayers.map((layer,index)=>({id:operation.inputs.featureId+'-'+index,kind:layer.kind,mesh:layer.mesh,quaternion:p.quaternion,position:p.position})));
+ return placements.map(p=>({id:operation.inputs.featureId,kind:({add:'unite',cut:'subtract',intersect:'intersect',none:'none','new-body':'none'})[state?.effectiveOperation??document.native.graph.features.find(f=>f.id===operation.inputs.featureId).data.operation],mesh:result.toolMesh,position:p.position,quaternion:p.quaternion}));
 }
 export async function buildOperationPreview({document,sourceDocument,previewOperation,rollbackAt=null}){
  if(previewOperation.name==='cad.document.import.v1'){const value=await importNative(document,previewOperation.inputs.text),candidate=await buildProof(value,{viewportOnly:true});return {...candidate,translation:{format:'native',features:value.native.graph.features.length},operationState:{featureId:previewOperation.inputs.importId,inputSignature:JSON.stringify(previewOperation.inputs)}};}
@@ -22,5 +25,5 @@ export async function buildOperationPreview({document,sourceDocument,previewOper
  check(produce,'UnsupportedCapability','This operation has no exact preview producer.');
  const candidate=await buildProof(document,{viewportOnly:true,rollbackAt,previewBooleanFeatureId:previewOperation.inputs.featureId}),base=await buildProof(sourceDocument,{viewportOnly:true,rollbackAt,beforeOperation:previewOperation.name==='cad.extrusion.update.v1'});
  const operationState={...candidate.operationState,featureId:previewOperation.inputs.featureId,inputSignature:JSON.stringify(previewOperation.inputs)};
- return {...candidate,operationState,sourceInputHash:base.inputHash,scene:{...base.scene,previewLayers:await produce(executionContent(document,{rollbackAt}),previewOperation,operationState)}};
+ return {...candidate,operationState,sourceInputHash:base.inputHash,scene:{...base.scene,previewLayers:await produce(document,previewOperation,operationState,rollbackAt)}};
 }

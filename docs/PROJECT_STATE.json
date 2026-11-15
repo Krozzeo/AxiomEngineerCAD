@@ -8,9 +8,9 @@
   },
   "milestone": {
     "current": "E4.M1",
-    "status": "First native hierarchy block started; not a completed or installable milestone",
-    "ownerAcceptance": "in development; no completed M1 requested for acceptance",
-    "next": "Definition-local exact regeneration and verification, semantic commands, Components UI and in-place editing, then actual demo/acceptance"
+    "status": "Implemented candidate 0.4.0; exact acceptance and public experimental delivery gates pending",
+    "ownerAcceptance": "pending owner review after installable delivery",
+    "next": "Pass exact-head Windows/Linux native/browser/PDF/STEP; publish experimental and verify actual public Platform installation/GPU"
   },
   "lastDelivered": {
     "version": "0.3.13",
@@ -42,7 +42,11 @@
     "currentCadScope": "docs/E4_M1_COMPONENTS.md",
     "deliveryGate": "docs/MILESTONE_DELIVERY.md"
   },
-  "candidate": null,
+  "candidate": {
+    "version": "0.4.0",
+    "branch": "engineer/e4-m1-components",
+    "status": "source frozen for complete acceptance; immutable release provenance supplies exact commit and CI IDs"
+  },
   "previousDelivered": {
     "version": "0.2.5",
     "commit": "b8bd3c7b99cb0d7a4a8db208608389b78237c1b7",
@@ -119,8 +123,8 @@
   "development": {
     "branch": "engineer/e4-m1-components",
     "firstBlockCommit": "297c086",
-    "scope": "Validated structural hierarchy library; no completed M1, component UI or M1 release claimed",
-    "nativeTests": 341
+    "scope": "Shared local parametric definitions, nested instances, transactional semantic tools, in-place Model/Components UI and current demo",
+    "focusedEvidence": "Exact geometry, shared preview, unchanged snapshots/unrelated definitions; permission/cycle/stale/undo; actual Chrome/NVIDIA UI"
   },
   "previousStableDelivered": {
     "version": "0.2.6",
