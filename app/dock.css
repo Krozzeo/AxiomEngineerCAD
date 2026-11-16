@@ -13,3 +13,7 @@ html,body{height:100%;width:100%;margin:0;overflow:hidden}.docked-cad{display:fl
 .separated-panel>.topbar>*{display:none!important}.separated-panel>.topbar>.panel-return,.separated-panel>.topbar>.panel-label{display:flex!important}
 
 .exchange-content{padding:14px;display:flex;flex-direction:column;gap:12px;min-width:0}.exchange-content label,.exchange-content section{display:flex;flex-direction:column;gap:6px}.exchange-content input,.exchange-content select{width:100%;box-sizing:border-box;min-width:0}.exchange-content .exchange-toggle{flex-direction:row;align-items:center}.exchange-toggle input{width:auto}.exchange-content p{overflow-wrap:anywhere}.exchange-content [hidden]{display:none!important}.exchange-content .step-heading{display:flex;justify-content:space-between;align-items:center}.exchange-content h2{font-size:16px;margin:0}
+
+.component-controls{padding:12px;overflow:auto;max-height:45vh;background:var(--panel,#101c2a);border:1px solid #39536b}.component-controls label{display:inline-flex;flex-direction:column;margin:4px}.component-placement{display:flex;flex-wrap:wrap}.component-placement input{width:90px}.component-controls button{margin:4px}
+
+#wb-tree-items details details{margin-left:12px}#wb-tree-items summary{display:flex;align-items:center}.component-controls{max-height:none}.component-controls select{background:#0b1622;color:inherit;border:1px solid #39536b;padding:5px}

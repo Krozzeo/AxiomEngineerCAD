@@ -1,3 +1,4 @@
+import {definitionContent} from '../components/context.mjs';
 import {buildProof} from '../proof/kernel.mjs';
 import {externalGeometry} from './external-geometry.mjs';
 import {planeFrame} from './profile.mjs';
@@ -14,7 +15,7 @@ sourceSketch.data.constraints=[];
 for(const key of ['patterns','mirrors','conversions'])delete sourceSketch.data[key];
 sourceSketch.dependsOn=sourceSketch.data.plane.kind==='face'?[sourceSketch.data.plane.producerId]:[];
 for(const p of referenceDocument.native.graph.parameters)if(p.targets)p.targets=p.targets.filter(t=>t.sketchId!==f.id);
-const proof=await buildProof(referenceDocument,{viewportOnly:true,rollbackAt:f.id}),frame=planeFrame(f,c.graph);
+const localDocument=definitionContent(referenceDocument,f.definitionId);localDocument.native.graph.instances=[];const proof=await buildProof(localDocument,{viewportOnly:true,rollbackAt:f.id}),frame=planeFrame(f,c.graph);
 for(const e of f.data.entities.filter(e=>e.external)){const expected=externalGeometry(proof.scene,e.external,frame);
 check(e.type===expected.type&&(e.construction||e.converted),'LostReference','External reference type changed.');
 for(const key of ['point','a','b','center','radius'])if(expected[key]!==undefined){const a=Array.isArray(expected[key])?expected[key]:[expected[key]],b=Array.isArray(e[key])?e[key]:[e[key]];

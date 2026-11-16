@@ -1,3 +1,4 @@
+import {definitionGraph} from '../components/context.mjs';
 import {readStep,writeStep} from '../step/exchange.mjs';
 import {STEP_TYPE,isSolidFeature,validateStepFeature} from '../step/profile.mjs';
 import {surfaceReference} from '../reference/surfaces.mjs';
@@ -22,7 +23,7 @@ function drawing(loop){if(loop.kind==='circle')return cad.drawCircle(loop.radius
 
 function capMatches(shape,frame){return shape.faces.filter(face=>face.geomType==='PLANE'&&dot(face.normalAt().toTuple(),frame.normal)>1-1e-9&&Math.abs(dot(sub(face.center.toTuple(),frame.origin),frame.normal))<EPS);}
 function capLineage(builder,previous,output){if(!previous.element)return previous;const modified=builder.Modified(previous.element.wrapped);try{const count=modified.Size();if(count>1)return {state:'AmbiguousReference',candidates:count};if(count===1){const descendant=cad.cast(modified.First()),matches=output.faces.filter(face=>face.isSame(descendant));return matches.length===1?{state:'ResolvedReidentified',candidates:1,element:matches[0]}:{state:matches.length?'AmbiguousReference':'LostReference',candidates:matches.length};}if(builder.IsDeleted(previous.element.wrapped))return {state:'LostReference',candidates:0};const matches=output.faces.filter(face=>face.isSame(previous.element));return matches.length===1?{state:previous.state,candidates:1,element:matches[0]}:{state:matches.length?'AmbiguousReference':'LostReference',candidates:matches.length};}finally{modified.delete();}}
-export async function regenerateExtrusions(value,{includeMesh=false,includeToolMesh=false,featureId,inspectShape,previewBooleanFeatureId=null}={}){const graph=value.native?.graph??value.graph,oc=await initializeKernel(),memo=new Map(),retained=[];try{const validateSolid=shape=>{
+export async function regenerateExtrusions(value,{includeMesh=false,includeToolMesh=false,featureId,inspectShape,previewBooleanFeatureId=null}={}){const sourceGraph=value.native?.graph??value.graph,graph=definitionGraph(sourceGraph,sourceGraph.features.find(f=>f.id===featureId)?.definitionId??sourceGraph.primaryDefinitionId,{local:true}),oc=await initializeKernel(),memo=new Map(),retained=[];try{const validateSolid=shape=>{
  const analyzer=new oc.BRepCheck_Analyzer(shape.wrapped,true,false,true);let valid;
  try{valid=analyzer.IsValid();}finally{analyzer.delete();}
  check(valid&&!shape.isNull&&shape.solids.length>0,'InvalidGeometry','The feature must produce valid closed solids.');
