@@ -1,11 +1,10 @@
-# Engineer handoff — E3.M5 STEP / 0.3.11 candidate
+# Engineer handoff — E4.M1 component hierarchy development
 
-Current batch: **0.3.13 / E3 closure corrections**. Owner explicitly authorized corrected stable integration into main, followed by E4.M1. Import/Export are Right dock panels; missing STEP units require an explicit retained source-unit choice, valid spaced metadata is recognized; positive finite material density accepts integers/fractions with English validation; Navigation is in the View ribbon. Read docs/E3_M6_PRODUCTION.md. Exact-head PR/main CI, stable publication and real public installation remain delivery gates; none are claimed by this source update. E4.M1 has not yet been implemented.
+Current work: **0.4.1 / E4.M1 Project workspace structural extension**, branch `engineer/project-workspace`, based on delivered 0.4.0 (PR22). Implementation includes independent files/tabs, actual Game Engine Project browser, dependency-backed instances and source editing, component visibility/transparency, Insert/Move/grouping and immutable branch/version UI. Focused domain and Chrome/NVIDIA checks pass; complete exact-head acceptance/public installation is still pending. Read [scope/demo checks](docs/E4_M1_PROJECT_WORKSPACE.md) and [progress](docs/PROJECT_WORKSPACE_PROGRESS.md). No main/stable merge is authorized.
+Previous batch: **0.3.11 / E3.M5 STEP interoperability**, plus the standalone Bottom Dependencies panel driven by Parameter Manager selection. E3.M4/0.3.10 was delivered publicly and accepted by the owner. Read [M5 scope and demo checks](docs/E3_M5_INTEROPERABILITY.md). Complete exact-head acceptance/public installation are required; owner M5 acceptance is pending. At that historical delivery, main/stable were 0.2.6.
 
-Previous batch: **0.3.11 / E3.M5 STEP interoperability**, plus the standalone Bottom Dependencies panel driven by Parameter Manager selection. E3.M4/0.3.10 was delivered publicly and accepted by the owner. Read [M5 scope and demo checks](docs/E3_M5_INTEROPERABILITY.md). Complete exact-head acceptance/public installation are required; owner M5 acceptance is pending. Main/stable remain 0.2.6.
 
-
-0.3.9 was publicly installed and verified at 2bab5cdb3ce89cbe32001dbe6ad1478a41cd89cb. The owner requested M4 with functions, chamfer modes and selection-table feedback. Read docs/E3_M4_DEPENDENCIES.md for semantics, compatibility, tests and manual checks. Main/stable remain 0.2.6.
+0.3.9 was publicly installed and verified at 2bab5cdb3ce89cbe32001dbe6ad1478a41cd89cb. The owner requested M4 with functions, chamfer modes and selection-table feedback. Read docs/E3_M4_DEPENDENCIES.md for semantics, compatibility, tests and manual checks. At that historical delivery, main/stable were 0.2.6.
 
 Start with `npm run context`, AGENTS.md, [compact context](docs/PROJECT_CONTEXT.md) and the [integration notes](docs/PRE_E3_ASSISTANT.md). Read docs/E3_M5_INTEROPERABILITY.md for the current batch. E3.M2 construction remains a retained regression fixture.
 

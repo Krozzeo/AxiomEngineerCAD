@@ -8,6 +8,7 @@ export function sketchExternalReferences({getState,getScene,onCandidate}){
  let owner=null;const pending=new Map();
  function sync(){const state=getState();if(owner!==state?.id){pending.clear();owner=state?.id;}if(state)for(const [key,item]of pending)if(item.revision!==state.revision||state.items.some(e=>e.id===item.entity.id))pending.delete(key);return state;}
  function resolve(target,componentRole){
+  if(window.engineerLocalComponentTarget)target=window.engineerLocalComponentTarget(target);if(!target)return null;
   const state=sync();if(!state)return null;
   const clean=Object.fromEntries(fields.map(k=>[k,target[k]])),key=identity(clean);
   const existing=state.items.find(e=>e.referenceOnly&&identity(e.external)===key);
