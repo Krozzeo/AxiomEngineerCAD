@@ -4,29 +4,24 @@
     "path": "MASTER_DESIGN.md",
     "version": "0.2",
     "normalization": "utf8-lf",
-    "sha256": "9c2f3857a4a7f1156b1c10b82d2e76680604393b7f5799081f6fd22694502de6"
+    "sha256": "9355662f442d6b766950d147409a523e189bfd9a1826ad1d913b6b1eb7e50a9e"
   },
   "milestone": {
-    "current": "E4.M1",
-    "status": "Implemented candidate 0.4.0; exact acceptance and public experimental delivery gates pending",
-    "ownerAcceptance": "pending owner review after installable delivery",
-    "next": "Pass exact-head Windows/Linux native/browser/PDF/STEP; publish experimental and verify actual public Platform installation/GPU"
+    "current": "E4.M1 structural workspace extension",
+    "status": "0.4.1 workspace candidate:355 native tests and focused actual UI/negative/recovery checks passed; exact CI/public installation pending",
+    "ownerAcceptance": "0.4.0 delivered; requested structural refinements pending",
+    "next": "Complete independent-document workspace, Project/Version UI, component visibility/edit context, file insertion, motion/grouping and exact delivery"
   },
   "lastDelivered": {
-    "version": "0.3.13",
-    "commit": "861e6ff936c77fb3a4eba1d8cdd8239d151c5f73",
-    "pullRequest": 21,
-    "pullRequests": [
-      19,
-      20,
-      21
-    ],
-    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/v0.3.13",
-    "acceptanceRun": 43760510442,
-    "publicationRun": 43761813724,
-    "artifactBytes": 100318549,
-    "artifactSha256": "30b1c79c5dc3439ffdb26e2c7619ecdd08ea6f0e5d07938070ff1655ea7bac3d",
-    "verification": "Owner authorized corrected stable main integration and E4 start. Exact main Windows/Linux 338 native tests each, full browser/PDF/36 independent STEP cases passed. Public Platform 0.1.13 discovery/download/hash/install/activation, Chrome157/NVIDIA, 496 packaged source files matched (455 Windows line-ending normalization only), current M6 plus retained M5/M4/M3/feature/sketch and separate-window regressions passed with zero page errors. No completed M1 or manufacturing release claimed."
+    "version": "0.4.0",
+    "commit": "cc3b6f26f21729e94acab2b757440befe7b02171",
+    "pullRequest": 22,
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-22-cc3b6f26f21729e94acab2b757440befe7b02171",
+    "acceptanceRun": 43781673786,
+    "publicationRun": 43783374127,
+    "artifactBytes": 100339434,
+    "artifactSha256": "afe7d6565ae12659667d9e90201e799f130725c64ae8bc9fbca7653460d89a0d",
+    "verification": "Windows/Linux 344 native each, browser/PDF/36 independent STEP/performance passed. Actual public Platform0.1.13 install/launch and Chrome/NVIDIA M1 demo, 505 source files matched, zero page errors. Main stable remains0.3.13."
   },
   "constraints": [
     "MASTER_DESIGN is intent; implementation requires code and matching evidence.",
@@ -39,13 +34,13 @@
     "implementation": "IMPLEMENTATION_STATUS.md",
     "handoff": "AI_HANDOFF.md",
     "architecture": "docs/architecture/ADR_REGISTER.md",
-    "currentCadScope": "docs/E4_M1_COMPONENTS.md",
+    "currentCadScope": "docs/E4_M1_PROJECT_WORKSPACE.md",
     "deliveryGate": "docs/MILESTONE_DELIVERY.md"
   },
   "candidate": {
-    "version": "0.4.0",
-    "branch": "engineer/e4-m1-components",
-    "status": "source frozen for complete acceptance; immutable release provenance supplies exact commit and CI IDs"
+    "version": "0.4.1",
+    "branch": "engineer/project-workspace",
+    "status": "Implementation frozen for exact-commit acceptance and experimental publication; owner review pending"
   },
   "previousDelivered": {
     "version": "0.2.5",
@@ -121,10 +116,10 @@
     "publicationRun": 43761813724
   },
   "development": {
-    "branch": "engineer/e4-m1-components",
-    "firstBlockCommit": "297c086",
-    "scope": "Shared local parametric definitions, nested instances, transactional semantic tools, in-place Model/Components UI and current demo",
-    "focusedEvidence": "Exact geometry, shared preview, unchanged snapshots/unrelated definitions; permission/cycle/stale/undo; actual Chrome/NVIDIA UI"
+    "branch": "engineer/project-workspace",
+    "base": "cc3b6f26f21729e94acab2b757440befe7b02171",
+    "scope": "docs/requests/PROJECT_WORKSPACE_2026_11_16.md",
+    "design": "docs/architecture/ADR-029-PROJECT-WORKSPACE.md"
   },
   "previousStableDelivered": {
     "version": "0.2.6",

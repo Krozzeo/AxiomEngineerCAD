@@ -36,14 +36,14 @@ try {
     await unavailable.waitForTimeout(1000);assert.ok(failures>0);await unavailable.close();
   }
   report.criteria.push('Unavailable startup context/catalog/document/history services report disconnection without unhandled promise rejection');
-  direct = await context.newPage(); observe(direct); await direct.goto((ready.editorUrl).replace('/#','/?workspace=labs#'));await waitEditorIdle(direct);
+  direct = await context.newPage(); observe(direct); await direct.goto((ready.editorUrl).replace('/#','/?workspace=labs#'));await direct.waitForFunction(()=>!!window.engineerProjectBrowser);assert.equal(await direct.evaluate(()=>window.engineerWorkspace.empty),true);await direct.locator('.wb-menubar details').filter({has:direct.getByText('Create',{exact:true})}).locator('summary').click();await direct.getByRole('button',{name:'New part/assembly',exact:true}).click();await direct.locator('#project-icons .inline-name').fill('Direct lifecycle study');await Promise.all([direct.waitForEvent('load'),direct.locator('#project-icons .inline-name').press('Enter')]);await direct.waitForFunction(()=>window.engineerWorkspace&&!window.engineerWorkspace.empty);await waitEditorIdle(direct);
   await direct.locator('#name:not([disabled])').waitFor();
   assert.equal(await direct.locator('#name').inputValue(), 'Direct lifecycle study');
   await direct.locator('#notes').fill('Provisional design intent: preserve this note after reopening.');
   await direct.locator('#save').click(); await direct.locator('#message').filter({hasText:'projectBusy'}).waitFor();
   await direct.locator('#apply').click(); await direct.locator('#message').filter({hasText:'Properties applied'}).waitFor();
   await direct.locator('#save').click(); await direct.locator('#message').filter({hasText:'Document saved locally'}).waitFor();
-  const nativePath = join(root, 'direct', 'study', 'project.engineer-provisional.json');
+  const nativePath = join(root, 'direct', 'study', 'Direct lifecycle study.engineer.json');
   assert.match(JSON.parse(await readFile(nativePath)).metadata.notes, /preserve this note/);
   report.criteria.push('Direct CLI launches an authenticated browser editor; pending fields block save; applied properties persist');
   await direct.locator('#spatial-lab > summary').click();
@@ -159,6 +159,7 @@ try {
       if(softwareBrowser)constructionContext.on('page',observe);
       report.featureConstructionRenderer={softwareForced:!!softwareBrowser,flags:softwareBrowser?constructionArgs:[]};
       const {verifyComponentsUI}=await import('./browser-e4-m1.mjs');await verifyComponentsUI({context:constructionContext,host,observe,evidence,report});
+      const {verifyProjectWorkspaceUI}=await import('./browser-project-workspace.mjs');await verifyProjectWorkspaceUI({context:constructionContext,host,observe,evidence,report});
       const {verifyM6UI}=await import('./browser-e3-m6.mjs');await verifyM6UI({context:constructionContext,host,observe,evidence,report});
       const {verifyM5UI}=await import('./browser-e3-m5.mjs');await verifyM5UI({context:constructionContext,host,observe,evidence,report});
       const {verifyM4UI}=await import('./browser-m4.mjs');await verifyM4UI({context:constructionContext,host,observe,evidence,report});

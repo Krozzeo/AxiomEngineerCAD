@@ -28,20 +28,19 @@ test('real Platform host create/edit/stale-save/cancel/save/close/reopen and ori
     const res = await fetch(host.origin + '/v1/sessions', {method:'POST', headers:{Origin:host.origin, Authorization:'Bearer ' + host.token, 'Content-Type':'application/json'}, body:JSON.stringify({operationId:randomUUID(), ...data})});
     const value = await res.json(); if (!res.ok) throw Object.assign(Error(value.message), {code:value.code}); return value;
   };
-  const created = await request({action:'create', productId:manifest.productId, name:'Hosted document'});
-  assert.equal(created.state, 'ready'); const path = join(root, created.path), bytes = await readFile(path);
-  const edit = await http(created.editorUrl, 'edit', {expectedRevision:0, metadata:{name:'Hosted edit', notes:'Real IPC adapter'}});
-  assert.equal(edit.status, 200);
-  const status = await request({action:'status', sessionId:created.sessionId}); assert.equal(status.status.dirty, true);
-  await assert.rejects(request({action:'save', sessionId:created.sessionId, expectedRevision:0}), {code:'revisionConflict'});
-  assert.deepEqual(await readFile(path), bytes);
-  assert.equal((await http(created.editorUrl, 'close', {expectedRevision:1, decision:'discard'})).status, 403);
-  const cancel = await request({action:'close', sessionId:created.sessionId, expectedRevision:1, decision:'cancel'}); assert.equal(cancel.cancelled, true);
-  await request({action:'save', sessionId:created.sessionId, expectedRevision:1});
-  await request({action:'close', sessionId:created.sessionId, expectedRevision:1, decision:'save'});
-  const reopened = await request({action:'open', productId:manifest.productId, path:created.path});
-  assert.equal(reopened.status.projectId, created.status.projectId); assert.equal(reopened.status.name, 'Hosted edit');
-  await request({action:'close', sessionId:reopened.sessionId, expectedRevision:1, decision:'discard'});
+  const created=await request({action:'create',productId:manifest.productId,name:'Hosted project'});assert.equal(created.state,'ready');
+  let w=(await http(created.editorUrl,'workspace')).value;assert.equal(w.empty,true);
+  w=(await http(created.editorUrl,'workspace/action',{action:'create',kind:'part',path:'Part.engineer.json',expectedRevision:w.revision})).value;
+  const scoped=async(url,name,input)=>{const current=(await http(url,'workspace')).value;return http(url,name,input,{'X-Engineer-Document':current.activeDocumentId,'X-Engineer-Context':current.contextId});};
+  const path=join(root,created.path,'..','Part.engineer.json'),bytes=await readFile(path);
+  const edit=await scoped(created.editorUrl,'edit',{expectedRevision:0,metadata:{name:'Hosted edit',notes:'Real IPC adapter'}});assert.equal(edit.status,200);
+  const status=await request({action:'status',sessionId:created.sessionId});assert.equal(status.status.dirty,true);const revision=status.status.revision;
+  await assert.rejects(request({action:'save',sessionId:created.sessionId,expectedRevision:revision-1}),{code:'revisionConflict'});assert.deepEqual(await readFile(path),bytes);
+  assert.equal((await scoped(created.editorUrl,'close',{expectedRevision:revision,decision:'discard'})).status,403);
+  const cancel=await request({action:'close',sessionId:created.sessionId,expectedRevision:revision,decision:'cancel'});assert.equal(cancel.cancelled,true);
+  await request({action:'save',sessionId:created.sessionId,expectedRevision:revision});await request({action:'close',sessionId:created.sessionId,expectedRevision:revision,decision:'save'});
+  const reopened=await request({action:'open',productId:manifest.productId,path:created.path});assert.equal(reopened.status.projectId,created.status.projectId);assert.equal(reopened.status.name,'Hosted project');assert.equal((await scoped(reopened.editorUrl,'document')).value.document.metadata.name,'Hosted edit');
+  await request({action:'close',sessionId:reopened.sessionId,expectedRevision:reopened.status.revision,decision:'discard'});
 });
 
 test('actual product process rejects incompatible host; failed process never signals ready', async t => {

@@ -9,7 +9,7 @@ import {editorDocument as document} from './editor-document.mjs';
 import {api,invoke,mutate,context} from './cad-commands.mjs';
 import {icon} from './icons.mjs';
 const $=id=>document.getElementById(id),v=window.engineerViewport,visibility=new Map();let visibilityRevision=-1;const ctx=await context().catch(error=>{$('wb-hint').textContent='Feature connection unavailable. Reload the editor to reconnect. '+error.message;return null;}),visibilityChannel=ctx?new BroadcastChannel('engineer-visibility-'+ctx.scope.sessionId):null;function applyVisibility(value){if(value.revision<visibilityRevision)return;visibilityRevision=value.revision;visibility.clear();for(const e of value.entries)visibility.set(e.id,e.state);window.dispatchEvent(new CustomEvent('engineer-visibility-changed'));}async function changeVisibility(changes){const before=await api('ui/visibility'),value=await api('ui/visibility/save',{operationId:crypto.randomUUID(),expectedVisibilityRevision:before.revision,changes});applyVisibility(value);visibilityChannel?.postMessage(value.revision);}if(visibilityChannel)visibilityChannel.onmessage=event=>{if(Number.isSafeInteger(event.data)&&event.data>visibilityRevision)api('ui/visibility').then(applyVisibility).catch(()=>{});};window.addEventListener('pagehide',()=>visibilityChannel?.close(),{once:true});
-window.engineerVisibility=id=>visibility.get(id)??'default';
+window.engineerVisibility=id=>visibility.get(id)??'default';window.engineerSetVisibility=changeVisibility;
 window.engineerHideModelSource=async id=>{await changeVisibility([{id,state:'hide'}]);await v.clear();};
 const notify=text=>{$('wb-hint').textContent=text;};
 const run=fn=>event=>{try{Promise.resolve(fn(event)).catch(e=>notify(e.message));}catch(e){notify(e.message);}};
@@ -20,7 +20,7 @@ featureActions.innerHTML='<button type="submit">Apply</button><button type="butt
 let editing=null,historyBusy=false,operationBusy=false,operationStarting=false,constructionKind=null,carriedSelections=null,pendingConstructionPicks=[],startingSelection=null;
 window.engineerFeatureConstruction=()=>!!editing||operationStarting||operationBusy;
 window.engineerOperationAcceptsId=id=>{if(operationStarting||!editing?.fields)return true;const target=v.entities().find(e=>e.id===id);return !!target&&editing.fields.accepts(target);};
-async function startFeature(kind,action,{toggle=false}={}){
+async function startFeature(kind,action,{toggle=false}={}){window.engineerCancelAssembly?.();
  if(operationBusy||operationStarting)return;
  if(window.engineerSketch?.operationActive)throw Error('Finish the sketch operation before starting a feature.');
  operationStarting=true;pendingConstructionPicks=[];startingSelection={sourceId:window.engineerSketch?.view()?.id??v.selection?.producerId??deleteSourceSelection?.id,target:v.selection??deleteSourceSelection};
@@ -71,7 +71,7 @@ async function history(action){if(historyBusy)return;historyBusy=true;top.datase
 document.addEventListener('keydown',run(event=>{if((event.ctrlKey||event.metaKey)&&['z','y'].includes(event.key.toLowerCase())){if(event.target.closest?.('input,textarea')&&!event.target.readOnly)return;event.preventDefault();return history(event.key.toLowerCase()==='y'?'redo':'undo');}}));
 const view=document.querySelector('.wb-menubar details:nth-child(3) .wb-menu'),restore=document.createElement('button');restore.textContent='Restore reference entries';restore.addEventListener('click',run(async()=>{const changes=[...visibility].filter(([,state])=>state==='delete').map(([id])=>({id,state:'default'}));if(changes.length)await changeVisibility(changes);}));view.append(restore);window.addEventListener('engineer-document-changed',()=>updateHistory().catch(()=>{}));setInterval(()=>updateHistory().catch(()=>{}),800);for(const button of Object.values(buttons))button.disabled=true;top.disabled=true;await updateHistory().catch(error=>notify('History connection unavailable. Reload the editor to reconnect. '+error.message));try{applyVisibility(await api('ui/visibility'));}catch(error){notify(error.message);}
 
-let deleteSourceSelection=null;window.addEventListener('engineer-feature-selected',event=>deleteSourceSelection=event.detail);window.addEventListener('engineer-sketch-selection',()=>deleteSourceSelection=null);window.addEventListener('engineer-selection-changed',event=>{if(!event.detail)return;const value=event.detail;deleteSourceSelection=window.engineerSourceItems?.().find(i=>value.kind==='datum'?i.kind==='datum'&&i.producerId===value.producerId&&i.role===value.role:i.id===value.producerId)??null;});
+let deleteSourceSelection=null;window.addEventListener('engineer-feature-selected',event=>deleteSourceSelection=event.detail);window.addEventListener('engineer-sketch-selection',()=>deleteSourceSelection=null);window.addEventListener('engineer-selection-changed',event=>{if(!event.detail)return;const value=event.detail;if(value.sourceDocumentId&&value.sourceDocumentId!==window.engineerWorkspace?.activeDocumentId){deleteSourceSelection=null;return;}deleteSourceSelection=window.engineerSourceItems?.().find(i=>value.kind==='datum'?i.kind==='datum'&&i.producerId===value.producerId&&i.role===value.role:i.id===value.producerId)??null;});
 document.addEventListener('keydown',run(async event=>{if(editing?.fields)return;if(event.key!=='Delete'||event.target.closest?.('input,textarea,select,[contenteditable=true]'))return;const sketch=window.engineerSketch;if(sketch?.view()?.selected){event.preventDefault();return sketch.removeSelection();}if(deleteSourceSelection){event.preventDefault();await deleteSource(deleteSourceSelection);deleteSourceSelection=null;}}));
 
 const previewRequestsInFlight=previewRequests();
@@ -126,6 +126,7 @@ function schedulePreview(){
   const kind=owner.referenceKind??(data.form==='finish'?data.finishing.kind:data.form==='repeat'?data.repeat.kind:data.form==='revolve'?'revolve':'extrude');highlightFeature(kind);featureHeading.textContent=['fillet','chamfer'].includes(kind)?kind[0].toUpperCase()+kind.slice(1):kind==='extrude'?'Extrude':kind==='revolve'?'Revolve':kind==='mirror'?'Mirror Feature':kind==='linear'?'Linear Feature Pattern':'Circular Feature Pattern';
   requestAnimationFrame(()=>{if(editing===owner&&!editor.hidden)owner.fields.focus();});
  }
+ window.engineerCancelFeature=()=>editing?closeFeature():Promise.resolve();
  async function closeFeature({nextKind=null}={}){await stopOperationPreview();editor.hidden=true;editing?.fields?.cancel();editing=null;highlightFeature(nextKind);window.engineerOperationFeature=null;window.dispatchEvent(new CustomEvent('engineer-feature-edit-changed'));document.querySelector('.proof-inspector').hidden=false;await v.build({reuseCurrent:true});}
  document.addEventListener('click',event=>{
   if(!editing?.fields&&!operationStarting)return;const node=event.target.closest?.('[data-source-id]');if(!node)return;

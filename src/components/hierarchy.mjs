@@ -5,9 +5,20 @@ export function composePlacement(parent,local){return {position:add(parent.posit
 // A definition owns geometry once. An occurrence owns only its path and placement.
 export function componentTree(value){
  validate(value);check(value.formatVersion===1,'IncompatibleVersion','Use a native document for components.');
- const g=value.native.graph,definitions=new Map(g.definitions.map(d=>[d.id,d]));let count=0;
- const walk=(definitionId,path,placement,instanceId=null)=>{check(++count<=257,'ResourceLimit','Expanded component hierarchy exceeds its native profile.');const d=definitions.get(definitionId);return {definitionId,name:d.name,kind:d.kind,path,placement,instanceId,featureIds:g.features.filter(f=>f.definitionId===definitionId).map(f=>f.id),children:g.instances.filter(i=>i.ownerDefinitionId===definitionId).map(i=>{const world=composePlacement(placement,i.transform),next=[...path,i.id];return i.dependencyId?{definitionId:i.definitionId,instanceId:i.id,path:next,placement:world,dependencyId:i.dependencyId,children:[]}:walk(i.definitionId,next,world,i.id);})};};
- return walk(g.primaryDefinitionId,[g.primaryDefinitionId],identity());
+ let count=0;
+ const walk=(graph,documentId,definitionId,path,placement,instanceId=null,snapshot=null,dependencyId=null,instanceOwnerDocumentId=null)=>{
+  check(++count<=257,'ResourceLimit','Expanded component hierarchy exceeds its native profile.');
+  const definition=graph.definitions.find(d=>d.id===definitionId);
+  check(definition,'LostReference','Component definition is missing from its effective snapshot.');
+  return {definitionId,sourceDocumentId:documentId,...(snapshot?{sourceSnapshot:snapshot}:{}),...(dependencyId?{dependencyId}:{}),name:definitionId===graph.primaryDefinitionId?(snapshot?.metadata.name??(documentId===value.documentId?value.metadata.name:definition.name)):definition.name,kind:definition.kind,path,placement,instanceId,instanceOwnerDocumentId,
+   featureIds:graph.features.filter(f=>f.definitionId===definitionId).map(f=>f.id),
+   children:graph.instances.filter(i=>i.ownerDefinitionId===definitionId).map(i=>{
+    const world=composePlacement(placement,i.transform),next=[...path,i.id];
+    if(i.dependencyId){const dependency=graph.dependencies.find(d=>d.id===i.dependencyId);check(dependency,'LostReference','Component dependency is missing.');return walk(dependency.snapshot.graph,dependency.documentId,i.definitionId,next,world,i.id,dependency.snapshot,i.dependencyId,documentId);}
+    return walk(graph,documentId,i.definitionId,next,world,i.id,snapshot,dependencyId,documentId);
+   })};
+ };
+ return walk(value.native.graph,value.documentId,value.native.graph.primaryDefinitionId,[value.native.graph.primaryDefinitionId],identity());
 }
 function draft(value,change){validate(value);check(value.formatVersion===1,'IncompatibleVersion','Use a native document for components.');const next=structuredClone(value);change(next.native.graph);validate(next);return next;}
 export function createComponentDefinition(value,{id,name,kind='part'}){return draft(value,g=>{check(['part','assembly'].includes(kind),'InvalidInput','Choose a part or assembly definition.');g.definitions.push({id,name,kind,datumRoles:['origin','axis-z','plane-xy']});});}
