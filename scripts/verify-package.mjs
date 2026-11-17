@@ -1,3 +1,4 @@
+import {verifyWorkspaceInstallation} from './verify-workspace-installation.mjs';
 import {verifyExtrusionInstallation} from './verify-extrusion-installation.mjs';
 import {verifyParameterInstallation} from './verify-parameter-installation.mjs';
 import {verifyParametricInstallation} from './verify-parametric-installation.mjs';
@@ -34,12 +35,17 @@ try {
   host = await startHost({root, stateRoot:join(base, 'profile'), manifests:[join(installation, 'platform/product.json')], checkReleases:false});
   await host.startup;
   const call = data => host.manager.execute({operationId:randomUUID(), ...data});
-  const created = await call({action:'create', productId:manifest.productId, name:'Prepared milestone acceptance'});
+  const projectWorkspace=await verifyWorkspaceInstallation(host,manifest.productId);
+  // Keep the pre-native migration corpus explicit; new projects now start as empty workspaces.
+  const legacyRoot=join(root,'legacy-lifecycle-acceptance');await mkdir(legacyRoot);
+  const {blank,FILENAME}=await import(pathToFileURL(join(installation,'src/document.mjs')));
+  const legacyPath=join(legacyRoot,FILENAME);await writeFile(legacyPath,JSON.stringify(blank('Prepared milestone acceptance'))+'\n');
+  const created = await call({action:'open', productId:manifest.productId, path:legacyPath});
   assert.equal(created.state, 'ready');
   const url = new URL(created.editorUrl), token = new URLSearchParams(url.hash.slice(1)).get('token');
   const response = await fetch(url.origin + '/v1/edit', {method:'POST', headers:{Origin:url.origin, Authorization:'Bearer ' + token, 'Content-Type':'application/json'},
     body:JSON.stringify({operationId:randomUUID(), expectedRevision:0, metadata:{name:'Prepared milestone acceptance', notes:'Edited from extracted installation'}})});
-  assert.equal(response.status, 200);
+  assert.equal(response.status, 200,await response.clone().text());
   await call({action:'save', sessionId:created.sessionId, expectedRevision:1});
   await call({action:'close', sessionId:created.sessionId, expectedRevision:1, decision:'save'});
   const reopened = await call({action:'open', productId:manifest.productId, path:created.path});
@@ -70,11 +76,11 @@ try {
   const workbenchProof=await verifyWorkbenchInstallation(host);const sketchProof=await verifySketchInstallation(host);const parametricProof=await verifyParametricInstallation(host);const parameterProof=await verifyParameterInstallation(host);const extrusionProof=await verifyExtrusionInstallation(host);
   const report = {passed:true, productId:manifest.productId, version:manifest.version, build:manifest.build ?? null,
     sha256:artifact.sha256, bytes:artifact.bytes, runtime:process.version, os:process.platform,
-    geometryCorpus,spatialCorpus:{passed:spatial.assemblySuite.passed,total:spatial.assemblySuite.total,resources:spatial.job.resources},spatialSaveReopen:true,
+    projectWorkspace,geometryCorpus,spatialCorpus:{passed:spatial.assemblySuite.passed,total:spatial.assemblySuite.total,resources:spatial.job.resources},spatialSaveReopen:true,
     correspondingSourceArchives:sourceManifest.archives.length,
     nativeStorage:{schemaVersion:1,versionId:version.versionId,convertVerifyVersionSaveReopen:true,resources:nativeProof.job.resources},
     semanticCommands,drawingProof,integratedProof,workbenchProof,sketchProof,parametricProof,parameterProof,extrusionProof,
-    scope:'Relocated prepared ZIP, source hashes, real Platform lifecycle, 29 exact-kernel/2D and 28 spatial cases, spatial drag/keep/save/reopen and native conversion/validation/version/save/reopen; no user profile/provider, WebGPU or final CAD schema claims'};
+    scope:'Relocated prepared ZIP, source hashes, independent workspace scoped edit/save/reopen and explicit legacy Platform lifecycle, 29 exact-kernel/2D and 28 spatial cases, spatial drag/keep/save/reopen and native conversion/validation/version/save/reopen; no user profile/provider, WebGPU or final CAD schema claims'};
   await writeFile(join(folder, 'package-validation.json'), JSON.stringify(report, null, 2) + '\n');
   console.log(JSON.stringify(report));
 } finally { await host?.close(); await rm(base, {recursive:true, force:true}); }
