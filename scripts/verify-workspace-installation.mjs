@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import {readFile} from 'node:fs/promises';
+import {readFile,mkdir,writeFile} from 'node:fs/promises';
+import {pathToFileURL} from 'node:url';
 import {resolve,dirname,join} from 'node:path';
 
 export async function verifyWorkspaceInstallation(host,productId){
@@ -19,4 +20,11 @@ export async function verifyWorkspaceInstallation(host,productId){
   assert.equal(document.documentId,workspace.activeDocumentId);assert.equal(document.metadata.notes,'Independent native part saved from relocated installation');assert.deepEqual(JSON.parse(await readFile(partPath,'utf8')),document);assert.deepEqual(await readFile(anchor),original);
   return {passed:true,emptyProject:true,independentNativePart:true,unscopedWriteRefused:true,scopedEditSaveReopen:true,stableProjectIdentity:true,projectAnchorPreserved:true};
  }finally{const status=await call({action:'status',sessionId:session.sessionId});await call({action:'close',sessionId:session.sessionId,expectedRevision:status.status.revision,decision:'discard'});}
+}
+
+export async function openLegacyInstallationFixture(host,installation,productId){
+ const folder=join(host.manager.root,'legacy-lifecycle-acceptance');await mkdir(folder);
+ const {blank,FILENAME}=await import(pathToFileURL(join(installation,'src/document.mjs'))),path=join(folder,FILENAME);
+ await writeFile(path,JSON.stringify(blank('Prepared milestone acceptance'))+'\n');
+ return host.manager.execute({operationId:crypto.randomUUID(),action:'open',productId,path});
 }

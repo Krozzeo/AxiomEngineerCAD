@@ -1,4 +1,4 @@
-import {verifyWorkspaceInstallation} from './verify-workspace-installation.mjs';
+import {verifyWorkspaceInstallation,openLegacyInstallationFixture} from './verify-workspace-installation.mjs';
 import {verifyExtrusionInstallation} from './verify-extrusion-installation.mjs';
 import {verifyParameterInstallation} from './verify-parameter-installation.mjs';
 import {verifyParametricInstallation} from './verify-parametric-installation.mjs';
@@ -33,14 +33,11 @@ try {
   const sourceManifest=JSON.parse(await readFile(join(installation,'legal/source-manifest.json'),'utf8'));
   for(const source of sourceManifest.archives){const bytes=await readFile(join(installation,'node_modules/.axiom-corresponding-source',source.name));assert.equal(createHash('sha256').update(bytes).digest('hex'),source.sha256);}
   host = await startHost({root, stateRoot:join(base, 'profile'), manifests:[join(installation, 'platform/product.json')], checkReleases:false});
-  await host.startup;
+  await host.startup;const projectRoot=host.manager.root;
   const call = data => host.manager.execute({operationId:randomUUID(), ...data});
   const projectWorkspace=await verifyWorkspaceInstallation(host,manifest.productId);
   // Keep the pre-native migration corpus explicit; new projects now start as empty workspaces.
-  const legacyRoot=join(root,'legacy-lifecycle-acceptance');await mkdir(legacyRoot);
-  const {blank,FILENAME}=await import(pathToFileURL(join(installation,'src/document.mjs')));
-  const legacyPath=join(legacyRoot,FILENAME);await writeFile(legacyPath,JSON.stringify(blank('Prepared milestone acceptance'))+'\n');
-  const created = await call({action:'open', productId:manifest.productId, path:legacyPath});
+  const created=await openLegacyInstallationFixture(host,installation,manifest.productId);
   assert.equal(created.state, 'ready');
   const url = new URL(created.editorUrl), token = new URLSearchParams(url.hash.slice(1)).get('token');
   const response = await fetch(url.origin + '/v1/edit', {method:'POST', headers:{Origin:url.origin, Authorization:'Bearer ' + token, 'Content-Type':'application/json'},
@@ -50,7 +47,7 @@ try {
   await call({action:'close', sessionId:created.sessionId, expectedRevision:1, decision:'save'});
   const reopened = await call({action:'open', productId:manifest.productId, path:created.path});
   assert.equal(reopened.status.projectId, created.status.projectId); assert.equal(reopened.status.revision, 1);
-  assert.equal(JSON.parse(await readFile(join(root, reopened.path))).metadata.notes, 'Edited from extracted installation');
+  assert.equal(JSON.parse(await readFile(resolve(projectRoot,reopened.path))).metadata.notes, 'Edited from extracted installation');
   const reopenedUrl=new URL(reopened.editorUrl),reopenedToken=new URLSearchParams(reopenedUrl.hash.slice(1)).get('token');
   const labResponse=await fetch(reopenedUrl.origin+'/v1/lab/run',{method:'POST',headers:{Origin:reopenedUrl.origin,Authorization:'Bearer '+reopenedToken,'Content-Type':'application/json'},body:JSON.stringify({operationId:randomUUID(),kind:'suite',expectedRevision:1})});
   assert.equal(labResponse.status,200);let lab;
@@ -63,20 +60,20 @@ try {
   const data=await post('lab/fixture',{fixture:'coaxial'});await post('lab/run',{kind:'assembly',assembly:data.assembly,drag:{bodyId:'collar',position:[0,0,35]},expectedRevision:1});const motion=await complete();assert.equal(motion.assembly.drag.accepted,true);
   await post('lab/apply',{kind:'assembly',jobId:motion.assembly.jobId,expectedRevision:1});await call({action:'save',sessionId:reopened.sessionId,expectedRevision:2});
   await call({action:'close', sessionId:reopened.sessionId, expectedRevision:2, decision:'save'});
-  const restored=await call({action:'open',productId:manifest.productId,path:created.path});assert.equal(restored.status.revision,2);const saved=JSON.parse(await readFile(join(root,restored.path)));assert.ok(Math.abs(saved.assembly.bodies[1].pose.position[2]-35)<1e-5);
+  const restored=await call({action:'open',productId:manifest.productId,path:created.path});assert.equal(restored.status.revision,2);const saved=JSON.parse(await readFile(resolve(projectRoot,restored.path)));assert.ok(Math.abs(saved.assembly.bodies[1].pose.position[2]-35)<1e-5);
   const nativeUrl=new URL(restored.editorUrl),nativeToken=new URLSearchParams(nativeUrl.hash.slice(1)).get('token');
   const nativePost=async(path,body)=>{const r=await fetch(nativeUrl.origin+'/v1/'+path,{method:'POST',headers:{Origin:nativeUrl.origin,Authorization:'Bearer '+nativeToken,'Content-Type':'application/json'},body:JSON.stringify({operationId:randomUUID(),...body})});assert.equal(r.status,200);return r.json();};
   await nativePost('native/convert',{expectedRevision:2});await nativePost('lab/run',{kind:'native-verify',expectedRevision:3});let nativeProof;
   for(let i=0;i<120;i++){nativeProof=await (await fetch(nativeUrl.origin+'/v1/lab',{headers:{Origin:nativeUrl.origin,Authorization:'Bearer '+nativeToken}})).json();if(nativeProof.job.state!=='running')break;await new Promise(r=>setTimeout(r,250));}
   assert.equal(nativeProof.job.state,'completed',JSON.stringify(nativeProof.job));assert.equal(nativeProof.nativeVerification.result.valid,true);const version=await nativePost('native/snapshot',{expectedRevision:3});assert.match(version.versionId,/^sha256:/);await call({action:'save',sessionId:restored.sessionId,expectedRevision:4});
-  await call({action:'close',sessionId:restored.sessionId,expectedRevision:4,decision:'save'});const nativeReopened=await call({action:'open',productId:manifest.productId,path:created.path});assert.equal(nativeReopened.status.revision,4);const nativeSaved=JSON.parse(await readFile(join(root,nativeReopened.path)));assert.equal(nativeSaved.formatVersion,1);assert.equal(nativeSaved.native.versions[0].id,version.versionId);assert.equal(nativeReopened.status.recovery.state,'Committed');
+  await call({action:'close',sessionId:restored.sessionId,expectedRevision:4,decision:'save'});const nativeReopened=await call({action:'open',productId:manifest.productId,path:created.path});assert.equal(nativeReopened.status.revision,4);const nativeSaved=JSON.parse(await readFile(resolve(projectRoot,nativeReopened.path)));assert.equal(nativeSaved.formatVersion,1);assert.equal(nativeSaved.native.versions[0].id,version.versionId);assert.equal(nativeReopened.status.recovery.state,'Committed');
   await seedHistoricalFixtures(host,pathToFileURL(installation+'/'));
-  const semanticCommands=await verifyCommandInstallation(nativeReopened.editorUrl);await call({action:'close',sessionId:nativeReopened.sessionId,expectedRevision:semanticCommands.applyRevision,decision:'discard'});const reviewReopened=await call({action:'open',productId:manifest.productId,path:created.path});const appliedDoc=JSON.parse(await readFile(join(root,reviewReopened.path)));assert.equal(appliedDoc.experiment.spec.width,60);assert.equal(reviewReopened.status.revision,semanticCommands.applyRevision);assert.equal(reviewReopened.status.recovery.operationId,semanticCommands.applyOperationId);const drawingProof=await verifyProofInstallation(reviewReopened.editorUrl,semanticCommands.applyRevision);await call({action:'close',sessionId:reviewReopened.sessionId,expectedRevision:semanticCommands.applyRevision,decision:'discard'});
+  const semanticCommands=await verifyCommandInstallation(nativeReopened.editorUrl);await call({action:'close',sessionId:nativeReopened.sessionId,expectedRevision:semanticCommands.applyRevision,decision:'discard'});const reviewReopened=await call({action:'open',productId:manifest.productId,path:created.path});const appliedDoc=JSON.parse(await readFile(resolve(projectRoot,reviewReopened.path)));assert.equal(appliedDoc.experiment.spec.width,60);assert.equal(reviewReopened.status.revision,semanticCommands.applyRevision);assert.equal(reviewReopened.status.recovery.operationId,semanticCommands.applyOperationId);const drawingProof=await verifyProofInstallation(reviewReopened.editorUrl,semanticCommands.applyRevision);await call({action:'close',sessionId:reviewReopened.sessionId,expectedRevision:semanticCommands.applyRevision,decision:'discard'});
   const integratedProof=await verifyIntegrationInstallation(host);
   const workbenchProof=await verifyWorkbenchInstallation(host);const sketchProof=await verifySketchInstallation(host);const parametricProof=await verifyParametricInstallation(host);const parameterProof=await verifyParameterInstallation(host);const extrusionProof=await verifyExtrusionInstallation(host);
   const report = {passed:true, productId:manifest.productId, version:manifest.version, build:manifest.build ?? null,
     sha256:artifact.sha256, bytes:artifact.bytes, runtime:process.version, os:process.platform,
-    projectWorkspace,geometryCorpus,spatialCorpus:{passed:spatial.assemblySuite.passed,total:spatial.assemblySuite.total,resources:spatial.job.resources},spatialSaveReopen:true,
+    projectPaths:{canonicalRootUsed:true,inputRootWasAlias:resolve(root)!==projectRoot},projectWorkspace,geometryCorpus,spatialCorpus:{passed:spatial.assemblySuite.passed,total:spatial.assemblySuite.total,resources:spatial.job.resources},spatialSaveReopen:true,
     correspondingSourceArchives:sourceManifest.archives.length,
     nativeStorage:{schemaVersion:1,versionId:version.versionId,convertVerifyVersionSaveReopen:true,resources:nativeProof.job.resources},
     semanticCommands,drawingProof,integratedProof,workbenchProof,sketchProof,parametricProof,parameterProof,extrusionProof,
