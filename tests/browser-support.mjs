@@ -1,5 +1,5 @@
-// Retain the submitted frame while DevTools awaits it; GC can otherwise report a false navigation.
-export async function waitViewportFrame(page){const frame=await page.evaluateHandle(()=>({completion:window.engineerViewport.renderer.serial}));try{await frame.evaluate(async retained=>{await retained.completion;});}finally{await frame.dispose();}}
+// Observe completion inside the page: DevTools awaits weak Promise handles and GC can report a false navigation.
+export async function waitViewportFrame(page){const id=crypto.randomUUID();await page.evaluate(id=>{const waits=window.__engineerFrameWaits??=new Map(),state={done:false,error:null};waits.set(id,state);window.engineerViewport.renderer.serial.then(()=>{state.done=true;},error=>{state.error=String(error);state.done=true;});},id);try{await page.waitForFunction(id=>window.__engineerFrameWaits.get(id)?.done,id);const error=await page.evaluate(id=>window.__engineerFrameWaits.get(id).error,id);if(error)throw Error('Viewport frame failed: '+error);}finally{await page.evaluate(id=>window.__engineerFrameWaits.delete(id),id);}}
 export async function waitEditorIdle(page){
   await page.evaluate(()=>window.engineerSketch?.transition??null);
   await page.locator('body[data-interaction-ready=true][data-workbench-ready=true]').waitFor();
