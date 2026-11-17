@@ -141,7 +141,9 @@ function schedulePreview(){
   if(operationStarting){pendingConstructionPicks.push(selected);event.stopImmediatePropagation();document.querySelector('.proof-inspector').hidden=true;return;}
   if(editing.fields.pickTarget(selected)){event.stopImmediatePropagation();document.querySelector('.proof-inspector').hidden=true;editor.hidden=false;}
  },true);
-$('feature-operation-fields').addEventListener('change',event=>{if(event.target.matches('[data-extrusion-name],#feature-operation-preview'))schedulePreview();});
+async function paintOperationVisibility(){const proof=v.proof;if(!editing?.fields||!proof?.preview||v.presentedManifest!==proof.manifestId)return;const layers=$('feature-operation-preview')?.checked?proof.scene.previewLayers??[]:[];if(v.renderer.scene?.previewLayers===layers||!layers.length&&!v.renderer.scene?.previewLayers?.length)return;await v.renderer.setPreviewLayers(layers);}
+window.addEventListener('engineer-proof-built',()=>paintOperationVisibility().catch(error=>notify(error.message)));
+$('feature-operation-fields').addEventListener('change',run(event=>{if(event.target.matches('#feature-operation-preview'))return paintOperationVisibility();if(event.target.matches('[data-extrusion-name]'))schedulePreview();}));
 $('feature-operation-form').addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.target.closest('button')){event.preventDefault();event.stopPropagation();if(event.target.id!=='extrusion-depth-value')schedulePreview();}});
 function cancelOperation(event){if(!editing)return;if(event.type==='keydown'&&event.key!=='Escape')return;event.preventDefault();event.stopImmediatePropagation();$('feature-operation-done').click();}
 document.addEventListener('keydown',cancelOperation,true);v.renderer.canvas.parentElement.addEventListener('contextmenu',cancelOperation,true);
