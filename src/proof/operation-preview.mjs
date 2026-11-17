@@ -15,7 +15,7 @@ const producers=new Map([
 ]);
 async function extrusion(document,operation,state,rollbackAt){
  const definitionId=document.native.graph.features.find(f=>f.id===operation.inputs.featureId).definitionId,scoped=definitionContent(document,definitionId);const result=await regenerateExtrusions(executionContent(scoped,{rollbackAt}),{featureId:operation.inputs.featureId,includeToolMesh:true,previewBooleanFeatureId:operation.inputs.featureId});
- const placements=[],walk=n=>{if(n.definitionId===definitionId)placements.push(n.placement);n.children.forEach(walk);};walk(componentTree(document));
+ const placements=[],walk=n=>{if(n.sourceDocumentId===document.documentId&&n.definitionId===definitionId)placements.push(n.placement);n.children.forEach(walk);};walk(componentTree(document));
  if(result.finishingLayers)return placements.flatMap(p=>result.finishingLayers.map((layer,index)=>({id:operation.inputs.featureId+'-'+index,kind:layer.kind,mesh:layer.mesh,quaternion:p.quaternion,position:p.position})));
  return placements.map(p=>({id:operation.inputs.featureId,kind:({add:'unite',cut:'subtract',intersect:'intersect',none:'none','new-body':'none'})[state?.effectiveOperation??document.native.graph.features.find(f=>f.id===operation.inputs.featureId).data.operation],mesh:result.toolMesh,position:p.position,quaternion:p.quaternion}));
 }
