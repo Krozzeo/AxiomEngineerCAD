@@ -3,6 +3,7 @@ const originalFetch=window.fetch.bind(window);let workspace=null;
 try{const response=await originalFetch('/v1/workspace',{headers:{Authorization:'Bearer '+token}});if(response.ok)workspace=await response.json();else{const error=await response.json();if(!/unsupported|unavailable/i.test(error.code+' '+error.message))throw Error(error.message);}}catch(error){console.error('Project startup',error);}
 window.engineerWorkspace=workspace;if(workspace?.preview)document.body?.classList.add('viewing-version');
 if(workspace){const documentId=workspace.activeDocumentId;window.fetch=(input,options={})=>{const url=new URL(typeof input==='string'||input instanceof URL?input:input.url,location.href);if(url.origin===location.origin&&url.pathname.startsWith('/v1/')){const headers=new Headers(input instanceof Request?input.headers:undefined);new Headers(options.headers).forEach((v,k)=>headers.set(k,v));headers.set('X-Engineer-Document',documentId);headers.set('X-Engineer-Context',workspace.contextId);options={...options,headers};}return originalFetch(input,options);};}
+try{
 await import('/app.mjs');
 await import('/lab.mjs');
 await import('/assembly.mjs');
@@ -16,3 +17,11 @@ await import('/interaction-workbench.mjs');
 await import('/sketch-workbench.mjs');
 await import('/presentation.mjs');
 await import('/parameter-manager.mjs');
+
+ document.body.dataset.editorReady='true';
+}catch(error){
+ document.body.dataset.editorReady='false';
+ const alert=document.createElement('section');alert.id='editor-startup-error';alert.className='editor-startup-error';alert.setAttribute('role','alert');
+ const message=document.createElement('p');message.textContent='The editor could not finish loading. Reload it, or reopen this project from Axiom Platform.';
+ const retry=document.createElement('button');retry.type='button';retry.textContent='Reload editor';retry.addEventListener('click',()=>location.reload());alert.append(message,retry);for(const node of document.body.children)node.inert=true;document.body.append(alert);console.error('Editor startup failed',error);
+}

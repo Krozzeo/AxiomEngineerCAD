@@ -43,3 +43,5 @@
 .component-edit-bar strong{color:#24374a}
 
 #project-content.dock-panel{display:flex;flex-direction:column;gap:0;min-height:0;overflow:hidden}#project-content .project-toolbar{flex:none}#project-content .project-browser{display:grid;grid-template-columns:150px minmax(0,1fr);flex:1;min-height:0;overflow:hidden}#project-error:empty{display:none}
+
+.editor-startup-error{position:fixed;inset:12px 12px auto;z-index:10000;padding:14px 18px;border:1px solid #d38a8a;border-radius:4px;background:#142232;color:#e6edf5;box-shadow:0 4px 24px #0008}.editor-startup-error p{margin:0 0 10px}

@@ -195,6 +195,7 @@ try {
   const {verifyReviewUI}=await import('./browser-review.mjs');await verifyReviewUI({hub,context,host,evidence,observe,report});
   const {verifyProofUI}=await import('./browser-proof.mjs');await verifyProofUI({hub,context,host,evidence,observe,report});if(process.env.ENGINEER_HARDWARE==='1')assert.equal(report.proof.gpu.classification,'hardware-adapter');
   const {verifyIntegrationUI}=await import('./browser-integration.mjs');await verifyIntegrationUI({hub,context,host,evidence,observe,report});
+  const {verifyStartupRecovery}=await import('./browser-startup.mjs');await verifyStartupRecovery({context,host,observe,report});
   const {verifyWorkbenchUI}=await import('./browser-workbench.mjs');await verifyWorkbenchUI({hub,context,host,evidence,observe,report});assert.deepEqual(report.pageErrors, []); report.passed = true;
 } catch (error) { report.failure = error.stack; if (direct) await direct.screenshot({path:join(evidence, 'failure.png')}).catch(() => {}); throw error; }
 finally {
