@@ -1,3 +1,5 @@
+// Retain the submitted frame while DevTools awaits it; GC can otherwise report a false navigation.
+export async function waitViewportFrame(page){const frame=await page.evaluateHandle(()=>({completion:window.engineerViewport.renderer.serial}));try{await frame.evaluate(async retained=>{await retained.completion;});}finally{await frame.dispose();}}
 export async function waitEditorIdle(page){
   await page.evaluate(()=>window.engineerSketch?.transition??null);
   await page.locator('body[data-interaction-ready=true][data-workbench-ready=true]').waitFor();
