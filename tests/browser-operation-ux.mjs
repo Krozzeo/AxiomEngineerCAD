@@ -31,7 +31,7 @@ export async function verifyOperationUX({context,host,observe,evidence,report}){
   await page.locator('[data-source-id=revolve-practice]').click();assert.match(await table('Axis').getAttribute('class'),/active/);
   await page.locator('[data-source-id=datum-y]').click();await page.locator('#extrusion-depth-value').fill('500');await page.locator('#extrusion-depth-value').press('Enter');
   assert.equal(await page.locator('#extrusion-depth-value').inputValue(),'360');
-  assert.equal(await form.getByText('Angle (Â°)',{exact:true}).locator('visible=true').count(),0);
+  assert.equal(await form.getByText('Angle (°)',{exact:true}).locator('visible=true').count(),0);
   await page.locator('#cad-feature-revolve').click();await page.locator('#feature-operation-editor').waitFor({state:'hidden'});await waitEditorIdle(page);
   await page.locator('[data-source-id=revolve-practice]').click();await page.locator('#cad-feature-revolve').click();await table('Axis').waitFor();assert.match(await table('Axis').getAttribute('class'),/active/);await end();
   await page.locator('#cad-extrude-sketch').click();assert.equal(await form.getByText('Value (mm)',{exact:true}).locator('visible=true').count(),0);await end();

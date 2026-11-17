@@ -4,7 +4,7 @@
 
 ## Implemented
 
-- Manager ComponentsÃ¢â€ â€™Features switch, actual current part heading, Group label, highlighted Exit component, shared Sketch/component Exit edit bar.
+- Manager Components→Features switch, actual current part heading, Group label, highlighted Exit component, shared Sketch/component Exit edit bar.
 - Project folder/catalog with independent native1 files, open sessions/tabs, empty new projects, stable Platform lease/project identity, document+context scoped requests, fresh Save/Discard/Cancel decisions and project-wide layout.
 - Actual Game Engine Project browser at fc2613243f0e52623dc053de5d9bd0796e4e7024, MIT attribution. Folders, breadcrumbs, inline creation, open/close/X/delete/explorer, native exact-derived isometric thumbnails, Project selection highlighting instances, drag insertion.
 - Cross-file insertion uses verified effective snapshots, source/owner document identity and namespaced scene model keys. Rejects direct/indirect recursion. Working source refresh validates candidates and retains last-good data on failure. Historical snapshots remain unchanged. External in-place edit binds the source document, displays the parent assembly transiently and refreshes its working dependency on exit.
