@@ -14,15 +14,15 @@ window.engineerOccurrenceOpacity=path=>{const active=window.engineerComponentCon
 const bar=editContextBar(document,{nameId:'component-edit-name',actions:[{id:'component-exit-edit',label:'Exit edit',onClick:()=>window.engineerExitComponent?.()}]});bar.classList.add('component-edit-bar');bar.hidden=true;document.querySelector('#proof-canvas').parentElement.append(bar);
 async function update(){const paths=[...(r.scene?.occurrences??[]).map(o=>o.path),...(r.scene?.datums??[]).map(d=>d.occurrencePath),...(r.scene?.sketches??[]).map(s=>s.occurrencePath??[s.definitionId])];await Promise.all(paths.map(key));const active=window.engineerComponentContext;bar.hidden=!active;bar.querySelector('strong').textContent=active?.name??'';document.body.classList.toggle('editing-component',!!active);r.prepare();await r.render();window.dispatchEvent(new CustomEvent('engineer-component-display-ready'));}
 for(const name of ['engineer-proof-built','engineer-component-context-changed','engineer-workspace-activated'])window.addEventListener(name,()=>update().then(()=>window.dispatchEvent(new CustomEvent('engineer-visibility-changed'))).catch(console.error));
-const menu=document.createElement('div');menu.className='cad-feature-menu';menu.hidden=true;document.body.append(menu);
-async function change(path,state){await setPreferences([{id:await key(path),state}]);menu.hidden=true;}
+const menu=document.createElement('div');menu.className='cad-feature-menu';menu.dataset.componentMenu='true';menu.hidden=true;document.body.append(menu);
+async function change(path,state){await setPreferences([{id:await key(path),state}]);}
 function open(path,x,y){
  menu.replaceChildren();
- const button=(label,fn,parent=menu)=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.onclick=()=>Promise.resolve(fn()).catch(error=>{document.getElementById('wb-hint').textContent=error.message;});parent.append(b);return b;};
+ const button=(label,fn,parent=menu)=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.onclick=()=>{menu.hidden=true;Promise.resolve().then(fn).catch(error=>{document.getElementById('wb-hint').textContent=error.message;});};parent.append(b);return b;};
  if(path?.length>1){
-  button(mode(path)==='hide'?'Reveal':'Hide',async()=>{const id=await key(path);if(mode(path)==='hide')return change(path,preference(id+'-view')==='entire'?'entire':'model');await setPreferences([{id:id+'-view',state:mode(path,{editing:false})==='entire'?'entire':'model'},{id,state:'hide'}]);menu.hidden=true;});
+  button(mode(path)==='hide'?'Reveal':'Hide',async()=>{const id=await key(path);if(mode(path)==='hide')return change(path,preference(id+'-view')==='entire'?'entire':'model');await setPreferences([{id:id+'-view',state:mode(path,{editing:false})==='entire'?'entire':'model'},{id,state:'hide'}]);});
   const view=document.createElement('details'),label=document.createElement('summary'),choices=document.createElement('div');label.textContent='View';choices.className='cad-menu-submenu';view.append(label,choices);menu.append(view);
-  for(const [state,name]of [['model','Model'],['entire','Entire part']]){const b=button(name,async()=>{const id=await key(path),hidden=preference(id)==='hide';await setPreferences([{id:id+'-view',state},...(!hidden?[{id,state}]:[])]);menu.hidden=true;},choices);b.setAttribute('aria-pressed',String((mode(path,{editing:false})==='hide'?preference(keys.get(JSON.stringify(path))+'-view'):mode(path,{editing:false}))===state));}
+  for(const [state,name]of [['model','Model'],['entire','Entire part']]){const b=button(name,async()=>{const id=await key(path),hidden=preference(id)==='hide';await setPreferences([{id:id+'-view',state},...(!hidden?[{id,state}]:[])]);},choices);b.setAttribute('aria-pressed',String((mode(path,{editing:false})==='hide'?preference(keys.get(JSON.stringify(path))+'-view'):mode(path,{editing:false}))===state));}
  }
  window.engineerExtendComponentMenu?.(path,menu);if(!menu.children.length)return;
  Object.assign(menu.style,{left:Math.min(x,innerWidth-210)+'px',top:Math.min(y,innerHeight-190)+'px'});menu.hidden=false;
