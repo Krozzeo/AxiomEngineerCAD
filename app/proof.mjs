@@ -23,9 +23,9 @@ async function selectId(selectionId,kind,pick){
  if(!proof)throw Error('Build the current model before selecting geometry.');
  const source=proof,epoch=presentationEpoch,intent=++selectionSequence;
  const selected=await api('proof/pick',{manifestId:source.manifestId,expectedRevision:source.revision,selectionId,kind});
- if(intent!==selectionSequence||proof!==source||presentationEpoch!==epoch)return null;
+ if(intent!==selectionSequence||proof?.manifestId!==source.manifestId||presentationEpoch!==epoch)return null;
  selection=selected;$('proof-reference').textContent=JSON.stringify({reference:selected,...(pick?{pick}:{})},null,2);renderer.selected=selectionId;renderer.prepare();emitSelection();await renderer.render();
- if(intent!==selectionSequence||selection!==selected||proof!==source||presentationEpoch!==epoch)return null;
+ if(intent!==selectionSequence||selection!==selected||proof?.manifestId!==source.manifestId||presentationEpoch!==epoch)return null;
  $('proof-selection').textContent=`${{instance:'Component',datum:'Reference',face:'Face',edge:'Edge',vertex:'Vertex',sketch:'Sketch entity',body:'Body',feature:'Feature'}[selected.kind]} · ${{xy:'Front',xz:'Top',yz:'Right',origin:'Origin',x:'X axis',y:'Y axis',z:'Z axis'}[selected.role]??selected.role}`;
  status(selected.authority?.includes('analytic sketch')?'Selection verified against the native sketch.':'Selection verified against the exact model.');return selected;
 }
@@ -111,7 +111,7 @@ async function pollProof(){
     owner.stage='result';const candidate=await api('proof/result');
     if(closed||polling!==owner||job!==resultJob||desired!==resultDesired||presentationEpoch!==resultEpoch)return;
     if(['anchorHash','versionId','proposalId','proposalRevision','previewHash','rollbackAt','operationEditId','contextHash'].some(key=>(candidate[key]??null)!==(resultDesired[key]??null)))return;
-    proof=candidate;selection=null;renderer.selected=0;$('proof-sheet').innerHTML=candidate.drawing?.svg??(candidate.exact?'<p>Open Drawing again to build a sheet for the current revision.</p>':'<p>No drawing in this empty document.</p>');
+    const sameManifest=proof?.manifestId===candidate.manifestId;proof=candidate;if(!sameManifest){selectionSequence++;selection=null;renderer.selected=0;}$('proof-sheet').innerHTML=candidate.drawing?.svg??(candidate.exact?'<p>Open Drawing again to build a sheet for the current revision.</p>':'<p>No drawing in this empty document.</p>');
     owner.stage='render';if(fitNext){renderer.scene=null;fitNext=false;}renderer.operationPreview=!!candidate.preview||!!candidate.proposalId;await renderer.setScene(window.engineerOperationPreviewVisible?.()===false?{...candidate.scene,previewLayers:[]}:candidate.scene);
     if(closed||polling!==owner||proof!==candidate||job!==resultJob||desired!==resultDesired||presentationEpoch!==resultEpoch)return;
     job=null;presentedManifest=candidate.manifestId;
