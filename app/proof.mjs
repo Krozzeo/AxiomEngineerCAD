@@ -94,20 +94,21 @@ async function pollProof(){
   if(!job&&proof&&s.current&&s.manifestId!==proof.manifestId){if(same({anchorHash:proof.anchorHash,versionId:proof.versionId,proposalId:proof.proposalId,viewportOnly:true,previewHash:proof.previewHash,rollbackAt:proof.rollbackAt},s.job)){job=s.job.id;desired=s.job;queueProofPoll();}else{invalidate();status('Preview source changed in another view. Build your selected source again.');}}
   if(proof&&!s.current){invalidate();status('Model changed. Drawing and selection are stale; rebuild to continue.');}
   if(job&&s.job?.id===job&&s.job.state!=='running'){
-   const resultDesired=desired,resultEpoch=presentationEpoch;job=null;$('proof-cancel').disabled=true;
+   const resultJob=job,resultDesired=desired,resultEpoch=presentationEpoch;$('proof-cancel').disabled=true;
    if(s.job.state==='completed'){
-    if(!s.current)return;
+    if(!s.current){job=null;return;}
     const candidate=await api('proof/result');
-    if(closed||job!==null||desired!==resultDesired||presentationEpoch!==resultEpoch)return;
+    if(closed||job!==resultJob||desired!==resultDesired||presentationEpoch!==resultEpoch)return;
+    if(['anchorHash','versionId','proposalId','proposalRevision','previewHash','rollbackAt','operationEditId','contextHash'].some(key=>(candidate[key]??null)!==(resultDesired[key]??null)))return;
     proof=candidate;selection=null;renderer.selected=0;$('proof-sheet').innerHTML=candidate.drawing?.svg??(candidate.exact?'<p>Open Drawing again to build a sheet for the current revision.</p>':'<p>No drawing in this empty document.</p>');
     if(fitNext){renderer.scene=null;fitNext=false;}renderer.operationPreview=!!candidate.preview||!!candidate.proposalId;await renderer.setScene(window.engineerOperationPreviewVisible?.()===false?{...candidate.scene,previewLayers:[]}:candidate.scene);
-    if(closed||proof!==candidate||job!==null||desired!==resultDesired||presentationEpoch!==resultEpoch)return;
-    presentedManifest=candidate.manifestId;
+    if(closed||proof!==candidate||job!==resultJob||desired!==resultDesired||presentationEpoch!==resultEpoch)return;
+    job=null;presentedManifest=candidate.manifestId;
     $('proof-export').disabled=!candidate.drawing||!!candidate.proposalId;$('proof-preflight').disabled=!candidate.drawing||!!candidate.proposalId;window.dispatchEvent(new CustomEvent('engineer-proof-built',{detail:candidate}));
     status(`Built from revision ${candidate.revision} · ${candidate.proposalId?'AI proposal · read-only':candidate.preview?'operation preview — not applied':candidate.versionId?'historical version':candidate.operationEditId?'operation edit — downstream rolled back':candidate.rollbackAt?'sketch edit — downstream rolled back':'working model'} · ${candidate.drawing?'width '+candidate.drawing.dimension.valueMm.toFixed(3)+' mm · vector drawing ready.':candidate.scene.sketches?.length?candidate.scene.sketches.length+' sketch(es) · reference frame ready.':'empty document · reference planes and axes ready.'}`);
     $('proof-diagnostics').textContent=JSON.stringify({renderer:renderer.info,buildMs:candidate.elapsedMs,resources:candidate.resources,exact:candidate.exact,drawCount:renderer.drawCount,errors:renderer.errors},null,2);
    }else{
-    const failure=s.job.state+' - '+s.job.error.code+': '+s.job.error.message;
+    job=null;const failure=s.job.state+' - '+s.job.error.code+': '+s.job.error.message;
     if(!wanted?.viewportOnly)$('proof-sheet').textContent=failure;
     status(failure);
    }
