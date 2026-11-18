@@ -4,7 +4,7 @@ const v=window.engineerViewport,r=v.renderer,keys=new Map(),pending=new Map(),sa
 async function key(path){const text=JSON.stringify(path);if(!keys.has(text)){if(!pending.has(text))pending.set(text,crypto.subtle.digest('SHA-256',new TextEncoder().encode(text)).then(data=>{const id='occurrence-'+[...new Uint8Array(data)].map(n=>n.toString(16).padStart(2,'0')).join('');keys.set(text,id);pending.delete(text);return id;}));return pending.get(text);}return keys.get(text);}
 const preferences=new Map();let preferencesRevision=0;
 function applyPreferences(value){preferencesRevision=value.revision;preferences.clear();for(const entry of value.entries)preferences.set(entry.id,entry.state);}
-async function reloadPreferences(){applyPreferences(await api('workspace/visibility'));await update();}
+async function reloadPreferences({initial=false}={}){applyPreferences(await api('workspace/visibility'));if(initial)void update().catch(console.error);else await update();}
 async function setPreferences(changes){const before=await api('workspace/visibility'),value=await api('workspace/visibility/save',{operationId:crypto.randomUUID(),expectedVisibilityRevision:before.revision,changes});applyPreferences(value);await update();window.dispatchEvent(new CustomEvent('engineer-visibility-changed'));}
 const preference=id=>preferences.get(id)??'default';
 function mode(path,{editing=true}={}){if(!path||path.length===1)return 'entire';if(editing&&same(path,window.engineerComponentContext?.path))return 'entire';let value='model';for(let n=2;n<=path.length;n++){const id=keys.get(JSON.stringify(path.slice(0,n))),state=id?preference(id):'default';if(state==='hide')return 'hide';if(state==='entire'||state==='reveal')value='entire';else if(state==='model')value='model';}if(editing&&same(path,window.engineerComponentContext?.path))return 'entire';return value;}
@@ -42,4 +42,4 @@ document.getElementById('proof-canvas').addEventListener('contextmenu',event=>{
 },true);
 document.addEventListener('pointerdown',event=>{if(!menu.contains(event.target))menu.hidden=true;},true);document.addEventListener('keydown',event=>{if(event.key==='Escape')menu.hidden=true;});
 
-window.engineerReloadOccurrenceVisibility=reloadPreferences;await reloadPreferences();
+window.engineerReloadOccurrenceVisibility=reloadPreferences;await reloadPreferences({initial:true});

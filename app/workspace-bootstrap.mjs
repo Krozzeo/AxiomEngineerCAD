@@ -25,21 +25,21 @@ if(workspace)window.fetch=async(input,options={})=>{
 };
 
 try{
-await import('/app.mjs');
-await import('/lab.mjs');
-await import('/assembly.mjs');
-await import('/native.mjs');
-await import('/review.mjs');
-await import('/proof.mjs');
-await import('/integration.mjs');
-await import('/workbench.mjs');
-await import('/dock-workbench.mjs');
-await import('/interaction-workbench.mjs');
-await import('/sketch-workbench.mjs');
-await import('/presentation.mjs');
-await import('/parameter-manager.mjs');
+document.body.dataset.editorLoading='app.mjs';await import('/app.mjs');
+document.body.dataset.editorLoading='lab.mjs';await import('/lab.mjs');
+document.body.dataset.editorLoading='assembly.mjs';await import('/assembly.mjs');
+document.body.dataset.editorLoading='native.mjs';await import('/native.mjs');
+document.body.dataset.editorLoading='review.mjs';await import('/review.mjs');
+document.body.dataset.editorLoading='proof.mjs';await import('/proof.mjs');
+document.body.dataset.editorLoading='integration.mjs';await import('/integration.mjs');
+document.body.dataset.editorLoading='workbench.mjs';await import('/workbench.mjs');
+document.body.dataset.editorLoading='dock-workbench.mjs';await import('/dock-workbench.mjs');
+document.body.dataset.editorLoading='interaction-workbench.mjs';await import('/interaction-workbench.mjs');
+document.body.dataset.editorLoading='sketch-workbench.mjs';await import('/sketch-workbench.mjs');
+document.body.dataset.editorLoading='presentation.mjs';await import('/presentation.mjs');
+document.body.dataset.editorLoading='parameter-manager.mjs';await import('/parameter-manager.mjs');
 
- document.body.dataset.editorReady='true';if(!document.body.classList.contains('separated-panel'))document.body.inert=false;
+ document.body.dataset.editorReady='true';delete document.body.dataset.editorLoading;if(!document.body.classList.contains('separated-panel'))document.body.inert=false;
 }catch(error){
  document.body.dataset.editorReady='false';document.body.inert=false;
  const alert=document.createElement('section');alert.id='editor-startup-error';alert.className='editor-startup-error';alert.setAttribute('role','alert');alert.dataset.error=String(error.message??error).slice(0,512);
