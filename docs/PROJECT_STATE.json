@@ -4,23 +4,24 @@
     "path": "MASTER_DESIGN.md",
     "version": "0.2",
     "normalization": "utf8-lf",
-    "sha256": "9c2f3857a4a7f1156b1c10b82d2e76680604393b7f5799081f6fd22694502de6"
+    "sha256": "9355662f442d6b766950d147409a523e189bfd9a1826ad1d913b6b1eb7e50a9e"
   },
   "milestone": {
-    "current": "E3.M6",
-    "status": "0.3.13 corrected E3 stable candidate; owner authorized main integration and E4.M1 start",
-    "ownerAcceptance": "Owner requested corrected stable integration and advancement; delivery gates pending",
-    "next": "After corrected stable delivery, E4.M1 definitions, instances, hierarchy and in-place part modeling"
+    "current": "E4.M1 workspace interaction refinements",
+    "status": "0.4.2 candidate frozen: focused native and actual Chrome/NVIDIA workspace navigation/context/grouping passed; exact-head Windows/Linux acceptance and public installation pending",
+    "ownerAcceptance": "0.4.1 delivered; owner requested workspace interaction refinements",
+    "next": "Deliver live document/context transitions, persistent occurrence modes, compact searchable/reorderable tabs and Project/Components interactions"
   },
   "lastDelivered": {
-    "version": "0.2.6",
-    "commit": "21842a0a4c1e8843e3091afbfa4f7731ee13bdfa",
-    "pullRequest": 18,
-    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/v0.2.6",
-    "acceptanceRun": 42399474320,
-    "publicationRun": 42400464406,
-    "artifactSha256": "31e653ebfa0f25ee929618fa367640b38f5e78aa858aeb023e521dff9832b30c",
-    "verification": "Owner accepted E2. Windows and Ubuntu exact main acceptance passed. Stable 0.2.6 published and independently installed from the public Platform 0.1.13 catalog, including assistant and PDF regression."
+    "version": "0.4.1",
+    "commit": "91fe145548511ae03c1edf1f7dcd2980da2012fc",
+    "pullRequest": 23,
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-23-91fe145548511ae03c1edf1f7dcd2980da2012fc",
+    "acceptanceRun": 44076621494,
+    "publicationRun": 44079492263,
+    "artifactBytes": 100415741,
+    "artifactSha256": "dda88bca1bfb533f93ea3c4ee8713d14b9f7c5189751a0916733ddfee64e943d",
+    "verification": "Windows/Linux 356 native tests each and complete browser/PDF/36 STEP/performance passed. Actual public Platform0.1.13 installation/launch; Chrome/NVIDIA GTX1650 hardware adapter; 536 packaged source files matched accepted commit; zero page errors. Main stable remains0.3.13."
   },
   "constraints": [
     "MASTER_DESIGN is intent; implementation requires code and matching evidence.",
@@ -33,13 +34,13 @@
     "implementation": "IMPLEMENTATION_STATUS.md",
     "handoff": "AI_HANDOFF.md",
     "architecture": "docs/architecture/ADR_REGISTER.md",
-    "currentCadScope": "docs/E3_M6_PRODUCTION.md",
+    "currentCadScope": "docs/E4_M1_PROJECT_WORKSPACE.md",
     "deliveryGate": "docs/MILESTONE_DELIVERY.md"
   },
   "candidate": {
-    "version": "0.3.13",
-    "branch": "engineer/e3-m1-sketch-breadth",
-    "status": "Right Import/Export panels, explicit missing STEP units, positive density and View navigation; stable integration authorized, exact CI pending"
+    "version": "0.4.2",
+    "branch": "engineer/workspace-interactions",
+    "status": "Frozen for complete exact-head acceptance and immutable experimental publication; owner review pending"
   },
   "previousDelivered": {
     "version": "0.2.5",
@@ -101,5 +102,33 @@
     "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-19-a6f9fd3e804c4f0294f673cd561559884c6b0bbe",
     "artifactSha256": "8b92cd952bfc7efb4441c124f0d0aa5a5e3cbc11307bc869c1d0d913cc3b0493",
     "verification": "Windows/Linux 336 tests each, full browser/PDF/36 independent STEP cases and actual public Platform 0.1.13 Chrome/NVIDIA installation passed."
+  },
+  "mainIntegration": {
+    "version": "0.3.13",
+    "commit": "861e6ff936c77fb3a4eba1d8cdd8239d151c5f73",
+    "pullRequests": [
+      19,
+      20,
+      21
+    ],
+    "mainAcceptanceRun": 43760510442,
+    "status": "stable 0.3.13 published and publicly installed/validated",
+    "publicationRun": 43761813724
+  },
+  "development": {
+    "branch": "engineer/project-workspace",
+    "base": "cc3b6f26f21729e94acab2b757440befe7b02171",
+    "scope": "docs/requests/PROJECT_WORKSPACE_2026_11_16.md",
+    "design": "docs/architecture/ADR-029-PROJECT-WORKSPACE.md"
+  },
+  "previousStableDelivered": {
+    "version": "0.2.6",
+    "commit": "21842a0a4c1e8843e3091afbfa4f7731ee13bdfa",
+    "pullRequest": 18,
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/v0.2.6",
+    "acceptanceRun": 42399474320,
+    "publicationRun": 42400464406,
+    "artifactSha256": "31e653ebfa0f25ee929618fa367640b38f5e78aa858aeb023e521dff9832b30c",
+    "verification": "Owner accepted E2. Windows and Ubuntu exact main acceptance passed. Stable 0.2.6 published and independently installed from the public Platform 0.1.13 catalog, including assistant and PDF regression."
   }
 }

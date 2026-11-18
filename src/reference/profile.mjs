@@ -64,7 +64,7 @@ export function referenceCommand(value,input){
 }
 export function referenceDatums(value){
  const graph=value.native?.graph??value.graph;if(!graph)return [];
- return graph.features.filter(f=>f.type===REFERENCE_TYPE&&!referenceSuppressed(graph,f.id)).flatMap(f=>{
+ return graph.features.filter(f=>f.type===REFERENCE_TYPE&&f.definitionId===graph.primaryDefinitionId&&!referenceSuppressed(graph,f.id)).flatMap(f=>{
   const base={kind:'datum',definitionId:f.definitionId,producerId:f.id,occurrencePath:[f.definitionId],referenceFeature:true};
   const geometry=referenceGeometry(graph,{...base,role:f.data.kind});
   if(f.data.kind==='coordinate')return [{...base,id:f.id,role:'origin',datumType:'point',coordinateSystem:true,name:f.data.name,originMm:geometry.origin,pointMm:geometry.origin,coordinateFrame:[geometry.frame.u,geometry.frame.v,geometry.frame.normal]},...['x','y','z','xy','xz','yz'].filter(role=>!(f.data.deletedRoles??[]).includes(role)).map(role=>{const g=referenceGeometry(graph,{...base,role});return {...base,id:f.id+'-'+role,parentId:f.id,role,datumType:g.kind==='line'?'axis':'plane',name:{x:'X axis',y:'Y axis',z:'Z axis',xy:'Front',xz:'Top',yz:'Right'}[role],originMm:g.origin,...(g.kind==='line'?{direction:g.direction}:{normal:g.normal,u:g.u,planeFrame:{origin:g.origin,u:g.u,v:g.v,normal:g.normal}})};})];

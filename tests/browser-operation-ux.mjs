@@ -1,3 +1,4 @@
+import {waitViewportFrame} from './browser-support.mjs';
 import assert from 'node:assert/strict';
 import {join} from 'node:path';
 import {sketchDocument,sketchCommit,sketchSettled} from './browser-sketch.mjs';
@@ -69,8 +70,8 @@ export async function verifyOperationUX({context,host,observe,evidence,report}){
   const hidden=await page.evaluate(async()=>{const v=window.engineerViewport,r=v.renderer;for(const m of r.scene.models){const o=r.scene.occurrences.find(o=>o.featureId===m.featureId);for(const edge of m.mesh.edges.filter(e=>!e.displayHidden&&e.points.length>=2)){const a=edge.points[0],b=edge.points.at(-1),mid=a.map((n,i)=>(n+b[i])/2),p=r.point(mid),hit=await r.pick(p[0],p[1]),entity=v.entities().find(e=>e.id===hit.selectionId);if(entity?.kind==='face'&&hit.selectionId!==o.edgeSelectionIds[edge.role]&&p[0]>15&&p[0]<r.canvas.width-15&&p[1]>15&&p[1]<r.canvas.height-15)return {feature:m.featureId,point:mid,pixel:p,id:hit.selectionId};}}return null;});assert.ok(hidden,'Find a physical edge occluded by a nearer face.');
   const shot=()=>page.locator('#proof-canvas').screenshot();
   const coords=await page.evaluate(p=>{const r=window.engineerViewport.renderer,b=r.canvas.getBoundingClientRect();return [p[0]*b.width/r.canvas.width,p[1]*b.height/r.canvas.height];},hidden.pixel);
-  await page.locator('[data-source-id="'+hidden.feature+'"]').hover();await page.evaluate(()=>window.engineerViewport.renderer.serial);assert.ok(pngPixels(await shot()).near(...coords,[255,128,0]),'Preselection contour remains visible behind a face.');
-  await page.locator('[data-source-id="'+hidden.feature+'"]').click();await page.evaluate(()=>window.engineerViewport.renderer.serial);assert.ok(pngPixels(await shot()).near(...coords,[121,121,255]),'Selected contour remains visible behind a face.');
+  await page.locator('[data-source-id="'+hidden.feature+'"]').hover();await waitViewportFrame(page);assert.ok(pngPixels(await shot()).near(...coords,[255,128,0]),'Preselection contour remains visible behind a face.');
+  await page.locator('[data-source-id="'+hidden.feature+'"]').click();await waitViewportFrame(page);assert.ok(pngPixels(await shot()).near(...coords,[121,121,255]),'Selected contour remains visible behind a face.');
   const front=await page.evaluate(async p=>{const r=window.engineerViewport.renderer;return (await r.pick(p[0],p[1])).selectionId;},hidden.pixel);assert.equal(front,hidden.id,'Through-depth feedback must not modify picking IDs.');
   if(evidence)await page.screenshot({path:join(evidence,'operation-ux-coordinate-contours.png')});
   assert.deepEqual(await page.evaluate(()=>window.engineerViewport.renderer.errors),[]);
