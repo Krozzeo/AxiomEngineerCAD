@@ -10,5 +10,5 @@ export async function waitEditorIdle(page){
 
 export async function createFirstPart(page,name){
  await waitEditorIdle(page);
- await page.waitForFunction(()=>!!window.engineerProjectBrowser);await page.locator('.wb-menubar details').filter({has:page.getByText('Create',{exact:true})}).locator('summary').click();await page.getByRole('button',{name:'New part/assembly',exact:true}).click();await page.locator('#project-icons .inline-name').fill(name);await Promise.all([page.waitForEvent('load'),page.locator('#project-icons .inline-name').press('Enter')]);await page.waitForFunction(()=>window.engineerWorkspace&&!window.engineerWorkspace.empty&&!!window.engineerViewport?.presentedManifest);await waitEditorIdle(page);
+ await page.waitForFunction(()=>!!window.engineerProjectBrowser);await page.locator('.wb-menubar details').filter({has:page.getByText('Create',{exact:true})}).locator('summary').click();await page.getByRole('button',{name:'New part/assembly',exact:true}).click();await page.locator('#project-icons .inline-name').fill(name);await page.locator('#project-icons .inline-name').press('Enter');await page.waitForFunction(()=>window.engineerWorkspace&&!window.engineerWorkspace.empty&&!!window.engineerViewport?.presentedManifest);await waitEditorIdle(page);
 }

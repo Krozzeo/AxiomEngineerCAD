@@ -1,0 +1,23 @@
+# E4.M1 workspace interactions / 0.4.2
+
+Owner request: [17 November refinements](requests/WORKSPACE_INTERACTIONS_2026_11_17.md). Builds on the immutable delivered 0.4.1/PR23. Stable0.3.13 is unchanged. This batch does not advance mates/E4.M2.
+
+## Implementation
+
+- Live document binding replaces page navigation for opening/closing tabs and entering/exiting source-component context. The editor/GPU device stays mounted. Requests/responses retain document/context/epoch ownership; old replies are discarded and queued server writes still recheck their original scope. Active drafts are closed through existing edit paths before switching. Module-owned source/parameter/AI/visibility state is rebound explicitly.
+- Open files preload real native viewport proofs asynchronously; temporary display caches cannot authorize picks. A new active document must present its current native manifest before semantic selection. Exact source-verification results are cached only by complete native document hash. Each revisited part retains its camera.
+- Native proof validity now includes parent assembly content and edited occurrence path. A source's isolated proof cannot be reused in context or after the context changes. Other occurrences stay visible at20% opacity; the edited occurrence/subtree is opaque. The shared edit bar exposes component name and Exit edit.
+- Compact ribbon-sized part tabs have cached thumbnail hover, persisted drag ordering and an ellipsis popup with focused search and All parts switch. Closing/reopening a file evicts its stale presentation cache.
+- Occurrence visibility belongs to the assembly, independently of the source part's own reference preferences. Hide/Reveal is first; View exposes Model/Entire part. Hiding retains the prior view mode. Hidden occurrences and their references are excluded from display/picking and marked in Components. Model is the default for inserted parts; standalone parts retain their own display preferences.
+- Right-click selects the Model/tree entity. Ctrl/Shift multiselection persists through right-click; New group groups the selected occurrences atomically and preserves world poses. Empty-space New group creates an empty root group. Drag feedback distinguishes insertion from dropping into a group.
+- Project tree includes part files with shared selection/open/menu/drag operations. Compact toolbar and responsive smaller document tiles; Project/Versions use the shared dark CAD menu and Refresh icons.
+
+## Verification and owner walkthrough
+
+Focused tests cover tab order validation/persistence, stale queued requests, context-owned proof rejection, per-assembly visibility ownership, atomic grouping/world poses and actual Chrome navigation/selection/visibility. `tests/browser-workspace-navigation.mjs` is invoked by the current-demo browser acceptance. Whole Windows/Linux acceptance and immutable public installation evidence are required before delivery.
+
+In **E4.M1 Project Workspace**, switch Base/Pin/Assembly repeatedly, hover and drag their tabs, search from the ellipsis and reopen a closed part using All parts. The page and GPU device remain the same; geometry still waits for native validation when a source actually changes. In Components, Hide a Pin, switch away/back or close/reopen Assembly, then Reveal it and check that View retains the chosen mode. Double-click or Edit component: the chosen Pin is opaque, Base/the other Pin transparent, and Exit edit remains available. Ctrl/Shift select occurrences, right-click and New group; verify world positions stay fixed. Empty-space New group creates an empty root group. Inspect insertion/inside feedback while dragging, and open/drag the same parts from the Project tree and icon view. Versions and Project have compact Refresh icons and matching menus.
+
+## Delivery status
+
+Focused native cases and actual Chrome/NVIDIA current-demo navigation passed, including equal tab metrics, same page/GPU identity, cached hover, persisted reorder, closed-part search/reopen, Hide/View persistence, Shift/Ctrl selection, opaque edited occurrence versus ghost neighbors, shared exact source preview and multi-selection grouping with fixed world poses. The local complete native suite passed358 tests during preparation. The candidate is frozen for complete exact-head Windows/Linux acceptance. Publication URL/hash and actual public Platform install/GPU evidence belong to the accepted commit artifacts; no installable completion claim is made by this source note.

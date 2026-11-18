@@ -671,3 +671,5 @@ $('edit-sketch-reference').addEventListener('change',error(async event=>{const c
 window.addEventListener('engineer-selection-changed',event=>{if(!event.detail&&!window.engineerOperationFeature)document.querySelector('.proof-inspector').hidden=true;else if(event.detail&&!selected&&!window.engineerOperationFeature)document.querySelector('.proof-inspector').hidden=false;});
 
 window.addEventListener('engineer-sketch-error',event=>status(event.detail));
+
+window.addEventListener('engineer-workspace-activated',()=>{seenRevision=-1;featureTarget=null;selected=null;retainedCamera=null;diagnosis=null;diagnosisKey=null;externalRefs.clear();cancelNewSketch();inspector.hidden=true;panel.hidden=true;modelStatus.hidden=true;toolHelp.hidden=true;document.querySelector('.proof-inspector').hidden=false;updateSketchActions();});

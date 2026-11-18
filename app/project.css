@@ -45,3 +45,25 @@
 #project-content.dock-panel{display:flex;flex-direction:column;gap:0;min-height:0;overflow:hidden}#project-content .project-toolbar{flex:none}#project-content .project-browser{display:grid;grid-template-columns:150px minmax(0,1fr);flex:1;min-height:0;overflow:hidden}#project-error:empty{display:none}
 
 .editor-startup-error{position:fixed;inset:12px 12px auto;z-index:10000;padding:14px 18px;border:1px solid #d38a8a;border-radius:4px;background:#142232;color:#e6edf5;box-shadow:0 4px 24px #0008}.editor-startup-error p{margin:0 0 10px}
+
+/* Compact project navigation; targets remain usable at narrow dock widths. */
+.part-tabs{min-height:0;height:27px;padding:0 4px;gap:2px;align-items:stretch;flex-shrink:0;font:inherit}
+.part-tabs .part-tab,.part-tabs .part-picker-button{font:inherit;font-size:12px;line-height:18px;padding:2px 7px;gap:10px;border-radius:0}
+.part-tab-close{padding:0 2px}.part-picker-button{margin-left:auto;position:sticky;right:0;background:#182a3b;flex-shrink:0}
+.part-tab-thumbnail,.part-tab-picker{position:fixed;z-index:2100;border:1px solid #45617b;background:#101e2d;box-shadow:0 5px 18px #0007;padding:8px}
+.part-tab-thumbnail{pointer-events:none;width:210px;height:150px}.part-tab-thumbnail img{width:100%;height:100%;object-fit:contain}
+.part-tab-picker{width:min(300px,90vw)}.part-tab-picker label{display:flex;align-items:center;gap:5px;margin-bottom:6px}.part-tab-picker input[type=search]{width:100%;box-sizing:border-box}.part-picker-list{max-height:320px;overflow:auto}.part-picker-list button{display:block;width:100%;text-align:left;padding:6px}.tab-drop-before{box-shadow:inset 3px 0 #65caff}
+.feature-context-name{font-size:12px;line-height:18px;margin:0 0 3px;padding:0 4px}#wb-tree-items{padding-top:0}
+.project-toolbar{min-height:24px;gap:2px;padding:0}.project-toolbar button,#project-breadcrumb{padding:1px 3px;margin:0;min-height:22px}#project-refresh,[data-version-refresh]{width:26px;height:24px;padding:3px;flex-shrink:0}#project-refresh svg,[data-version-refresh] svg{width:16px;height:16px}
+.project-browser{grid-template-columns:minmax(80px,35%) minmax(0,1fr);gap:4px}#project-icons{grid-template-columns:repeat(auto-fit,minmax(min(100%,70px),1fr));gap:4px;container-type:inline-size}.project-file{padding:4px;max-width:145px;justify-self:stretch}.project-file .part-preview{width:min(98px,100%);height:auto;aspect-ratio:140/108;max-height:76px}.project-file .project-icon:not(.part-preview){width:min(34px,100%);height:auto}.project-file .file-name{max-width:100%;font-size:12px;line-height:16px}#project-files .project-tree-row{min-width:0}#project-files .file-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#project-files .project-icon{width:18px;height:18px;flex-shrink:0}
+.project-context-menu{padding:4px;min-width:180px}.project-context-menu button{background:transparent;border:0;border-radius:0;color:inherit}.project-context-menu button:hover{background:#26435e}
+.cad-feature-menu details{position:relative}.cad-feature-menu details>summary{cursor:pointer;list-style:none;padding:6px 10px}.cad-feature-menu details>summary:after{content:'▸';float:right}.cad-feature-menu details[open]>.cad-menu-submenu{position:absolute;left:100%;top:0;min-width:150px;padding:4px;background:#142435;border:1px solid #45617b}.cad-feature-menu button[aria-pressed=true]{background:#284a65}
+.component-drop-inside{outline:2px solid #6ec7ff;outline-offset:-2px;background:#285678!important}.component-drop-before{box-shadow:0 -2px #6ec7ff}.component-edit-bar{z-index:15}.component-edit-bar[hidden]{display:none}
+
+.project-browser{container:project-browser/inline-size}@container project-browser (max-width:260px){#project-icons{grid-template-columns:repeat(auto-fit,minmax(min(100%,35px),1fr))}.project-file .file-name{font-size:11px}.project-close-part{font-size:12px;padding:0 3px}}
+
+.part-tabs{height:25px}.part-tabs .part-tab,.part-tabs .part-picker-button{height:24px;font-size:11px;line-height:17px;padding:3px 9px}.docked-cad #history-content{gap:0;padding-top:4px}.component-edit-bar strong{color:inherit}
+
+.part-tabs{max-height:25px;flex-wrap:nowrap;align-items:center}.part-tabs .part-tab,.part-tabs .part-picker-button{flex-shrink:0}.part-tabs span{font:inherit;margin:0;color:inherit}
+
+.docked-cad .command-ribbon .ribbon-tabs button,.docked-cad .part-tabs .part-tab,.docked-cad .part-tabs .part-picker-button{height:24px;font-size:11px;line-height:17px;padding:3px 9px}.docked-cad .part-tabs{height:25px;max-height:25px}

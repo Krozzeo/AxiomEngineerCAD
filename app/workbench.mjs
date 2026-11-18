@@ -70,3 +70,5 @@ window.engineerSelectSource=selectNode;window.addEventListener('engineer-sketch-
 for(const event of ['engineer-visibility-changed','engineer-datums-changed','engineer-sketch-selection','engineer-feature-edit-changed'])window.addEventListener(event,renderTree);
 
 window.addEventListener('engineer-component-context-changed',()=>{treeKey=null;renderTree();});
+
+window.engineerRefreshSources=async()=>{while(refreshing)await new Promise(resolve=>setTimeout(resolve,10));treeKey=null;selectedNode=null;await refresh();};

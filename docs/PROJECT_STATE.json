@@ -7,21 +7,21 @@
     "sha256": "9355662f442d6b766950d147409a523e189bfd9a1826ad1d913b6b1eb7e50a9e"
   },
   "milestone": {
-    "current": "E4.M1 structural workspace extension",
-    "status": "0.4.1 workspace candidate:355 native tests and focused actual UI/negative/recovery checks passed; exact CI/public installation pending",
-    "ownerAcceptance": "0.4.0 delivered; requested structural refinements pending",
-    "next": "Complete independent-document workspace, Project/Version UI, component visibility/edit context, file insertion, motion/grouping and exact delivery"
+    "current": "E4.M1 workspace interaction refinements",
+    "status": "0.4.2 candidate frozen: focused native and actual Chrome/NVIDIA workspace navigation/context/grouping passed; exact-head Windows/Linux acceptance and public installation pending",
+    "ownerAcceptance": "0.4.1 delivered; owner requested workspace interaction refinements",
+    "next": "Deliver live document/context transitions, persistent occurrence modes, compact searchable/reorderable tabs and Project/Components interactions"
   },
   "lastDelivered": {
-    "version": "0.4.0",
-    "commit": "cc3b6f26f21729e94acab2b757440befe7b02171",
-    "pullRequest": 22,
-    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-22-cc3b6f26f21729e94acab2b757440befe7b02171",
-    "acceptanceRun": 43781673786,
-    "publicationRun": 43783374127,
-    "artifactBytes": 100339434,
-    "artifactSha256": "afe7d6565ae12659667d9e90201e799f130725c64ae8bc9fbca7653460d89a0d",
-    "verification": "Windows/Linux 344 native each, browser/PDF/36 independent STEP/performance passed. Actual public Platform0.1.13 install/launch and Chrome/NVIDIA M1 demo, 505 source files matched, zero page errors. Main stable remains0.3.13."
+    "version": "0.4.1",
+    "commit": "91fe145548511ae03c1edf1f7dcd2980da2012fc",
+    "pullRequest": 23,
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-23-91fe145548511ae03c1edf1f7dcd2980da2012fc",
+    "acceptanceRun": 44076621494,
+    "publicationRun": 44079492263,
+    "artifactBytes": 100415741,
+    "artifactSha256": "dda88bca1bfb533f93ea3c4ee8713d14b9f7c5189751a0916733ddfee64e943d",
+    "verification": "Windows/Linux 356 native tests each and complete browser/PDF/36 STEP/performance passed. Actual public Platform0.1.13 installation/launch; Chrome/NVIDIA GTX1650 hardware adapter; 536 packaged source files matched accepted commit; zero page errors. Main stable remains0.3.13."
   },
   "constraints": [
     "MASTER_DESIGN is intent; implementation requires code and matching evidence.",
@@ -38,9 +38,9 @@
     "deliveryGate": "docs/MILESTONE_DELIVERY.md"
   },
   "candidate": {
-    "version": "0.4.1",
-    "branch": "engineer/project-workspace",
-    "status": "Implementation frozen for exact-commit acceptance and experimental publication; owner review pending"
+    "version": "0.4.2",
+    "branch": "engineer/workspace-interactions",
+    "status": "Frozen for complete exact-head acceptance and immutable experimental publication; owner review pending"
   },
   "previousDelivered": {
     "version": "0.2.5",

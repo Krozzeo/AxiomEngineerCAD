@@ -2,7 +2,27 @@ const token=sessionStorage.getItem('engineer-token')??new URLSearchParams(locati
 const originalFetch=window.fetch.bind(window);let workspace=null;
 try{const response=await originalFetch('/v1/workspace',{headers:{Authorization:'Bearer '+token}});if(response.ok)workspace=await response.json();else{const error=await response.json();if(!/unsupported|unavailable/i.test(error.code+' '+error.message))throw Error(error.message);}}catch(error){console.error('Project startup',error);}
 window.engineerWorkspace=workspace;if(workspace?.preview)document.body?.classList.add('viewing-version');
-if(workspace){const documentId=workspace.activeDocumentId;window.fetch=(input,options={})=>{const url=new URL(typeof input==='string'||input instanceof URL?input:input.url,location.href);if(url.origin===location.origin&&url.pathname.startsWith('/v1/')){const headers=new Headers(input instanceof Request?input.headers:undefined);new Headers(options.headers).forEach((v,k)=>headers.set(k,v));headers.set('X-Engineer-Document',documentId);headers.set('X-Engineer-Context',workspace.contextId);options={...options,headers};}return originalFetch(input,options);};}
+// Every request and response retains the document/context that initiated it.
+// Rebinding never turns an old request into an edit of the newly active part.
+let scope=workspace,scopeEpoch=0,transition=null,releaseTransition=null;const reads=new Set();
+window.engineerBindWorkspace=value=>{scope=value;window.engineerWorkspace=value;scopeEpoch++;releaseTransition?.();transition=null;releaseTransition=null;};
+if(workspace)window.fetch=async(input,options={})=>{
+ const url=new URL(typeof input==='string'||input instanceof URL?input:input.url,location.href);
+ if(url.origin!==location.origin||!url.pathname.startsWith('/v1/'))return originalFetch(input,options);
+ const isSwitch=url.pathname==='/v1/workspace/action'&&['open','activate','close','edit-component','exit-component','create'].includes(JSON.parse(options.body??'{}').action);
+ if(isSwitch&&!transition){transition=new Promise(resolve=>{releaseTransition=resolve;});for(const controller of reads)controller.abort();}
+ const requestedEpoch=scopeEpoch;if(transition&&!isSwitch){await transition;if(requestedEpoch!==scopeEpoch)throw new DOMException("The active CAD context changed.","AbortError");}
+ const controller=options.method!=='POST'?new AbortController():null;
+ if(controller){reads.add(controller);if(options.signal)options.signal.addEventListener('abort',()=>controller.abort(),{once:true});options={...options,signal:controller.signal};}
+ const epoch=scopeEpoch,headers=new Headers(input instanceof Request?input.headers:undefined);
+ new Headers(options.headers).forEach((v,k)=>headers.set(k,v));
+ headers.set('X-Engineer-Document',scope.activeDocumentId);headers.set('X-Engineer-Context',scope.contextId);
+ let response;try{response=await originalFetch(input,{...options,headers});}catch(error){if(isSwitch){releaseTransition?.();transition=null;releaseTransition=null;}throw error;}finally{if(controller)reads.delete(controller);}
+ const json=response.json.bind(response);
+ response.json=async()=>{const value=await json();if(isSwitch&&(!response.ok||value.contextId===scope.contextId)){releaseTransition?.();transition=null;releaseTransition=null;}if(epoch!==scopeEpoch)throw new DOMException('The active CAD context changed.','AbortError');return value;};
+ return response;
+};
+
 try{
 await import('/app.mjs');
 await import('/lab.mjs');

@@ -14,7 +14,7 @@ export async function startEditor({adapter, embeddingOrigin}) {
     'X-Content-Type-Options':'nosniff', 'Referrer-Policy':'no-referrer', 'Cache-Control':'no-store'
   };
   const respond = (res, status, value) => { res.writeHead(status, {...headers, 'Content-Type':'application/json'}); res.end(JSON.stringify(value)); };
-  const routes = {'/v1/workspace/versions':'workspace.versions','/v1/workspace/version/action':'workspace.version.action','/v1/workspace/thumbnail':'workspace.thumbnail','/v1/workspace':'workspace.inspect','/v1/workspace/action':'workspace.action','/v1/document':'document.inspect', '/v1/edit':'document.edit', '/v1/buffer':'document.buffer', '/v1/save':'document.save',
+  const routes = {'/v1/workspace/preload':'workspace.preload','/v1/workspace/visibility':'workspace.visibility','/v1/workspace/visibility/save':'workspace.visibility.save','/v1/workspace/versions':'workspace.versions','/v1/workspace/version/action':'workspace.version.action','/v1/workspace/thumbnail':'workspace.thumbnail','/v1/workspace':'workspace.inspect','/v1/workspace/action':'workspace.action','/v1/document':'document.inspect', '/v1/edit':'document.edit', '/v1/buffer':'document.buffer', '/v1/save':'document.save',
     '/v1/ui/visibility':'ui.visibility.get','/v1/ui/visibility/save':'ui.visibility.save', '/v1/ui/layout':'ui.layout.get','/v1/ui/layout/save':'ui.layout.save', '/v1/lab':'lab.inspect','/v1/lab/run':'lab.run','/v1/lab/cancel':'lab.cancel','/v1/lab/apply':'lab.apply','/v1/lab/fixture':'lab.fixture'};
   for(const name of ['inspect','convert','graph','snapshot','publish','restore','refresh','attach','adopt','recover','removeVersion'])routes['/v1/native/'+name]='native.'+name;
   for(const name of ['catalog','context','status','invoke','grant','revoke','cancel'])routes['/v1/cad/'+name]='cad.'+name;
@@ -52,15 +52,15 @@ export async function startEditor({adapter, embeddingOrigin}) {
         const close = url.pathname === '/v1/close';
         check(!close || !embeddingOrigin, 'permissionDenied', 'Close this hosted session from Axiom Platform.');
         const method = routes[url.pathname] ?? (close ? 'project.close' : null);
-        const reads=['workspace.versions','workspace.thumbnail','workspace.inspect','document.inspect','lab.inspect','native.inspect','cad.catalog','cad.context','cad.status','proof.catalog','proof.status','proof.result','ui.layout.get','ui.visibility.get'];
+        const reads=['workspace.preload','workspace.visibility','workspace.versions','workspace.thumbnail','workspace.inspect','document.inspect','lab.inspect','native.inspect','cad.catalog','cad.context','cad.status','proof.catalog','proof.status','proof.result','ui.layout.get','ui.visibility.get'];
         check(method && (req.method === 'GET' && reads.includes(method) || req.method === 'POST' && !reads.includes(method)), 'unsupportedCapability', 'Unknown endpoint or HTTP method.');
         let bytes = 0; const chunks = [];
         for await (const chunk of req) { bytes += chunk.length; check(bytes <= (['/v1/cad/invoke','/v1/proof/build'].includes(url.pathname)?6291456:url.pathname.startsWith('/v1/native/')?131072:32768), 'invalidRequest', 'Request exceeds its bounded body limit.'); chunks.push(chunk); }
-        let params = {};if(method==='workspace.thumbnail')params.id=url.searchParams.get('id');if(method==='cad.status'&&url.searchParams.has('jobId'))params.jobId=url.searchParams.get('jobId');
+        let params = {};if(method==='workspace.thumbnail'||method==='workspace.preload')params.id=url.searchParams.get('id');if(method==='cad.status'&&url.searchParams.has('jobId'))params.jobId=url.searchParams.get('jobId');
         if (req.method === 'POST') { try { params = JSON.parse(Buffer.concat(chunks).toString('utf8')); } catch { check(false, 'invalidRequest', 'Invalid JSON request.'); } }
         check(params && typeof params === 'object' && !Array.isArray(params), 'invalidRequest', 'Parameters must be an object.');
         const result = await adapter.enqueue(async () => {
-          const partScoped=!url.pathname.startsWith('/v1/workspace')&&!url.pathname.startsWith('/v1/ui/layout')||url.pathname.startsWith('/v1/workspace/version')||method==='workspace.action'&&['insert','move-components','reparent-component','remove-component','create-group','edit-component','exit-component','refresh-references'].includes(params.action);
+          const partScoped=!url.pathname.startsWith('/v1/workspace')&&!url.pathname.startsWith('/v1/ui/layout')||url.pathname.startsWith('/v1/workspace/version')||url.pathname.startsWith('/v1/workspace/visibility')||method==='workspace.action'&&['insert','move-components','reparent-component','remove-component','create-group','edit-component','exit-component','refresh-references'].includes(params.action);
           if(partScoped&&(adapter.workspace?.catalog.persistent||adapter.workspace?.protectContexts))check(req.headers['x-engineer-document']===adapter.doc.value.documentId&&req.headers['x-engineer-context']===adapter.workspace.contextId,'DocumentContextChanged','This action belongs to another editing context. Reload the active tab.');
           adapter.httpClosing = close;
           try { return await adapter.execute(method, params); } finally { adapter.httpClosing = false; }

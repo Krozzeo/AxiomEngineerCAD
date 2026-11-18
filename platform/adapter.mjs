@@ -65,6 +65,8 @@ export class EngineerAdapter {
     if(method==='workspace.versions'){check(this.workspace,'UnsupportedCapability','Open a workspace first.');return this.workspace.versions();}
     if(method==='workspace.version.action'){check(this.workspace,'UnsupportedCapability','Open a workspace first.');return this.workspace.versionAction(params);}
     if(this.doc?.readOnly&&!method.startsWith('workspace.')&&(method==='cad.invoke'&&params.effectClass!=='ReadOnly'||method.startsWith('native.')&&!['native.inspect','native.refresh'].includes(method)||['document.edit','document.save','lab.run','lab.apply'].includes(method)))check(false,'ReadOnlyVersion','This version is read-only. Create a branch to edit it.');
+    if(method==='workspace.visibility'||method==='workspace.visibility.save'){check(this.workspace,'UnsupportedCapability','Project workspace is unavailable.');const doc=this.workspace.editContext?.assembly??this.doc;return method==='workspace.visibility'?readVisibility(doc):saveVisibility(doc,params);}
+    if(method==='workspace.preload'){check(this.workspace,'UnsupportedCapability','Project workspace is unavailable.');return this.workspace.preload(params.id);}
     if(method==='workspace.thumbnail'){check(this.workspace,'UnsupportedCapability','Project workspace is unavailable.');return this.workspace.thumbnail(params.id);}
     if(method==='workspace.inspect'){check(this.workspace,'UnsupportedCapability','Project workspace is unavailable.');return this.workspace.view();}
     if(method==='workspace.action'){check(this.workspace,'UnsupportedCapability','Project workspace is unavailable.');return this.workspace.action(params);}

@@ -1,5 +1,7 @@
 # Workspace restructuring progress
 
+2026-11-17: 0.4.1 was delivered through PR23 with exact Windows/Linux acceptance44076621494, publication44079492263 and actual public Platform/GPU verification. The owner requested0.4.2 interaction refinements; current scope/status: [workspace interactions](WORKSPACE_INTERACTIONS_0_4_2.md). Earlier entries below describe the previous candidate before its publication.
+
 2026-11-16. Branch `engineer/project-workspace`, version0.4.1, based on delivered0.4.0 `cc3b6f26f21729e94acab2b757440befe7b02171`. User request: docs/requests/PROJECT_WORKSPACE_2026_11_16.md. ADR029 authorizes independent native files/project container. Main/stable remains0.3.13; no stable merge requested. Not yet a new delivery or E4.M2 acceptance.
 
 ## Implemented
