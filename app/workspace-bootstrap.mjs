@@ -1,3 +1,4 @@
+document.body.inert=true;
 const token=sessionStorage.getItem('engineer-token')??new URLSearchParams(location.hash.slice(1)).get('token');if(token)sessionStorage.setItem('engineer-token',token);
 const originalFetch=window.fetch.bind(window);let workspace=null;
 try{const response=await originalFetch('/v1/workspace',{headers:{Authorization:'Bearer '+token}});if(response.ok)workspace=await response.json();else{const error=await response.json();if(!/unsupported|unavailable/i.test(error.code+' '+error.message))throw Error(error.message);}}catch(error){console.error('Project startup',error);}
@@ -38,10 +39,10 @@ await import('/sketch-workbench.mjs');
 await import('/presentation.mjs');
 await import('/parameter-manager.mjs');
 
- document.body.dataset.editorReady='true';
+ document.body.dataset.editorReady='true';if(!document.body.classList.contains('separated-panel'))document.body.inert=false;
 }catch(error){
- document.body.dataset.editorReady='false';
- const alert=document.createElement('section');alert.id='editor-startup-error';alert.className='editor-startup-error';alert.setAttribute('role','alert');
+ document.body.dataset.editorReady='false';document.body.inert=false;
+ const alert=document.createElement('section');alert.id='editor-startup-error';alert.className='editor-startup-error';alert.setAttribute('role','alert');alert.dataset.error=String(error.message??error).slice(0,512);
  const message=document.createElement('p');message.textContent='The editor could not finish loading. Reload it, or reopen this project from Axiom Platform.';
  const retry=document.createElement('button');retry.type='button';retry.textContent='Reload editor';retry.addEventListener('click',()=>location.reload());alert.append(message,retry);for(const node of document.body.children)node.inert=true;document.body.append(alert);console.error('Editor startup failed',error);
 }
