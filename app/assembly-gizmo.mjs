@@ -30,3 +30,5 @@ function restore(){if(!drag)return;const scene=drag.scene;drag=null;r.scene=scen
 svg.onpointercancel=restore;svg.onpointerup=()=>{if(!drag)return;const current=drag;restore();const values=current.state.mode==='translate'?current.delta:scale(current.direction,current.angle*180/Math.PI);void current.state.commit({values,pivot:current.origin,manual:true}).finally(paint);};
 window.addEventListener('keydown',e=>{if(e.key==='Escape')restore();});window.addEventListener('engineer-camera-presented',paint);window.addEventListener('engineer-proof-built',paint);
 window.engineerAssemblyManual=value=>{restore();state=value;paint();};
+
+window.engineerDiscardAssemblyManual=()=>{drag=null;state=null;lastKey=null;lastScene=null;svg.replaceChildren();svg.setAttribute('hidden','');};

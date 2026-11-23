@@ -25,3 +25,10 @@ document.addEventListener('keydown',event=>{
 });
 window.addEventListener('engineer-selection-changed',event=>{if(!event.detail&&owner==='model')window.engineerClearSelection();});
 document.addEventListener('pointerdown',event=>{if(event.button===0&&event.target.id==='proof-canvas')window.engineerClaimSelection('model');},true);
+
+window.addEventListener('engineer-workspace-activated',()=>window.engineerClearSelection());
+
+for(const name of ['pointerdown','click','keydown'])document.addEventListener(name,event=>{
+ if(!window.engineerWorkspaceTransition||event.target.closest?.('.part-tabs')&&(!event.ctrlKey&&!event.metaKey))return;
+ event.preventDefault();event.stopImmediatePropagation();
+},true);
