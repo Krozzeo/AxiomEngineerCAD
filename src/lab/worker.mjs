@@ -29,6 +29,7 @@ process.on('message',async message=>{
     else if(message.kind==='parametric-sketch')result=await solveParametric(message.payload.data,{drag:message.payload.drag});
     else if(message.kind==='assembly')result=solveAssembly(message.payload.assembly,{drag:message.payload.drag});
     else if(message.kind==='assembly-suite')result=assemblySuite();
+    else if(message.kind==='spatial-native')result=await(await import('../assembly/native.mjs')).solveNativeAssembly(message.payload.document,message.payload.options);
     else if(message.kind==='native-verify')result=await verifyNative(message.payload.document);
     else if(message.kind==='command-validate')result=await verifyCommand(message.payload);
     else if(message.kind==='drawing-proof'&&message.payload.previewOperation)result=await buildOperationPreview(message.payload);

@@ -1,3 +1,4 @@
+import './selection-coordinator.mjs';
 document.body.inert=true;
 const token=sessionStorage.getItem('engineer-token')??new URLSearchParams(location.hash.slice(1)).get('token');if(token)sessionStorage.setItem('engineer-token',token);
 const originalFetch=window.fetch.bind(window);let workspace=null;

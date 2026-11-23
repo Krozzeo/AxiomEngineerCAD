@@ -1,6 +1,7 @@
 # Compact Engineer context
 
-Current work: **0.4.2 / E4.M1 workspace interaction refinements**, branch `engineer/workspace-interactions`, based on delivered 0.4.1 (PR23, `91fe145548511ae03c1edf1f7dcd2980da2012fc`). Scope and verification are in [workspace interaction notes](WORKSPACE_INTERACTIONS_0_4_2.md). Focused domain and actual Chrome/NVIDIA workspace checks passed. The candidate is frozen for complete exact-head Windows/Linux CI and actual public installation; neither gate is claimed complete here. This is an owner-requested M1 refinement, not E4.M2 or a stable merge. Main/stable remains0.3.13.
+Current work: **0.4.3 / E4.M2 spatial mate solver foundation**, branch `engineer/e4-m2-spatial-mates`, based on delivered0.4.2/PR24 (`dc2541e92a158799448b33e8b12cae09e970bbbb`). Owner request and current checks: [M2 scope](E4_M2_SPATIAL_MATES.md), [ADR030](architecture/ADR-030-NATIVE-SPATIAL-MATES.md). Native occurrence-mate tests and prior actual Chrome/NVIDIA workspace regressions passed. Native mate/copy/import regressions and actual hardware/software M2 UI walkthrough passed. The candidate is frozen for complete exact-head acceptance and public installation; those gates are pending. Main/stable0.3.13 remains unchanged.
+
 Previous batch: **0.3.11 / E3.M5 STEP interoperability**, plus the standalone Bottom Dependencies panel driven by Parameter Manager selection. E3.M4/0.3.10 was delivered publicly and accepted by the owner. Read [M5 scope and demo checks](E3_M5_INTEROPERABILITY.md). Complete exact-head acceptance/public installation are required; owner M5 acceptance is pending. At that historical delivery, main/stable were 0.2.6.
 
 

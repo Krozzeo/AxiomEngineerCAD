@@ -7,21 +7,21 @@
     "sha256": "9355662f442d6b766950d147409a523e189bfd9a1826ad1d913b6b1eb7e50a9e"
   },
   "milestone": {
-    "current": "E4.M1 workspace interaction refinements",
-    "status": "0.4.2 candidate frozen: focused native and actual Chrome/NVIDIA workspace navigation/context/grouping passed; exact-head Windows/Linux acceptance and public installation pending",
-    "ownerAcceptance": "0.4.1 delivered; owner requested workspace interaction refinements",
-    "next": "Deliver live document/context transitions, persistent occurrence modes, compact searchable/reorderable tabs and Project/Components interactions"
+    "current": "E4.M2 spatial mate solver foundation",
+    "status": "0.4.3 candidate frozen for exact-head acceptance: native mate/reference/copy regressions and actual hardware/software M2 UI walkthrough passed; full browser, Windows/Linux CI and public installation pending",
+    "ownerAcceptance": "0.4.2 delivered; owner requested M2 plus attached workspace refinements",
+    "next": "Complete exact-head Windows/Linux acceptance and immutable experimental publication; verify actual public Platform installation"
   },
   "lastDelivered": {
-    "version": "0.4.1",
-    "commit": "91fe145548511ae03c1edf1f7dcd2980da2012fc",
-    "pullRequest": 23,
-    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-23-91fe145548511ae03c1edf1f7dcd2980da2012fc",
-    "acceptanceRun": 44076621494,
-    "publicationRun": 44079492263,
-    "artifactBytes": 100415741,
-    "artifactSha256": "dda88bca1bfb533f93ea3c4ee8713d14b9f7c5189751a0916733ddfee64e943d",
-    "verification": "Windows/Linux 356 native tests each and complete browser/PDF/36 STEP/performance passed. Actual public Platform0.1.13 installation/launch; Chrome/NVIDIA GTX1650 hardware adapter; 536 packaged source files matched accepted commit; zero page errors. Main stable remains0.3.13."
+    "version": "0.4.2",
+    "commit": "dc2541e92a158799448b33e8b12cae09e970bbbb",
+    "pullRequest": 24,
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-24-dc2541e92a158799448b33e8b12cae09e970bbbb",
+    "acceptanceRun": 44297236874,
+    "publicationRun": 45078355142,
+    "artifactBytes": 100435613,
+    "artifactSha256": "649ecacafc7dcd0ddaf4c9c7460b011d662636a7da2bf7a6e5c11dd3728c4085",
+    "verification": "Exact-head Windows/Linux358 native tests each, complete browser/PDF/STEP/performance passed; actual public Platform0.1.13 install and Chrome157/NVIDIA demo passed;541 source files matched; zero page/renderer errors."
   },
   "constraints": [
     "MASTER_DESIGN is intent; implementation requires code and matching evidence.",
@@ -34,13 +34,13 @@
     "implementation": "IMPLEMENTATION_STATUS.md",
     "handoff": "AI_HANDOFF.md",
     "architecture": "docs/architecture/ADR_REGISTER.md",
-    "currentCadScope": "docs/E4_M1_PROJECT_WORKSPACE.md",
+    "currentCadScope": "docs/E4_M2_SPATIAL_MATES.md",
     "deliveryGate": "docs/MILESTONE_DELIVERY.md"
   },
   "candidate": {
-    "version": "0.4.2",
-    "branch": "engineer/workspace-interactions",
-    "status": "Frozen for complete exact-head acceptance and immutable experimental publication; owner review pending"
+    "version": "0.4.3",
+    "branch": "engineer/e4-m2-spatial-mates",
+    "status": "Frozen candidate; complete acceptance and public installation pending; owner review pending"
   },
   "previousDelivered": {
     "version": "0.2.5",

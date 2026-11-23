@@ -64,3 +64,5 @@ References: [Master §21](../../MASTER_DESIGN.md#21-risks-experiments-and-archit
 - [ADR028 — Production acceptance and exchange](ADR-028-PRODUCTION-EXCHANGE.md): E3.M6 candidate; native copies, explicit STEP protocols and nominal material/mass.
 
 - [ADR029 — Project workspace](ADR-029-PROJECT-WORKSPACE.md): owner-authorized independent native files, project tabs, branch/version history and component editing context.
+
+- [ADR030 — Native spatial mates](ADR-030-NATIVE-SPATIAL-MATES.md): E4.M2 occurrence-bound analytic relations, DOF, constrained motion and atomic failure.

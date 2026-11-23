@@ -10,6 +10,7 @@ export function workbenchItems(value){validate(value);const g=value.native?.grap
   ...baseDatums(value).filter(d=>!d.referenceFeature),
   ...ordered.flatMap(f=>f.type==='reference-geometry'?referenceItems(f).map(d=>({...d,disabled:!!suppression.get(f.id).length,explicitlyDisabled:!!f.disabled,suppressedBy:suppression.get(f.id)})):[{id:f.id,kind:'feature',name:featureName(f),type:f.type,disabled:!!suppression.get(f.id).length,explicitlyDisabled:!!f.disabled,suppressedBy:suppression.get(f.id),definitionId:f.definitionId,producerId:f.id,role:'result',occurrencePath:[f.definitionId],dependsOn:f.dependsOn}]),
   ...(g?.instances??[]).map(i=>({id:i.id,kind:'instance',name:g.definitions.find(d=>d.id===i.definitionId)?.name??i.id,definitionId:i.definitionId,occurrencePath:[i.ownerDefinitionId,i.id],positionMm:i.transform.position})),
+  ...(g?.spatial?.mates??[]).map(m=>({id:m.id,kind:'mate',name:m.name,type:m.type,a:m.a,b:m.b})),
   ...(value.assembly?.mates??[]).map(m=>({id:m.id,kind:'mate',name:m.type==='coincident'?'Coincident plane mate':m.id,type:m.type,a:m.a,b:m.b})),
   ...(g?.drawings??[]).map(d=>({id:d.id,kind:'drawing',name:'Retained model drawing',revision:d.revision,sheets:d.sheets.length}))];}
 export function sceneSelections(scene){const records=[];for(const o of scene.occurrences){const mesh=scene.models.find(m=>m.definitionId===o.definitionId).mesh,base={occurrencePath:o.path,definitionId:o.definitionId,producerId:o.featureId,...(o.sourceDocumentId?{sourceDocumentId:o.sourceDocumentId,sourceDefinitionId:o.sourceDefinitionId}: {})};

@@ -1,18 +1,18 @@
 import {check} from '../document.mjs';
 import {assemblyRecipe,NUMERIC,SPATIAL,datum} from './profile.mjs';
-import {add,sub,mul,dot,cross,norm,rotate,inverse,qmul,log,increment,rank,linear} from './math.mjs';
+import {add,sub,mul,dot,cross,norm,rotate,inverse,qmul,log,increment,rank,linear,exp} from './math.mjs';
 function world(b,ref){const d=datum(b,ref.datumId);return {...d,origin:add(b.pose.position,rotate(b.pose.quaternion,d.origin)),direction:d.direction?rotate(b.pose.quaternion,d.direction):null,quaternion:b.pose.quaternion};}
 export function relations(bodies,mates){const index=new Map(bodies.map(b=>[b.id,b])),rows=[];let singular=false;
   const append=(m,values,unit)=>values.forEach(value=>rows.push({id:m.id,value,unit}));
   for(const m of mates){const a=world(index.get(m.a.bodyId),m.a),b=world(index.get(m.b.bodyId),m.b),v=sub(b.origin,a.origin);
-    if(m.type==='fixed'){append(m,v,'mm');append(m,log(qmul(b.quaternion,inverse(a.quaternion))),'rad');}
+    if(m.type==='fixed'){const position=m.relative?add(a.origin,rotate(a.quaternion,m.relative.position)):a.origin,quaternion=m.relative?qmul(a.quaternion,m.relative.quaternion):a.quaternion;append(m,sub(b.origin,position),'mm');append(m,log(qmul(b.quaternion,inverse(quaternion))),'rad');}
     if(m.type==='coincident'&&a.kind==='point')append(m,v,'mm');
     if(m.type==='coincident'&&a.kind==='plane'){append(m,cross(a.direction,b.direction),'direction');append(m,[dot(v,a.direction)],'mm');}
     if(m.type==='concentric'){append(m,cross(a.direction,b.direction),'direction');append(m,cross(v,a.direction),'mm');}
     if(m.type==='parallel')append(m,cross(a.direction,b.direction),'direction');
     if(m.type==='perpendicular')append(m,[dot(a.direction,b.direction)],'direction');
-    if(m.type==='distance'){singular ||= norm(v)<1e-8;append(m,[norm(v)-m.value],'mm');}
-    if(m.type==='angle'){const s=norm(cross(a.direction,b.direction));singular ||= s<1e-8;append(m,[Math.atan2(s,dot(a.direction,b.direction))-m.value],'rad');}
+    if(m.type==='distance'){if(a.kind==='plane'||b.kind==='plane'){const normal=a.direction??b.direction;if(a.kind==='plane'&&b.kind==='plane')append(m,cross(a.direction,b.direction),'direction');append(m,[dot(v,normal)-m.value],'mm');}else{singular ||= norm(v)<1e-8;append(m,[norm(v)-m.value],'mm');}}
+    if(m.type==='angle'){const s=norm(cross(a.direction,b.direction));if(m.regularized&&(m.value<1e-8||Math.abs(m.value-Math.PI)<1e-8)){append(m,cross(a.direction,b.direction),'direction');append(m,[dot(a.direction,b.direction)-Math.cos(m.value)],'direction');}else{singular ||= s<1e-8;append(m,[Math.atan2(s,dot(a.direction,b.direction))-m.value],'rad');}}
   }return {rows,singular};
 }
 const valid=rows=>rows.every(r=>Math.abs(r.value)<=(r.unit==='mm'?NUMERIC.lengthMm:NUMERIC.angleRad));
@@ -29,14 +29,18 @@ function optimize(initial,mates,extra=()=>[]){let bodies=structuredClone(initial
     if(lambda>=1e12||norm(step)<1e-12)break;
   }return {bodies,iterations,variables};
 }
-export function solveAssembly(input,{drag}={}){
-  const source=assemblyRecipe(input),started=performance.now(),base=optimize(source.bodies,source.mates);let solved=base,dragResult=null;
-  if(drag){check(drag&&typeof drag==='object'&&Object.keys(drag).every(k=>['bodyId','position','quaternion'].includes(k))&&source.bodies.some(b=>b.id===drag.bodyId),'LostReference','Drag a known body.');
-    check(Array.isArray(drag.position)&&drag.position.length===3&&drag.position.every(x=>Number.isFinite(x)&&Math.abs(x)<=1000),'InvalidInput','Drag position must be a bounded mm vector.');
+export function solveAssembly(input,{drag,targets}={}){
+  const source=assemblyRecipe(input),started=performance.now(),seed=structuredClone(source.bodies);
+  if(source.profile==='E4.M2-spatial/1')for(const m of source.mates.filter(m=>m.type==='perpendicular'||m.type==='angle')){const a=seed.find(b=>b.id===m.a.bodyId),b=seed.find(b=>b.id===m.b.bodyId),wa=world(a,m.a),wb=world(b,m.b);if(norm(cross(wa.direction,wb.direction))<1e-6&&(m.type==='perpendicular'||Math.abs(Math.acos(Math.max(-1,Math.min(1,dot(wa.direction,wb.direction))))-m.value)>1e-8)){const target=!b.grounded?b:!a.grounded?a:null;if(target){let axis=cross(wa.direction,Math.abs(wa.direction[0])<.8?[1,0,0]:[0,1,0]);axis=mul(axis,.02/norm(axis));target.pose.quaternion=qmul(exp(axis),target.pose.quaternion);}}}
+  const base=optimize(seed,source.mates);let solved=base,dragResult=null;
+  if(drag||targets?.length){
+   const targetList=targets??[drag];for(const drag of targetList){check(drag&&typeof drag==='object'&&Object.keys(drag).every(k=>['bodyId','position','quaternion'].includes(k))&&source.bodies.some(b=>b.id===drag.bodyId),'LostReference','Drag a known body.');
+    check(Array.isArray(drag.position)&&drag.position.length===3&&drag.position.every(x=>Number.isFinite(x)&&Math.abs(x)<=(source.profile==='E4.M2-spatial/1'?1e6:1000)),'InvalidInput','Drag position must be a bounded mm vector.');
     if(drag.quaternion)check(Array.isArray(drag.quaternion)&&drag.quaternion.length===4&&drag.quaternion.every(Number.isFinite)&&Math.abs(norm(drag.quaternion)-1)<1e-8,'InvalidInput','Drag orientation must be a unit quaternion.');
-    const extra=bodies=>{const b=bodies.find(b=>b.id===drag.bodyId);return [...sub(b.pose.position,drag.position).map(value=>({id:'temporary-drag',value,unit:'mm'})),...(drag.quaternion?log(qmul(b.pose.quaternion,inverse(drag.quaternion))).map(value=>({id:'temporary-drag',value,unit:'rad'})):[])];};
+    }
+    const extra=bodies=>targetList.flatMap(drag=>{const b=bodies.find(b=>b.id===drag.bodyId);return [...sub(b.pose.position,drag.position).map(value=>({id:'temporary-drag',value,unit:'mm'})),...(drag.quaternion?log(qmul(b.pose.quaternion,inverse(drag.quaternion))).map(value=>({id:'temporary-drag',value,unit:'rad'})):[])];});
     const attempted=optimize(base.bodies,source.mates,extra),accepted=valid(relations(base.bodies,source.mates).rows)&&valid(relations(attempted.bodies,source.mates).rows)&&valid(extra(attempted.bodies));
-    dragResult={accepted,target:structuredClone(drag),reason:accepted?'Temporary target satisfied; permanent mate rank measured after removal.':'Infeasible target; previous feasible poses preserved.',iterations:attempted.iterations};if(accepted)solved=attempted;
+    dragResult={accepted,target:structuredClone(targets??drag),reason:accepted?'Temporary target satisfied; permanent mate rank measured after removal.':'Infeasible target; previous feasible poses preserved.',iterations:attempted.iterations};if(accepted)solved=attempted;
   }
   const {rows,J}=jacobian(solved.bodies,solved.variables,source.mates),n=solved.variables.length*6,r=rank(J,n,NUMERIC.rankThreshold),state=relations(solved.bodies,source.mates),redundant=[];
   const accumulated=[];let previous=0;for(const m of source.mates){accumulated.push(...J.filter((_,i)=>rows[i].id===m.id));const next=rank(accumulated,n,NUMERIC.rankThreshold);if(next===previous)redundant.push(m.id);previous=next;}
@@ -45,7 +49,8 @@ export function solveAssembly(input,{drag}={}){
   let withinBounds=true;try{assemblyRecipe({...source,bodies:solved.bodies});}catch{withinBounds=false;}
   const status=!withinBounds?'Unsolved':!consistent?(contradictory||n===0?'Inconsistent':singular?'SingularOrIndeterminate':'Unsolved'):singular?'SingularOrIndeterminate':redundant.length?'RedundantConsistent':n-r===0?'FullyDefined':'UnderDefined';
   const applicable=consistent&&!singular&&withinBounds&&(!dragResult||dragResult.accepted);
-  return {solver:SPATIAL,numeric:NUMERIC,status,remainingDOF:consistent&&!singular?n-r:null,rank:r,variables:n,grounded:source.bodies.filter(b=>b.grounded).map(b=>b.id),redundant,conflicts,
+  const bodyDOF=Object.fromEntries(solved.bodies.map((body,index)=>{const k=solved.variables.indexOf(index);return [body.id,body.grounded?0:consistent&&!singular?6-r+rank(J.map(row=>row.filter((_,i)=>i<k*6||i>=k*6+6)),n-6,NUMERIC.rankThreshold):null];}));
+  return {bodyDOF,solver:SPATIAL,numeric:NUMERIC,status,remainingDOF:consistent&&!singular?n-r:null,rank:r,variables:n,grounded:source.bodies.filter(b=>b.grounded).map(b=>b.id),redundant,conflicts,
     evidence:{rows,maxLengthResidualMm:Math.max(0,...rows.filter(r=>r.unit==='mm').map(r=>Math.abs(r.value))),maxAngularResidualRad:Math.max(0,...rows.filter(r=>r.unit!=='mm').map(r=>Math.abs(r.value))),method:'Central-difference world tangent Jacobian; pivoted local rank; no global uniqueness claim.'},
     applicable,drag:dragResult,recipe:source,poses:solved.bodies.map(b=>({bodyId:b.id,...b.pose})),
     solvedRecipe:applicable?{...source,bodies:solved.bodies}:null,iterations:solved.iterations,elapsedMs:performance.now()-started,

@@ -1,3 +1,4 @@
+import {validateSpatial} from '../assembly/native-profile.mjs';
 import {definitionGraph} from '../components/context.mjs';
 import {STEP_TYPE,validateStepFeature} from '../step/profile.mjs';
 import {validateDependencyGraph} from '../parameters/dependencies.mjs';
@@ -27,8 +28,8 @@ function acyclic(items,edges){const visiting=new Set(),done=new Set();const walk
 function geometry(value){check(keys(value,['profile','kernel','spec'])&&value.profile==='E0.M2-probe-v0'&&value.kernel===KERNEL,'incompatibleVersion','Unsupported historical geometry runtime. Source preserved.');recipe(value.spec);}
 export function emptyGraph(){return {primaryDefinitionId:'definition-main',definitions:[{id:'definition-main',name:'Main study',kind:'part',datumRoles:['origin','axis-z','plane-xy']}],parameters:[],features:[],instances:[],drawings:[],sources:[],dependencies:[]};}
 export function validateGraph(g,{documentId,versions=[],depth=0,ancestors=[]}={}){
-  check(depth<=4&&keys(g,['primaryDefinitionId','definitions','parameters','features','instances','drawings','sources','dependencies']),'InvalidNativeGraph','Unsupported graph fields or dependency depth.');
-  const limits={definitions:16,parameters:64,features:64,instances:64,drawings:8,sources:4,dependencies:8};const ids=new Set();
+  check(depth<=4&&keys(g,['primaryDefinitionId','definitions','parameters','features','instances','drawings','sources','dependencies','spatial']),'InvalidNativeGraph','Unsupported graph fields or dependency depth.');
+  validateSpatial(g.spatial);const limits={definitions:16,parameters:64,features:64,instances:64,drawings:8,sources:4,dependencies:8};const ids=new Set();
   for(const [name,limit]of Object.entries(limits)){boundedArray(g[name],limit);for(const item of g[name]){check(item&&id(item.id)&&!ids.has(item.id),'InvalidNativeGraph','Use globally unique stable entity IDs.');ids.add(item.id);}}
   const defs=new Map(g.definitions.map(d=>[d.id,d])),features=new Map(g.features.map(f=>[f.id,f])),params=new Map(g.parameters.map(p=>[p.id,p])),deps=new Map(g.dependencies.map(d=>[d.id,d]));
   check(defs.has(g.primaryDefinitionId),'LostReference','Missing primary definition.');
