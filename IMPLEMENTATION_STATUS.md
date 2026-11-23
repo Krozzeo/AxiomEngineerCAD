@@ -1,13 +1,20 @@
+# Current: E4.M3 /0.4.4 acceptance candidate
+
+See [M3 scope](docs/E4_M3_MATES_MOTION.md), ADR031 and docs/PROJECT_STATE.json. Branch `engineer/e4-m3-mates-motion` is based on delivered0.4.3/PR25. Six focused native M3 cases and the378-test native suite pass; actual Chrome/NVIDIA M3 and M2 workflows passed. Final exact-head full acceptance and public installation remain pending. Main/stable0.3.13 is unchanged.
+
+Delivered0.4.3 provenance:97c62f5a48e08531ad1f60cce1626f1ce8ceb2d9, acceptance45104971025, publication45106380535; public Platform0.1.13/NVIDIA verified553 source files and zero page/renderer errors.
+
+Historical implementation notes follow; their pending gates describe those earlier candidates, not the current delivery.
+
 # Engineer implementation status
 
-Current batch: **0.3.13 / E3 closure corrections**. Owner explicitly authorized corrected stable integration into main, followed by E4.M1. Import/Export are Right dock panels; missing STEP units require an explicit retained source-unit choice, valid spaced metadata is recognized; positive finite material density accepts integers/fractions with English validation; Navigation is in the View ribbon. Read docs/E3_M6_PRODUCTION.md. Exact-head PR/main CI, stable publication and real public installation remain delivery gates; none are claimed by this source update. E4.M1 has not yet been implemented.
-
-Previous batch: **0.3.11 / E3.M5 STEP interoperability**, plus the standalone Bottom Dependencies panel driven by Parameter Manager selection. E3.M4/0.3.10 was delivered publicly and accepted by the owner. Read [M5 scope and demo checks](docs/E3_M5_INTEROPERABILITY.md). Complete exact-head acceptance/public installation are required; owner M5 acceptance is pending. Main/stable remain 0.2.6.
+Historical0.4.2 implementation record: **0.4.2 / E4.M1 workspace interaction refinements**, branch `engineer/workspace-interactions`, based on delivered 0.4.1 (PR23, `91fe145548511ae03c1edf1f7dcd2980da2012fc`). Scope and verification are in [workspace interaction notes](docs/WORKSPACE_INTERACTIONS_0_4_2.md). Focused domain and actual Chrome/NVIDIA workspace checks passed. The candidate is frozen for complete exact-head Windows/Linux CI and actual public installation; neither gate is claimed complete here. This is an owner-requested M1 refinement, not E4.M2 or a stable merge. Main/stable remains0.3.13.
+Previous batch: **0.3.11 / E3.M5 STEP interoperability**, plus the standalone Bottom Dependencies panel driven by Parameter Manager selection. E3.M4/0.3.10 was delivered publicly and accepted by the owner. Read [M5 scope and demo checks](docs/E3_M5_INTEROPERABILITY.md). Complete exact-head acceptance/public installation are required; owner M5 acceptance is pending. At that historical delivery, main/stable were 0.2.6.
 
 
 Previous M4 implementation: **0.3.10 / E3.M4 parameter and feature dependency diagnostics**. Full typed operation-field queries/bindings, causal dependent/source traces at working or retained versions, read-only source impact and typed rejection, exact Undo/Redo; safe formula catalogue with shared blue function autocomplete; directed distance/angle and two-distance chamfer; short selection labels and physical row hover. See [scope and verification](docs/E3_M4_DEPENDENCIES.md). M4 exact CI and public installation passed; owner accepted.
 
-Previous delivery: **0.3.9 / E3.M3**, 315 native tests, full Windows/Linux/browser/PDF and actual public Platform/Chrome/NVIDIA acceptance passed. PROJECT_STATE indexes immutable delivery. Main/stable remain 0.2.6.
+Previous delivery: **0.3.9 / E3.M3**, 315 native tests, full Windows/Linux/browser/PDF and actual public Platform/Chrome/NVIDIA acceptance passed. PROJECT_STATE indexes immutable delivery. At that historical delivery, main/stable were 0.2.6.
 
 Development process: compact verified context, focused diagnosis and non-duplicated exact-head PR/main CI were integrated in main through PR17 at `60a5ceb42be30fd82bb33263799a67706653be64` with owner authorization. See `docs/DEVELOPMENT_WORKFLOW.md`.
 

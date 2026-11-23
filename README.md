@@ -2,7 +2,7 @@
 
 Local-first, browser-operated parametric mechanical CAD and engineering-documentation product in the Axiom family, designed from the outset for both human users and AI agents.
 
-> **Current candidate: 0.3.5 / E3.M2 feature operations.** See [tools and demo](docs/E3_M2_FEATURE_OPERATIONS.md).
+> **Current candidate:0.4.4 / E4.M3 remaining mates and responsive motion.** See [scope and demo checks](docs/E4_M3_MATES_MOTION.md). Tangent/Between/Fixed, native mate previews/editing and constrained pointer motion accompany the requested workspace refinements. Exact-head acceptance and public installation remain delivery gates.
 
 Start development with `npm run context` and [the compact context](docs/PROJECT_CONTEXT.md). The [workflow](docs/DEVELOPMENT_WORKFLOW.md) selects focused checks during implementation, then complete exact-head acceptance and real installation proof for delivery.
 
@@ -10,7 +10,7 @@ Start development with `npm run context` and [the compact context](docs/PROJECT_
 
 Every completed review milestone is delivered as an experimental prepared installation. In Platform 0.1.12+, open **Installations → Add installation → Axiom Engineer CAD → Refresh**, select the published experimental build, download/install and activate. Then create an Engineer project. Source PRs and passing tests alone are not installable publications. See [milestone delivery](docs/MILESTONE_DELIVERY.md) for the publication and verification gate.
 
-**Current demo:** **E2.M4 Drawing Reconstruction**. Install and activate the selected build, then use **Load Demos**. Last verified delivery: [0.2.3 / PR18](https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-18-7945d5c1bac966b9972d7251ccfa393836344904).
+**Current demo:** **E4.M3 Mates and Motion**. Install and activate the selected build, then use **Load Demos**. Last verified immutable delivery: [0.4.3 / PR25](https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-25-97c62f5a48e08531ad1f60cce1626f1ce8ceb2d9).
 
 The 0.1.8 workbench adds live primitive previews, persistent Snap (hold Ctrl to bypass), atomic relation cleanup, all geometric constraints in Parameter Manager, searchable binding/value controls, repairable conflict/missing-reference lists, intuitive signed dimensions and planar-face sketch supports. New Sketch previews normal/right orientation; Exit Sketch returns selection to its source. Conservative planar geometry witnesses require explicit repair when the supporting face changes. [Technical decisions and compatibility](docs/architecture/ADR-025-SKETCH-INTERACTION-AND-PLANAR-SUPPORT.md).
 

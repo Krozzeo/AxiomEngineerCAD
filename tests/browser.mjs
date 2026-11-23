@@ -36,14 +36,14 @@ try {
     await unavailable.waitForTimeout(1000);assert.ok(failures>0);await unavailable.close();
   }
   report.criteria.push('Unavailable startup context/catalog/document/history services report disconnection without unhandled promise rejection');
-  direct = await context.newPage(); observe(direct); await direct.goto((ready.editorUrl).replace('/#','/?workspace=labs#'));await waitEditorIdle(direct);
+  direct = await context.newPage(); observe(direct); await direct.goto((ready.editorUrl).replace('/#','/?workspace=labs#'));await direct.waitForFunction(()=>!!window.engineerProjectBrowser);assert.equal(await direct.evaluate(()=>window.engineerWorkspace.empty),true);await direct.locator('.wb-menubar details').filter({has:direct.getByText('Create',{exact:true})}).locator('summary').click();await direct.getByRole('button',{name:'New part/assembly',exact:true}).click();await direct.locator('#project-icons .inline-name').fill('Direct lifecycle study');await direct.locator('#project-icons .inline-name').press('Enter');await direct.waitForFunction(()=>window.engineerWorkspace&&!window.engineerWorkspace.empty);await waitEditorIdle(direct);
   await direct.locator('#name:not([disabled])').waitFor();
   assert.equal(await direct.locator('#name').inputValue(), 'Direct lifecycle study');
   await direct.locator('#notes').fill('Provisional design intent: preserve this note after reopening.');
   await direct.locator('#save').click(); await direct.locator('#message').filter({hasText:'projectBusy'}).waitFor();
   await direct.locator('#apply').click(); await direct.locator('#message').filter({hasText:'Properties applied'}).waitFor();
   await direct.locator('#save').click(); await direct.locator('#message').filter({hasText:'Document saved locally'}).waitFor();
-  const nativePath = join(root, 'direct', 'study', 'project.engineer-provisional.json');
+  const nativePath = join(root, 'direct', 'study', 'Direct lifecycle study.engineer.json');
   assert.match(JSON.parse(await readFile(nativePath)).metadata.notes, /preserve this note/);
   report.criteria.push('Direct CLI launches an authenticated browser editor; pending fields block save; applied properties persist');
   await direct.locator('#spatial-lab > summary').click();
@@ -56,7 +56,7 @@ try {
   await direct.mouse.move(canvasBox.x+canvasBox.width/2,canvasBox.y+canvasBox.height/2);await direct.mouse.down();await direct.mouse.move(canvasBox.x+canvasBox.width/2,canvasBox.y+canvasBox.height/2-40);await direct.mouse.up();
   await direct.locator('#assembly-status').filter({hasText:'UnderDefined · DOF 2 · drag accepted'}).waitFor();
   await direct.waitForFunction(()=>!document.querySelector('#assembly-pose').textContent.includes('35.000000'));
-  await direct.locator('#assembly-keep').click();await direct.locator('#revision').filter({hasText:'2'}).waitFor();
+  await direct.locator('#assembly-keep').click();await direct.locator('.dock-tabs [data-panel=history]').click();await direct.locator('#revision').filter({hasText:'2'}).waitFor();
   const spatialSaved=direct.waitForResponse(r=>r.url().endsWith('/v1/save'));await direct.locator('#save').click();await spatialSaved;
   assert.ok(JSON.parse(await readFile(nativePath)).assembly.bodies[1].pose.position[2]>35);
   await direct.locator('#assembly-suite').click();await direct.locator('#assembly-suite-summary').filter({hasText:'Passed 28 / 28'}).waitFor();
@@ -77,7 +77,7 @@ try {
   await direct.locator('#lab-width').fill('60');await direct.locator('#lab-build').click();
   await direct.locator('#lab-status').filter({hasText:'Completed geometry'}).waitFor();
   await direct.locator('#lab-metrics').filter({hasText:'17434.513322'}).waitFor();
-  await direct.locator('#lab-keep').click();await direct.locator('#revision').filter({hasText:'3'}).waitFor();
+  await direct.locator('#lab-keep').click();await direct.locator('.dock-tabs [data-panel=history]').click();await direct.locator('#revision').filter({hasText:'3'}).waitFor();
   const persisted=direct.waitForResponse(r=>r.url().endsWith('/v1/save'));
   await direct.locator('#save').click();await persisted;await direct.locator('#message').filter({hasText:'Document saved locally'}).waitFor();
   assert.equal(JSON.parse(await readFile(nativePath)).experiment.spec.width,60);
@@ -158,6 +158,10 @@ try {
       const constructionContext=softwareBrowser?await softwareBrowser.newContext({viewport:{width:1440,height:960}}):context;
       if(softwareBrowser)constructionContext.on('page',observe);
       report.featureConstructionRenderer={softwareForced:!!softwareBrowser,flags:softwareBrowser?constructionArgs:[]};
+      const {verifyComponentsUI}=await import('./browser-e4-m1.mjs');await verifyComponentsUI({context:constructionContext,host,observe,evidence,report});
+      const {verifyE4M3UI}=await import('./browser-e4-m3.mjs');await verifyE4M3UI({context:constructionContext,host,observe,evidence,report});
+      const {verifyE4M2UI}=await import('./browser-e4-m2.mjs');await verifyE4M2UI({context:constructionContext,host,observe,evidence,report});
+      const {verifyProjectWorkspaceUI}=await import('./browser-project-workspace.mjs');await verifyProjectWorkspaceUI({context:constructionContext,host,observe,evidence,report});
       const {verifyM6UI}=await import('./browser-e3-m6.mjs');await verifyM6UI({context:constructionContext,host,observe,evidence,report});
       const {verifyM5UI}=await import('./browser-e3-m5.mjs');await verifyM5UI({context:constructionContext,host,observe,evidence,report});
       const {verifyM4UI}=await import('./browser-m4.mjs');await verifyM4UI({context:constructionContext,host,observe,evidence,report});
@@ -193,6 +197,7 @@ try {
   const {verifyReviewUI}=await import('./browser-review.mjs');await verifyReviewUI({hub,context,host,evidence,observe,report});
   const {verifyProofUI}=await import('./browser-proof.mjs');await verifyProofUI({hub,context,host,evidence,observe,report});if(process.env.ENGINEER_HARDWARE==='1')assert.equal(report.proof.gpu.classification,'hardware-adapter');
   const {verifyIntegrationUI}=await import('./browser-integration.mjs');await verifyIntegrationUI({hub,context,host,evidence,observe,report});
+  const {verifyStartupRecovery}=await import('./browser-startup.mjs');await verifyStartupRecovery({context,host,observe,report});
   const {verifyWorkbenchUI}=await import('./browser-workbench.mjs');await verifyWorkbenchUI({hub,context,host,evidence,observe,report});assert.deepEqual(report.pageErrors, []); report.passed = true;
 } catch (error) { report.failure = error.stack; if (direct) await direct.screenshot({path:join(evidence, 'failure.png')}).catch(() => {}); throw error; }
 finally {

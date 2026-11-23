@@ -1,0 +1,1 @@
+export let reference=null;export function referenceDrag(transfer,value){reference=value;transfer.setData(value.mime,JSON.stringify(value.data));transfer.effectAllowed='copyMove';}export function clearReferenceDrag(){reference=null;}
