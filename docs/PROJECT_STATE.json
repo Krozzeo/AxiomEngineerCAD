@@ -8,20 +8,20 @@
   },
   "milestone": {
     "current": "E4.M3 remaining mates and responsive motion",
-    "status": "0.4.4 candidate frozen for exact-head complete acceptance;378 native tests and actual GPU M3/M2 workflows passed during focused validation",
-    "ownerAcceptance": "Owner requested M3 plus attached corrections and explicit Ctrl/Shift multi-selection behavior",
-    "next": "Complete Windows/Linux acceptance, immutable experimental publication and actual public Platform install/launch"
+    "status": "E4.M3 delivered as experimental0.4.4; source and installed-package acceptance passed",
+    "ownerAcceptance": "Owner demo acceptance not inferred; technical process stop authorized",
+    "next": "Selective verification tooling/process improvement before further CAD milestones"
   },
   "lastDelivered": {
-    "version": "0.4.3",
-    "commit": "97c62f5a48e08531ad1f60cce1626f1ce8ceb2d9",
-    "pullRequest": 25,
-    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-25-97c62f5a48e08531ad1f60cce1626f1ce8ceb2d9",
-    "acceptanceRun": 45104971025,
-    "publicationRun": 45106380535,
-    "artifactBytes": 100474857,
-    "artifactSha256": "5389160a8758bb777d2c5108de2a7ff10b972490896e64a95b8770fc60a097ce",
-    "verification": "Windows/Linux372 native tests each, full browser/PDF/STEP/performance; actual public Platform0.1.13 install,553 source files matched; NVIDIA GTX1650 UI passed without page/renderer errors."
+    "version": "0.4.4",
+    "commit": "863daea5c96f165c917914fa3124f387e613fba3",
+    "pullRequest": 26,
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-26-863daea5c96f165c917914fa3124f387e613fba3",
+    "acceptanceRun": 45240534757,
+    "publicationRun": 45243129752,
+    "artifactBytes": 100500777,
+    "artifactSha256": "a630e9bc7b96d381187d4f3ff6e643a6bb28695cb2cc66a77992f0595a98edf1",
+    "verification": "Exact-head Windows/Linux379 native tests each; full browser/PDF/36 independent STEP round trips/performance; actual public Platform0.1.13 discovery/install/activation/launch,561 source files matched, Chrome157/NVIDIA GTX1650 current demo passed with zero page/renderer errors."
   },
   "constraints": [
     "MASTER_DESIGN is intent; implementation requires code and matching evidence.",
@@ -35,23 +35,20 @@
     "handoff": "AI_HANDOFF.md",
     "architecture": "docs/architecture/ADR_REGISTER.md",
     "currentCadScope": "docs/E4_M3_MATES_MOTION.md",
-    "deliveryGate": "docs/MILESTONE_DELIVERY.md"
+    "deliveryGate": "docs/MILESTONE_DELIVERY.md",
+    "verification": "docs/VERIFICATION.md"
   },
-  "candidate": {
-    "version": "0.4.4",
-    "branch": "engineer/e4-m3-mates-motion",
-    "status": "Frozen acceptance candidate; full validation/public installation and owner review pending"
-  },
+  "candidate": null,
   "previousDelivered": {
-    "version": "0.4.2",
-    "commit": "dc2541e92a158799448b33e8b12cae09e970bbbb",
-    "pullRequest": 24,
-    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-24-dc2541e92a158799448b33e8b12cae09e970bbbb",
-    "acceptanceRun": 44297236874,
-    "publicationRun": 45078355142,
-    "artifactBytes": 100435613,
-    "artifactSha256": "649ecacafc7dcd0ddaf4c9c7460b011d662636a7da2bf7a6e5c11dd3728c4085",
-    "verification": "Exact-head Windows/Linux358 native tests each, complete browser/PDF/STEP/performance passed; actual public Platform0.1.13 install and Chrome157/NVIDIA demo passed;541 source files matched; zero page/renderer errors."
+    "version": "0.4.3",
+    "commit": "97c62f5a48e08531ad1f60cce1626f1ce8ceb2d9",
+    "pullRequest": 25,
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-25-97c62f5a48e08531ad1f60cce1626f1ce8ceb2d9",
+    "acceptanceRun": 45104971025,
+    "publicationRun": 45106380535,
+    "artifactBytes": 100474857,
+    "artifactSha256": "5389160a8758bb777d2c5108de2a7ff10b972490896e64a95b8770fc60a097ce",
+    "verification": "Windows/Linux372 native tests each, full browser/PDF/STEP/performance; actual public Platform0.1.13 install,553 source files matched; NVIDIA GTX1650 UI passed without page/renderer errors."
   },
   "earlierDelivered": {
     "version": "0.1.8",
@@ -117,10 +114,10 @@
     "publicationRun": 43761813724
   },
   "development": {
-    "branch": "engineer/project-workspace",
-    "base": "cc3b6f26f21729e94acab2b757440befe7b02171",
-    "scope": "docs/requests/PROJECT_WORKSPACE_2026_11_16.md",
-    "design": "docs/architecture/ADR-029-PROJECT-WORKSPACE.md"
+    "branch": "engineer/selective-verification",
+    "base": "863daea5c96f165c917914fa3124f387e613fba3",
+    "scope": "Owner-authorized selective verification, compact reports and reusable isolated UI scenarios; no product version change",
+    "design": "docs/VERIFICATION.md"
   },
   "previousStableDelivered": {
     "version": "0.2.6",
@@ -131,5 +128,29 @@
     "publicationRun": 42400464406,
     "artifactSha256": "31e653ebfa0f25ee929618fa367640b38f5e78aa858aeb023e521dff9832b30c",
     "verification": "Owner accepted E2. Windows and Ubuntu exact main acceptance passed. Stable 0.2.6 published and independently installed from the public Platform 0.1.13 catalog, including assistant and PDF regression."
-  }
+  },
+  "deliveryHistory": [
+    {
+      "version": "0.4.2",
+      "commit": "dc2541e92a158799448b33e8b12cae09e970bbbb",
+      "pullRequest": 24,
+      "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-24-dc2541e92a158799448b33e8b12cae09e970bbbb",
+      "acceptanceRun": 44297236874,
+      "publicationRun": 45078355142,
+      "artifactBytes": 100435613,
+      "artifactSha256": "649ecacafc7dcd0ddaf4c9c7460b011d662636a7da2bf7a6e5c11dd3728c4085",
+      "verification": "Exact-head Windows/Linux358 native tests each, complete browser/PDF/STEP/performance passed; actual public Platform0.1.13 install and Chrome157/NVIDIA demo passed;541 source files matched; zero page/renderer errors."
+    },
+    {
+      "version": "0.4.3",
+      "commit": "97c62f5a48e08531ad1f60cce1626f1ce8ceb2d9",
+      "pullRequest": 25,
+      "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-25-97c62f5a48e08531ad1f60cce1626f1ce8ceb2d9",
+      "acceptanceRun": 45104971025,
+      "publicationRun": 45106380535,
+      "artifactBytes": 100474857,
+      "artifactSha256": "5389160a8758bb777d2c5108de2a7ff10b972490896e64a95b8770fc60a097ce",
+      "verification": "Windows/Linux372 native tests each, full browser/PDF/STEP/performance; actual public Platform0.1.13 install,553 source files matched; NVIDIA GTX1650 UI passed without page/renderer errors."
+    }
+  ]
 }
