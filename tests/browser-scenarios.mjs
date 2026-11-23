@@ -18,13 +18,14 @@ export const browserScenarios = [
   ['editing-recovery', 'editing-recovery', 'verifyRecoveryProjectUI', 'e2-m3-drawing-proposal', 'E2.M3 Drawing Proposal'],
   ['workbench', 'workbench', 'verifyWorkbenchUI', 'e1-m1-workbench', 'E1.M1 Model Workbench'],
   ['proof', 'proof', 'verifyProofUI', 'e0-m6-drawing-gpu', 'E0.M6 Drawing & GPU Lab'],
+  ['versioned-assemblies', 'e4-m4', 'verifyE4M4UI', 'e4-m4-versioned-assemblies', 'E4.M4 Versioned Assembly'],
   ['startup', 'startup', 'verifyStartupRecovery'],
 ].map(([id, module, entry, fixtureId, fixtureName]) => ({
   id, module: `./browser-${module}.mjs`, entry,
   fixtures: fixtureId ? [{id: fixtureId, name: fixtureName}] : [],
 }));
 
-export const constructionScenarios = browserScenarios.slice(0, 11).map(s => s.id);
+export const constructionScenarios = [...browserScenarios.slice(0, 11).map(s => s.id), 'versioned-assemblies'];
 
 export function scenarioById(id) {
   const scenario = browserScenarios.find(s => s.id === id);

@@ -38,3 +38,5 @@ export function icon(name){
  return paths[name]?`<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="${paths[name]}" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`:`<img src="/icons/${name}.svg" width="18" height="18" alt="">`;}
 
 Object.assign(paths,{hand:'M6 12V6a2 2 0 0 1 4 0v5-8a2 2 0 0 1 4 0v8-6a2 2 0 0 1 4 0v7-3a2 2 0 0 1 4 0v6l-4 7H9l-6-8a2 2 0 0 1 3-2z',assembly:'M2 6l5-3 5 3-5 3zM2 6v6l5 3 5-3V6M12 13l5-3 5 3-5 3zM12 13v6l5 3 5-3v-6',between:'M3 3v18M21 3v18M12 3v18M4 12h16m-3-3 3 3-3 3m-10-6-3 3 3 3'});
+
+Object.assign(paths,{reverse:'M3 7h16m-4-4 4 4-4 4M21 17H5m4-4-4 4 4 4'});

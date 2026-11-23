@@ -99,3 +99,7 @@ body.assembly-constructing .proof-inspector,body.assembly-constructing .assembly
 .mate-tree-row{display:flex;align-items:center;gap:4px}.mate-tree-row>button{flex:1}.component-fixed{margin-left:auto;display:inline-flex}.component-fixed svg{width:14px;height:14px}
 
 #project-files{max-width:var(--project-pane-width,100%);box-sizing:border-box}
+
+/* Shared mate/motion relation controls keep vector glyphs centered. */
+.assembly-mode-buttons button {display:inline-flex;align-items:center;justify-content:center;}
+.assembly-mode-buttons button svg {display:block;flex:none;margin:0;}

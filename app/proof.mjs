@@ -22,7 +22,7 @@ async function build({automatic=false,reuseCurrent=false,previewOperation=null,o
 async function selectId(selectionId,kind,pick,interactionOrigin){
  if(!proof)throw Error('Build the current model before selecting geometry.');
  const source=proof,epoch=presentationEpoch,intent=++selectionSequence;
- const selected=await api('proof/pick',{manifestId:source.manifestId,expectedRevision:source.revision,selectionId,kind});
+ let selected;try{selected=await api('proof/pick',{manifestId:source.manifestId,expectedRevision:source.revision,selectionId,kind});}catch(error){if(intent!==selectionSequence||proof?.manifestId!==source.manifestId||presentationEpoch!==epoch)return null;const current=await api('document').catch(()=>null);if(current&&current.document.revision!==source.revision)return null;throw error;}
  if(intent!==selectionSequence||proof?.manifestId!==source.manifestId||presentationEpoch!==epoch)return null;
  selection=selected;$('proof-reference').textContent=JSON.stringify({reference:selected,...(pick?{pick}:{})},null,2);renderer.selected=selectionId;renderer.prepare();emitSelection(interactionOrigin);await renderer.render();
  if(intent!==selectionSequence||selection!==selected||proof?.manifestId!==source.manifestId||presentationEpoch!==epoch)return null;

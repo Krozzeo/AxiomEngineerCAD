@@ -68,3 +68,5 @@ References: [Master §21](../../MASTER_DESIGN.md#21-risks-experiments-and-archit
 - [ADR030 — Native spatial mates](ADR-030-NATIVE-SPATIAL-MATES.md): E4.M2 occurrence-bound analytic relations, DOF, constrained motion and atomic failure.
 
 - [ADR031 — Responsive assembly motion](ADR-031-RESPONSIVE-ASSEMBLY-MOTION.md): E4.M3 constrained pointer projection, native mate preview and shared relation trees.
+
+- [ADR032 — Grouped motion and published components](ADR-032-MOTION-SESSIONS-PUBLISHED-COMPONENTS.md): E4.M4 staged poses, GPU transforms and immutable Latest/Pinned updates.

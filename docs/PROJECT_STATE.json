@@ -7,10 +7,10 @@
     "sha256": "9355662f442d6b766950d147409a523e189bfd9a1826ad1d913b6b1eb7e50a9e"
   },
   "milestone": {
-    "current": "E4.M3 remaining mates and responsive motion",
-    "status": "E4.M3 delivered as experimental0.4.4; source and installed-package acceptance passed",
-    "ownerAcceptance": "Owner demo acceptance not inferred; technical process stop authorized",
-    "next": "Selective verification tooling/process improvement before further CAD milestones"
+    "current": "E4.M4 published component versions, Latest/Pinned and safe updates",
+    "status": "0.4.5 candidate frozen for exact-head complete acceptance; focused motion/version domain and real hardware UI checks passed; full exact-head acceptance/public installation pending",
+    "ownerAcceptance": "Owner authorized M4 and assembly corrections; explicitly chose grouped motion sessions; demo review pending",
+    "next": "Freeze candidate, complete exact-head Windows/Linux acceptance and publish/verify experimental0.4.5"
   },
   "lastDelivered": {
     "version": "0.4.4",
@@ -34,11 +34,15 @@
     "implementation": "IMPLEMENTATION_STATUS.md",
     "handoff": "AI_HANDOFF.md",
     "architecture": "docs/architecture/ADR_REGISTER.md",
-    "currentCadScope": "docs/E4_M3_MATES_MOTION.md",
+    "currentCadScope": "docs/E4_M4_VERSIONS.md",
     "deliveryGate": "docs/MILESTONE_DELIVERY.md",
     "verification": "docs/VERIFICATION.md"
   },
-  "candidate": null,
+  "candidate": {
+    "version": "0.4.5",
+    "branch": "engineer/e4-m4-versioned-assemblies",
+    "status": "Frozen candidate; complete exact-head acceptance/public installation pending"
+  },
   "previousDelivered": {
     "version": "0.4.3",
     "commit": "97c62f5a48e08531ad1f60cce1626f1ce8ceb2d9",
@@ -114,10 +118,10 @@
     "publicationRun": 43761813724
   },
   "development": {
-    "branch": "engineer/selective-verification",
-    "base": "863daea5c96f165c917914fa3124f387e613fba3",
-    "scope": "Owner-authorized selective verification, compact reports and reusable isolated UI scenarios; no product version change",
-    "design": "docs/VERIFICATION.md"
+    "branch": "engineer/e4-m4-versioned-assemblies",
+    "base": "b4f471adbbcdac5ea5e99de3a9ccc51dcb9a9663",
+    "scope": "docs/requests/E4_M4_OWNER_CHANGES_2026_11_23.md",
+    "design": "docs/architecture/ADR-032-MOTION-SESSIONS-PUBLISHED-COMPONENTS.md"
   },
   "previousStableDelivered": {
     "version": "0.2.6",

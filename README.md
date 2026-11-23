@@ -1,3 +1,5 @@
+Current development: [E4.M4 /0.4.5 candidate](docs/E4_M4_VERSIONS.md); use [selective verification](docs/VERIFICATION.md). Published delivery provenance is in [PROJECT_STATE](docs/PROJECT_STATE.json).
+
 # Axiom Engineer CAD
 
 Local-first, browser-operated parametric mechanical CAD and engineering-documentation product in the Axiom family, designed from the outset for both human users and AI agents.

@@ -48,7 +48,7 @@ export class Document {
   pending() { return [...this.buffers.values()].some(b => b.dirty); }
   status() {
     return {projectId:this.value.documentId, name:this.value.metadata.name, revision:this.value.revision,
-      savedRevision:this.saved.revision,...(this.readOnly?{readOnly:true}:{}),dirty:JSON.stringify(this.value) !== JSON.stringify(this.saved) || this.pending() || this.recovery?.state==='RecoveryRequired',
+      savedRevision:this.saved.revision,...(this.readOnly?{readOnly:true}:{}),dirty:JSON.stringify(this.value) !== JSON.stringify(this.saved) || this.pending() || !!this.stagedMotion || this.recovery?.state==='RecoveryRequired',
       busy:!!this.lab?.running||!!this.commands?.running||!!this.proof?.running, pendingBuffers:this.pending(),recovery:this.recovery};
   }
   view() { return {document:structuredClone(this.value), status:this.status()}; }
@@ -62,7 +62,7 @@ export class Document {
     this.buffers.set(clientId, {sequence, dirty}); return {status:this.status()};
   }
   edit({metadata, expectedRevision}) {
-    this.expect(expectedRevision); validateMetadata(metadata);
+    this.expect(expectedRevision);check(!this.stagedMotion,'projectBusy','Finish the motion session before editing metadata.'); validateMetadata(metadata);
     check(this.value.revision < Number.MAX_SAFE_INTEGER, 'invalidRequest', 'Revision limit reached.');
     const next = {...this.value, revision:this.value.revision + 1, metadata:structuredClone(metadata)};
     this.commands?.history.record(this.value,next);this.value=next;
@@ -70,6 +70,7 @@ export class Document {
   }
   async save(expectedRevision,operationId=randomUUID()) {
     this.expect(expectedRevision);
+    if(this.stagedMotion){await this.workspace.flushMotion(this);expectedRevision=this.value.revision;}
     // Background sketch inspection/preview cannot change MAIN. Finish that read
     // under the existing adapter queue, then repeat the causal revision check.
     if(this.commands?.running&&['sketch-diagnostics','sketch-preview'].includes(this.commands.job.kind))await this.commands.job.promise;

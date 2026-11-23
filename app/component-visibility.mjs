@@ -25,11 +25,11 @@ function open(path,x,y){
   for(const [state,name]of [['model','Model'],['entire','Entire part']]){const b=button(name,async()=>{const id=await key(path),hidden=preference(id)==='hide';await setPreferences([{id:id+'-view',state},...(!hidden?[{id,state}]:[])]);},choices);b.setAttribute('aria-pressed',String((mode(path,{editing:false})==='hide'?preference(keys.get(JSON.stringify(path))+'-view'):mode(path,{editing:false}))===state));}
  }
  if(path?.length>2)for(const group of window.engineerComponents.nodes().filter(n=>n.kind==='assembly'&&n.path.length>1&&n.path.length<path.length&&n.path.every((id,i)=>path[i]===id)))button('Select group · '+group.name,()=>window.engineerComponents.choose(group));
- window.engineerExtendComponentMenu?.(path,menu);if(!menu.children.length)return;
+ window.engineerExtendComponentMenu?.(path,menu,{allowGroup:document.querySelector('[data-wb-tree=mates]')?.getAttribute('aria-selected')!=='true'});if(!menu.children.length)return;
  Object.assign(menu.style,{left:Math.min(x,innerWidth-210)+'px',top:Math.min(y,innerHeight-190)+'px'});menu.hidden=false;
 }
 document.querySelector('.wb-tree').addEventListener('contextmenu',event=>{
- if(document.querySelector('[data-wb-tree=components]')?.getAttribute('aria-selected')!=='true')return;
+ if(event.target.closest('[data-mate-id]'))return;if(!['components','mates'].some(tab=>document.querySelector('[data-wb-tree='+tab+']')?.getAttribute('aria-selected')==='true'))return;
  event.preventDefault();event.stopImmediatePropagation();const row=event.target.closest('[data-component-path]'),path=row?JSON.parse(row.dataset.componentPath):null,node=path&&window.engineerComponents.nodes().find(n=>same(n.path,path));
  if(node)window.engineerComponents.choose(node,{preserve:true});open(path,event.clientX,event.clientY);
 },true);
