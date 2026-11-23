@@ -20,7 +20,7 @@ export async function beginMotion(scene,nodes){const model=await motionModel().c
 function retire(){epoch++;cached=null;loading=null;pendingCommits=0;}
 window.addEventListener('engineer-workspace-activated',retire);
 window.addEventListener('engineer-document-changed',event=>{if(!event.detail.assemblyMotion)retire();});
-window.addEventListener('engineer-proof-built',()=>{if(pendingCommits&&cached){const model=cached.model;applyAssemblyModel(v.proof.scene,{...model,sourcePoses:model.paths.map((path,i)=>{const o=v.proof.scene.occurrences.find(o=>same(o.path,path));return o?{position:o.position,quaternion:o.quaternion}:model.sourcePoses[i];})});}else{cached=null;if(v.renderer.scene?.occurrences.length)void motionModel().catch(()=>{});}});
+window.addEventListener('engineer-proof-built',()=>{if(pendingCommits&&cached){const model=cached.model;applyAssemblyModel(v.proof.scene,{...model,sourcePoses:model.paths.map((path,i)=>{const o=v.proof.scene.occurrences.find(o=>same(o.path,path));return o?{position:o.position,quaternion:o.quaternion}:model.sourcePoses[i];})});}else{cached=null;if(!v.proof?.preview&&!window.engineerComponentContext&&v.renderer.scene?.occurrences.some(o=>o.path.length>1))void motionModel().catch(()=>{});}});
 window.addEventListener('engineer-assembly-motion-committed',event=>{pendingCommits=Math.max(0,pendingCommits-1);if(!event.detail.success){retire();void v.build({reuseCurrent:true});}else if(!pendingCommits){cached=null;void motionModel().catch(()=>{});}});
 window.engineerAssemblyOptimisticPose=path=>pendingCommits?cached?.model.recipe.bodies[cached.model.paths.findIndex(p=>same(p,path))]?.pose:null;
 window.engineerApplyAssemblyModel=applyAssemblyModel;
