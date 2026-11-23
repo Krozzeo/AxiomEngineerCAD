@@ -2,7 +2,7 @@
 
 Local-first, browser-operated parametric mechanical CAD and engineering-documentation product in the Axiom family, designed from the outset for both human users and AI agents.
 
-> **Current candidate: 0.3.5 / E3.M2 feature operations.** See [tools and demo](docs/E3_M2_FEATURE_OPERATIONS.md).
+> **Current candidate:0.4.3 / E4.M2 spatial mate foundation.** See [scope and demo checks](docs/E4_M2_SPATIAL_MATES.md). Native occurrence mates, DOF and constrained motion accompany the requested workspace refinements. Full exact-head acceptance and public installation remain separate delivery gates.
 
 Start development with `npm run context` and [the compact context](docs/PROJECT_CONTEXT.md). The [workflow](docs/DEVELOPMENT_WORKFLOW.md) selects focused checks during implementation, then complete exact-head acceptance and real installation proof for delivery.
 

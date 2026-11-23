@@ -1,3 +1,7 @@
+import {workspaceDemo,WORKSPACE_DEMO,workspaceMateDemo,MATE_WORKSPACE_DEMO} from '../src/workspace/demo.mjs';
+import {VersionHistory} from '../src/workspace/versions.mjs';
+import {ProjectWorkspace} from '../src/workspace/session.mjs';
+import {componentDemo,COMPONENT_DEMO} from '../src/components/demo.mjs';
 import {productionDemo,PRODUCTION_DEMO} from '../src/step/production-demo.mjs';
 import {stepDemo,STEP_DEMO} from '../src/step/demo.mjs';
 import {dependencyDemo,DEPENDENCY_DEMO} from '../src/parameters/dependency-demo.mjs';
@@ -39,7 +43,8 @@ import {CadGitHub} from '../src/workbench/github.mjs';
 import {readLayout,saveLayout} from '../src/workbench/layout.mjs';
 
 export class EngineerAdapter {
-  constructor({start = startEditor, demoCatalog = manifest.demos} = {}) {
+  constructor({start = startEditor, demoCatalog = manifest.demos, projectContainers=true} = {}) {
+    this.projectContainers=projectContainers;
     this.start = start; this.demoCatalog = demoCatalog; this.receipts = new Map(); this.queue = Promise.resolve(); this.ended = false;
   }
   enqueue(action) { const result = this.queue.then(action); this.queue = result.catch(() => {}); return result; }
@@ -49,13 +54,26 @@ export class EngineerAdapter {
       m.requestId === m.correlationId && m.actor?.kind === 'human' && typeof m.actor.id === 'string' &&
       typeof m.sessionId === 'string' && m.sessionId.length > 0 && (!this.sessionId || m.sessionId === this.sessionId),
     'permissionDenied', 'Invalid product session envelope.');
-    check(!m.projectId || m.projectId === this.doc?.value.documentId || m.projectId === this.closedProjectId,
+    check(!m.projectId || m.projectId === (this.workspace?.anchor.value.documentId??this.doc?.value.documentId) || m.projectId === this.closedProjectId,
       'permissionDenied', 'Foreign document identity.');
     check(m.params && typeof m.params === 'object' && !Array.isArray(m.params), 'invalidRequest', 'Parameters must be an object.');
     this.sessionId = m.sessionId;
     return this.execute(m.method, m.params);
   }
   async execute(method, params) {
+    if(method==='document.save'){check(this.doc&&!this.doc.readOnly,'ReadOnlyVersion','Open a working part before saving.');this.doc.expect(params.expectedRevision);return this.workspace?this.workspace.saveDocument(this.doc):this.doc.save(params.expectedRevision,params.operationId);}
+    if(method==='workspace.versions'){check(this.workspace,'UnsupportedCapability','Open a workspace first.');return this.workspace.versions();}
+    if(method==='workspace.version.action'){check(this.workspace,'UnsupportedCapability','Open a workspace first.');return this.workspace.versionAction(params);}
+    if(this.doc?.readOnly&&!method.startsWith('workspace.')&&(method==='cad.invoke'&&params.effectClass!=='ReadOnly'||method.startsWith('native.')&&!['native.inspect','native.refresh'].includes(method)||['document.edit','document.save','lab.run','lab.apply'].includes(method)))check(false,'ReadOnlyVersion','This version is read-only. Create a branch to edit it.');
+    if(method==='workspace.visibility'||method==='workspace.visibility.save'){check(this.workspace,'UnsupportedCapability','Project workspace is unavailable.');const doc=this.workspace.editContext?.assembly??this.doc;return method==='workspace.visibility'?readVisibility(doc):saveVisibility(doc,params);}
+    if(method==='workspace.preload'){check(this.workspace,'UnsupportedCapability','Project workspace is unavailable.');return this.workspace.preload(params.id);}
+    if(method==='workspace.mates'){check(this.workspace,'UnsupportedCapability','Project workspace is unavailable.');return this.workspace.mateDiagnosis();}
+    if(method==='workspace.thumbnail'){check(this.workspace,'UnsupportedCapability','Project workspace is unavailable.');return this.workspace.thumbnail(params.id);}
+    if(method==='workspace.inspect'){check(this.workspace,'UnsupportedCapability','Project workspace is unavailable.');return this.workspace.view();}
+    if(method==='workspace.action'){check(this.workspace,'UnsupportedCapability','Project workspace is unavailable.');return this.workspace.action(params);}
+
+    if(this.workspace&&!this.workspace.activeId&&(method==='cad.invoke'&&params.effectClass!=='ReadOnly'||method.startsWith('native.')&&!['native.inspect','native.refresh'].includes(method)||['lab.run','lab.apply'].includes(method)))check(false,'NoActivePart','Create or open a part/assembly in Project before modeling.');
+    if(method==='proof.build'&&this.doc?.commands?.running&&['query','sketch-diagnostics','sketch-preview'].includes(this.doc.commands.job.kind))await this.doc.commands.job.promise;
     if(method.startsWith('proof.')){check(this.doc&&!this.ended,'cancelled','Open a live study first.');const name=method.slice(6);check(['catalog','status','result','build','cancel','pick','export','preflight'].includes(name),'unsupportedCapability','Unknown proof operation.');const reads=['catalog','status','result'];if(reads.includes(name))return this.doc.proof[name]();const id=params.operationId,key=JSON.stringify({method,params});check(typeof id==='string'&&/^[a-zA-Z0-9_-]{8,100}$/.test(id),'invalidRequest','Use a unique bounded operation identity.');const old=this.receipts.get(id);if(old){check(old.key===key,'invalidRequest','Operation identity reused.');if(old.error)fail(old.error.code,old.error.message);return structuredClone(old.result);}try{const result=await this.doc.proof[name](params);this.receipts.set(id,{key,result:structuredClone(result)});return result;}catch(e){this.receipts.set(id,{key,error:{code:e.code??'operationFailed',message:e.message}});throw e;}}
     if(['cad.catalog','cad.context','cad.status','cad.invoke','cad.grant','cad.revoke','cad.cancel'].includes(method)){check(this.doc&&!this.ended,'cancelled','Open a live study first.');return this.handle(method,params);}
     check(['initialize', ...manifest.capabilities, 'document.inspect', 'document.edit', 'document.buffer','lab.run','lab.inspect','lab.cancel','lab.apply','lab.fixture','native.inspect','native.convert','native.graph','native.snapshot','native.publish','native.restore','native.refresh','native.attach','native.adopt','native.recover','native.removeVersion','ui.layout.get','ui.layout.save','ui.visibility.get','ui.visibility.save'].includes(method),
@@ -112,6 +130,8 @@ export class EngineerAdapter {
       check((await readdir(destination)).length===0,'projectBusy','Demos require a fresh empty destination.');
       const projects=[];let nativePaths;if(p.demoIds.some(id=>id.startsWith('e0-m4-')||id==='e0-m5-review')){const docs=await nativeDemo();nativePaths={};for(const [id,key,folderName]of [['e0-m4-source','source','E0-M4-Source'],['e0-m4-native','consumer','E0-M4-Native']]){const folder=join(destination,folderName);await mkdir(folder);const path=join(folder,FILENAME);await atomicJson(path,docs[key]);nativePaths[id]=path;}if(p.demoIds.includes('e0-m5-review')){const folder=join(destination,'E0-M5-Review');await mkdir(folder);const path=join(folder,FILENAME);await atomicJson(path,await reviewDemo(docs.consumer));nativePaths['e0-m5-review']=path;}}
       for(const demoId of p.demoIds){
+        if([WORKSPACE_DEMO.id,MATE_WORKSPACE_DEMO.id].includes(demoId)){const folder=join(destination,demoId===MATE_WORKSPACE_DEMO.id?'E4-M2-Spatial-Mates':'E4-M1-Project-Workspace');await mkdir(folder);await mkdir(join(folder,'Parts'));const demo=await(demoId===MATE_WORKSPACE_DEMO.id?workspaceMateDemo():workspaceDemo()),path=join(folder,FILENAME);for(const [name,value]of demo.documents)await atomicJson(join(folder,name),value);await atomicJson(path,demo.anchor);await atomicJson(join(folder,'.engineer-project.json'),demo.index);await atomicJson(join(folder,'.engineer-ui.json'),demo.layout);projects.push({demoId,path,...await this.detect(path)});continue;}
+        if(demoId===COMPONENT_DEMO.id){const folder=join(destination,'E4-M1-Shared-Components');await mkdir(folder);const path=join(folder,FILENAME),value=await componentDemo();await runWorker('native-verify',{document:value});await atomicJson(path,value);projects.push({demoId,path,...await this.detect(path)});continue;}
         if(demoId===PRODUCTION_DEMO.id){const folder=join(destination,'E3-M6-Production-Part');await mkdir(folder);const path=join(folder,FILENAME),value=await productionDemo();await runWorker('native-verify',{document:value});await atomicJson(path,value);projects.push({demoId,path,...await this.detect(path)});continue;}
         if(demoId===STEP_DEMO.id){const folder=join(destination,'E3-M5-STEP-Interoperability');await mkdir(folder);const path=join(folder,FILENAME),value=await stepDemo();await runWorker('native-verify',{document:value});await atomicJson(path,value);projects.push({demoId,path,...await this.detect(path)});continue;}
         if(demoId===DEPENDENCY_DEMO.id){const folder=join(destination,'E3-M4-Dependency-Workbench');await mkdir(folder);const path=join(folder,FILENAME),value=await dependencyDemo();await runWorker('native-verify',{document:value});await atomicJson(path,value);projects.push({demoId,path,...await this.detect(path)});continue;}
@@ -156,24 +176,21 @@ export class EngineerAdapter {
         if (create) check((await readdir(folder)).every(n => n === '.axiom-platform-session.lock'), 'projectBusy', 'Project folder changed during creation.');
         const path = create ? join(folder, FILENAME) : detected.path;
         const state=create?{value:initial}:await readState(path),value=state.value;
-        this.doc = new Document(path, value, {authorize:path => authorized(this.root, path),diskHash:state.diskHash,recovery:state.recovery});
-        this.doc.native = new NativeSession(this.doc,this.root);
-        this.doc.lab = new LabSession(this.doc);
-        this.doc.proof = new ProofSession(this.doc,this.root);
-        this.doc.commands = new CommandSession(this.doc,{sessionId:this.sessionId,root:this.root});await this.doc.commands.load();
-        this.assistant=new CadAssistant(this);this.github=new CadGitHub(this);
+        this.doc=await this.loadWorkingDocument(path,{state});
+        this.bindDocumentServices({doc:this.doc});
+        if(this.projectContainers){this.workspace=new ProjectWorkspace(this,this.doc,folder);await this.workspace.initialize({empty:create});}
         this.runtime = await this.start({adapter:this, embeddingOrigin:this.embeddingOrigin});
         check(!this.ended, 'cancelled', 'Session closed before document creation completed.');
-        if (create) await atomicJson(path, value);
-        return {path, status:this.doc.status(), editorUrl:this.runtime.url};
+        if(create){await atomicJson(path,value);if(this.workspace)await this.workspace.catalog.commit(structuredClone(this.workspace.catalog.value));}
+        return {path,status:this.workspace?.status()??this.doc.status(),editorUrl:this.runtime.url};
       } catch (error) { await this.cleanup(); throw error; }
     }
     check(this.doc, 'invalidRequest', 'Open a document first.');
     if(method==='ui.visibility.get')return readVisibility(this.doc);
     if(method==='ui.visibility.save')return saveVisibility(this.doc,p);
-    if(method==='ui.layout.get')return readLayout(this.doc);
-    if(method==='ui.layout.save')return saveLayout(this.doc,p);
-    if (method === 'project.status') return {status:this.doc.status()};
+    if(method==='ui.layout.get')return readLayout(this.workspace?.anchor??this.doc);
+    if(method==='ui.layout.save')return saveLayout(this.workspace?.anchor??this.doc,p);
+    if (method === 'project.status') return {status:this.workspace?.status()??this.doc.status()};
     if (method === 'document.inspect') return this.doc.view();
     if (method === 'document.buffer') return this.doc.reportBuffer(p);
     if (method === 'document.edit') return this.doc.edit(p);
@@ -200,20 +217,26 @@ export class EngineerAdapter {
     if(method==='native.adopt')return this.doc.native.adopt(p);
     if(method==='native.recover')return this.doc.native.recover(p);
     if(method==='native.removeVersion')fail('ReferencedVersion','Immutable versions are append-only; deletion/garbage collection is unsupported.');
+    if (method === 'project.save'&&this.workspace)return this.workspace.saveAll(p.expectedRevision);
     if (method === 'project.save') {if(this.doc.recovery?.state==='Committed'&&this.doc.recovery.operationId===p.operationId&&p.expectedRevision===this.doc.value.revision)return {status:this.doc.status(),receiptConfirmed:true};return this.doc.save(p.expectedRevision,p.operationId);}
     if (method === 'project.close') {
-      this.doc.expect(p.expectedRevision,{allowRecovery:p.decision!=='save'});
+      if(this.workspace)this.workspace.expect(p.expectedRevision);else this.doc.expect(p.expectedRevision,{allowRecovery:p.decision!=='save'});
       check(['save','discard','cancel'].includes(p.decision), 'invalidRequest', 'Choose Save, Discard or Cancel.');
-      if (p.decision === 'cancel') return {closed:false, cancelled:true, status:this.doc.status()};
-      if (p.decision === 'save') await this.doc.save(p.expectedRevision);
-      const status = this.doc.status(); this.closedProjectId = status.projectId;
+      if (p.decision === 'cancel') return {closed:false, cancelled:true, status:this.workspace?.status()??this.doc.status()};
+      if (p.decision === 'save'){if(this.workspace)await this.workspace.saveAll(p.expectedRevision);else await this.doc.save(p.expectedRevision);}
+      const status=this.workspace?.status()??this.doc.status();this.closedProjectId=status.projectId;
       this.ended = true;
       // HTTP close schedules cleanup after its response has been sent.
       if (!this.httpClosing) await this.cleanup();
       return {closed:true, status};
     }
   }
+  async authorizedPath(path){return authorized(this.root,path);}
+  async loadWorkingDocument(path,{state,stateRoot,partId,readOnly=false}={}){state??=await readState(path);const doc=new Document(path,state.value,{authorize:path=>authorized(this.root,path),diskHash:state.diskHash,recovery:state.recovery});if(stateRoot)doc.stateRoot=stateRoot;doc.readOnly=readOnly;doc.versionHistory=new VersionHistory(doc);doc.native=new NativeSession(doc,this.root);doc.lab=new LabSession(doc);doc.proof=new ProofSession(doc,this.root);doc.commands=new CommandSession(doc,{sessionId:partId?this.sessionId+':'+partId:this.sessionId,root:this.root});if(!readOnly)await doc.commands.load();return doc;}
+  bindDocumentServices(session){this.doc=session.doc;session.assistant??=new CadAssistant(this);session.github??=new CadGitHub(this);this.assistant=session.assistant;this.github=session.github;}
+  async closeWorkingDocument(doc){doc.closed=true;await doc.proof?.close();await doc.commands?.close();await doc.lab?.close();}
   async cleanup() {
+    if(this.workspace){const workspace=this.workspace;this.workspace=null;await workspace.shutdown();this.doc=workspace.anchor;}
     this.assistant?.close();
     if (this.doc) this.doc.closed = true;
     await this.doc?.proof?.close();

@@ -22,7 +22,7 @@ export class CadGitHub {
     check(!this.working,'projectBusy','A GitHub operation is running.');
     this.working=true;
     try{
-      const settings=await this.settings(),account=this.peer.account,epoch=this.peer.epoch;
+      const settings=await this.settings(),account=this.peer.account,epoch=this.peer.epoch;check(!settings.pending?.documentId||settings.pending.documentId===this.doc.value.documentId,'projectBusy','Open the part with the pending publication before checking its result.');
       const sameAccount=()=>check(!this.doc.closed&&epoch===this.peer.epoch&&account.id===this.peer.account?.id,'RevisionConflict','The GitHub account changed.');
       const save=async data=>{sameAccount();await writeProjectPreferences(this.doc,settingsFile,data);};
       if(input.action==='repositories')return (await this.peer.repositories()).filter(repo=>repo.canPush);
@@ -73,7 +73,7 @@ export class CadGitHub {
         const previous=await this.peer.manifest(settings.repository,this.prefix,head);
         sameAccount();
         check(previous?.snapshotHash!==snapshotHash,'InvalidInput','This saved snapshot is already published.');
-        this.plan={id:randomUUID(),head,snapshotHash,revision,epoch,change:previous?'Update':'Add'};
+        this.plan={id:randomUUID(),documentId:this.doc.value.documentId,head,snapshotHash,revision,epoch,change:previous?'Update':'Add'};
         return {...this.plan,repository:settings.repository,branch:settings.branch,file:this.prefix+'project.engineer-provisional.json',bytes:bytes.length};
       }
       const plan=this.plan;

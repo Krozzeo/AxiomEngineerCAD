@@ -48,7 +48,7 @@ export class Document {
   pending() { return [...this.buffers.values()].some(b => b.dirty); }
   status() {
     return {projectId:this.value.documentId, name:this.value.metadata.name, revision:this.value.revision,
-      savedRevision:this.saved.revision, dirty:JSON.stringify(this.value) !== JSON.stringify(this.saved) || this.pending() || this.recovery?.state==='RecoveryRequired',
+      savedRevision:this.saved.revision,...(this.readOnly?{readOnly:true}:{}),dirty:JSON.stringify(this.value) !== JSON.stringify(this.saved) || this.pending() || this.recovery?.state==='RecoveryRequired',
       busy:!!this.lab?.running||!!this.commands?.running||!!this.proof?.running, pendingBuffers:this.pending(),recovery:this.recovery};
   }
   view() { return {document:structuredClone(this.value), status:this.status()}; }

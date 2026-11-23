@@ -361,6 +361,7 @@ export function mountServices({document,dock,menu,header,assistant,apiPanel}){
   }
   configMenu.append(make('summary','Config'),choices);menu.insertBefore(configMenu,menu.querySelector('#panels-menu'));
   void run(chatStatus,refreshAI)();void run(ghStatus,refreshGit)();
+  window.addEventListener('engineer-workspace-activated',()=>{setPreview(null);branchKey=null;reviewPlan=null;void refreshAI().catch(()=>{});});
   const timer=setInterval(()=>{if(document.hidden)return;void refreshAI().catch(()=>{});},2500);
   const gitTimer=setInterval(()=>{if(!document.hidden&&!ghWorking)void refreshGit().catch(()=>{});},4000);
   window.addEventListener('pagehide',()=>{clearInterval(timer);clearInterval(gitTimer);composerResize.disconnect();},{once:true});

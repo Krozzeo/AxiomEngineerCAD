@@ -1,6 +1,6 @@
 # E3.M6 — Production part acceptance and exchange corrections
 
-Correction candidate 0.3.13, PR19. The owner authorized E3 stable integration and E4.M1 start. Main remains 0.2.6 until this candidate passes the complete delivery gates. This is a reviewable CAD part acceptance profile, not a manufacturing release or general assembly implementation.
+Stable 0.3.13 is published from main 861e6ff936c77fb3a4eba1d8cdd8239d151c5f73 through owner-authorized PR19/20/21. Exact main Windows/Linux acceptance and actual public Platform installation passed. E4.M1 has started separately; it is not part of this stable release. This is a reviewable CAD part acceptance profile, not a manufacturing release or general assembly implementation.
 
 ## Owner corrections and root cause
 
@@ -43,3 +43,5 @@ STEP metadata accepts arbitrary whitespace around nested unit/schema lists. If a
 Material density accepts positive finite integers and fractions (`step=any`), with explicit English errors for empty/zero/negative values. The old artificial 100000 upper bound is removed from UI/command/native validation consistently. Apply is serialized while running. UI acceptance includes 100, 0.125, 1000001 and the demo's 2700 kg/m³; invalid inputs preserve the committed document.
 
 A presentation-gated regression reproduced early Apply readiness while `renderer.setScene` was deliberately blocked. Model-owner preview/refresh completion now requires the viewport presented manifest, rather than only a computed proof object. The Import panel uses this one completion path; Analyze remains disabled while cancellation drains. Material completion waits for the presented refresh, and native export waits for active work instead of failing on a brief rebuild. The browser test holds actual scene presentation and proves Apply stays disabled until release.
+
+Final closure also resolves the missing Import icon to the existing shared folder asset, keeps dock initialization usable on an interrupted product-version request and preserves parameter rejection diagnostics across delayed document notifications. Each observed failure has a bounded before/after browser case. Main acceptance: https://github.com/Krozzeo/AxiomEngineerCAD/actions/runs/43760510442. Publication: https://github.com/Krozzeo/AxiomEngineerCAD/actions/runs/43761813724. Stable release: https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/v0.3.13. Public installation evidence is retained separately in Engineer-E3-Stable-0.3.13-public-install/validation.json.

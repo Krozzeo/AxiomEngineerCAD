@@ -1,11 +1,14 @@
-# Engineer handoff — E3.M5 STEP / 0.3.11 candidate
+# Current: E4.M2 / 0.4.3 frozen candidate
 
-Current batch: **0.3.13 / E3 closure corrections**. Owner explicitly authorized corrected stable integration into main, followed by E4.M1. Import/Export are Right dock panels; missing STEP units require an explicit retained source-unit choice, valid spaced metadata is recognized; positive finite material density accepts integers/fractions with English validation; Navigation is in the View ribbon. Read docs/E3_M6_PRODUCTION.md. Exact-head PR/main CI, stable publication and real public installation remain delivery gates; none are claimed by this source update. E4.M1 has not yet been implemented.
+Owner requested the M2 spatial mate foundation together with `docs/requests/E4_M2_OWNER_CHANGES_2026_11_22.txt`. See `docs/E4_M2_SPATIAL_MATES.md` and ADR030. Branch `engineer/e4-m2-spatial-mates` is based on publicly delivered0.4.2. Native mate/reference/copy/import tests and actual hardware/software M2 walkthrough passed. Complete exact-head CI/public installation remain pending. No delivery is claimed until those gates pass. Main/stable0.3.13 unchanged.
 
-Previous batch: **0.3.11 / E3.M5 STEP interoperability**, plus the standalone Bottom Dependencies panel driven by Parameter Manager selection. E3.M4/0.3.10 was delivered publicly and accepted by the owner. Read [M5 scope and demo checks](docs/E3_M5_INTEROPERABILITY.md). Complete exact-head acceptance/public installation are required; owner M5 acceptance is pending. Main/stable remain 0.2.6.
+# Engineer handoff — E4.M1 component hierarchy development
+
+Current work: **0.4.2 / E4.M1 workspace interaction refinements**, branch `engineer/workspace-interactions`, based on delivered 0.4.1 (PR23, `91fe145548511ae03c1edf1f7dcd2980da2012fc`). Scope and verification are in [workspace interaction notes](docs/WORKSPACE_INTERACTIONS_0_4_2.md). Focused domain and actual Chrome/NVIDIA workspace checks passed. The candidate is frozen for complete exact-head Windows/Linux CI and actual public installation; neither gate is claimed complete here. This is an owner-requested M1 refinement, not E4.M2 or a stable merge. Main/stable remains0.3.13.
+Previous batch: **0.3.11 / E3.M5 STEP interoperability**, plus the standalone Bottom Dependencies panel driven by Parameter Manager selection. E3.M4/0.3.10 was delivered publicly and accepted by the owner. Read [M5 scope and demo checks](docs/E3_M5_INTEROPERABILITY.md). Complete exact-head acceptance/public installation are required; owner M5 acceptance is pending. At that historical delivery, main/stable were 0.2.6.
 
 
-0.3.9 was publicly installed and verified at 2bab5cdb3ce89cbe32001dbe6ad1478a41cd89cb. The owner requested M4 with functions, chamfer modes and selection-table feedback. Read docs/E3_M4_DEPENDENCIES.md for semantics, compatibility, tests and manual checks. Main/stable remain 0.2.6.
+0.3.9 was publicly installed and verified at 2bab5cdb3ce89cbe32001dbe6ad1478a41cd89cb. The owner requested M4 with functions, chamfer modes and selection-table feedback. Read docs/E3_M4_DEPENDENCIES.md for semantics, compatibility, tests and manual checks. At that historical delivery, main/stable were 0.2.6.
 
 Start with `npm run context`, AGENTS.md, [compact context](docs/PROJECT_CONTEXT.md) and the [integration notes](docs/PRE_E3_ASSISTANT.md). Read docs/E3_M5_INTEROPERABILITY.md for the current batch. E3.M2 construction remains a retained regression fixture.
 
