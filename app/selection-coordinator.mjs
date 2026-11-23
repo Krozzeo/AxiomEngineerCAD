@@ -29,6 +29,6 @@ document.addEventListener('pointerdown',event=>{if(event.button===0&&event.targe
 window.addEventListener('engineer-workspace-activated',()=>window.engineerClearSelection());
 
 for(const name of ['pointerdown','click','keydown'])document.addEventListener(name,event=>{
- if(!window.engineerWorkspaceTransition||event.target.closest?.('.part-tabs')&&(!event.ctrlKey&&!event.metaKey))return;
+ if(!window.engineerWorkspaceTransition||event.target.closest?.('.part-tabs,.part-tab-picker')&&(!event.ctrlKey&&!event.metaKey))return;
  event.preventDefault();event.stopImmediatePropagation();
 },true);

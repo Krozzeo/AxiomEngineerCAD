@@ -22,21 +22,22 @@ export function mountWorkspace({document,dock,projectPanel,versionPanel,header,m
  const error=e=>{document.getElementById('project-error').textContent=e.message;};
  async function action(input){const result=await api('workspace/action',{operationId:crypto.randomUUID(),expectedRevision:workspace.revision,...input});workspace=result;window.engineerWorkspace=result;return result;}
  let switching=false,requestedPart=null;
+ let rebindEpoch=0,transitionCount=0;const inertLocks=new Map();
  async function rebind(next){
-  const locks=[document.getElementById('editor-workspace'),document.querySelector('.command-ribbon')].filter(Boolean).map(node=>[node,node.inert]);window.engineerWorkspaceTransition=true;for(const [node]of locks)node.inert=true;
+  const epoch=++rebindEpoch;transitionCount++;const locks=[document.getElementById('editor-workspace'),document.querySelector('.command-ribbon')].filter(Boolean);window.engineerWorkspaceTransition=true;for(const node of locks){let lease=inertLocks.get(node);if(!lease){lease={count:0,inert:node.inert};inertLocks.set(node,lease);}lease.count++;node.inert=true;}
   window.engineerDiscardAssemblyDrag?.();window.engineerDiscardAssemblyManual?.();window.engineerCancelAssembly?.();window.engineerCancelMate?.();window.engineerClearSelection?.();
   try{window.engineerViewport.suspend();
   window.engineerBindWorkspace(next);workspace=next;
   window.engineerComponentContext=next.editContext?.node??null;
   window.dispatchEvent(new CustomEvent('engineer-component-context-changed'));
-  await window.engineerReloadVisibility?.();
-  await window.engineerReloadOccurrenceVisibility?.();
-  await window.engineerViewport.activateDocument(next);
+  await window.engineerReloadVisibility?.();if(epoch!==rebindEpoch)return;
+  await window.engineerReloadOccurrenceVisibility?.();if(epoch!==rebindEpoch)return;
+  await window.engineerViewport.activateDocument(next);if(epoch!==rebindEpoch)return;
   window.dispatchEvent(new CustomEvent('engineer-workspace-activated',{detail:next}));
-  const current=await api('document');
+  const current=await api('document');if(epoch!==rebindEpoch)return;
   window.dispatchEvent(new CustomEvent('engineer-document-changed',{detail:current}));
-  await window.engineerRefreshSources?.();await refresh();
-  }finally{window.engineerWorkspaceTransition=false;for(const [node,inert]of locks)node.inert=inert;}
+  await window.engineerRefreshSources?.();if(epoch!==rebindEpoch)return;await refresh();
+  }catch(error){if(epoch===rebindEpoch)throw error;}finally{transitionCount--;window.engineerWorkspaceTransition=transitionCount>0;for(const node of locks){const lease=inertLocks.get(node);if(--lease.count===0){node.inert=lease.inert;inertLocks.delete(node);}}}
  }
  window.engineerActivateWorkspace=rebind;
  async function prepareSwitch(){if(window.engineerSketch?.view())await window.engineerSketch.exit();if(window.engineerSketch?.operationActive)document.getElementById('new-sketch-cancel')?.click();window.engineerCancelAssembly?.();await window.engineerCancelFeature?.();}
