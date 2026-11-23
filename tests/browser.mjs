@@ -56,7 +56,7 @@ try {
   await direct.mouse.move(canvasBox.x+canvasBox.width/2,canvasBox.y+canvasBox.height/2);await direct.mouse.down();await direct.mouse.move(canvasBox.x+canvasBox.width/2,canvasBox.y+canvasBox.height/2-40);await direct.mouse.up();
   await direct.locator('#assembly-status').filter({hasText:'UnderDefined · DOF 2 · drag accepted'}).waitFor();
   await direct.waitForFunction(()=>!document.querySelector('#assembly-pose').textContent.includes('35.000000'));
-  await direct.locator('#assembly-keep').click();await direct.locator('#revision').filter({hasText:'2'}).waitFor();
+  await direct.locator('#assembly-keep').click();await direct.locator('.dock-tabs [data-panel=history]').click();await direct.locator('#revision').filter({hasText:'2'}).waitFor();
   const spatialSaved=direct.waitForResponse(r=>r.url().endsWith('/v1/save'));await direct.locator('#save').click();await spatialSaved;
   assert.ok(JSON.parse(await readFile(nativePath)).assembly.bodies[1].pose.position[2]>35);
   await direct.locator('#assembly-suite').click();await direct.locator('#assembly-suite-summary').filter({hasText:'Passed 28 / 28'}).waitFor();
@@ -77,7 +77,7 @@ try {
   await direct.locator('#lab-width').fill('60');await direct.locator('#lab-build').click();
   await direct.locator('#lab-status').filter({hasText:'Completed geometry'}).waitFor();
   await direct.locator('#lab-metrics').filter({hasText:'17434.513322'}).waitFor();
-  await direct.locator('#lab-keep').click();await direct.locator('#revision').filter({hasText:'3'}).waitFor();
+  await direct.locator('#lab-keep').click();await direct.locator('.dock-tabs [data-panel=history]').click();await direct.locator('#revision').filter({hasText:'3'}).waitFor();
   const persisted=direct.waitForResponse(r=>r.url().endsWith('/v1/save'));
   await direct.locator('#save').click();await persisted;await direct.locator('#message').filter({hasText:'Document saved locally'}).waitFor();
   assert.equal(JSON.parse(await readFile(nativePath)).experiment.spec.width,60);
@@ -159,6 +159,7 @@ try {
       if(softwareBrowser)constructionContext.on('page',observe);
       report.featureConstructionRenderer={softwareForced:!!softwareBrowser,flags:softwareBrowser?constructionArgs:[]};
       const {verifyComponentsUI}=await import('./browser-e4-m1.mjs');await verifyComponentsUI({context:constructionContext,host,observe,evidence,report});
+      const {verifyE4M3UI}=await import('./browser-e4-m3.mjs');await verifyE4M3UI({context:constructionContext,host,observe,evidence,report});
       const {verifyE4M2UI}=await import('./browser-e4-m2.mjs');await verifyE4M2UI({context:constructionContext,host,observe,evidence,report});
       const {verifyProjectWorkspaceUI}=await import('./browser-project-workspace.mjs');await verifyProjectWorkspaceUI({context:constructionContext,host,observe,evidence,report});
       const {verifyM6UI}=await import('./browser-e3-m6.mjs');await verifyM6UI({context:constructionContext,host,observe,evidence,report});

@@ -1,10 +1,12 @@
-import {check} from '../document.mjs';
+import {check} from '../errors.mjs';
 import {assemblyRecipe,NUMERIC,SPATIAL,datum} from './profile.mjs';
 import {add,sub,mul,dot,cross,norm,rotate,inverse,qmul,log,increment,rank,linear,exp} from './math.mjs';
 function world(b,ref){const d=datum(b,ref.datumId);return {...d,origin:add(b.pose.position,rotate(b.pose.quaternion,d.origin)),direction:d.direction?rotate(b.pose.quaternion,d.direction):null,quaternion:b.pose.quaternion};}
 export function relations(bodies,mates){const index=new Map(bodies.map(b=>[b.id,b])),rows=[];let singular=false;
   const append=(m,values,unit)=>values.forEach(value=>rows.push({id:m.id,value,unit}));
   for(const m of mates){const a=world(index.get(m.a.bodyId),m.a),b=world(index.get(m.b.bodyId),m.b),v=sub(b.origin,a.origin);
+    if(m.type==='between'){const mid=(refs)=>{const planes=refs.map(ref=>world(index.get(ref.bodyId),ref));return {origin:mul(planes.reduce((v,p)=>add(v,p.origin),[0,0,0]),1/planes.length),direction:planes[0].direction,planes};},x=mid([m.a,...m.extraA]),y=mid([m.b,...m.extraB]);for(const set of [x,y])for(const plane of set.planes.slice(1))append(m,cross(set.direction,plane.direction),'direction');append(m,cross(x.direction,y.direction),'direction');append(m,[dot(sub(y.origin,x.origin),x.direction)],'mm');}
+    if(m.type==='tangent'){if(a.kind==='cylinder'&&b.kind==='cylinder'){append(m,cross(a.direction,b.direction),'direction');append(m,[norm(cross(v,a.direction))-a.radius-b.radius],'mm');}else{const plane=a.kind==='plane'?a:b,cylinder=a.kind==='cylinder'?a:b;append(m,[dot(plane.direction,cylinder.direction)],'direction');append(m,[Math.abs(dot(sub(cylinder.origin,plane.origin),plane.direction))-cylinder.radius],'mm');}}
     if(m.type==='fixed'){const position=m.relative?add(a.origin,rotate(a.quaternion,m.relative.position)):a.origin,quaternion=m.relative?qmul(a.quaternion,m.relative.quaternion):a.quaternion;append(m,sub(b.origin,position),'mm');append(m,log(qmul(b.quaternion,inverse(quaternion))),'rad');}
     if(m.type==='coincident'&&a.kind==='point')append(m,v,'mm');
     if(m.type==='coincident'&&a.kind==='plane'){append(m,cross(a.direction,b.direction),'direction');append(m,[dot(v,a.direction)],'mm');}
@@ -29,17 +31,19 @@ function optimize(initial,mates,extra=()=>[]){let bodies=structuredClone(initial
     if(lambda>=1e12||norm(step)<1e-12)break;
   }return {bodies,iterations,variables};
 }
-export function solveAssembly(input,{drag,targets}={}){
+export function solveAssembly(input,{drag,targets,projectTargets=false}={}){
   const source=assemblyRecipe(input),started=performance.now(),seed=structuredClone(source.bodies);
-  if(source.profile==='E4.M2-spatial/1')for(const m of source.mates.filter(m=>m.type==='perpendicular'||m.type==='angle')){const a=seed.find(b=>b.id===m.a.bodyId),b=seed.find(b=>b.id===m.b.bodyId),wa=world(a,m.a),wb=world(b,m.b);if(norm(cross(wa.direction,wb.direction))<1e-6&&(m.type==='perpendicular'||Math.abs(Math.acos(Math.max(-1,Math.min(1,dot(wa.direction,wb.direction))))-m.value)>1e-8)){const target=!b.grounded?b:!a.grounded?a:null;if(target){let axis=cross(wa.direction,Math.abs(wa.direction[0])<.8?[1,0,0]:[0,1,0]);axis=mul(axis,.02/norm(axis));target.pose.quaternion=qmul(exp(axis),target.pose.quaternion);}}}
+  if(source.profile!=='E0.M3-datums-v0')for(const m of source.mates.filter(m=>m.type==='perpendicular'||m.type==='angle')){const a=seed.find(b=>b.id===m.a.bodyId),b=seed.find(b=>b.id===m.b.bodyId),wa=world(a,m.a),wb=world(b,m.b);if(norm(cross(wa.direction,wb.direction))<1e-6&&(m.type==='perpendicular'||Math.abs(Math.acos(Math.max(-1,Math.min(1,dot(wa.direction,wb.direction))))-m.value)>1e-8)){const target=!b.grounded?b:!a.grounded?a:null;if(target){let axis=cross(wa.direction,Math.abs(wa.direction[0])<.8?[1,0,0]:[0,1,0]);axis=mul(axis,.02/norm(axis));target.pose.quaternion=qmul(exp(axis),target.pose.quaternion);}}}
+  for(const m of source.mates.filter(m=>m.type==='tangent')){const a=seed.find(b=>b.id===m.a.bodyId),b=seed.find(b=>b.id===m.b.bodyId),wa=world(a,m.a),wb=world(b,m.b),target=!b.grounded?b:!a.grounded?a:null;if(!target)continue;if(wa.kind==='cylinder'&&wb.kind==='cylinder'&&norm(cross(sub(wb.origin,wa.origin),wa.direction))<1e-7){const axis=cross(wa.direction,Math.abs(wa.direction[0])<.8?[1,0,0]:[0,1,0]);target.pose.position=add(target.pose.position,mul(axis,.02/norm(axis)));}else if(wa.kind!==wb.kind){const plane=wa.kind==='plane'?wa:wb,cylinder=wa.kind==='cylinder'?wa:wb;if(Math.abs(dot(sub(cylinder.origin,plane.origin),plane.direction))<1e-7)target.pose.position=add(target.pose.position,mul(plane.direction,.02));}}
   const base=optimize(seed,source.mates);let solved=base,dragResult=null;
   if(drag||targets?.length){
    const targetList=targets??[drag];for(const drag of targetList){check(drag&&typeof drag==='object'&&Object.keys(drag).every(k=>['bodyId','position','quaternion'].includes(k))&&source.bodies.some(b=>b.id===drag.bodyId),'LostReference','Drag a known body.');
-    check(Array.isArray(drag.position)&&drag.position.length===3&&drag.position.every(x=>Number.isFinite(x)&&Math.abs(x)<=(source.profile==='E4.M2-spatial/1'?1e6:1000)),'InvalidInput','Drag position must be a bounded mm vector.');
+    check(Array.isArray(drag.position)&&drag.position.length===3&&drag.position.every(x=>Number.isFinite(x)&&Math.abs(x)<=(source.profile!=='E0.M3-datums-v0'?1e6:1000)),'InvalidInput','Drag position must be a bounded mm vector.');
     if(drag.quaternion)check(Array.isArray(drag.quaternion)&&drag.quaternion.length===4&&drag.quaternion.every(Number.isFinite)&&Math.abs(norm(drag.quaternion)-1)<1e-8,'InvalidInput','Drag orientation must be a unit quaternion.');
     }
     const extra=bodies=>targetList.flatMap(drag=>{const b=bodies.find(b=>b.id===drag.bodyId);return [...sub(b.pose.position,drag.position).map(value=>({id:'temporary-drag',value,unit:'mm'})),...(drag.quaternion?log(qmul(b.pose.quaternion,inverse(drag.quaternion))).map(value=>({id:'temporary-drag',value,unit:'rad'})):[])];});
-    const attempted=optimize(base.bodies,source.mates,extra),accepted=valid(relations(base.bodies,source.mates).rows)&&valid(relations(attempted.bodies,source.mates).rows)&&valid(extra(attempted.bodies));
+    let attempted=optimize(base.bodies,source.mates,extra);if(projectTargets){const soft=bodies=>extra(bodies).map(row=>({...row,value:row.value*.001}));const near=optimize(base.bodies,source.mates,soft);attempted=optimize(near.bodies,source.mates);}
+    const accepted=valid(relations(base.bodies,source.mates).rows)&&valid(relations(attempted.bodies,source.mates).rows)&&(projectTargets||valid(extra(attempted.bodies)));
     dragResult={accepted,target:structuredClone(targets??drag),reason:accepted?'Temporary target satisfied; permanent mate rank measured after removal.':'Infeasible target; previous feasible poses preserved.',iterations:attempted.iterations};if(accepted)solved=attempted;
   }
   const {rows,J}=jacobian(solved.bodies,solved.variables,source.mates),n=solved.variables.length*6,r=rank(J,n,NUMERIC.rankThreshold),state=relations(solved.bodies,source.mates),redundant=[];
@@ -54,5 +58,5 @@ export function solveAssembly(input,{drag,targets}={}){
     evidence:{rows,maxLengthResidualMm:Math.max(0,...rows.filter(r=>r.unit==='mm').map(r=>Math.abs(r.value))),maxAngularResidualRad:Math.max(0,...rows.filter(r=>r.unit!=='mm').map(r=>Math.abs(r.value))),method:'Central-difference world tangent Jacobian; pivoted local rank; no global uniqueness claim.'},
     applicable,drag:dragResult,recipe:source,poses:solved.bodies.map(b=>({bodyId:b.id,...b.pose})),
     solvedRecipe:applicable?{...source,bodies:solved.bodies}:null,iterations:solved.iterations,elapsedMs:performance.now()-started,
-    limits:['Local numerical prototype; no global convergence proof','Analytic datums only; no arbitrary B-Rep mating','Tangent and width unsupported','CPU datum diagram is not interference or WebGPU evidence']};
+    limits:['Local numerical prototype; no global convergence proof','Analytic datums only; no arbitrary B-Rep mating',...(source.profile==='E0.M3-datums-v0'?['Tangent and width unsupported']:['Analytic cylinder/plane tangency; plane-set Between only']),'CPU datum diagram is not interference or WebGPU evidence']};
 }

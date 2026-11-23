@@ -1,0 +1,13 @@
+# E4.M3 — Remaining mates and responsive motion (0.4.4 candidate)
+
+Owner request: [retained full text](requests/E4_M3_OWNER_CHANGES_2026_11_23.txt). Additional steering: Move component inherits multiple preselected components; during construction Ctrl or Shift adds components and a plain click replaces the selection. Multiple selection uses world/Absolute coordinates.
+
+The candidate adds bounded analytic tangent and Between relations, single-reference Fixed, inferred compatible relation buttons, draft native preview with Cancel/Apply, editing and reciprocal Components/Mates trees. Motion prepares exact native references once, projects temporary targets in a browser worker and validates final poses natively. Project divider/layout/close controls, edit-context focus, selection feedback and exclusive operation inspectors follow the owner request.
+
+Current demo: E4.M3 Mates and Motion. Base fixed, first pin coaxial with6mm plane separation (one spin DOF), second pin free. Use the free pin for relation authoring and motion; retained M2/M1 projects remain historical regression fixtures.
+
+Bounds: analytic cylinder/plane and external parallel cylinder/cylinder tangency; Between plane sets of one or two planes each,3–4 total. No arbitrary-surface tangency, collision avoidance or global convergence claim. Existing fixed-pair relations retain their meaning. New Fixed pins one owned rigid occurrence to its current world frame. External assembly files move rigidly at their file boundary.
+
+Verification: six focused native M3 tests and the378-test full native suite passed. Actual Chrome/NVIDIA M3 and historical M2 UI walkthroughs passed, including consecutive and partially constrained drags, native tangent/Between previews, editing, model selection and reference retirement. Final layout/cancellation checks and complete exact-head Windows/Linux browser/PDF/STEP/performance, immutable publication and actual public Platform installation remain mandatory. The source candidate is frozen before final acceptance; matching delivery evidence will be recorded externally without a self-referential source commit.
+
+Implementation recovery evidence: a stale tree-selection suppression flag could swallow a later Model pick. Semantic selection now carries its UI origin through the asynchronous pick result. Worker previews have per-gesture cancellation and context retirement; accepted pointer poses stay visible while revision-checked native commits queue. Between reference traversal covers reparent, copy/import and deletion; Fixed supports owned organizational groups without fabricating GPU geometry for their frames. All relation buttons reuse valid existing vector glyphs.

@@ -1,3 +1,4 @@
+import {mateReferences} from '../assembly/native-profile.mjs';
 import {check,validate} from '../document.mjs';
 import {componentTree} from './hierarchy.mjs';
 import {qmul,rotate,inverse,sub,exp} from '../assembly/math.mjs';
@@ -22,7 +23,7 @@ export function reparentComponent(value,{path,parentPath,beforeId=null,contextPa
  check(all.filter(n=>n.instanceId===node.instanceId&&n.instanceOwnerDocumentId===value.documentId).length===1||contextPath?.length>1&&contextPath.every((id,i)=>node.path[i]===id),'AmbiguousReference','Edit the shared group to reorganize its contents.');
  const next=structuredClone(value),g=next.native.graph,item=g.instances.find(i=>i.id===node.instanceId);item.ownerDefinitionId=parent.definitionId;
  item.transform={position:rotate(inverse(parent.placement.quaternion),sub(node.placement.position,parent.placement.position)),quaternion:qmul(inverse(parent.placement.quaternion),node.placement.quaternion)};
- if(g.spatial){const moved=old=>path.every((id,i)=>old[i]===id)?[...parentPath,item.id,...old.slice(path.length)]:old;g.spatial.grounded=g.spatial.grounded.map(moved);for(const mate of g.spatial.mates)for(const ref of [mate.a,mate.b])ref.occurrencePath=moved(ref.occurrencePath);}
+ if(g.spatial){const moved=old=>path.every((id,i)=>old[i]===id)?[...parentPath,item.id,...old.slice(path.length)]:old;g.spatial.grounded=g.spatial.grounded.map(moved);for(const mate of g.spatial.mates)for(const ref of mateReferences(mate))ref.occurrencePath=moved(ref.occurrencePath);}
  g.instances=g.instances.filter(i=>i.id!==item.id);const at=beforeId?g.instances.findIndex(i=>i.id===beforeId&&i.ownerDefinitionId===parent.definitionId):-1;check(!beforeId||at>=0,'LostReference','The target sibling changed.');if(at>=0)g.instances.splice(at,0,item);else g.instances.push(item);validate(next);return next;
 }
 

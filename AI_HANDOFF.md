@@ -1,10 +1,14 @@
-# Current: E4.M2 / 0.4.3 frozen candidate
+# Current: E4.M3 /0.4.4 acceptance candidate
 
-Owner requested the M2 spatial mate foundation together with `docs/requests/E4_M2_OWNER_CHANGES_2026_11_22.txt`. See `docs/E4_M2_SPATIAL_MATES.md` and ADR030. Branch `engineer/e4-m2-spatial-mates` is based on publicly delivered0.4.2. Native mate/reference/copy/import tests and actual hardware/software M2 walkthrough passed. Complete exact-head CI/public installation remain pending. No delivery is claimed until those gates pass. Main/stable0.3.13 unchanged.
+See [M3 scope](docs/E4_M3_MATES_MOTION.md), ADR031 and docs/PROJECT_STATE.json. Branch `engineer/e4-m3-mates-motion` is based on delivered0.4.3/PR25. Six focused native M3 cases and the378-test native suite pass; actual Chrome/NVIDIA M3 and M2 workflows passed. Final exact-head full acceptance and public installation remain pending. Main/stable0.3.13 is unchanged.
+
+Delivered0.4.3 provenance:97c62f5a48e08531ad1f60cce1626f1ce8ceb2d9, acceptance45104971025, publication45106380535; public Platform0.1.13/NVIDIA verified553 source files and zero page/renderer errors.
+
+Historical implementation notes follow; their pending gates describe those earlier candidates, not the current delivery.
 
 # Engineer handoff — E4.M1 component hierarchy development
 
-Current work: **0.4.2 / E4.M1 workspace interaction refinements**, branch `engineer/workspace-interactions`, based on delivered 0.4.1 (PR23, `91fe145548511ae03c1edf1f7dcd2980da2012fc`). Scope and verification are in [workspace interaction notes](docs/WORKSPACE_INTERACTIONS_0_4_2.md). Focused domain and actual Chrome/NVIDIA workspace checks passed. The candidate is frozen for complete exact-head Windows/Linux CI and actual public installation; neither gate is claimed complete here. This is an owner-requested M1 refinement, not E4.M2 or a stable merge. Main/stable remains0.3.13.
+Historical0.4.2 implementation record: **0.4.2 / E4.M1 workspace interaction refinements**, branch `engineer/workspace-interactions`, based on delivered 0.4.1 (PR23, `91fe145548511ae03c1edf1f7dcd2980da2012fc`). Scope and verification are in [workspace interaction notes](docs/WORKSPACE_INTERACTIONS_0_4_2.md). Focused domain and actual Chrome/NVIDIA workspace checks passed. The candidate is frozen for complete exact-head Windows/Linux CI and actual public installation; neither gate is claimed complete here. This is an owner-requested M1 refinement, not E4.M2 or a stable merge. Main/stable remains0.3.13.
 Previous batch: **0.3.11 / E3.M5 STEP interoperability**, plus the standalone Bottom Dependencies panel driven by Parameter Manager selection. E3.M4/0.3.10 was delivered publicly and accepted by the owner. Read [M5 scope and demo checks](docs/E3_M5_INTEROPERABILITY.md). Complete exact-head acceptance/public installation are required; owner M5 acceptance is pending. At that historical delivery, main/stable were 0.2.6.
 
 

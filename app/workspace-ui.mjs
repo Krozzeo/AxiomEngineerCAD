@@ -9,7 +9,7 @@ export function mountWorkspace({document,dock,projectPanel,versionPanel,header,m
  if(dockControls)projectPanel.prepend(dockControls);document.getElementById('project-refresh').innerHTML=icon('refresh');
  const divider=projectPanel.querySelector('.project-tree-divider'),pane=projectPanel.querySelector('.project-browser');
  let treeWidth=dock.value().sizes?.projectTreeWidth??150,splitDrag=null;
- const resizeProject=()=>{if(!pane.clientWidth||!pane.clientHeight)return;const place=dock.value().positions.project,side=['left','right'].includes(place),available=Math.max(40,pane.clientWidth-treeWidth-6),size=Math.max(40,Math.min(145,side?available*.62:Math.min(available*.62,pane.clientHeight-32)));pane.style.setProperty('--project-tree-width',Math.max(60,Math.min(treeWidth,pane.clientWidth-50))+'px');pane.style.setProperty('--project-tile-size',size+'px');};
+ const resizeProject=()=>{if(!pane.clientWidth||!pane.clientHeight)return;const place=dock.value().positions.project,side=['left','right'].includes(place),available=Math.max(40,pane.clientWidth-treeWidth-6),size=Math.max(40,Math.min(145,side?available*.62:Math.min(available*.62,pane.clientHeight-32)));pane.style.setProperty('--project-pane-width',pane.clientWidth+'px');pane.style.setProperty('--project-tree-width',treeWidth+'px');pane.style.setProperty('--project-tile-size',size+'px');};
  const observer=new ResizeObserver(resizeProject);observer.observe(pane);
  divider.onpointerdown=e=>{e.preventDefault();splitDrag={x:e.clientX,width:treeWidth};divider.setPointerCapture(e.pointerId);};
  divider.onpointermove=e=>{if(!splitDrag)return;treeWidth=Math.max(60,Math.min(700,splitDrag.width+e.clientX-splitDrag.x));resizeProject();};

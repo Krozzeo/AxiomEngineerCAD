@@ -7,21 +7,21 @@
     "sha256": "9355662f442d6b766950d147409a523e189bfd9a1826ad1d913b6b1eb7e50a9e"
   },
   "milestone": {
-    "current": "E4.M2 spatial mate solver foundation",
-    "status": "0.4.3 candidate frozen for exact-head acceptance: native mate/reference/copy regressions and actual hardware/software M2 UI walkthrough passed; full browser, Windows/Linux CI and public installation pending",
-    "ownerAcceptance": "0.4.2 delivered; owner requested M2 plus attached workspace refinements",
-    "next": "Complete exact-head Windows/Linux acceptance and immutable experimental publication; verify actual public Platform installation"
+    "current": "E4.M3 remaining mates and responsive motion",
+    "status": "0.4.4 candidate frozen for exact-head complete acceptance;378 native tests and actual GPU M3/M2 workflows passed during focused validation",
+    "ownerAcceptance": "Owner requested M3 plus attached corrections and explicit Ctrl/Shift multi-selection behavior",
+    "next": "Complete Windows/Linux acceptance, immutable experimental publication and actual public Platform install/launch"
   },
   "lastDelivered": {
-    "version": "0.4.2",
-    "commit": "dc2541e92a158799448b33e8b12cae09e970bbbb",
-    "pullRequest": 24,
-    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-24-dc2541e92a158799448b33e8b12cae09e970bbbb",
-    "acceptanceRun": 44297236874,
-    "publicationRun": 45078355142,
-    "artifactBytes": 100435613,
-    "artifactSha256": "649ecacafc7dcd0ddaf4c9c7460b011d662636a7da2bf7a6e5c11dd3728c4085",
-    "verification": "Exact-head Windows/Linux358 native tests each, complete browser/PDF/STEP/performance passed; actual public Platform0.1.13 install and Chrome157/NVIDIA demo passed;541 source files matched; zero page/renderer errors."
+    "version": "0.4.3",
+    "commit": "97c62f5a48e08531ad1f60cce1626f1ce8ceb2d9",
+    "pullRequest": 25,
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-25-97c62f5a48e08531ad1f60cce1626f1ce8ceb2d9",
+    "acceptanceRun": 45104971025,
+    "publicationRun": 45106380535,
+    "artifactBytes": 100474857,
+    "artifactSha256": "5389160a8758bb777d2c5108de2a7ff10b972490896e64a95b8770fc60a097ce",
+    "verification": "Windows/Linux372 native tests each, full browser/PDF/STEP/performance; actual public Platform0.1.13 install,553 source files matched; NVIDIA GTX1650 UI passed without page/renderer errors."
   },
   "constraints": [
     "MASTER_DESIGN is intent; implementation requires code and matching evidence.",
@@ -34,23 +34,24 @@
     "implementation": "IMPLEMENTATION_STATUS.md",
     "handoff": "AI_HANDOFF.md",
     "architecture": "docs/architecture/ADR_REGISTER.md",
-    "currentCadScope": "docs/E4_M2_SPATIAL_MATES.md",
+    "currentCadScope": "docs/E4_M3_MATES_MOTION.md",
     "deliveryGate": "docs/MILESTONE_DELIVERY.md"
   },
   "candidate": {
-    "version": "0.4.3",
-    "branch": "engineer/e4-m2-spatial-mates",
-    "status": "Frozen candidate; complete acceptance and public installation pending; owner review pending"
+    "version": "0.4.4",
+    "branch": "engineer/e4-m3-mates-motion",
+    "status": "Frozen acceptance candidate; full validation/public installation and owner review pending"
   },
   "previousDelivered": {
-    "version": "0.2.5",
-    "commit": "b8bd3c7b99cb0d7a4a8db208608389b78237c1b7",
-    "pullRequest": 18,
-    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-18-b8bd3c7b99cb0d7a4a8db208608389b78237c1b7",
-    "acceptanceRun": 42384834832,
-    "publicationRun": 42385651870,
-    "artifactSha256": "266e6cb581df1e9cc5eb31be93a4bf464a1d15c2187e6077ce80aa1e77448da0",
-    "verification": "Windows and Ubuntu acceptance, public Platform installation and UI review. Owner verified live SVG reconstruction and model-to-drawing; exported A4 landscape with two views and 48 and 12 mm dimensions."
+    "version": "0.4.2",
+    "commit": "dc2541e92a158799448b33e8b12cae09e970bbbb",
+    "pullRequest": 24,
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-24-dc2541e92a158799448b33e8b12cae09e970bbbb",
+    "acceptanceRun": 44297236874,
+    "publicationRun": 45078355142,
+    "artifactBytes": 100435613,
+    "artifactSha256": "649ecacafc7dcd0ddaf4c9c7460b011d662636a7da2bf7a6e5c11dd3728c4085",
+    "verification": "Exact-head Windows/Linux358 native tests each, complete browser/PDF/STEP/performance passed; actual public Platform0.1.13 install and Chrome157/NVIDIA demo passed;541 source files matched; zero page/renderer errors."
   },
   "earlierDelivered": {
     "version": "0.1.8",

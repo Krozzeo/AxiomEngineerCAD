@@ -66,3 +66,5 @@ References: [Master §21](../../MASTER_DESIGN.md#21-risks-experiments-and-archit
 - [ADR029 — Project workspace](ADR-029-PROJECT-WORKSPACE.md): owner-authorized independent native files, project tabs, branch/version history and component editing context.
 
 - [ADR030 — Native spatial mates](ADR-030-NATIVE-SPATIAL-MATES.md): E4.M2 occurrence-bound analytic relations, DOF, constrained motion and atomic failure.
+
+- [ADR031 — Responsive assembly motion](ADR-031-RESPONSIVE-ASSEMBLY-MOTION.md): E4.M3 constrained pointer projection, native mate preview and shared relation trees.

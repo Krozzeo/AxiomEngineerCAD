@@ -85,3 +85,17 @@
 .operation-value-table tr[aria-selected=true]{background:#285d80;color:#fff}.operation-value-table tr.preselected{background:#35506b}
 
 .assembly-gizmo{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:18;touch-action:none}.assembly-gizmo[hidden]{display:none}
+
+/* E4.M3: persistent tree divider can clip the file pane; resizing never changes its position. */
+#project-content .project-browser{overflow:hidden}#project-icons{min-width:0}
+.project-close-part{top:0;right:0;background:rgb(0 0 0 / 50%);font-size:22px;font-weight:800;line-height:22px;padding:0 4px;border-radius:0}
+.part-tab-close{display:inline-flex;align-items:center;justify-content:center;background:rgb(0 0 0 / 50%);font-size:18px;font-weight:800;line-height:20px;min-width:20px;height:20px;padding:0}
+.component-edit-bar #component-exit-edit{margin-left:auto}
+.assembly-mode-buttons{display:grid;grid-template-columns:repeat(auto-fit,minmax(36px,1fr));max-width:100%}
+.operation-value-table tr[aria-selected=true]{outline:2px solid #1786ff;outline-offset:-2px}.operation-value-table tr.preselected{outline:2px solid #ff8000;outline-offset:-2px}
+.assembly-relative-toggle{display:flex;align-items:center;gap:8px}.assembly-relative-toggle input{appearance:none;width:34px;height:18px;border-radius:12px;background:#33475b;position:relative;flex:none;cursor:pointer}
+.assembly-relative-toggle input:before{content:'';position:absolute;width:12px;height:12px;top:2px;left:3px;border-radius:50%;background:#d9e7f5}.assembly-relative-toggle input:checked{background:#267ba8}.assembly-relative-toggle input:checked:before{left:17px}
+body.assembly-constructing .proof-inspector,body.assembly-constructing .assembly-diagnostics{display:none!important}
+.mate-tree-row{display:flex;align-items:center;gap:4px}.mate-tree-row>button{flex:1}.component-fixed{margin-left:auto;display:inline-flex}.component-fixed svg{width:14px;height:14px}
+
+#project-files{max-width:var(--project-pane-width,100%);box-sizing:border-box}
