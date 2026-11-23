@@ -1,11 +1,12 @@
+import {motionModel,applyAssemblyModel} from './assembly-motion.mjs';
 import {editorDocument as document} from './editor-document.mjs';
 import {api} from './cad-commands.mjs';
 let sequence=0,pending=Promise.resolve(),flushing=null;
 export async function stageMotion(input){
- const task=pending.then(async()=>{const doc=(await api('document')).document;
+ const task=pending.then(async()=>{const previous=!input.targets?await motionModel():null,scene=window.engineerViewport.renderer.scene;const doc=(await api('document')).document;
   const result=await api('workspace/action',{...input,action:'motion-stage',documentId:doc.documentId,
    expectedDocumentRevision:doc.revision,sequence,operationId:crypto.randomUUID()});
-  sequence=result.sequence;window.engineerMotionStaged=true;
+  sequence=result.sequence;window.engineerMotionStaged=true;if(previous)applyAssemblyModel(scene,{...result.motion,sourcePoses:previous.recipe.bodies.map(b=>b.pose)});
   document.getElementById('wb-hint').textContent='Motion session · changes will be confirmed together.';
   window.dispatchEvent(new CustomEvent('engineer-assembly-motion-staged',{detail:result}));return result;
  });pending=task.catch(()=>{});return task;

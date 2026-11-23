@@ -22,7 +22,7 @@ window.addEventListener('engineer-workspace-activated',retire);
 window.addEventListener('engineer-document-changed',event=>{if(!event.detail.assemblyMotion)retire();});
 window.addEventListener('engineer-proof-built',()=>{if(pendingCommits&&cached){const model=cached.model;applyAssemblyModel(v.proof.scene,{...model,sourcePoses:model.paths.map((path,i)=>{const o=v.proof.scene.occurrences.find(o=>same(o.path,path));return o?{position:o.position,quaternion:o.quaternion}:model.sourcePoses[i];})});}else{cached=null;if(!v.proof?.preview&&!window.engineerComponentContext&&v.renderer.scene?.occurrences.some(o=>o.path.length>1))void motionModel().catch(()=>{});}});
 window.addEventListener('engineer-assembly-motion-committed',event=>{pendingCommits=Math.max(0,pendingCommits-1);if(!event.detail.success){retire();void v.build({reuseCurrent:true});}else if(!pendingCommits){cached=null;void motionModel().catch(()=>{});}});
-window.engineerAssemblyOptimisticPose=path=>pendingCommits||window.engineerMotionStaged?cached?.model.recipe.bodies[cached.model.paths.findIndex(p=>same(p,path))]?.pose:null;
+window.engineerAssemblyOptimisticPose=path=>pendingCommits||window.engineerMotionStaged?(cached?.model.recipe.bodies[cached.model.paths.findIndex(p=>same(p,path))]?.pose??cached?.model.frames?.find(f=>same(f.path,path))?.pose):null;
 window.engineerApplyAssemblyModel=applyAssemblyModel;
 
 window.addEventListener('engineer-assembly-motion-staged',event=>{const model=event.detail.motion;cached={key:JSON.stringify([window.engineerWorkspace?.contextId,v.proof?.revision]),model};});
