@@ -1,8 +1,8 @@
-# Current: E4.M3 /0.4.4 acceptance candidate
+# Current: selective verification tooling / delivered CAD0.4.4
 
-See [M3 scope](docs/E4_M3_MATES_MOTION.md), ADR031 and docs/PROJECT_STATE.json. Branch `engineer/e4-m3-mates-motion` is based on delivered0.4.3/PR25. Six focused native M3 cases and the378-test native suite pass; actual Chrome/NVIDIA M3 and M2 workflows passed. Final exact-head full acceptance and public installation remain pending. Main/stable0.3.13 is unchanged.
+Owner authorized a technical stop to reduce iteration cost. See [verification guide](docs/VERIFICATION.md), [workflow](docs/DEVELOPMENT_WORKFLOW.md) and docs/PROJECT_STATE.json. Branch `engineer/selective-verification` adds executable impact selection, isolated existing UI scenarios, per-suite compact reports and measured durations. No CAD version increment or milestone advancement. Focused verification is development evidence; complete milestone gates remain intact. Local verification passed:386 native tests (including seven tooling contracts), actual Chrome/NVIDIA isolated M3, startup and historical operation-UX scenarios, and the no-matching-case/retry negative checks. The shared full-suite construction order remains unchanged. Cross-platform source acceptance is tracked separately in the PR.
 
-Delivered0.4.3 provenance:97c62f5a48e08531ad1f60cce1626f1ce8ceb2d9, acceptance45104971025, publication45106380535; public Platform0.1.13/NVIDIA verified553 source files and zero page/renderer errors.
+Delivered E4.M3/0.4.4 provenance: `863daea5c96f165c917914fa3124f387e613fba3`, PR26, acceptance45240534757, publication45243129752. Windows/Linux379 native tests each plus complete browser/PDF/STEP/performance passed. Actual public Platform0.1.13 install matched561 source files and passed Chrome/NVIDIA current-demo checks without page/renderer errors. Main/stable0.3.13 unchanged.
 
 Historical implementation notes follow; their pending gates describe those earlier candidates, not the current delivery.
 

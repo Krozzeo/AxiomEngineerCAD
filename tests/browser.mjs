@@ -1,3 +1,4 @@
+import {constructionScenarios, constructionLaunchOptions, runBrowserScenario} from './browser-scenarios.mjs';
 import {prepareModernUI} from './modern-ui-support.mjs';
 import {waitEditorIdle} from './browser-support.mjs';
 import assert from 'node:assert/strict';
@@ -145,30 +146,18 @@ try {
   await hub.getByRole('button',{name:'Load Demos',exact:true}).click();
   await hub.waitForFunction(()=>document.querySelector('.load-demos')?.textContent==='Load Demos');const {seedHistoricalFixtures}=await import('../scripts/acceptance-demo-fixtures.mjs');await seedHistoricalFixtures(host);
   {
-    const {verifyFeatureConstructionUI}=await import('./browser-feature-construction.mjs');
     // Keep the no-GPU/failure corpus in its original context. Physical picking
     // requires an actual renderer; CI uses explicitly labelled SwiftShader.
     // Linux canvas/shared-image interop needs ANGLE and Dawn to share the
     // SwiftShader Vulkan instance (Chromium issue 575926500).
-    const constructionArgs=process.platform==='linux'
-      ?['--enable-unsafe-webgpu','--use-angle=swiftshader','--enable-unsafe-swiftshader','--use-vulkan=swiftshader','--enable-features=Vulkan']
-      :['--enable-unsafe-webgpu','--use-webgpu-adapter=swiftshader','--disable-gpu-watchdog','--enable-dawn-features=allow_unsafe_apis','--disable-dawn-features=use_dxc','--enable-webgpu-developer-features','--use-gpu-in-tests','--enable-accelerated-2d-canvas'];
-    const softwareBrowser=process.env.ENGINEER_HARDWARE==='1'?null:await chromium.launch({channel:'chromium',headless:true,ignoreDefaultArgs:['--disable-gpu-compositing'],args:constructionArgs});
+    const constructionOptions=constructionLaunchOptions(false);
+    const constructionArgs=constructionOptions.args;
+    const softwareBrowser=process.env.ENGINEER_HARDWARE==='1'?null:await chromium.launch(constructionOptions);
     try{
       const constructionContext=softwareBrowser?await softwareBrowser.newContext({viewport:{width:1440,height:960}}):context;
       if(softwareBrowser)constructionContext.on('page',observe);
       report.featureConstructionRenderer={softwareForced:!!softwareBrowser,flags:softwareBrowser?constructionArgs:[]};
-      const {verifyComponentsUI}=await import('./browser-e4-m1.mjs');await verifyComponentsUI({context:constructionContext,host,observe,evidence,report});
-      const {verifyE4M3UI}=await import('./browser-e4-m3.mjs');await verifyE4M3UI({context:constructionContext,host,observe,evidence,report});
-      const {verifyE4M2UI}=await import('./browser-e4-m2.mjs');await verifyE4M2UI({context:constructionContext,host,observe,evidence,report});
-      const {verifyProjectWorkspaceUI}=await import('./browser-project-workspace.mjs');await verifyProjectWorkspaceUI({context:constructionContext,host,observe,evidence,report});
-      const {verifyM6UI}=await import('./browser-e3-m6.mjs');await verifyM6UI({context:constructionContext,host,observe,evidence,report});
-      const {verifyM5UI}=await import('./browser-e3-m5.mjs');await verifyM5UI({context:constructionContext,host,observe,evidence,report});
-      const {verifyM4UI}=await import('./browser-m4.mjs');await verifyM4UI({context:constructionContext,host,observe,evidence,report});
-      const {verifyM3UI}=await import('./browser-m3.mjs');await verifyM3UI({context:constructionContext,host,observe,evidence,report});
-      const {verifyOperationUX}=await import('./browser-operation-ux.mjs');await verifyOperationUX({context:constructionContext,host,observe,evidence,report});
-      const {verifyFeatureRefinementsUI}=await import('./browser-feature-refinements.mjs');await verifyFeatureRefinementsUI({context:constructionContext,host,observe,evidence,report});
-      await verifyFeatureConstructionUI({context:constructionContext,host,observe,evidence,report});
+      for (const id of constructionScenarios) await runBrowserScenario(id,{context:constructionContext,host,observe,evidence,report});
     }finally{await softwareBrowser?.close();}
   }
 
