@@ -1,4 +1,4 @@
-# Axiom Engineer CAD â€” Master Design Document
+# Axiom Engineer CAD — Master Design Document
 
 **Document version:** 0.3.0 (owner-approved Main version series)
 **Date:** 2026-11-24
@@ -64,13 +64,13 @@ One local engineering document can contain component definitions, part geometry,
 3. Build and change moderately complex parametric solids with basic feature operations and dependency regeneration.
 4. Build and move assemblies using specified spatial mates, including version-following component references.
 5. Measure geometry and calculate physical properties when material data exists.
-6. Create model-associated A0â€“A4 engineering drawings with editable title blocks, dimensions, annotations, section views, basic BOM/balloons and **true vector PDF** output.
+6. Create model-associated A0–A4 engineering drawings with editable title blocks, dimensions, annotations, section views, basic BOM/balloons and **true vector PDF** output.
 7. Import/export exact STEP geometry at a bounded MVP level; keep an architecture for richer third-party migration.
 8. Have an AI agent (a) create a usable engineering drawing from a moderately complex modeled part, and (b) construct an editable moderately complex parametric part from a sufficiently specified engineering drawing, with reviewable evidence and explicit ambiguity handling.
 
 ### 1.4 Meaning of MVP
 
-The list above defines the **first functional product release**, not an initial coding sprint. Generations E0â€“E6 progressively implement and prove vertical slices. E2 deliberately tests a narrow model/drawing/AI round trip **before** feature breadth is complete; E6 closes the complete MVP. Do not call E1 or E2 the finished MVP. Exact supported profile bounds, complexity limits and numerical thresholds are measured and frozen in E0/E6 rather than fabricated upfront.
+The list above defines the **first functional product release**, not an initial coding sprint. Generations E0–E6 progressively implement and prove vertical slices. E2 deliberately tests a narrow model/drawing/AI round trip **before** feature breadth is complete; E6 closes the complete MVP. Do not call E1 or E2 the finished MVP. Exact supported profile bounds, complexity limits and numerical thresholds are measured and frozen in E0/E6 rather than fabricated upfront.
 
 ### 1.5 Explicit exclusions from MVP
 
@@ -147,21 +147,21 @@ Normative decisions in these documents are design constraints. **TBD/experiment*
 
 ```text
 Axiom Platform Hub / local host
-  â”œâ”€ authorized projects, registrations, installation versions, leases
-  â”œâ”€ provider accounts, transport, tool/review/usage services
-  â””â”€ official Engineer product adapter (versioned IPC)
-       â””â”€ Engineer local domain daemon and headless tool service
-            â”œâ”€ document store, revision/version manager, command/event bus
-            â”œâ”€ parametric feature/dependency graph and regeneration scheduler
-            â”œâ”€ sketch solver, assembly solver, B-Rep/OCCT workers
-            â”œâ”€ drawing/vector/BOM engine and CAD import/export adapters
-            â””â”€ agent domain tool registry, proposal transaction, evidence
-                 â†• authenticated protocol
+  ├─ authorized projects, registrations, installation versions, leases
+  ├─ provider accounts, transport, tool/review/usage services
+  └─ official Engineer product adapter (versioned IPC)
+       └─ Engineer local domain daemon and headless tool service
+            ├─ document store, revision/version manager, command/event bus
+            ├─ parametric feature/dependency graph and regeneration scheduler
+            ├─ sketch solver, assembly solver, B-Rep/OCCT workers
+            ├─ drawing/vector/BOM engine and CAD import/export adapters
+            └─ agent domain tool registry, proposal transaction, evidence
+                 ↕ authenticated protocol
        Engineer browser UI
-            â”œâ”€ WebGPU CAD viewport and selection/camera interactions
-            â”œâ”€ sketch/model/assembly/drawing workbenches
-            â”œâ”€ tree, inspectors, parameters, status and diagnostics
-            â””â”€ AI task, diff, review and reference-evidence presentation
+            ├─ WebGPU CAD viewport and selection/camera interactions
+            ├─ sketch/model/assembly/drawing workbenches
+            ├─ tree, inspectors, parameters, status and diagnostics
+            └─ AI task, diff, review and reference-evidence presentation
 ```
 
 Prefer one domain implementation callable by headless daemon tasks and browser-preview workers, not separately authored mathematical rules. Live drag may use a temporary/preview solve for responsiveness; the authoritative commit validates against current domain revision. Choose concrete process/worker topology in E0 after benchmark.
@@ -220,7 +220,7 @@ EngineeringDocument (stable documentId, native format version, unit profile)
   ComponentInstances (definitionId, transform, version policy, local overrides)
   AssemblyGroups / MateConstraints / GroundedInstances
   Drawings
-    Sheets (A0â€“A4, orientation, editable title block)
+    Sheets (A0–A4, orientation, editable title block)
     ViewDefinitions (target + effective model revision + projection)
     Sections, Dimensions, Annotations, BOM, Balloons
   Revisions / ImmutablePublishedVersions / Branch-or-workhead history
@@ -232,7 +232,7 @@ EngineeringDocument (stable documentId, native format version, unit profile)
 
 - Stable UUID-like identity for document, component definition, instance, feature, sketch, entity, constraint, parameter, drawing, sheet, view and annotation.
 - Explicit semantic references to geometric subelements; raw kernel face-array offsets or transient GPU indices are **not** persistent IDs.
-- Dependency graph connects parameter â†’ sketch â†’ feature â†’ body â†’ instance/mate â†’ drawing/BOM; support incremental recomputation, invalidation and diagnostics.
+- Dependency graph connects parameter → sketch → feature → body → instance/mate → drawing/BOM; support incremental recomputation, invalidation and diagnostics.
 - Prevent cyclic definition references, invalid cross-version references and unsupported broken external links.
 - Instance transforms and definition-local geometry have separate coordinate systems; record handedness/up-axis and explicit unit conversion on import/export.
 - A drawing may target an entire assembly, one definition or a selected view state without becoming a separate independent document.
@@ -466,12 +466,12 @@ Basic bounded import/export of **exact** STEP bodies, with correct units, coordi
 
 ```text
 Source file / official translator / authenticated approved export
-   â†’ per-format importer adapter
-   â†’ neutral CAD exchange/semantic intermediate representation
+   → per-format importer adapter
+   → neutral CAD exchange/semantic intermediate representation
        (exact geometry, assembly tree, units, metadata, available constraints)
-   â†’ validated mapping into Engineer document + provenance
-   â†’ optional feature recognition / AI-assisted parametric reconstruction
-   â†’ geometry/metadata/reference/drawing fidelity report
+   → validated mapping into Engineer document + provenance
+   → optional feature recognition / AI-assisted parametric reconstruction
+   → geometry/metadata/reference/drawing fidelity report
 ```
 
 Future target formats include IGES, Parasolid, SolidWorks, Autodesk Inventor, Fusion 360, Siemens NX and others. Native proprietary support may require authorized official APIs/translators, supported product installations and license review. Do not promise opening every proprietary native version directly or recovering unavailable history/constraints. STEP/IGES usually do not carry an original editable feature timeline; recognition yields a **new proposed design history**, not proof of the original designer's intent.
@@ -525,11 +525,11 @@ For each operation: `operationId`, actor, product/project/workspace scope, expec
 
 Cancelled/stale tasks cannot apply late results; a transport response is not a domain success. External writes, publication and file export are separately permissioned and never implied by an account connection.
 
-### 14.4 AI workflow A: model â†’ manufacturing drawing
+### 14.4 AI workflow A: model → manufacturing drawing
 
 From a moderately complex **existing** parametric part, query: structure, important features/holes, axes, dimensions, materials, versions and candidate manufacturing intent. Agent chooses principal/projected/isometric views, cuts, dimension placement, title block and notes. CAD engine calculates exact projections and dimension values; agent arranges/documentation choices, not freehand geometry. Generate associated drawing and vector PDF; check complete dimensions, duplicate/redundant/contradictory annotations, view-source consistency, dangling refs and document validity. Human reviews.
 
-### 14.5 AI workflow B: drawing â†’ editable parametric model
+### 14.5 AI workflow B: drawing → editable parametric model
 
 Input may be vector PDF or raster/scan with explicit separate capability paths. Extract views, geometry, projection convention, dimensions, section lines and text; build an **intermediate normalized evidence model** with confidence/source pointers. Resolve dimensions and infer a candidate sketch/feature plan. If drawing underdetermines the solid, explicitly ask questions or present alternatives; do not invent nominal dimensions silently. Generate editable features, recalculate and reproject; compare against drawing measurements/views, report tolerance/differences and ambiguous/unrepresented details. Human reviews and applies.
 
@@ -549,7 +549,7 @@ The semantic tool surface is an explicit versioned public-style Engineer API, no
 
 Report model/provider capability profiles separately: text-only, tool-capable, vision-capable, local, hosted, context/token/latency ceilings and unverified. No model is guaranteed to complete a CAD task merely because it connects to Platform. Agent workflows must support uncertainty/clarification and an explicit unsupported-capability result.
 
-The full modelâ†’drawing and drawingâ†’model quality framework, independent human/third-party holdouts, pass/fail metrics and unambiguous input levels are in [AI evaluation](docs/quality/AI_EVALUATION.md). Provider calls also obey [engineering data exposure](docs/security/DATA_EXPOSURE.md): external account availability is not permission to transmit full project geometry.
+The full model→drawing and drawing→model quality framework, independent human/third-party holdouts, pass/fail metrics and unambiguous input levels are in [AI evaluation](docs/quality/AI_EVALUATION.md). Provider calls also obey [engineering data exposure](docs/security/DATA_EXPOSURE.md): external account availability is not permission to transmit full project geometry.
 
 ## 15. Human interface and navigation
 
@@ -630,69 +630,69 @@ A CAD shape can be geometrically equivalent without byte-identical B-Rep or face
 
 ### 18.0 Organization
 
-Seven **Generations** group dependency-aware, independently verifiable **Milestones**. Milestone IDs `E0.M1`, etc. are Engineer-specific; they do not rename Platform P0â€“P5 or Game Engine M19â€“M40. Each milestone ships evidence appropriate to its type: research spikes need executable reference experiments, ADR and negative proof; domain slices require reproducible commands, persistence and headless conformance; UI slices need editable human demos; agent slices need deterministic tool parity and separate real-provider evidence. Do not invent features or fake UI just to satisfy a checklist. Missing fundamentals block dependent milestones; a later stage does not retroactively certify earlier claims.
+Seven **Generations** group dependency-aware, independently verifiable **Milestones**. Milestone IDs `E0.M1`, etc. are Engineer-specific; they do not rename Platform P0–P5 or Game Engine M19–M40. Each milestone ships evidence appropriate to its type: research spikes need executable reference experiments, ADR and negative proof; domain slices require reproducible commands, persistence and headless conformance; UI slices need editable human demos; agent slices need deterministic tool parity and separate real-provider evidence. Do not invent features or fake UI just to satisfy a checklist. Missing fundamentals block dependent milestones; a later stage does not retroactively certify earlier claims.
 
-Do **not** begin the next dependent Milestone solely because code compiles. For each slice: plan â†’ implement â†’ run positive/negative/lifecycle checks â†’ inspect human workflow â†’ exercise equivalent typed tools â†’ record metrics/risks â†’ owner review â†’ either accept or produce redesign ADR with corrected downstream dependencies.
+Do **not** begin the next dependent Milestone solely because code compiles. For each slice: plan → implement → run positive/negative/lifecycle checks → inspect human workflow → exercise equivalent typed tools → record metrics/risks → owner review → either accept or produce redesign ADR with corrected downstream dependencies.
 
-### Generation E0 â€” Architecture feasibility, evidence and Platform integration
+### Generation E0 — Architecture feasibility, evidence and Platform integration
 
 **Goal:** close high-cost uncertainties **before** freezing native schema and extending feature breadth. This Generation is a proof of compatible authoritative geometry, 2D/3D constraints, topology, document identity, transactional tools, drawings and Platform integration. **Exit:** owner-reviewed integrated E0.M7 vertical proof and go/no-go ADR, not a renderer demo. The accepted MVP feature scope remains unchanged.
 
-#### E0.M1 â€” Platform product contract, repository and runnable shell
+#### E0.M1 — Platform product contract, repository and runnable shell
 - **Deliver:** repo/CI scaffolding, ADR register and requirements traceability, real Platform descriptor/adapter, lifecycle create/open/status/save/close with a **provisional** minimal document envelope and direct/Hub startup; no frozen CAD schema yet.
 - **Verify:** current accepted Platform API contract; unknown/incompatible format, stale revision, busy session, failed process and unauthorized location do not write; direct and hosted paths actually launch; source/SDK version recorded.
 - **Depends:** published supported Platform contract; no unmerged provider PR assumption.
 
-#### E0.M2 â€” Exact kernel, 2D sketch solver, topology and numerical proof
+#### E0.M2 — Exact kernel, 2D sketch solver, topology and numerical proof
 - **Deliver:** bounded OCCT/Wasm-or-native and PlaneGCS-or-alternative experiments; exact additive/subtractive extrusion, revolve, boolean, STEP, sketch solving, selection/semantic face lineage and topological naming strategy; license/build feasibility and numeric/tolerance/scale draft.
 - **Verify:** stable-or-actionably-lost face/edge reference under upstream parameter edits, split/merge and feature reorder; valid/nonmanifold/near-degenerate cases; 2D DOF/conflict/drag; independent B-Rep/volume oracle; memory/deadline/cancel; explicit kernel/solver ADR and license evidence.
 - **Depends:** E0.M1.
 
-#### E0.M3 â€” Spatial mate-solver feasibility
+#### E0.M3 — Spatial mate-solver feasibility
 - **Deliver:** separate prototype for rigid-component 6-DOF transforms, grounded instance, coincident/concentric/distance/angle-type relations on datum references, rank/redundancy/conflict diagnosis, constrained pointer-like motion and singularity detection. Define unsupported tangent/width cases before full assembly work.
 - **Verify:** independent 2- and 3-body fixtures; feasible, redundant, inconsistent and singular assemblies; drag constrained and fully fixed states; no silent retarget or partial commit; cancellation resource bounds; solver selection ADR.
 - **Depends:** E0.M2's exact-reference and unit contracts.
 
-#### E0.M4 â€” Native document, cross-document dependencies and version graph
+#### E0.M4 — Native document, cross-document dependencies and version graph
 - **Deliver:** **provisional-until-validated then versioned** schema for definitions, instances/occurrence paths, parameter/feature graph, drawings, semantic selectors, external document/definition refs, revision/recovery snapshot/immutable version/publication distinctions, dependency manifests, portable storage and atomic transactions. Resolve logical-artifact vs physical package topology.
 - **Verify:** create/save/reopen/copy/relocate; missing/changed external definition; stale/corrupt/symlinked/locked/partial writes preserve original; immutable snapshot identity and reproducible dependency closure; migration/old-reader refusal; no reliance on absolute paths.
-- **Depends:** E0.M1â€“E0.M3 and approved topology/version model ADR. E0.M2/E0.M3 proofs **precede schema stabilization**.
+- **Depends:** E0.M1–E0.M3 and approved topology/version model ADR. E0.M2/E0.M3 proofs **precede schema stabilization**.
 
-#### E0.M5 â€” Shared CAD command bus and typed agent tool contract
+#### E0.M5 — Shared CAD command bus and typed agent tool contract
 - **Deliver:** domain commands, typed JSON input/output contracts, stable semantic context, explicit effect/permission classes, compact bounded queries, receipt/error taxonomy, isolated proposals, review diff, expected-revision/stale handling and human Apply via accepted Platform review primitives.
 - **Verify:** same primitive model operation through manual/headless command paths; replayable deterministic agent script; stale, unauthorized, cancelled, unknown tool/version and rollback cases never change committed document; no provider required for conformance.
 - **Depends:** E0.M4, accepted Platform tools/AI contract.
 
-#### E0.M6 â€” Exact drawing, WebGPU CAD picking and security/performance proof
+#### E0.M6 — Exact drawing, WebGPU CAD picking and security/performance proof
 - **Deliver:** minimal exact B-Rep orthographic/HLR/vector PDF route; semantic dimension reference; WebGPU CAD viewport, face/edge/instance picking on actual hardware, Null-vs-hardware labels; authenticated local service and IP/provider exposure preflight; versioned quantitative acceptance profiles.
 - **Verify:** vector strokes/text/page size against independent checks; changed model invalidates dimension; picking matches exact semantic selection and drag modes; limits/latency/memory measured on named devices; network-disabled and external-exposure-denied fixtures pass.
-- **Depends:** E0.M2, E0.M4â€“E0.M5.
+- **Depends:** E0.M2, E0.M4–E0.M5.
 
-#### E0.M7 â€” Integrated end-to-end proof and go/no-go
-- **Deliver:** one real portable document implementing sketch constraints â†’ B-Rep solid â†’ dependent face feature â†’ dimension update/regeneration â†’ second definition/instance â†’ one spatial mate â†’ saved revision/reopen â†’ associative vector drawing â†’ deterministic proposed edit/diff/review/Apply. Recorded risk status and redesigned downstream milestones if any fundamental assumption fails.
+#### E0.M7 — Integrated end-to-end proof and go/no-go
+- **Deliver:** one real portable document implementing sketch constraints → B-Rep solid → dependent face feature → dimension update/regeneration → second definition/instance → one spatial mate → saved revision/reopen → associative vector drawing → deterministic proposed edit/diff/review/Apply. Recorded risk status and redesigned downstream milestones if any fundamental assumption fails.
 - **Verify:** preservation or explicit safe failure of every reference and change, independent geometry checks, stable version/dependency state, headless/manual equivalent operations, rollback/crash tests and actual WebGPU evidence. Publish signed-off acceptance corpus and quantitative E0 baseline; request owner **Go / Redesign / Stop** decision.
-- **Depends:** E0.M1â€“E0.M6.
+- **Depends:** E0.M1–E0.M6.
 
-### Generation E1 â€” Parametric sketch and first real solid
+### Generation E1 — Parametric sketch and first real solid
 
 **Goal:** An editable, fully/under-constrained sketch drives a precise solid; the model survives reopen and can be controlled by AI tools.
 
-#### E1.M1 â€” Workbench, camera, selection and datums
+#### E1.M1 — Workbench, camera, selection and datums
 - **Deliver:** central WebGPU view, menu/status/tree/Inspector skeleton, CAD navigation, selection filters, base planes/axes and click/drag modes.
 - **Verify:** mouse/keyboard select geometry, orbit/pan/zoom without stealing entity drag, fit/orthographic views, source-highlight and fallback device errors.
 - **Depends:** E0.M7.
 
-#### E1.M2 â€” Sketch primitive creation/editing
+#### E1.M2 — Sketch primitive creation/editing
 - **Deliver:** sketch planes, points, lines, circles and rectangles, selection/edit/delete, construction geometry and validated persistence.
 - **Verify:** manually and through typed tools create/reopen identical sketch with stable IDs; reject invalid geometry; editing cannot corrupt saved shape.
 - **Depends:** E1.M1, E0.M5.
 
-#### E1.M3 â€” Sketch solver, driving/reference dimensions and drag
+#### E1.M3 — Sketch solver, driving/reference dimensions and drag
 - **Deliver:** coincidence/horizontal/vertical/fixed/length/radius/diameter and foundational relationships, status/DOF/conflict reporting, blue/black/red indication, constrained drag.
 - **Verify:** fully defined rectangle at origin, freely dragged underconstrained circle, intentional redundant/conflicting constraints with exact error; reference dimension cannot drive.
 - **Depends:** E1.M2, E0.M2.
 
-#### E1.M4 â€” Parameter Manager v1 and expression engine
+#### E1.M4 — Parameter Manager v1 and expression engine
 
 Implementation note (2026-11-01): the owner also requested physical dimension placement/editing, contextual Sketch Manager/Inspector, Shift relation suggestions and faster solved drag with this delivery. [ADR022](docs/architecture/ADR-022-PARAMETERS-AND-SKETCH-WORKBENCH.md) records the bounded early line/point/circle subset of E3; remaining E3 and E1.M5 scope below stays planned. This note is traceability, not acceptance.
 
@@ -700,157 +700,157 @@ Implementation note (2026-11-01): the owner also requested physical dimension pl
 - **Verify:** equation controls sketch geometry, changing one variable updates dependent dimensions, cycle/unit mismatch rejected atomically, persisted expressions survive reopen.
 - **Depends:** E1.M3.
 
-#### E1.M5 â€” Exact extrusion and regeneration loop
+#### E1.M5 — Exact extrusion and regeneration loop
 - **Deliver:** closed-profile detection, additive B-Rep extrusion, feature/history entry, regeneration and geometry status, first physical property queries.
-- **Verify:** sketch â†’ exact solid â†’ change parameter â†’ regenerate, volume/face query correct; invalid profile/failed boolean preserves last-good state; human and agent both create.
-- **Depends:** E1.M3â€“E1.M4, E0.M7.
+- **Verify:** sketch → exact solid → change parameter → regenerate, volume/face query correct; invalid profile/failed boolean preserves last-good state; human and agent both create.
+- **Depends:** E1.M3–E1.M4, E0.M7.
 
-### Generation E2 â€” Early end-to-end AI/CAD feasibility
+### Generation E2 — Early end-to-end AI/CAD feasibility
 
 **Goal:** Prove **both directions** of model/drawing communication on controlled simple geometry before broad CAD feature investment. This is not final moderate-complexity acceptance.
 
-#### E2.M1 â€” Semantic geometry and bounded visual evidence
+#### E2.M1 — Semantic geometry and bounded visual evidence
 - **Deliver:** stable geometry/feature/parameter queries, selected-face/edge context, targeted viewport capture, provenance and bounded results.
 - **Verify:** agent identifies same model features/nominal dimensions as direct API; context limits, invalid IDs, stale capture and no-browser headless path behave correctly.
 - **Depends:** E1.M5.
 
-#### E2.M2 â€” Minimal associative drawing/vector pipeline
+#### E2.M2 — Minimal associative drawing/vector pipeline
 - **Deliver:** one sheet, basic model-linked orthographic view, accurate HLR/projection, measured/driving dimension binding and true vector PDF prototype.
 - **Verify:** simple extrusion with a supported inner-loop through-hole **or**, if E1 has not proven nested profiles, a solid without drilled features yields exact dimensions and vector strokes/text; fixture must not rely on E3 cut tools. Parameter edit regenerates view; stale dimension warns.
 - **Depends:** E2.M1, E0.M6.
 
-#### E2.M3 â€” AI model-to-drawing vertical proof
+#### E2.M3 — AI model-to-drawing vertical proof
 - **Deliver:** agent tool workflow for selecting drawing orientation/views/cotations with isolation, diff, evidence and human Apply.
-- **Verify:** controlled simple part â†’ consistent PDF and associated sheet, edits are reviewable; cancelled/stale proposal cannot apply; compare deterministic fixture vs real-provider behavior separately.
+- **Verify:** controlled simple part → consistent PDF and associated sheet, edits are reviewable; cancelled/stale proposal cannot apply; compare deterministic fixture vs real-provider behavior separately.
 - **Depends:** E2.M2.
 
-#### E2.M4 â€” AI drawing-to-model vertical proof
+#### E2.M4 — AI drawing-to-model vertical proof
 - **Deliver:** small normalized drawing-evidence schema, bounded extraction of vector drawing and optional multimodal input, editable sketch/extrusion proposal and reprojection check.
-- **Verify:** specified simple orthographic drawing â†’ editable parametric solid with measured source references; ambiguous view/absent dimension produces question/uncertainty, not invented shape.
-- **Depends:** E2.M1â€“E2.M3.
+- **Verify:** specified simple orthographic drawing → editable parametric solid with measured source references; ambiguous view/absent dimension produces question/uncertainty, not invented shape.
+- **Depends:** E2.M1–E2.M3.
 
-### Generation E3 â€” Complete MVP sketch/feature modeling breadth
+### Generation E3 — Complete MVP sketch/feature modeling breadth
 
 **Goal:** Model moderately complex mechanical parts robustly with dependency edits, patterns and exact export.
 
-#### E3.M1 â€” Extended sketch entities and constraints
+#### E3.M1 — Extended sketch entities and constraints
 - **Deliver:** arcs, polygons, trim/split, mirror and sketch patterns; tangent, concentric, equal, symmetry, parallel, perpendicular, angle and other type-appropriate sketch constraints.
 - **Verify:** mixed arcs/lines, trim with dependent constraints, DOF/conflicts/drag and persistence; both manual and semantic edit paths.
 - **Depends:** E1.M5.
 
-#### E3.M2 â€” Feature cuts, revolve, mirror and patterns
+#### E3.M2 — Feature cuts, revolve, mirror and patterns
 - **Deliver:** cut/extrude, additive/subtractive revolve, mirrored features and linear/circular feature patterns with dependency-aware identities.
 - **Verify:** shaft, flange and hole-array parts regenerate on dimension/count edits; invalid axis, reference and boolean fails safely.
 - **Depends:** E3.M1.
 
-#### E3.M3 â€” Finishing operations and multibody handling
+#### E3.M3 — Finishing operations and multibody handling
 - **Deliver:** bounded fillet/chamfer, feature suppression, multiple bodies, safe feature-order dependency checks and in-place edits.
 - **Verify:** moderate bracket with fillet, repeated holes and multibody operations; deletion/suppression impacts visible, last-good geometry safe.
 - **Depends:** E3.M2.
 
-#### E3.M4 â€” Parameter/feature dependency diagnostics
+#### E3.M4 — Parameter/feature dependency diagnostics
 - **Deliver:** full parameter table scope, feature parameter binding, trace dependents, typed error explanations, undo/redo and version-aware update impact.
 - **Verify:** edits propagate through feature DAG, cycles/missing references rejected, undo restores shapes/dimensions, agent gets compact causal explanation.
 - **Depends:** E3.M3.
 
-#### E3.M5 â€” STEP interoperability v1
+#### E3.M5 — STEP interoperability v1
 - **Deliver:** bounded exact STEP import/export, units/orientation, source preservation, translation report and reimported-body support.
 - **Verify:** independent CAD fixtures round-trip valid B-Rep within calibrated tolerance, unsupported history marked absent, malformed file/timeouts cancelled with no write.
 - **Depends:** E0.M2, E3.M3.
 
-#### E3.M6 â€” Part production acceptance
+#### E3.M6 — Part production acceptance
 - **Deliver:** editable sample parts, headless + browser regression suite, current acceptance matrix and measured performance budget.
 - **Verify:** end-to-end Project B; save/reopen, parameter changes, **E0.M4 recovery and immutable data snapshots (not E4 published Latest/Pinned)**, geometry volume/area and independent imported/exported comparison.
-- **Depends:** E3.M1â€“E3.M5.
+- **Depends:** E3.M1–E3.M5.
 
-### Generation E4 â€” Component composition, versions and assemblies
+### Generation E4 — Component composition, versions and assemblies
 
 **Goal:** The unified document supports realistic parts/assemblies and version-safe external/internal dependencies.
 
-#### E4.M1 â€” Definitions, instances and hierarchy
+#### E4.M1 — Definitions, instances and hierarchy
 - **Deliver:** in-document component definitions, repeated instances, nested assembly groups, in-place part modeling and component tree.
 - **Verify:** multiple instances share one definition and keep independent placements; edit a definition updates valid consumers, not unrelated snapshots.
 - **Depends:** E3.M6, E0.M4.
 
-#### E4.M2 â€” Spatial mate solver foundation
+#### E4.M2 — Spatial mate solver foundation
 - **Deliver:** ground/fix, coincident, concentric, parallel, perpendicular, distance and angle mates with component DOF, strict reference handling.
 - **Verify:** over/underdefined assembly diagnosis, constrained move/rotate, unsolvable mate rejection and no silent geometry-reference retargeting.
-- **Depends:** E4.M1, E0.M2â€“E0.M3.
+- **Depends:** E4.M1, E0.M2–E0.M3.
 
-#### E4.M3 â€” Remaining mate and motion behavior
+#### E4.M3 — Remaining mate and motion behavior
 - **Deliver:** tangent and width mates, responsive free motion, 3D selection/picking modes and spatial diagnostics.
 - **Verify:** width centered between datum planes, tangent cylindrical/surface cases in declared bounds, fully fixed vs free components draggable as expected.
 - **Depends:** E4.M2.
 
-#### E4.M4 â€” Versions, Latest/Pinned and safe auto-updates
+#### E4.M4 — Versions, Latest/Pinned and safe auto-updates
 - **Deliver:** immutable component/assembly published versions, Latest/Pinned resolver, effective dependency snapshots, preview/validation and version comparison.
 - **Verify:** new published component automatically updates valid Latest working consumers; Pinned unchanged; broken mate blocks update; historical assembly reconstructs old dependency set.
 - **Depends:** E4.M2, E0.M4.
 
-#### E4.M5 â€” Interference, physical assembly properties
+#### E4.M5 — Interference, physical assembly properties
 - **Deliver:** bounded exact interference and clearance check, materials/density, mass/center of mass/inertia aggregate, missing-material warnings; owner-approved Main version-series, Manager/Parameter Manager/Insert restructuring and relation/save corrections in ADR033.
 - **Verify:** overlapping solids detected, touching distinguished, repeated instances mass counted correctly and absent density never yields fabricated mass.
-- **Depends:** E4.M3â€“E4.M4.
+- **Depends:** E4.M3–E4.M4.
 
-#### E4.M6 â€” Assembly acceptance
+#### E4.M6 — Assembly acceptance
 - **Deliver:** editable sample reducer/bracket assembly, mate/version/update history, headless tools and user-visible diagnostics.
 - **Verify:** Project C full flow; nested/reused components, free moves, bad mate, Latest and Pinned, save/reopen, conflict rollback, exported evidence.
-- **Depends:** E4.M1â€“E4.M5.
+- **Depends:** E4.M1–E4.M5.
 
-### Generation E5 â€” Manufacturing drawings and mature AI workflows
+### Generation E5 — Manufacturing drawings and mature AI workflows
 
 **Goal:** Complete target drawing features and full moderately complex bidirectional AI acceptance; prioritize engineering correctness over visual polish alone.
 
-#### E5.M1 â€” Sheet formats, views and presentation
-- **Deliver:** A0â€“A4 portrait/landscape, title block, orthographic/projected/isometric views, scale/layout and consistent visibility/HLR.
+#### E5.M1 — Sheet formats, views and presentation
+- **Deliver:** A0–A4 portrait/landscape, title block, orthographic/projected/isometric views, scale/layout and consistent visibility/HLR.
 - **Verify:** correct vector geometry, page dimensions, multi-sheet persistence and model/version association for parts and assemblies.
 - **Depends:** E2.M2, E4.M6.
 
-#### E5.M2 â€” Sections, annotations and dimension association
+#### E5.M2 — Sections, annotations and dimension association
 - **Deliver:** section plane/hatching, center/hidden marks, driving/reference dimensions, notes, labels and revision-linked failure warnings.
 - **Verify:** section reveals internal geometry; linked dimensions follow parameter edits; orphan/ambiguous references are flagged, not falsely displayed.
 - **Depends:** E5.M1.
 
-#### E5.M3 â€” BOM/balloons and PDF production export
+#### E5.M3 — BOM/balloons and PDF production export
 - **Deliver:** assembly BOM item/name/code/quantity/material/effective-version, linked balloons, editable fields, printable vector PDF.
 - **Verify:** quantities match actual resolved instances, version pin shown, text/linework remain vector (not raster image), PDF opens at correct sheet sizes.
 - **Depends:** E5.M2, E4.M4.
 
-#### E5.M4 â€” AI model â†’ moderate drawing completion
+#### E5.M4 — AI model → moderate drawing completion
 - **Deliver:** broad feature/face/parameter context, multi-view/cut/dimension plan generation, ambiguity/unsupported reporting, proposal review, PDF validation.
 - **Verify:** Project D on predefined moderate part plus holdouts; correct measured dimensions, complete needed views and valid PDF; tool/context/real-model evidence separated.
-- **Depends:** E5.M1â€“E5.M3, E2.M3.
+- **Depends:** E5.M1–E5.M3, E2.M3.
 
-#### E5.M5 â€” AI moderate drawing â†’ parametric model completion
+#### E5.M5 — AI moderate drawing → parametric model completion
 - **Deliver:** vector/raster drawing evidence extraction with capability detection, feature planning, human clarification, rebuilt editable model, reprojection/difference report.
 - **Verify:** Project E on independent drawings; resolved geometry/dimensions and editable history, no invented critical unspecified dimensions; ambiguous case blocked/clarified.
-- **Depends:** E5.M2â€“E5.M3, E3.M6, E2.M4. Run independently of E5.M4 after shared drawing/tool contracts are stable; E6 integrates both AI directions.
+- **Depends:** E5.M2–E5.M3, E3.M6, E2.M4. Run independently of E5.M4 after shared drawing/tool contracts are stable; E6 integrates both AI directions.
 
-### Generation E6 â€” MVP closure, reliability and delivery
+### Generation E6 — MVP closure, reliability and delivery
 
 **Goal:** Convert the vertical slices into one supported, reproducible Windows-first product without weakening earlier acceptance.
 
-#### E6.M1 â€” Cross-document/version and regeneration hardening
+#### E6.M1 — Cross-document/version and regeneration hardening
 - **Deliver:** invalid/stale ref repair UX, resource limits, crash/reopen recovery, migrations and versioned deterministic regression corpus.
 - **Verify:** rerun E0.M4 cross-document dependency/missing-source tests plus interrupted save, stale AI proposal, failed Latest update, corrupt cache and kernel-version mismatch; all preserve previously accepted integrity. This is hardening, **not first discovery** of external-reference semantics.
 - **Depends:** E4.M6, E5.M5.
 
-#### E6.M2 â€” Performance, device and accessibility verification
+#### E6.M2 — Performance, device and accessibility verification
 - **Deliver:** explicit hardware tiers, real WebGPU tests, fallback diagnostics, responsive drag/viewport benchmarks, keyboard/status accessibility and bounded headless workers.
 - **Verify:** report exact devices/files/times/limits, distinguish GPU/Null and external model/fixture evidence; no hand-waved performance claims.
 - **Depends:** E6.M1.
 
-#### E6.M3 â€” Platform packaging and compatibility
+#### E6.M3 — Platform packaging and compatibility
 - **Deliver:** prepared product artifacts, descriptor/adapter, pinned published Platform SDK, side-by-side installation/upgrade/rollback, relocated Windows launcher and documentation.
 - **Verify:** install into fresh relocated folder, host/direct startup, create/open/edit/save/close/reopen, incompatible version refusal, rollback unchanged documents; no secrets or user files packaged.
-- **Depends:** E6.M1â€“E6.M2.
+- **Depends:** E6.M1–E6.M2.
 
-#### E6.M4 â€” Full five-project human and agent acceptance
-- **Deliver:** Aâ€“E demo corpus, reproducible tests plus manual review script, final feature/agent coverage matrix and known-limit report.
+#### E6.M4 — Full five-project human and agent acceptance
+- **Deliver:** A–E demo corpus, reproducible tests plus manual review script, final feature/agent coverage matrix and known-limit report.
 - **Verify:** all five projects pass on specified hardware/runtime/provider profiles; human and agent actions converge through domain commands; independently sourced drawing tests included.
 - **Depends:** E6.M3.
 
-#### E6.M5 â€” Release and MVP closure decision
+#### E6.M5 — Release and MVP closure decision
 - **Deliver:** tagged compatible release, final design/ADR/status/changelog, verified hashes, installer/project guides, exact CI/hardware/model evidence and maintenance backlog.
 - **Verify:** every required milestone and acceptance gate passes with no unreviewed data-loss/semantic-correctness blocker; owner explicitly accepts scope and outstanding operational limits. No automatic declaration from historical test counts.
 - **Depends:** E6.M4.
@@ -867,8 +867,8 @@ Implementation note (2026-11-01): the owner also requested physical dimension pl
 ### 18.2 Three decision horizons (not alternate MVPs)
 
 1. **Validated foundation (E0):** prove kernel, topology, 2D/3D solvers, document graph, typed tools, exact drawing and Platform contract coexist; redesign if not.
-2. **Useful extensible CAD (E1â€“E3):** editable parametric parts and bounded initial AI/drawing proofs are real and recoverable; **not** the approved full MVP.
-3. **Owner-approved complete MVP (E4â€“E6):** assemblies, Latest/Pinned, comprehensive drawings, interoperability and both moderate AI workflows pass independent acceptance.
+2. **Useful extensible CAD (E1–E3):** editable parametric parts and bounded initial AI/drawing proofs are real and recoverable; **not** the approved full MVP.
+3. **Owner-approved complete MVP (E4–E6):** assemblies, Latest/Pinned, comprehensive drawings, interoperability and both moderate AI workflows pass independent acceptance.
 
 Milestone count is not an effort estimate. Maintain critical-path, risk burn-down and explicit resource estimates **after** E0; do not invent dates. E2's early AI proof is intentionally narrow. E5 AI directions may progress independently once shared drawing/tool contracts exist; E6 integrates and validates both.
 
@@ -882,23 +882,23 @@ False-positive topology resolutions, nonreproducible historical versions, uncont
 
 Each project has a fixed saved source, task brief, named input complexity profile, nominal expected geometry/units, independent measurement oracle, permitted tolerances, expected negative cases, browser demonstration, headless tool trace and reproducible outcome. Assign requirement IDs and exact versioned fixture manifests to each case. Weakening a fixture to pass a failing test requires owner-reviewed profile revision. Calibrate quantitative tolerances and complexity limits at E0; record them in fixture manifests and never adjust merely to pass a failing run.
 
-### Project A â€” Sketch behavior
+### Project A — Sketch behavior
 
-Fully constrain a dimensioned rectangle/circle arrangement, demonstrate blueâ†’black status, intentionally add redundant/conflicting constraints (red + explanation), drag an underconstrained entity without violating remaining constraints; modify driving/reference dimensions and undo/reopen. No arbitrary point must be pre-constrained.
+Fully constrain a dimensioned rectangle/circle arrangement, demonstrate blue→black status, intentionally add redundant/conflicting constraints (red + explanation), drag an underconstrained entity without violating remaining constraints; modify driving/reference dimensions and undo/reopen. No arbitrary point must be pre-constrained.
 
-### Project B â€” Moderate parametric part
+### Project B — Moderate parametric part
 
 Create a bracket/flange with at least several dependent sketches, additive/subtractive features, hole pattern, revolve or curved feature where applicable, material and named equations. Recalculate after changing nominal dimensions; ensure correct volume, measured references, stable feature relations, native save/reopen, STEP export/reimport and readable failure if a dependent feature becomes invalid.
 
-### Project C â€” Constrained multi-component assembly
+### Project C — Constrained multi-component assembly
 
 Reuse definitions as multiple instances; position using coincident/concentric/distance/angle/width or other appropriate mates; ground one component; observe remaining DOF/movement; detect interference; compute assembled mass with materials; create a Main save point, prove Latest/Pinned semantics, resolve broken-update choices and deleted-version successors, reopen historical effective assembly. Produce correct BOM source data.
 
-### Project D â€” AI drawing from existing moderate part
+### Project D — AI drawing from existing moderate part
 
 Target an **engineering draft for human review**, not an automatically released fabrication drawing; the model cannot invent datum/fit/finish/tolerance intent. Score measured dimensions, view sufficiency and source association separately with versioned provider profiles. Give agent a known native model, no hand-entered drawing dimensions. It queries geometry/parameters, selects appropriate orthographic/isometric/section views, constructs A-series sheet and valid annotations/title block; emits true vector PDF. Validate each displayed dimension against model truth, check no stale/orphaned dimensions, require human review and retain exact tool/capture/evidence trace.
 
-### Project E â€” AI model from independent moderate drawing
+### Project E — AI model from independent moderate drawing
 
 Separate vector/raster cohorts and complexity levels. Projections may underdetermine 3D geometry; clarification or abstention is the correct result for ambiguous drawings. Score editable history, exact solid equivalence, evidence lineage and cost independently. Supply independently prepared vector/raster technical drawing with declared view conventions and sufficient dimensions. Agent extracts evidence, asks about missing critical data where needed, produces editable feature-based model and reprojection/measurement comparison. Run an intentionally ambiguous negative case. A coincident-looking image alone cannot pass; verify geometry, dimensions, editing behavior and provenance. Test at least one external/provider-independent fixture to prevent same-renderer self-validation bias.
 
@@ -952,8 +952,8 @@ Each milestone report records: objective; exact product/Platform/kernel/solver v
 | Manual/agent commands diverge or proposals leak writes | E0.M5 | Tool schema conformance, replay, stale/unauthorized rollback |
 | WebGPU picking mismatches exact CAD geometry | E0.M6 | Real-hardware semantic face/edge selection evidence |
 | PDF is raster, dimensionally wrong or stale | E0.M6/E2.M2 | Independent HLR, vector stroke/text and dimension checks |
-| Sensitive engineering data leaves device without task permission | E0.M5â€“E0.M6 | Exposure profiles, offline/denial tests and audit receipts |
-| AI invents ambiguous geometry or manufacturing information | E2.M4/E5.M4â€“M5 | Independent holdouts, correct abstention and verified model/drawing differences |
+| Sensitive engineering data leaves device without task permission | E0.M5–E0.M6 | Exposure profiles, offline/denial tests and audit receipts |
+| AI invents ambiguous geometry or manufacturing information | E2.M4/E5.M4–M5 | Independent holdouts, correct abstention and verified model/drawing differences |
 | Proprietary migration loses history/metadata | E3.M5/future | Per-field fidelity and source preservation; no unsupported recovery claims |
 | Platform provider SDK stays experimental or incompatible | E0.M1/E2.M3 | Pin accepted Platform release; model capability-detect; no duplicate secrets |
 
@@ -979,7 +979,7 @@ Architectural hooks only in MVP; implementation deferred unless explicitly reapp
 
 ### 23.1 First action for any coding agent
 
-1. Read **this entire master** and relevant versioned contracts in Â§2.4, plus current `README.md`, `IMPLEMENTATION_STATUS.md` and `AI_HANDOFF.md` (when created).
+1. Read **this entire master** and relevant versioned contracts in §2.4, plus current `README.md`, `IMPLEMENTATION_STATUS.md` and `AI_HANDOFF.md` (when created).
 2. Check real current Engineer branch, GitHub issue/PR state and exact Platform/Game Engine versions; the historical baselines in `2.3` are not current truth forever.
 3. Read the linked Platform product/AI/ownership contracts before changing integration; read Game Engine docs only for relevant patterns and behavior.
 4. Identify next unaccepted milestone and its prerequisites; do not implement unscheduled downstream features or reclassify deferred features as required.
@@ -1004,7 +1004,7 @@ For a discovered limitation: record observed evidence and user-visible impact; l
 
 ## 24. v0.2 architecture hardening and decision ledger
 
-### 24.1 Adopted v0.2 changes â€” functional MVP scope unchanged
+### 24.1 Adopted v0.2 changes — functional MVP scope unchanged
 
 1. Prove topological lineage and 2D numerical behavior before native schema freeze.
 2. Prototype 3D rigid mate solver and constrained motion in E0, ahead of full assemblies.
@@ -1017,7 +1017,7 @@ For a discovered limitation: record observed evidence and user-visible impact; l
 9. Classify drawings as geometric correctness vs engineering draft vs future manufacturing release.
 10. Benchmark AI with independent vector/raster cohorts, ambiguity rejection and editable geometry proof.
 11. Reorganize E0 into seven high-uncertainty proofs; correct E2 drilled fixture and E3 snapshot ambiguity; permit independent E5 AI paths and type-specific DoD.
-12. Add maintained ADR, geometry, data/version, tool, quality, traceability, AI-evaluation and security contracts linked in Â§2.4.
+12. Add maintained ADR, geometry, data/version, tool, quality, traceability, AI-evaluation and security contracts linked in §2.4.
 
 ### 24.2 Technical decisions deliberately unresolved until E0 evidence
 
@@ -1033,7 +1033,7 @@ This is **master v0.2.0**, not a software release or milestone acceptance. Futur
 
 Implementation evidence update2026-10-31: E0.M7 review candidate0.0.7 connects the bounded sketch/solid/face/mate/drawing/proposal/native chain. [Report](docs/milestones/E0_M7_REPORT.md), [ADR012](docs/architecture/ADR-012-INTEGRATED-E0-GATE.md). Implementation progress only; approved MVP unchanged, owner Go/Redesign/Stop and E1 authorization remain pending.
 
-Owner update2026-10-31: Go for E1/0.1.0 recorded in [decision](docs/architecture/E0_OWNER_GO_2026_10_31.json); measured E0 corpus is preserved. [E1.M1](docs/milestones/E1_M1_REPORT.md) implements the workbench foundation, with [ADR016](docs/architecture/ADR-016-E1-WORKBENCH.md). E1.M2â€“M5 and later generations remain planned. No MVP scope change.
+Owner update2026-10-31: Go for E1/0.1.0 recorded in [decision](docs/architecture/E0_OWNER_GO_2026_10_31.json); measured E0 corpus is preserved. [E1.M1](docs/milestones/E1_M1_REPORT.md) implements the workbench foundation, with [ADR016](docs/architecture/ADR-016-E1-WORKBENCH.md). E1.M2–M5 and later generations remain planned. No MVP scope change.
 
 Owner-requested structural extension 2026-11-16: Project file browser and document tabs, empty-project startup, per-component Model/Entire Part/Hide visibility, transparent edit context, component/group drag organization, Insert/Move operation split and per-document branch/version tree with validated conflict-aware merges are authorized before continuing E4.M2. Group replaces the former Assembly group label. This authorization does not claim completion of mate solving, published Latest/Pinned updates or final assembly drawing/export scope. ADR029 records persistence, migration and authority constraints.
 

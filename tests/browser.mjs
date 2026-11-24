@@ -81,7 +81,7 @@ try {
   await direct.locator('#lab-keep').click();await direct.locator('.dock-tabs [data-panel=history]').click();await direct.locator('#revision').filter({hasText:'3'}).waitFor();
   const persisted=direct.waitForResponse(r=>r.url().endsWith('/v1/save'));
   await direct.locator('#save').click();await persisted;await direct.locator('#message').filter({hasText:'Document saved locally'}).waitFor();
-  assert.equal(JSON.parse(await readFile(nativePath)).experiment.spec.width,60);
+  assert.equal(JSON.parse(await readFile(nativePath)).experiment.spec.width,60);await waitEditorIdle(direct);
   await direct.locator('#lab-scenario').selectOption('invalid-profile');await direct.locator('#lab-build').click();
   await direct.locator('#lab-status').filter({hasText:'failed'}).waitFor();
   assert.match(await direct.locator('#lab-metrics').textContent(),/17434\.513322/);
