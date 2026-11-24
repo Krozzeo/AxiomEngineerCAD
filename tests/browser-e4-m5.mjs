@@ -1,10 +1,10 @@
 import assert from 'node:assert/strict';
 import {join} from 'node:path';
-import {waitEditorIdle} from './browser-support.mjs';
+import {waitCurrentViewport} from './browser-support.mjs';
 import {sketchDocument,sketchCommit} from './browser-sketch.mjs';
 export async function verifyE4M5UI({context,host,observe,evidence,report}){
  const entry=host.manager.catalog().recents.find(p=>p.name==='E4.M5 Assembly Analysis and Versions');assert.ok(entry);const session=await host.manager.execute({operationId:crypto.randomUUID(),action:'open',productId:entry.productId,path:entry.path}),page=await context.newPage();observe(page);page.setDefaultTimeout(20000);
- const stage=text=>console.log('E4 M5 '+text),current=async()=>{await waitEditorIdle(page);const doc=await sketchDocument(page);await page.waitForFunction(rev=>{const v=window.engineerViewport;return v?.proof?.revision===rev&&v.presentedManifest===v.proof.manifestId&&!v.requestState.job;},doc.revision);},versions=async()=>{await page.locator('[data-wb-tree=versions]').click();await page.locator('[data-version-node]').first().waitFor();};
+ const stage=text=>console.log('E4 M5 '+text),current=()=>waitCurrentViewport(page),versions=async()=>{await page.locator('[data-wb-tree=versions]').click();await page.locator('[data-version-node]').first().waitFor();};
  try{
   await page.goto(session.editorUrl);await page.waitForFunction(()=>window.engineerViewport?.presentedManifest);await current();
   stage('Manager version series replaces the separate panel; save points retain the former Main');await versions();assert.equal(await page.locator('[data-open-panel=versions]').count(),0);const initialVersions=await page.locator('[data-version-node]').count();await page.getByRole('button',{name:'Create new version',exact:true}).click();await page.waitForFunction(()=>document.querySelectorAll('[data-version-node]').length>=2);await page.waitForFunction(()=>document.body.dataset.editorReady==='true');await current();await versions();assert.equal(await page.locator('[data-version-node]').count(),initialVersions+1);assert.equal(await page.locator('[data-version-node][aria-current=true]').count(),1);

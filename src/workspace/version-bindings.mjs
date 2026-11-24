@@ -51,7 +51,10 @@ export class VersionBindings{
    doc.native.set(c.candidate,doc.value.revision);doc.commands.history.record(c.before,doc.value);if(p.candidateId)this.candidates.delete(p.candidateId);return {...w.view(),issues:c.issues};
  }
  async refresh(doc,visited=new Set()){
-   if(doc.readOnly||doc.stagedMotion||doc.pending()||doc.status().busy||doc.commands.editingSketch||visited.has(doc.value.documentId))return [];visited.add(doc.value.documentId);const updates=[],processed=new Set();
+   if(doc.readOnly||doc.stagedMotion||doc.pending()||doc.commands.editingSketch||visited.has(doc.value.documentId))return [];
+   // Read-only preloading must not silently suppress source/version propagation.
+   if(doc.proof?.running)await doc.proof.job.promise;
+   if(doc.status().busy)return [];visited.add(doc.value.documentId);const updates=[],processed=new Set();
    for(const instance of [...doc.value.native.graph.instances.filter(i=>i.dependencyId)]){
      const d=doc.value.native.graph.dependencies.find(d=>d.id===doc.value.native.graph.instances.find(i=>i.id===instance.id)?.dependencyId);if(!d||processed.has(d.id))continue;processed.add(d.id);
      try{

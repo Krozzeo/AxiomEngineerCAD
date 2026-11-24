@@ -55,3 +55,16 @@ test('repeated Latest instances share the immutable binding while retaining inde
  const f=await fixture(t,{projectContainers:true});await f.call('project.create',{path:f.folder,name:'Repeated source'});const w=f.adapter.workspace,create=async path=>f.call('workspace.action',{action:'create',kind:'part',path,expectedRevision:(await f.call('workspace.inspect')).revision});await create('Source.engineer.json');const source=w.activeId;await create('Assembly.engineer.json');const doc=f.adapter.doc;
  for(let i=0;i<10;i++)await f.call('workspace.action',{action:'insert',id:source,documentId:doc.value.documentId,expectedDocumentRevision:doc.value.revision});assert.equal(doc.value.native.graph.instances.length,10);assert.equal(doc.value.native.graph.dependencies.length,1);await doc.save(doc.value.revision);
 });
+
+test('a background viewport build cannot suppress deleted-version replacement on opening an assembly',async t=>{
+ const f=await fixture(t,{projectContainers:true});await f.call('project.create',{path:f.folder,name:'Background version refresh'});const w=f.adapter.workspace;
+ const create=async path=>f.call('workspace.action',{action:'create',kind:'part',path,expectedRevision:(await f.call('workspace.inspect')).revision});
+ await create('Source.engineer.json');const source=f.adapter.doc,sourceEntry=w.entry(w.activeId),old=(await series(source).read()).mainId;
+ await series(source).create({expectedRevision:source.value.revision});await create('Assembly.engineer.json');const consumer=f.adapter.doc;
+ const instanceId=(await f.call('workspace.action',{action:'insert',id:sourceEntry.id,selection:old,documentId:consumer.value.documentId,expectedDocumentRevision:consumer.value.revision})).insertedInstanceId;
+ await f.call('workspace.action',{action:'component-version-set',instanceId,selection:old,documentId:consumer.value.documentId,expectedDocumentRevision:consumer.value.revision});
+ const removed=await series(source).remove({expectedRevision:source.value.revision,nodeId:old});
+ consumer.proof.build({operationId:randomUUID(),expectedRevision:consumer.value.revision,viewportOnly:true});assert.equal(consumer.proof.running,true);
+ await w.refreshWorkingReferences(consumer);const row=(await w.versionBindings.rows(consumer)).find(r=>r.id===instanceId);
+ assert.equal(row.selection,removed.replacementId);assert.equal(row.notice.deletedNodeId,old);
+});

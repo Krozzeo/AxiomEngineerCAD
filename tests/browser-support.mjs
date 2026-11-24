@@ -12,3 +12,16 @@ export async function createFirstPart(page,name){
  await waitEditorIdle(page);
  await page.waitForFunction(()=>!!window.engineerProjectBrowser);await page.locator('.wb-menubar details').filter({has:page.getByText('Create',{exact:true})}).locator('summary').click();await page.getByRole('button',{name:'New part/assembly',exact:true}).click();await page.locator('#project-icons .inline-name').fill(name);await page.locator('#project-icons .inline-name').press('Enter');await page.waitForFunction(()=>window.engineerWorkspace&&!window.engineerWorkspace.empty&&!!window.engineerViewport?.presentedManifest);await waitEditorIdle(page);
 }
+
+// Version refresh/acknowledgement can advance the document while a view is building.
+// Compare against the live revision instead of capturing a superseded revision once.
+export async function waitCurrentViewport(page){
+ await waitEditorIdle(page);
+ await page.waitForFunction(async()=>{
+  const state=window.engineerComponentVersionState?.();
+  if(window.engineerWorkspaceTransition||state?.busy||state?.loading)return false;
+  try{const {api}=await import('/cad-commands.mjs'),doc=(await api('document')).document,v=window.engineerViewport;
+   return v?.proof?.revision===doc.revision&&v.presentedManifest===v.proof.manifestId&&!v.requestState.job;
+  }catch(error){if(error.name==='AbortError')return false;throw error;}
+ });
+}

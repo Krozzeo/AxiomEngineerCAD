@@ -43,7 +43,7 @@ try {
   await direct.locator('#notes').fill('Provisional design intent: preserve this note after reopening.');
   await direct.locator('#save').click(); await direct.locator('#message').filter({hasText:'projectBusy'}).waitFor();
   await direct.locator('#apply').click(); await direct.locator('#message').filter({hasText:'Properties applied'}).waitFor();
-  await direct.locator('#save').click(); await direct.locator('#message').filter({hasText:'Document saved locally'}).waitFor();
+  await direct.locator('#save').click(); await direct.locator('#message').filter({hasText:'Document saved locally'}).waitFor();await waitEditorIdle(direct);
   const nativePath = join(root, 'direct', 'study', 'Direct lifecycle study.engineer.json');
   assert.match(JSON.parse(await readFile(nativePath)).metadata.notes, /preserve this note/);
   report.criteria.push('Direct CLI launches an authenticated browser editor; pending fields block save; applied properties persist');
@@ -58,7 +58,7 @@ try {
   await direct.locator('#assembly-status').filter({hasText:'UnderDefined · DOF 2 · drag accepted'}).waitFor();
   await direct.waitForFunction(()=>!document.querySelector('#assembly-pose').textContent.includes('35.000000'));
   await direct.locator('#assembly-keep').click();await direct.locator('.dock-tabs [data-panel=history]').click();await direct.locator('#revision').filter({hasText:'2'}).waitFor();
-  const spatialSaved=direct.waitForResponse(r=>r.url().endsWith('/v1/save'));await direct.locator('#save').click();await spatialSaved;
+  const spatialSaved=direct.waitForResponse(r=>r.url().endsWith('/v1/save'));await direct.locator('#save').click();await spatialSaved;await direct.locator('#message').filter({hasText:'Document saved locally'}).waitFor();await waitEditorIdle(direct);
   assert.ok(JSON.parse(await readFile(nativePath)).assembly.bodies[1].pose.position[2]>35);
   await direct.locator('#assembly-suite').click();await direct.locator('#assembly-suite-summary').filter({hasText:'Passed 28 / 28'}).waitFor();
   await direct.locator('#assembly-suite-details > summary').click();
@@ -80,8 +80,8 @@ try {
   await direct.locator('#lab-metrics').filter({hasText:'17434.513322'}).waitFor();
   await direct.locator('#lab-keep').click();await direct.locator('.dock-tabs [data-panel=history]').click();await direct.locator('#revision').filter({hasText:'3'}).waitFor();
   const persisted=direct.waitForResponse(r=>r.url().endsWith('/v1/save'));
-  await direct.locator('#save').click();await persisted;await direct.locator('#message').filter({hasText:'Document saved locally'}).waitFor();
-  assert.equal(JSON.parse(await readFile(nativePath)).experiment.spec.width,60);await waitEditorIdle(direct);
+  await direct.locator('#save').click();await persisted;await direct.locator('#message').filter({hasText:'Document saved locally'}).waitFor();await waitEditorIdle(direct);
+  assert.equal(JSON.parse(await readFile(nativePath)).experiment.spec.width,60);
   await direct.locator('#lab-scenario').selectOption('invalid-profile');await direct.locator('#lab-build').click();
   await direct.locator('#lab-status').filter({hasText:'failed'}).waitFor();
   assert.match(await direct.locator('#lab-metrics').textContent(),/17434\.513322/);
