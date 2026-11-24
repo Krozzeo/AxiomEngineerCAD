@@ -1,30 +1,26 @@
 # Compact Engineer context
 
-Current batch: **0.3.13 / E3 closure corrections**. Owner explicitly authorized corrected stable integration into main, followed by E4.M1. Import/Export are Right dock panels; missing STEP units require an explicit retained source-unit choice, valid spaced metadata is recognized; positive finite material density accepts integers/fractions with English validation; Navigation is in the View ribbon. Read docs/E3_M6_PRODUCTION.md. Exact-head PR/main CI, stable publication and real public installation remain delivery gates; none are claimed by this source update. E4.M1 has not yet been implemented.
+Current candidate: **0.4.5 / E4.M4** on `engineer/e4-m4-versioned-assemblies`, based on the selective-verification branch and delivered CAD0.4.4. Read [M4 scope/demo](E4_M4_VERSIONS.md), [ADR032](architecture/ADR-032-MOTION-SESSIONS-PUBLISHED-COMPONENTS.md) and the retained owner request map. This adds published versions/Latest/Pinned plus grouped motion and assembly UI corrections. Focused domain and actual hardware UI checks passed; exact-head full acceptance and public installation remain pending.
 
-Previous batch: **0.3.11 / E3.M5 STEP interoperability**, plus the standalone Bottom Dependencies panel driven by Parameter Manager selection. E3.M4/0.3.10 was delivered publicly and accepted by the owner. Read [M5 scope and demo checks](E3_M5_INTEROPERABILITY.md). Complete exact-head acceptance/public installation are required; owner M5 acceptance is pending. Main/stable remain 0.2.6.
+Last immutable delivery0.4.4/PR26 passed exact-head Windows/Linux379 native tests each, full browser/PDF/36 STEP round trips/performance and actual public Platform0.1.13 install with Chrome/NVIDIA hardware.561 packaged source files matched; zero page/renderer errors. Provenance is in PROJECT_STATE.json. Main/stable0.3.13 remains unchanged.
 
+Start with `npm run context`. MASTER_DESIGN.md is the canonical intent; its normalized SHA256 matches the reviewed baseline in PROJECT_STATE.json. Reuse unchanged intent and read affected sections. Full design review is required if that hash changes or a foundational/scope contradiction appears. A compact brief is navigation, never implementation proof.
 
-Start with `npm run context`. `PROJECT_STATE.json` records the reviewed Master hash (UTF-8 with CRLF normalized to LF) and last immutable delivery. A matching hash permits targeted reading under AGENTS1; a mismatch requires full design review. The Master remains authoritative. A brief is navigation, never proof of implementation.
+Platform owns lifecycle, credentials and shared AI/review SDK. Engineer owns exact geometry, sketches, parametric history, versions, assemblies, drawings and semantic CAD tools. Preserve native identities, revision checks, human AI Apply, atomic persistence, immutable releases and user files. GPU IDs only author references against their native manifest; they never establish persistent geometry identity.
 
-Platform owns generic local lifecycle, credentials and shared AI/review SDK. Engineer owns exact geometry, sketch solving, native history, assemblies, drawings and semantic CAD operations. Source mutations share revision-checked commands; GPU triangles and pixel IDs never establish native identity. Keep immutable builds/user files and human authorization boundaries intact.
+Retained M3 scope: analytic cylinder/plane and external parallel cylinder/cylinder tangency; Between plane sets (3–4 refs); single-reference Fixed plus retained M2 fixed pairs; native draft preview/editing; worker-based feasible pointer projection and continuous queued motion; reciprocal Components/Mates trees; owner Project/operation corrections. No arbitrary-surface tangency, collision avoidance or global numerical convergence claim. External assembly files are rigid at file boundaries. Latest/Pinned updates and interference remain later milestones.
 
-E0/E1 established the exact native foundation; E2 is closed as 0.2.6 stable. E3.M1–M4 are delivered and owner-accepted through 0.3.10. E3.M5 adds bounded exact STEP import/export, original source and translation reports, independent native CAD round trips, imported-face native additions and a standalone selection-driven Dependencies panel. Historical tests use explicit fixtures outside the production demo catalog.
-
-Current implemented bounds include part-local extrusion/revolution histories, exact boolean operations and feature transforms, typed sketch constraints/equations, referenced planes/axes/coordinate systems, inline Parameter Manager, docking and separate windows. Conservative geometry witnesses require explicit repair when their source disappears. Existing documents retain their sign and face-refinement semantics. Older strict readers reject new source extensions. General assemblies, broad drawing generation and a general nonlinear 3D datum constraint solver remain outside this batch.
-
-Select a narrow entry point:
-
-| Change | Read first | Focused evidence |
+| Change | Entry points | Focused checks |
 | --- | --- | --- |
-| Sketch interaction/Inspector | `app/sketch-workbench.mjs`, sketch references and intent | `scripts/check-sketch-interactions-ui.mjs` |
-| Constraints/drag/signs | `src/sketch/`, command reducer/session | Relevant sketch tests; `tests/sketch-interactions.test.mjs` |
-| Supports/extrusion | `src/extrusion/`, `src/sketch/support.mjs`, ADR025 | Extrusion/support tests plus actual Model picking |
-| Parameters/tables | `src/parameters/`, `app/parameter-manager.mjs` | Parameter tests and browser table/value cases |
-| Viewport/panels | `app/proof.mjs`, GPU view, camera, panel channel | Actual camera/picking/separate-window checks; delayed-response ordering regression |
-| Native/AI authority | `src/native/`, `src/commands/`, relevant contracts | Native/version/permission/atomicity tests |
-| Delivery | `docs/MILESTONE_DELIVERY.md`, pinned SDK publication context | Exact PR acceptance, immutable package and actual Platform installation |
+| Published versions/updates | src/workspace/publications.mjs; app/published-versions.mjs | e4-m4-versions.test.mjs, browser:versioned-assemblies |
+| Grouped motion/GPU | src/workspace/motion-session.mjs; app/assembly-stage.mjs; app/gpu-motion.mjs | e4-m4-motion.test.mjs, actual M4 and M3/M2 neighbors |
+| Mates/native references | src/assembly/native-profile.mjs, native.mjs, solver.mjs, profile.mjs; src/workspace/session.mjs | e4-spatial-mates.test.mjs, e4-m3-motion.test.mjs |
+| Motion/preview/selection | app/assembly-motion*.mjs, assembly-gizmo.mjs, assembly-controls.mjs, assembly-mates.mjs, proof.mjs | browser-e4-m3.mjs, browser-e4-m2.mjs |
+| Component/Mate trees | app/components-workbench.mjs, mate-tree.mjs | actual reciprocal tree, Edit/Delete and scope handoff |
+| Project/layout | app/workspace-ui.mjs, project.css, dock-workbench.mjs | side resize, default layout, filenames/copies |
+| Sketch/parameters/features | app/sketch-workbench.mjs; src/sketch/, src/parameters/, src/extrusion/ | existing relevant domain/browser tests |
+| Delivery | AGENTS.md, DEVELOPMENT_WORKFLOW.md, MILESTONE_DELIVERY.md | exact-head Windows/Linux; public install and real GPU |
 
-The complete acceptance entry points remain `npm run check` and `npm run test:browser`, on Windows/Linux, with independent PDF verification. Focused checks support diagnosis; they never replace publication acceptance. Use real hardware for hardware claims and label unsupported/software/fault-injection paths separately.
+Begin each implementation block with `npm run verify -- --plan` or an explicit area/suite. Read the report summary; rerun only failed focused suites. Update impact rules and declare fixtures for new scenarios. Unknown code falls back to full local verification; partial evidence never grants publication.
 
-The compact context and workflow are developer infrastructure. Read the current task separately, use `DEVELOPMENT_WORKFLOW.md`, and preserve delivered evidence while reviewing process and CAD changes independently.
+Focused tests diagnose changes. Complete `npm run check`, `npm run test:browser`, independent PDF/STEP and performance checks on Windows/Linux remain publication acceptance. Freeze source/version/docs first; final delivery evidence is external to the accepted source commit. Do not restart acceptance for a cosmetic evidence commit. Do not skip a failing required test or claim software rendering as hardware proof.

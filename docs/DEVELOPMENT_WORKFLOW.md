@@ -6,6 +6,10 @@
 2. Map each owner request to its module, observable result and smallest meaningful verification. Separate product failures from stale test assumptions. Keep implementation, validated evidence and owner acceptance distinct.
 3. Return compact tool results: outcome, current commit, failing case, relevant excerpt and full report path. Batch independent reads, avoid entire catalogues/logs, and expand only for a concrete question. Approximately 1,000–1,500 tokens is a context target, not a license to omit a required contract.
 
+## Executable selective checks
+
+Use [VERIFICATION.md](VERIFICATION.md) and `npm run verify -- --plan` before choosing validation. The maintained impact map selects existing tests and isolated real-UI scenarios. Read compact reports first; rerun failed focused suites instead of all historical workflows. `npm run verify:history` measures suite cost without inventing token usage. A focused pass is development evidence only; trusted complete delivery gates remain unchanged.
+
 ## Implement and diagnose
 
 - Edit the affected functions and run focused cases plus neighbors. Use one hypothesis and a bounded reproducer for each observed failure. Confirm the reproducer's preconditions, actual status/revision and failure before claiming a fix.

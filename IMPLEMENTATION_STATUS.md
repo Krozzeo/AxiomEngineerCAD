@@ -1,13 +1,20 @@
+# Current: E4.M4 /0.4.5 candidate
+
+Owner authorized published versions/Latest/Pinned and assembly corrections, and selected grouped motion sessions. See [M4 scope/demo](docs/E4_M4_VERSIONS.md), ADR032, the request map and docs/PROJECT_STATE.json. Branch `engineer/e4-m4-versioned-assemblies` includes the selective verification tooling. Motion stages privately and confirms one revision/Undo entry; native validation remains authoritative. GPU rigid buffers and a reduced worker solve address measured preview cost. Published updates preserve Pinned/historical closures and block lost/conflicting native mates.
+
+Focused domain and actual Chrome/NVIDIA UI checks passed, including direct dragging, Mate/trees, publication, policy preview/Apply and renderer recovery. Full exact-head Windows/Linux acceptance and immutable public installation remain mandatory and are not yet claimed. Last delivered CAD0.4.4 is `863daea5c96f165c917914fa3124f387e613fba3` (PR26, acceptance45240534757, publication45243129752). Main/stable0.3.13 unchanged.
+
+Historical implementation notes follow; their pending gates describe those earlier candidates, not the current delivery.
+
 # Engineer implementation status
 
-Current batch: **0.3.13 / E3 closure corrections**. Owner explicitly authorized corrected stable integration into main, followed by E4.M1. Import/Export are Right dock panels; missing STEP units require an explicit retained source-unit choice, valid spaced metadata is recognized; positive finite material density accepts integers/fractions with English validation; Navigation is in the View ribbon. Read docs/E3_M6_PRODUCTION.md. Exact-head PR/main CI, stable publication and real public installation remain delivery gates; none are claimed by this source update. E4.M1 has not yet been implemented.
-
-Previous batch: **0.3.11 / E3.M5 STEP interoperability**, plus the standalone Bottom Dependencies panel driven by Parameter Manager selection. E3.M4/0.3.10 was delivered publicly and accepted by the owner. Read [M5 scope and demo checks](docs/E3_M5_INTEROPERABILITY.md). Complete exact-head acceptance/public installation are required; owner M5 acceptance is pending. Main/stable remain 0.2.6.
+Historical0.4.2 implementation record: **0.4.2 / E4.M1 workspace interaction refinements**, branch `engineer/workspace-interactions`, based on delivered 0.4.1 (PR23, `91fe145548511ae03c1edf1f7dcd2980da2012fc`). Scope and verification are in [workspace interaction notes](docs/WORKSPACE_INTERACTIONS_0_4_2.md). Focused domain and actual Chrome/NVIDIA workspace checks passed. The candidate is frozen for complete exact-head Windows/Linux CI and actual public installation; neither gate is claimed complete here. This is an owner-requested M1 refinement, not E4.M2 or a stable merge. Main/stable remains0.3.13.
+Previous batch: **0.3.11 / E3.M5 STEP interoperability**, plus the standalone Bottom Dependencies panel driven by Parameter Manager selection. E3.M4/0.3.10 was delivered publicly and accepted by the owner. Read [M5 scope and demo checks](docs/E3_M5_INTEROPERABILITY.md). Complete exact-head acceptance/public installation are required; owner M5 acceptance is pending. At that historical delivery, main/stable were 0.2.6.
 
 
 Previous M4 implementation: **0.3.10 / E3.M4 parameter and feature dependency diagnostics**. Full typed operation-field queries/bindings, causal dependent/source traces at working or retained versions, read-only source impact and typed rejection, exact Undo/Redo; safe formula catalogue with shared blue function autocomplete; directed distance/angle and two-distance chamfer; short selection labels and physical row hover. See [scope and verification](docs/E3_M4_DEPENDENCIES.md). M4 exact CI and public installation passed; owner accepted.
 
-Previous delivery: **0.3.9 / E3.M3**, 315 native tests, full Windows/Linux/browser/PDF and actual public Platform/Chrome/NVIDIA acceptance passed. PROJECT_STATE indexes immutable delivery. Main/stable remain 0.2.6.
+Previous delivery: **0.3.9 / E3.M3**, 315 native tests, full Windows/Linux/browser/PDF and actual public Platform/Chrome/NVIDIA acceptance passed. PROJECT_STATE indexes immutable delivery. At that historical delivery, main/stable were 0.2.6.
 
 Development process: compact verified context, focused diagnosis and non-duplicated exact-head PR/main CI were integrated in main through PR17 at `60a5ceb42be30fd82bb33263799a67706653be64` with owner authorization. See `docs/DEVELOPMENT_WORKFLOW.md`.
 

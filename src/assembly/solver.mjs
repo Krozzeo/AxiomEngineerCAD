@@ -1,42 +1,52 @@
-import {check} from '../document.mjs';
+import {check} from '../errors.mjs';
 import {assemblyRecipe,NUMERIC,SPATIAL,datum} from './profile.mjs';
-import {add,sub,mul,dot,cross,norm,rotate,inverse,qmul,log,increment,rank,linear} from './math.mjs';
+import {add,sub,mul,dot,cross,norm,rotate,inverse,qmul,log,increment,rank,linear,exp} from './math.mjs';
 function world(b,ref){const d=datum(b,ref.datumId);return {...d,origin:add(b.pose.position,rotate(b.pose.quaternion,d.origin)),direction:d.direction?rotate(b.pose.quaternion,d.direction):null,quaternion:b.pose.quaternion};}
 export function relations(bodies,mates){const index=new Map(bodies.map(b=>[b.id,b])),rows=[];let singular=false;
   const append=(m,values,unit)=>values.forEach(value=>rows.push({id:m.id,value,unit}));
-  for(const m of mates){const a=world(index.get(m.a.bodyId),m.a),b=world(index.get(m.b.bodyId),m.b),v=sub(b.origin,a.origin);
-    if(m.type==='fixed'){append(m,v,'mm');append(m,log(qmul(b.quaternion,inverse(a.quaternion))),'rad');}
+  for(const m of mates){const a=world(index.get(m.a.bodyId),m.a),b=world(index.get(m.b.bodyId),m.b),v=sub(b.origin,a.origin);if(typeof m.flipped==='boolean'&&a.direction&&b.direction&&['parallel','concentric','coincident','between'].includes(m.type))append(m,[dot(a.direction,b.direction)-(m.flipped?-1:1)],'direction');
+    if(m.type==='between'){const mid=(refs)=>{const planes=refs.map(ref=>world(index.get(ref.bodyId),ref));return {origin:mul(planes.reduce((v,p)=>add(v,p.origin),[0,0,0]),1/planes.length),direction:planes[0].direction,planes};},x=mid([m.a,...m.extraA]),y=mid([m.b,...m.extraB]);for(const set of [x,y])for(const plane of set.planes.slice(1))append(m,cross(set.direction,plane.direction),'direction');append(m,cross(x.direction,y.direction),'direction');append(m,[dot(sub(y.origin,x.origin),x.direction)],'mm');}
+    if(m.type==='tangent'){if(a.kind==='cylinder'&&b.kind==='cylinder'){append(m,cross(a.direction,b.direction),'direction');append(m,[norm(cross(v,a.direction))-a.radius-b.radius],'mm');}else{const plane=a.kind==='plane'?a:b,cylinder=a.kind==='cylinder'?a:b;append(m,[dot(plane.direction,cylinder.direction)],'direction');append(m,[(typeof m.flipped==='boolean'?(m.flipped?-1:1)*dot(sub(cylinder.origin,plane.origin),plane.direction):Math.abs(dot(sub(cylinder.origin,plane.origin),plane.direction)))-cylinder.radius],'mm');}}
+    if(m.type==='fixed'){const position=m.relative?add(a.origin,rotate(a.quaternion,m.relative.position)):a.origin,quaternion=m.relative?qmul(a.quaternion,m.relative.quaternion):a.quaternion;append(m,sub(b.origin,position),'mm');append(m,log(qmul(b.quaternion,inverse(quaternion))),'rad');}
     if(m.type==='coincident'&&a.kind==='point')append(m,v,'mm');
     if(m.type==='coincident'&&a.kind==='plane'){append(m,cross(a.direction,b.direction),'direction');append(m,[dot(v,a.direction)],'mm');}
     if(m.type==='concentric'){append(m,cross(a.direction,b.direction),'direction');append(m,cross(v,a.direction),'mm');}
     if(m.type==='parallel')append(m,cross(a.direction,b.direction),'direction');
     if(m.type==='perpendicular')append(m,[dot(a.direction,b.direction)],'direction');
-    if(m.type==='distance'){singular ||= norm(v)<1e-8;append(m,[norm(v)-m.value],'mm');}
-    if(m.type==='angle'){const s=norm(cross(a.direction,b.direction));singular ||= s<1e-8;append(m,[Math.atan2(s,dot(a.direction,b.direction))-m.value],'rad');}
+    if(m.type==='distance'){if(a.kind==='plane'||b.kind==='plane'){const normal=a.direction??b.direction;if(a.kind==='plane'&&b.kind==='plane')append(m,cross(a.direction,b.direction),'direction');append(m,[dot(v,normal)-(m.flipped?-m.value:m.value)],'mm');}else{singular ||= norm(v)<1e-8;append(m,[norm(v)-m.value],'mm');}}
+    if(m.type==='angle'){const s=norm(cross(a.direction,b.direction));if(m.regularized&&(m.value<1e-8||Math.abs(m.value-Math.PI)<1e-8)){append(m,cross(a.direction,b.direction),'direction');append(m,[dot(a.direction,b.direction)-Math.cos(m.flipped?Math.PI-m.value:m.value)],'direction');}else{singular ||= s<1e-8;append(m,[Math.atan2(s,dot(a.direction,b.direction))-(m.flipped?Math.PI-m.value:m.value)],'rad');}}
   }return {rows,singular};
 }
 const valid=rows=>rows.every(r=>Math.abs(r.value)<=(r.unit==='mm'?NUMERIC.lengthMm:NUMERIC.angleRad));
 function jacobian(bodies,variables,mates,extra=()=>[]){const base=[...relations(bodies,mates).rows,...extra(bodies)],n=variables.length*6,J=base.map(()=>Array(n).fill(0)),h=NUMERIC.differenceStep;
   for(let col=0;col<n;col++){const d=Array(n).fill(0);d[col]=h;const plus=[...relations(increment(bodies,variables,d),mates).rows,...extra(increment(bodies,variables,d))];d[col]=-h;const minus=[...relations(increment(bodies,variables,d),mates).rows,...extra(increment(bodies,variables,d))];for(let row=0;row<base.length;row++)J[row][col]=(plus[row].value-minus[row].value)/(2*h);}return {rows:base,J};}
-function optimize(initial,mates,extra=()=>[]){let bodies=structuredClone(initial),lambda=1e-3,iterations=0;const variables=bodies.flatMap((b,i)=>b.grounded?[]:[i]),n=variables.length*6;
-  for(;iterations<NUMERIC.maxIterations;iterations++){
+function optimize(initial,mates,extra=()=>[],maxIterations=NUMERIC.maxIterations,stopOnPlateau=false){let bodies=structuredClone(initial),lambda=1e-3,iterations=0;const variables=bodies.flatMap((b,i)=>b.grounded?[]:[i]),n=variables.length*6;
+  for(;iterations<maxIterations;iterations++){
     const {rows,J}=jacobian(bodies,variables,mates,extra);if(valid(rows)||!n)break;const residual=rows.map(r=>r.value),cost=dot(residual,residual);
     const a=Array.from({length:n},()=>Array(n).fill(0)),b=Array(n).fill(0);
     for(let i=0;i<n;i++){for(let j=0;j<n;j++)a[i][j]=J.reduce((s,row)=>s+row[i]*row[j],0);a[i][i]+=lambda;b[i]=-J.reduce((s,row,k)=>s+row[i]*residual[k],0);}
     let step=linear(a,b);if(!step)break;const length=norm(step);if(length>50)step=mul(step,50/length);
     const candidate=increment(bodies,variables,step),values=[...relations(candidate,mates).rows,...extra(candidate)].map(r=>r.value),next=dot(values,values);
+    if(stopOnPlateau&&Math.abs(next-cost)<1e-12*Math.max(1,cost)){if(next<cost)bodies=candidate;break;}
     if(next<cost){bodies=candidate;lambda=Math.max(1e-12,lambda/4);}else lambda=Math.min(1e12,lambda*10);
     if(lambda>=1e12||norm(step)<1e-12)break;
   }return {bodies,iterations,variables};
 }
-export function solveAssembly(input,{drag}={}){
-  const source=assemblyRecipe(input),started=performance.now(),base=optimize(source.bodies,source.mates);let solved=base,dragResult=null;
-  if(drag){check(drag&&typeof drag==='object'&&Object.keys(drag).every(k=>['bodyId','position','quaternion'].includes(k))&&source.bodies.some(b=>b.id===drag.bodyId),'LostReference','Drag a known body.');
-    check(Array.isArray(drag.position)&&drag.position.length===3&&drag.position.every(x=>Number.isFinite(x)&&Math.abs(x)<=1000),'InvalidInput','Drag position must be a bounded mm vector.');
+export function solveAssembly(input,{drag,targets,projectTargets=false}={}){
+  const source=assemblyRecipe(input),started=performance.now(),seed=structuredClone(source.bodies);
+  if(source.profile!=='E0.M3-datums-v0')for(const m of source.mates.filter(m=>m.type==='perpendicular'||m.type==='angle')){const a=seed.find(b=>b.id===m.a.bodyId),b=seed.find(b=>b.id===m.b.bodyId),wa=world(a,m.a),wb=world(b,m.b);if(norm(cross(wa.direction,wb.direction))<1e-6&&(m.type==='perpendicular'||Math.abs(Math.acos(Math.max(-1,Math.min(1,dot(wa.direction,wb.direction))))-(m.flipped?Math.PI-m.value:m.value))>1e-8)){const target=!b.grounded?b:!a.grounded?a:null;if(target){let axis=cross(wa.direction,Math.abs(wa.direction[0])<.8?[1,0,0]:[0,1,0]);axis=mul(axis,.02/norm(axis));target.pose.quaternion=qmul(exp(axis),target.pose.quaternion);}}}
+  for(const m of source.mates.filter(m=>m.type==='tangent')){const a=seed.find(b=>b.id===m.a.bodyId),b=seed.find(b=>b.id===m.b.bodyId),wa=world(a,m.a),wb=world(b,m.b),target=!b.grounded?b:!a.grounded?a:null;if(!target)continue;if(wa.kind==='cylinder'&&wb.kind==='cylinder'&&norm(cross(sub(wb.origin,wa.origin),wa.direction))<1e-7){const axis=cross(wa.direction,Math.abs(wa.direction[0])<.8?[1,0,0]:[0,1,0]);target.pose.position=add(target.pose.position,mul(axis,.02/norm(axis)));}else if(wa.kind!==wb.kind){const plane=wa.kind==='plane'?wa:wb,cylinder=wa.kind==='cylinder'?wa:wb;if(Math.abs(dot(sub(cylinder.origin,plane.origin),plane.direction))<1e-7)target.pose.position=add(target.pose.position,mul(plane.direction,.02));}}
+  for(const m of source.mates.filter(m=>typeof m.flipped==='boolean'&&['parallel','concentric','coincident','between'].includes(m.type))){const a=seed.find(b=>b.id===m.a.bodyId),b=seed.find(b=>b.id===m.b.bodyId),wa=world(a,m.a),wb=world(b,m.b);if(wa.direction&&wb.direction&&norm(cross(wa.direction,wb.direction))<1e-7&&dot(wa.direction,wb.direction)*(m.flipped?-1:1)<0){const target=!b.grounded?b:!a.grounded?a:null;if(target){let axis=cross(wa.direction,Math.abs(wa.direction[0])<.8?[1,0,0]:[0,1,0]);target.pose.quaternion=qmul(exp(mul(axis,.02/norm(axis))),target.pose.quaternion);}}}
+  const base=optimize(seed,source.mates);let solved=base,dragResult=null;
+  if(drag||targets?.length){
+   const targetList=targets??[drag];for(const drag of targetList){check(drag&&typeof drag==='object'&&Object.keys(drag).every(k=>['bodyId','position','quaternion'].includes(k))&&source.bodies.some(b=>b.id===drag.bodyId),'LostReference','Drag a known body.');
+    check(Array.isArray(drag.position)&&drag.position.length===3&&drag.position.every(x=>Number.isFinite(x)&&Math.abs(x)<=(source.profile!=='E0.M3-datums-v0'?1e6:1000)),'InvalidInput','Drag position must be a bounded mm vector.');
     if(drag.quaternion)check(Array.isArray(drag.quaternion)&&drag.quaternion.length===4&&drag.quaternion.every(Number.isFinite)&&Math.abs(norm(drag.quaternion)-1)<1e-8,'InvalidInput','Drag orientation must be a unit quaternion.');
-    const extra=bodies=>{const b=bodies.find(b=>b.id===drag.bodyId);return [...sub(b.pose.position,drag.position).map(value=>({id:'temporary-drag',value,unit:'mm'})),...(drag.quaternion?log(qmul(b.pose.quaternion,inverse(drag.quaternion))).map(value=>({id:'temporary-drag',value,unit:'rad'})):[])];};
-    const attempted=optimize(base.bodies,source.mates,extra),accepted=valid(relations(base.bodies,source.mates).rows)&&valid(relations(attempted.bodies,source.mates).rows)&&valid(extra(attempted.bodies));
-    dragResult={accepted,target:structuredClone(drag),reason:accepted?'Temporary target satisfied; permanent mate rank measured after removal.':'Infeasible target; previous feasible poses preserved.',iterations:attempted.iterations};if(accepted)solved=attempted;
+    }
+    const extra=bodies=>targetList.flatMap(drag=>{const b=bodies.find(b=>b.id===drag.bodyId);return [...sub(b.pose.position,drag.position).map(value=>({id:'temporary-drag',value,unit:'mm'})),...(drag.quaternion?log(qmul(b.pose.quaternion,inverse(drag.quaternion))).map(value=>({id:'temporary-drag',value,unit:'rad'})):[])];});
+    let attempted;if(projectTargets){const soft=bodies=>extra(bodies).map(row=>({...row,value:row.value*.001}));const near=optimize(base.bodies,source.mates,soft);attempted=optimize(near.bodies,source.mates);}else attempted=optimize(base.bodies,source.mates,extra);
+    const accepted=valid(relations(base.bodies,source.mates).rows)&&valid(relations(attempted.bodies,source.mates).rows)&&(projectTargets||valid(extra(attempted.bodies)));
+    dragResult={accepted,target:structuredClone(targets??drag),reason:accepted?'Temporary target satisfied; permanent mate rank measured after removal.':'Infeasible target; previous feasible poses preserved.',iterations:attempted.iterations};if(accepted)solved=attempted;
   }
   const {rows,J}=jacobian(solved.bodies,solved.variables,source.mates),n=solved.variables.length*6,r=rank(J,n,NUMERIC.rankThreshold),state=relations(solved.bodies,source.mates),redundant=[];
   const accumulated=[];let previous=0;for(const m of source.mates){accumulated.push(...J.filter((_,i)=>rows[i].id===m.id));const next=rank(accumulated,n,NUMERIC.rankThreshold);if(next===previous)redundant.push(m.id);previous=next;}
@@ -45,9 +55,23 @@ export function solveAssembly(input,{drag}={}){
   let withinBounds=true;try{assemblyRecipe({...source,bodies:solved.bodies});}catch{withinBounds=false;}
   const status=!withinBounds?'Unsolved':!consistent?(contradictory||n===0?'Inconsistent':singular?'SingularOrIndeterminate':'Unsolved'):singular?'SingularOrIndeterminate':redundant.length?'RedundantConsistent':n-r===0?'FullyDefined':'UnderDefined';
   const applicable=consistent&&!singular&&withinBounds&&(!dragResult||dragResult.accepted);
-  return {solver:SPATIAL,numeric:NUMERIC,status,remainingDOF:consistent&&!singular?n-r:null,rank:r,variables:n,grounded:source.bodies.filter(b=>b.grounded).map(b=>b.id),redundant,conflicts,
+  const bodyDOF=Object.fromEntries(solved.bodies.map((body,index)=>{const k=solved.variables.indexOf(index);return [body.id,body.grounded?0:consistent&&!singular?6-r+rank(J.map(row=>row.filter((_,i)=>i<k*6||i>=k*6+6)),n-6,NUMERIC.rankThreshold):null];}));
+  return {bodyDOF,solver:SPATIAL,numeric:NUMERIC,status,remainingDOF:consistent&&!singular?n-r:null,rank:r,variables:n,grounded:source.bodies.filter(b=>b.grounded).map(b=>b.id),redundant,conflicts,
     evidence:{rows,maxLengthResidualMm:Math.max(0,...rows.filter(r=>r.unit==='mm').map(r=>Math.abs(r.value))),maxAngularResidualRad:Math.max(0,...rows.filter(r=>r.unit!=='mm').map(r=>Math.abs(r.value))),method:'Central-difference world tangent Jacobian; pivoted local rank; no global uniqueness claim.'},
     applicable,drag:dragResult,recipe:source,poses:solved.bodies.map(b=>({bodyId:b.id,...b.pose})),
     solvedRecipe:applicable?{...source,bodies:solved.bodies}:null,iterations:solved.iterations,elapsedMs:performance.now()-started,
-    limits:['Local numerical prototype; no global convergence proof','Analytic datums only; no arbitrary B-Rep mating','Tangent and width unsupported','CPU datum diagram is not interference or WebGPU evidence']};
+    limits:['Local numerical prototype; no global convergence proof','Analytic datums only; no arbitrary B-Rep mating',...(source.profile==='E0.M3-datums-v0'?['Tangent and width unsupported']:['Analytic cylinder/plane tangency; plane-set Between only']),'CPU datum diagram is not interference or WebGPU evidence']};
+}
+
+// Pointer previews need feasible poses, not a fresh rank/redundancy diagnosis.
+// Native Apply still uses solveAssembly's full double-precision validation.
+export function projectMotion(input,targets){
+ const started=performance.now(),source=assemblyRecipe(input),seed=structuredClone(source.bodies),seen=new Set();
+ check(valid(relations(source.bodies,source.mates).rows),'ConstraintConflict','Start motion from a feasible assembly.');
+ for(const t of targets){const b=seed.find(b=>b.id===t.bodyId);check(b&&!seen.has(t.bodyId),'LostReference','Choose each rigid body once.');seen.add(t.bodyId);check(t.position?.length===3&&t.position.every(x=>Number.isFinite(x)&&Math.abs(x)<=1e6)&&t.quaternion?.length===4&&t.quaternion.every(Number.isFinite)&&Math.abs(norm(t.quaternion)-1)<1e-8,'InvalidInput','Use bounded positions and unit rotations.');if(!b.grounded)b.pose={position:[...t.position],quaternion:[...t.quaternion]};}
+ let solved={bodies:seed,iterations:0};
+ if(!valid(relations(seed,source.mates).rows)){const active=new Set([...seen].filter(id=>!source.bodies.find(b=>b.id===id).grounded));let changed=true;while(changed){changed=false;for(const m of source.mates){const ids=[m.a,m.b,...(m.extraA??[]),...(m.extraB??[])].map(r=>r.bodyId);if(ids.some(id=>active.has(id)))for(const id of ids)if(!active.has(id)&&!source.bodies.find(b=>b.id===id).grounded){active.add(id);changed=true;}}}if(targets.length===1){const t=targets[0],anchor=source.bodies.find(b=>b.id===t.bodyId),q=qmul(t.quaternion,inverse(anchor.pose.quaternion));for(const b of seed)if(active.has(b.id)&&b.id!==t.bodyId){const original=source.bodies.find(old=>old.id===b.id);b.pose={position:add(t.position,rotate(q,sub(original.pose.position,anchor.pose.position))),quaternion:qmul(q,original.pose.quaternion)};}}const isolated=seed.map(b=>({...b,grounded:b.grounded||!active.has(b.id)}));if(valid(relations(isolated,source.mates).rows))solved={bodies:isolated,iterations:0};else if(active.size>[...seen].filter(id=>!source.bodies.find(b=>b.id===id).grounded).length){const soft=bodies=>targets.flatMap(t=>{const b=bodies.find(b=>b.id===t.bodyId);return [...sub(b.pose.position,t.position).map(value=>({value:value*.05,unit:'mm'})),...log(qmul(b.pose.quaternion,inverse(t.quaternion))).map(value=>({value:value*.05,unit:'rad'}))];});const near=optimize(isolated,source.mates,soft,16,true);solved=optimize(near.bodies,source.mates,()=>[],8);}else solved=optimize(isolated,source.mates,()=>[],24);solved.bodies=solved.bodies.map((b,i)=>({...b,grounded:source.bodies[i].grounded}));}
+ const applicable=valid(relations(solved.bodies,source.mates).rows);
+ const recipe=applicable?{...source,bodies:solved.bodies}:source;
+ return {applicable,solvedRecipe:recipe,elapsedMs:performance.now()-started,iterations:solved.iterations};
 }

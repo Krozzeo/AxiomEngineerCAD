@@ -125,11 +125,16 @@ export async function verifyConsolidationProjectUI({context,host,evidence,observ
  assert.equal(await p.getByRole('menuitem',{name:/^(Enable|Disable)$/}).count(),0);
  assert.equal(rejectedPreview,true);
  await p.unroute('**/v1/proof/build',busyOnFirstEdit);
- await p.locator('#feature-operation-preview').uncheck();
- await rolledBack(false);
+ await p.waitForFunction(()=>window.engineerViewport.presentedManifest===window.engineerViewport.proof?.manifestId);
+ let displayBuildRequests=0;const denyDisplayBuild=route=>{displayBuildRequests++;return route.fulfill({status:409,json:{code:'projectBusy',message:'The display toggle must not require another geometry job.'}});};
+ await p.route('**/v1/proof/build',denyDisplayBuild);
+ try{await p.locator('#feature-operation-preview').uncheck();await rolledBack(false);await sketchSettled(p);if(gpu)assert.equal(await p.evaluate(()=>window.engineerViewport.renderer.operationLayers.faceCount),0);
+ await p.locator('#feature-operation-preview').check();await rolledBack(true);await sketchSettled(p);if(gpu)assert.ok(await p.evaluate(()=>window.engineerViewport.renderer.operationLayers.faceCount>0));
+ await p.locator('#feature-operation-preview').uncheck();await rolledBack(false);assert.equal(displayBuildRequests,0,'Preview visibility must be presentation-only');}
+ finally{await p.unroute('**/v1/proof/build',denyDisplayBuild);}
  await p.locator('#feature-operation-done').click();
  await p.waitForFunction(id=>window.engineerViewport.proof?.scene.occurrences[0]?.featureId===id,pad.id);
  assert.deepEqual(await sketchDocument(p),source);
  assert.equal(await downstream.getAttribute('aria-disabled'),null);
- p.on('dialog',d=>d.accept());await p.close();await host.manager.execute({operationId:crypto.randomUUID(),action:'close',sessionId:session.sessionId,expectedRevision:source.revision,decision:'discard'});report.consolidation={passed:true,physicalExternalSnap:gpu,physicalExternalSelection:gpu,menuDismiss:true,radialDrag:true,sourceNavigation:true,depthDraftAndBinding:true,oneSolid:true,undoRedo:true,saveReopen:true};
+ p.on('dialog',d=>d.accept());await p.close();await host.manager.execute({operationId:crypto.randomUUID(),action:'close',sessionId:session.sessionId,expectedRevision:source.revision,decision:'discard'});report.consolidation={passed:true,physicalExternalSnap:gpu,physicalExternalSelection:gpu,menuDismiss:true,radialDrag:true,sourceNavigation:true,depthDraftAndBinding:true,previewVisibilityWithoutKernelBuild:true,oneSolid:true,undoRedo:true,saveReopen:true};
 }

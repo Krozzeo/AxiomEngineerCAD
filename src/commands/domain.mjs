@@ -1,3 +1,5 @@
+import {definitionContent} from '../components/context.mjs';
+import * as components from '../components/hierarchy.mjs';
 import {applyInlineExpressions,applyDimensionExpression} from '../parameters/inline.mjs';
 import {targetField,setField} from '../parameters/feature-fields.mjs';
 import {referenceCommand} from '../reference/profile.mjs';
@@ -15,7 +17,25 @@ import {M5_PROFILE} from '../sketch/relations.mjs';
 export function featureOf(value,id){const f=value.native?.graph.features.find(f=>f.id===id);check(f,'LostReference','Feature identity is missing.');check(f.type==='geometry-probe','UnsupportedCapability','This command requires a geometry-probe feature.');return f;}
 function length(q,targetUnit){check(Object.hasOwn(UNITS,q.unit),'InvalidUnits','Choose mm, cm, m or inch for length.');return q.value*UNITS[q.unit]/UNITS[targetUnit];}
 // One pure command reducer serves manual MAIN changes, headless replay and isolated proposals.
-export function command(value,name,input){check(value.formatVersion===1,'IncompatibleVersion','Open/convert a native v1 study first.');if(name==='cad.drawing.reconstruct.v1')return reconstruct(value,input.svg);
+export function command(value,name,input){
+ if(name.startsWith('cad.component.')) {
+  const actions={'cad.component.definition.create.v1':()=>components.createComponentDefinition(value,input),'cad.component.instance.insert.v1':()=>components.insertComponentInstance(value,input),'cad.component.instance.update.v1':()=>components.updateComponentInstance(value,input),'cad.component.instance.remove.v1':()=>components.removeComponentInstance(value,input.id),'cad.component.definition.remove.v1':()=>components.removeComponentDefinition(value,input.id)};
+  check(actions[name],'UnsupportedCapability','Unknown component operation.');return actions[name]();
+ }
+ const g=value.native?.graph,target=g?.features.find(f=>f.id===(input.sketchId??input.featureId));
+ const id=input.definitionId??target?.definitionId??g?.primaryDefinitionId;
+ if(target&&input.definitionId)check(target.definitionId===input.definitionId,'LostReference','The target belongs to another definition.');
+ if(g&&id!==g.primaryDefinitionId) {
+  check(!target||target.definitionId===id,'LostReference','The target belongs to another definition.');
+  check(/^(cad\.(sketch|extrusion|reference)\.|cad\.feature\.(update|delete|enable|reorder|extrude)\.v1$|cad\.material\.set\.v1$)/.test(name),'UnsupportedCapability','This operation has document scope.');
+  const scoped=definitionContent(value,id),next=commandInContext(scoped,name,input);
+  next.native.graph.primaryDefinitionId=g.primaryDefinitionId;
+  for(const [key,type]of [['experiment','geometry-probe'],['assembly','spatial-probe']]){const f=next.native.graph.features.find(f=>f.definitionId===g.primaryDefinitionId&&f.type===type);if(f)next[key]=structuredClone(f.data);else delete next[key];}
+  validate(next);return next;
+ }
+ return commandInContext(value,name,input);
+}
+function commandInContext(value,name,input){check(value.formatVersion===1,'IncompatibleVersion','Open/convert a native v1 study first.');if(name==='cad.drawing.reconstruct.v1')return reconstruct(value,input.svg);
  const next=structuredClone(value);
   if(name==='cad.drawing.layout.set.v1'){
     const graph=next.native.graph,producer=graph.features.find(f=>f.id===input.producerId);

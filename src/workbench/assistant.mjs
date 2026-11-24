@@ -22,33 +22,37 @@ const historyFile='.engineer-assistant-history.json',historyBytes=1024*1024;
 const defaults={model:'',reasoning:'platform',requireConfirmation:true,instructions:'',maxRequests:12,maxTools:24,maxOutputTokens:4096,maxSeconds:180,maxProjectTokens:100000,maxTaskTokens:40000};
 const ranges={maxRequests:[2,50],maxTools:[1,60],maxOutputTokens:[512,16384],maxSeconds:[15,300],maxProjectTokens:[0,1000000000],maxTaskTokens:[0,1000000000]};
 
+function preferenceScope(doc,name){if(name===historyFile)return {root:doc.stateRoot??dirname(doc.path),documentId:doc.value.documentId};const owner=doc.workspace?.anchor??doc;return {root:dirname(owner.path),documentId:owner.value.documentId};}
 export async function readProjectPreferences(doc,name,fallback,maxBytes=32768){
-  const path=join(dirname(doc.path),name);
+  const scope=preferenceScope(doc,name),path=join(scope.root,name);
   try{
     const info=await lstat(path);
     check(info.isFile()&&!info.isSymbolicLink()&&info.nlink===1&&info.size<=maxBytes,'PermissionDenied','Invalid project settings file.');
     const data=JSON.parse(await readFile(path,'utf8'));
-    check(data.documentId===doc.value.documentId,'LostReference','Settings belong to another project.');
+    check(data.documentId===scope.documentId,'LostReference','Settings belong to another project.');
     return data.settings;
   }catch(error){if(error.code==='ENOENT')return fallback;throw error;}
 }
 
 export function writeProjectPreferences(doc,name,settings){
-  return atomicJson(join(dirname(doc.path),name),{documentId:doc.value.documentId,settings});
+  const scope=preferenceScope(doc,name);return atomicJson(join(scope.root,name),{documentId:scope.documentId,settings});
 }
 
 export class CadAssistant {
-  constructor(adapter){this.adapter=adapter;this.doc=adapter.doc;this.messages=[];this.pending=null;this.proposal=null;this.active=null;this.usage=0;this.unreported=0;}
+  constructor(adapter){this.adapter=adapter;this.doc=adapter.doc;this.messages=[];this.pending=null;this.proposal=null;this.active=null;this.localLedger={usage:0,unreported:0};}
+  get usageLedger(){return this.doc.workspace?(this.doc.workspace.assistantLedger??={usage:0,unreported:0}):this.localLedger;}
+  get usage(){return this.usageLedger.usage;}set usage(value){this.usageLedger.usage=value;}
+  get unreported(){return this.usageLedger.unreported;}set unreported(value){this.usageLedger.unreported=value;}
   get commands(){return this.doc.commands;}
   async ledger(){
-    this.ledgerRead??=readProjectPreferences(this.doc,'.engineer-assistant-usage.json',{usage:0,unreported:0}).then(data=>{
+    this.usageLedger.read??=readProjectPreferences(this.doc,'.engineer-assistant-usage.json',{usage:0,unreported:0}).then(data=>{
       check(Number.isSafeInteger(data.usage)&&data.usage>=0&&Number.isSafeInteger(data.unreported)&&data.unreported>=0,'InvalidInput','Invalid assistant usage ledger.');
       this.usage=data.usage;this.unreported=data.unreported;
     });
-    return this.ledgerRead;
+    return this.usageLedger.read;
   }
   saveLedger(){return writeProjectPreferences(this.doc,'.engineer-assistant-usage.json',{usage:this.usage,unreported:this.unreported});}
-  async settings(){return {...defaults,...await readProjectPreferences(this.adapter.doc,'.engineer-assistant.json',{})};}
+  async settings(){return {...defaults,...await readProjectPreferences(this.doc,'.engineer-assistant.json',{})};}
   async configure(input){
     check(!this.active,'projectBusy','Wait for the current assistant request.');
     const current=await this.settings(),settings={...current};
