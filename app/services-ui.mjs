@@ -53,7 +53,7 @@ export function mountServices({document,dock,menu,header,assistant,apiPanel}){
   function setPreview(id){
     viewedProposal=id;viewing=!!id;document.body.dataset.aiPreview=String(viewing);
     for(const selector of ['.command-ribbon','#history-content','#parameters-content','#properties-content','#workbench-labs','#inspector-content','#save','#cad-undo']){
-      const node=document.querySelector(selector);if(node)node.inert=viewing;
+      const node=document.querySelector(selector);if(node)node.inert=viewing||!!window.engineerWorkspaceTransition&&['.command-ribbon','#save'].includes(selector);
     }
     paintBranches();
   }

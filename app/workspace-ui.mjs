@@ -24,7 +24,7 @@ export function mountWorkspace({document,dock,projectPanel,versionPanel,header,m
  let switching=false,requestedPart=null;
  let rebindEpoch=0,transitionCount=0;const inertLocks=new Map();
  async function rebind(next){
-  const epoch=++rebindEpoch;transitionCount++;const locks=[document.getElementById('editor-workspace'),document.querySelector('.command-ribbon')].filter(Boolean);window.engineerWorkspaceTransition=true;for(const node of locks){let lease=inertLocks.get(node);if(!lease){lease={count:0,inert:node.inert};inertLocks.set(node,lease);}lease.count++;node.inert=true;}
+  const epoch=++rebindEpoch;transitionCount++;const locks=[document.getElementById('editor-workspace'),document.querySelector('.command-ribbon'),document.getElementById('save')].filter(Boolean);window.engineerWorkspaceTransition=true;for(const node of locks){let lease=inertLocks.get(node);if(!lease){lease={count:0,inert:node.inert};inertLocks.set(node,lease);}lease.count++;node.inert=true;}
   window.engineerDiscardAssemblyDrag?.();window.engineerDiscardAssemblyManual?.();window.engineerCancelAssembly?.();window.engineerCancelMate?.();window.engineerClearSelection?.();
   try{window.engineerViewport.suspend();
   window.engineerBindWorkspace(next);workspace=next;

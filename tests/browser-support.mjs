@@ -21,7 +21,8 @@ export async function waitCurrentViewport(page){
   const state=window.engineerComponentVersionState?.();
   if(window.engineerWorkspaceTransition||state?.busy||state?.loading)return false;
   try{const {api}=await import('/cad-commands.mjs'),doc=(await api('document')).document,v=window.engineerViewport;
-   return v?.proof?.revision===doc.revision&&v.presentedManifest===v.proof.manifestId&&!v.requestState.job;
+   const settled=window.engineerComponentVersionState?.();
+   return !window.engineerWorkspaceTransition&&!settled?.busy&&!settled?.loading&&doc.documentId===window.engineerWorkspace?.activeDocumentId&&v?.proof?.revision===doc.revision&&v.presentedManifest===v.proof.manifestId&&!v.requestState.job;
   }catch(error){if(error.name==='AbortError')return false;throw error;}
  });
 }

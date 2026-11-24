@@ -15,6 +15,7 @@ export const browserScenarios = [
   ['extended-sketch', 'extended-sketch', 'verifyExtendedSketchUI', 'e3-m1-extended-sketches', 'E3.M1 Extended Sketches'],
   ['feature-operations', 'feature-operations', 'verifyFeatureOperationsUI', 'e3-m2-feature-operations', 'E3.M2 Shaft and Flange'],
   ['sketch-interaction', 'sketch-interactions', 'verifyInteractionProjectUI', 'e2-m3-drawing-proposal', 'E2.M3 Drawing Proposal'],
+  ['embedded-sketch', 'sketch', 'verifySketchProjectUI', 'e1-m2-sketch', 'E1.M2 Editable Sketches'],
   ['editing-recovery', 'editing-recovery', 'verifyRecoveryProjectUI', 'e2-m3-drawing-proposal', 'E2.M3 Drawing Proposal'],
   ['workbench', 'workbench', 'verifyWorkbenchUI', 'e1-m1-workbench', 'E1.M1 Model Workbench'],
   ['proof', 'proof', 'verifyProofUI', 'e0-m6-drawing-gpu', 'E0.M6 Drawing & GPU Lab'],
