@@ -37,7 +37,7 @@ $('metadata').addEventListener('submit', event => {
   });
 });
 $('reset').addEventListener('click', () => run(async () => { await report(false); pending = false; state = await request('document'); render(true); message('Fields reset to the working revision.'); }));
-$('save').addEventListener('click', () => { message('Saving document…');run(async () => { const result = await request('save', {expectedRevision:state.status.revision}); state.status = result.status; render();await window.engineerWorkspaceRefresh?.();message('Document saved locally.'); }); });
+$('save').addEventListener('click', () => { message('Saving document…');run(async () => { const result = await request('save', {expectedRevision:state.status.revision}); state.status = result.status; render();await window.engineerWorkspaceRefresh?.();window.dispatchEvent(new CustomEvent('engineer-document-changed',{detail:await request('document')}));await window.engineerViewport?.build({automatic:true,reuseCurrent:true});message('Document saved locally.'); }); });
 $('close').addEventListener('click', () => $('close-dialog').showModal());
 for (const button of document.querySelectorAll('[data-decision]')) button.addEventListener('click', () => run(async () => {
   const workspace=window.engineerWorkspace?await request('workspace'):null;const result = await request('close', {expectedRevision:workspace?.projectRevision??state.status.revision, decision:button.dataset.decision});

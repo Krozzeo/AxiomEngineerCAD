@@ -7,7 +7,7 @@ const id=x=>typeof x==='string'&&/^[a-zA-Z0-9_-]{1,64}$/.test(x);
 const vector=(v,n,bound)=>Array.isArray(v)&&v.length===n&&v.every(x=>Number.isFinite(x)&&Math.abs(x)<=bound);
 const keys=(v,allowed)=>v&&typeof v==='object'&&!Array.isArray(v)&&Object.keys(v).every(k=>allowed.includes(k));
 export function assemblyRecipe(input){
-  check(keys(input,['profile','unit','bodies','mates'])&&[PROFILE,'E4.M2-spatial/1','E4.M3-spatial/1','E4.M4-spatial/1'].includes(input.profile)&&input.unit==='mm','InvalidInput','Choose the versioned mm datum experiment.');
+  check(keys(input,['profile','unit','bodies','mates'])&&[PROFILE,'E4.M2-spatial/1','E4.M3-spatial/1','E4.M4-spatial/1','E4.M5-spatial/1'].includes(input.profile)&&input.unit==='mm','InvalidInput','Choose the versioned mm datum experiment.');
   check(Array.isArray(input.bodies)&&input.bodies.length>=(input.profile!==PROFILE?1:2)&&input.bodies.length<=(input.profile!==PROFILE?33:4)&&Array.isArray(input.mates)&&input.mates.length<=(input.profile!==PROFILE?128:16),'ResourceLimit','Use 2–4 bodies and at most 16 mates.');
   const modern=input.profile!==PROFILE;const bodies=new Map();
   for(const b of input.bodies){
@@ -21,7 +21,7 @@ export function assemblyRecipe(input){
   }
   check(input.bodies.some(b=>b.grounded),'InvalidInput','Ground at least one body to define the world frame.');
   const ids=new Set();for(const m of input.mates){
-    check(keys(m,['id','type','a','b','value',...(modern?['regularized','relative','extraA','extraB','flipped']:[])])&&(!Object.hasOwn(m,'regularized')||typeof m.regularized==='boolean')&&id(m.id)&&!ids.has(m.id),'InvalidInput','Invalid or duplicate mate ID.');ids.add(m.id);if(Object.hasOwn(m,'flipped'))check(input.profile==='E4.M4-spatial/1'&&typeof m.flipped==='boolean','InvalidInput','Use an explicit reversible direction.');if(m.relative)check(modern&&m.type==='fixed'&&keys(m.relative,['position','quaternion'])&&vector(m.relative.position,3,1e6)&&vector(m.relative.quaternion,4,1)&&Math.abs(norm(m.relative.quaternion)-1)<1e-8,'InvalidInput','Invalid fixed relative frame.');
+    check(keys(m,['id','type','a','b','value',...(modern?['regularized','relative','extraA','extraB','flipped']:[])])&&(!Object.hasOwn(m,'regularized')||typeof m.regularized==='boolean')&&id(m.id)&&!ids.has(m.id),'InvalidInput','Invalid or duplicate mate ID.');ids.add(m.id);if(Object.hasOwn(m,'flipped'))check(['E4.M4-spatial/1','E4.M5-spatial/1'].includes(input.profile)&&typeof m.flipped==='boolean','InvalidInput','Use an explicit reversible direction.');if(m.relative)check(modern&&m.type==='fixed'&&keys(m.relative,['position','quaternion'])&&vector(m.relative.position,3,1e6)&&vector(m.relative.quaternion,4,1)&&Math.abs(norm(m.relative.quaternion)-1)<1e-8,'InvalidInput','Invalid fixed relative frame.');
     check(['coincident','concentric','distance','angle','parallel','perpendicular','fixed',...(modern?['tangent','between']:[])].includes(m.type),'UnsupportedCapability','Tangent/width and arbitrary surface mates are unsupported in E0.M3; use analytic datums.');
     if(m.type==='between')check(modern&&Array.isArray(m.extraA)&&Array.isArray(m.extraB)&&m.extraA.length<=1&&m.extraB.length<=1&&m.extraA.length+m.extraB.length>=1,'InvalidInput','Between requires two bounded plane sets.');
     const datums=[];for(const ref of [m.a,m.b,...(m.extraA??[]),...(m.extraB??[])]){check(keys(ref,['bodyId','datumId'])&&id(ref.bodyId)&&id(ref.datumId),'InvalidInput','Use body/datum semantic references.');const b=bodies.get(ref.bodyId),d=b?.datums.find(d=>d.id===ref.datumId);

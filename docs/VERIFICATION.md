@@ -52,7 +52,7 @@ classify an unknown runtime file as documentation merely to avoid a check.
 demo fixtures they need. `tests/browser-focused.mjs` starts a real temporary
 Platform, seeds only those fixtures and invokes those functions. It never changes
 the production Load Demos catalogue. The complete browser suite uses the original
-eleven construction scenarios in order, followed by the registered M4 scenario, with every assertion intact.
+eleven construction scenarios in order, followed by the registered M4 and two M5 scenarios, with every assertion intact.
 Other historical full-suite paths remain present.
 
 The focused runner defaults to explicitly labelled software WebGPU. `--hardware`

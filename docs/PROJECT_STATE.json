@@ -2,26 +2,26 @@
   "schemaVersion": 1,
   "canonical": {
     "path": "MASTER_DESIGN.md",
-    "version": "0.2",
+    "version": "0.3",
     "normalization": "utf8-lf",
-    "sha256": "9355662f442d6b766950d147409a523e189bfd9a1826ad1d913b6b1eb7e50a9e"
+    "sha256": "48fb4b89ae0278f0296bce0946463b71641d21cf5ea90a594b1932d955ab7c5d"
   },
   "milestone": {
-    "current": "E4.M4 published component versions, Latest/Pinned and safe updates",
-    "status": "0.4.5 candidate frozen for exact-head complete acceptance; focused motion/version domain and real hardware UI checks passed; full exact-head acceptance/public installation pending",
-    "ownerAcceptance": "Owner authorized M4 and assembly corrections; explicitly chose grouped motion sessions; demo review pending",
-    "next": "Freeze candidate, complete exact-head Windows/Linux acceptance and publish/verify experimental0.4.5"
+    "current": "E4.M5 interference, physical assembly properties and Main version series",
+    "status": "Frozen implementation candidate; focused native and actual hardware UI passed; exact-head Windows/Linux acceptance and public installation pending",
+    "ownerAcceptance": "Owner authorized M5 and November24 version redesign with explicit save-point, promotion and deletion-successor rules; M5 demo review pending",
+    "next": "Exact-head acceptance, experimental publication and actual public Platform installation; then owner M5 demo review"
   },
   "lastDelivered": {
-    "version": "0.4.4",
-    "commit": "863daea5c96f165c917914fa3124f387e613fba3",
-    "pullRequest": 26,
-    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-26-863daea5c96f165c917914fa3124f387e613fba3",
-    "acceptanceRun": 45240534757,
-    "publicationRun": 45243129752,
-    "artifactBytes": 100500777,
-    "artifactSha256": "a630e9bc7b96d381187d4f3ff6e643a6bb28695cb2cc66a77992f0595a98edf1",
-    "verification": "Exact-head Windows/Linux379 native tests each; full browser/PDF/36 independent STEP round trips/performance; actual public Platform0.1.13 discovery/install/activation/launch,561 source files matched, Chrome157/NVIDIA GTX1650 current demo passed with zero page/renderer errors."
+    "version": "0.4.5",
+    "commit": "0353c31565fdc14509978d993e95c1873c5a04db",
+    "pullRequest": 28,
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-28-0353c31565fdc14509978d993e95c1873c5a04db",
+    "acceptanceRun": 45297135286,
+    "publicationRun": 45299778228,
+    "artifactBytes": 100547879,
+    "artifactSha256": "f9bb9148388527979f2d11a70bb322d644bbc552dddd019a0273b11c1109fdc4",
+    "verification": "Exact-head Windows/Linux394 native tests each; full browser/PDF/36 STEP round trips/performance. Actual public Platform0.1.13 download/install/activation/launch; Chrome157/NVIDIA GTX1650,581 source files matched, no page/renderer errors."
   },
   "constraints": [
     "MASTER_DESIGN is intent; implementation requires code and matching evidence.",
@@ -34,25 +34,25 @@
     "implementation": "IMPLEMENTATION_STATUS.md",
     "handoff": "AI_HANDOFF.md",
     "architecture": "docs/architecture/ADR_REGISTER.md",
-    "currentCadScope": "docs/E4_M4_VERSIONS.md",
+    "currentCadScope": "docs/E4_M5_ASSEMBLY_ANALYSIS.md",
     "deliveryGate": "docs/MILESTONE_DELIVERY.md",
     "verification": "docs/VERIFICATION.md"
   },
   "candidate": {
-    "version": "0.4.5",
-    "branch": "engineer/e4-m4-versioned-assemblies",
-    "status": "Frozen candidate; complete exact-head acceptance/public installation pending"
+    "version": "0.4.6",
+    "branch": "engineer/e4-m5-versions-properties",
+    "status": "Frozen implementation candidate; focused native and actual hardware UI passed; exact-head Windows/Linux acceptance and public installation pending"
   },
   "previousDelivered": {
-    "version": "0.4.3",
-    "commit": "97c62f5a48e08531ad1f60cce1626f1ce8ceb2d9",
-    "pullRequest": 25,
-    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-25-97c62f5a48e08531ad1f60cce1626f1ce8ceb2d9",
-    "acceptanceRun": 45104971025,
-    "publicationRun": 45106380535,
-    "artifactBytes": 100474857,
-    "artifactSha256": "5389160a8758bb777d2c5108de2a7ff10b972490896e64a95b8770fc60a097ce",
-    "verification": "Windows/Linux372 native tests each, full browser/PDF/STEP/performance; actual public Platform0.1.13 install,553 source files matched; NVIDIA GTX1650 UI passed without page/renderer errors."
+    "version": "0.4.4",
+    "commit": "863daea5c96f165c917914fa3124f387e613fba3",
+    "pullRequest": 26,
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-26-863daea5c96f165c917914fa3124f387e613fba3",
+    "acceptanceRun": 45240534757,
+    "publicationRun": 45243129752,
+    "artifactBytes": 100500777,
+    "artifactSha256": "a630e9bc7b96d381187d4f3ff6e643a6bb28695cb2cc66a77992f0595a98edf1",
+    "verification": "Exact-head Windows/Linux379 native tests each; full browser/PDF/36 independent STEP round trips/performance; actual public Platform0.1.13 discovery/install/activation/launch,561 source files matched, Chrome157/NVIDIA GTX1650 current demo passed with zero page/renderer errors."
   },
   "earlierDelivered": {
     "version": "0.1.8",

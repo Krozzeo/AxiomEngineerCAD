@@ -1,3 +1,11 @@
+# Current: E4.M5 /0.4.6 candidate
+
+Owner authorized full M5 and Main-series/Manager/Parameter Manager/Insert/constraint/save changes. Read docs/E4_M5_ASSEMBLY_ANALYSIS.md, ADR033 and docs/requests/E4_M5_OWNER_CHANGES_2026_11_24.md. Focused native and actual Chrome/NVIDIA UI paths cover save points, per-instance versions, exact analysis, lost-reference choices, deletion notices, mate toggles and insertion. Complete final exact-head acceptance/public installation remains pending. Main/stable0.3.13 unchanged.
+
+Latest follows Main; Pinned selects any retained version. Old branch/publication objects remain compatibility data. New M5 bindings and diagnostic mates are explicit profiles. Review source integrity, pending decisions, save/reopen and GPU evidence; never claim software rendering as physical proof. Detailed measured development logs are ignored under .axiom. Last delivered0.4.5 is0353c31565fdc14509978d993e95c1873c5a04db, PR28, acceptance45297135286/publication45299778228; see PROJECT_STATE.
+
+Historical implementation records follow and do not describe the current candidate gates.
+
 # Current: E4.M4 /0.4.5 candidate
 
 Owner authorized published versions/Latest/Pinned and assembly corrections, and selected grouped motion sessions. See [M4 scope/demo](docs/E4_M4_VERSIONS.md), ADR032, the request map and docs/PROJECT_STATE.json. Branch `engineer/e4-m4-versioned-assemblies` includes the selective verification tooling. Motion stages privately and confirms one revision/Undo entry; native validation remains authoritative. GPU rigid buffers and a reduced worker solve address measured preview cost. Published updates preserve Pinned/historical closures and block lost/conflicting native mates.

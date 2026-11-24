@@ -1,18 +1,14 @@
-Current development: [E4.M4 /0.4.5 candidate](docs/E4_M4_VERSIONS.md); use [selective verification](docs/VERIFICATION.md). Published delivery provenance is in [PROJECT_STATE](docs/PROJECT_STATE.json).
-
 # Axiom Engineer CAD
 
-Local-first, browser-operated parametric mechanical CAD and engineering-documentation product in the Axiom family, designed from the outset for both human users and AI agents.
+Local-first parametric mechanical CAD in the Axiom family.
 
-> **Current candidate:0.4.4 / E4.M3 remaining mates and responsive motion.** See [scope and demo checks](docs/E4_M3_MATES_MOTION.md). Tangent/Between/Fixed, native mate previews/editing and constrained pointer motion accompany the requested workspace refinements. Exact-head acceptance and public installation remain delivery gates.
+Current development candidate: **0.4.6 / E4.M5**, exact assembly interference/clearance and physical properties, plus the owner-approved Main version series. [Scope and demo](docs/E4_M5_ASSEMBLY_ANALYSIS.md). Complete final acceptance and public installation are pending; this source branch is not an installable delivery by itself.
 
-Start development with `npm run context` and [the compact context](docs/PROJECT_CONTEXT.md). The [workflow](docs/DEVELOPMENT_WORKFLOW.md) selects focused checks during implementation, then complete exact-head acceptance and real installation proof for delivery.
+Last verified immutable delivery: [0.4.5 / PR28](https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-28-0353c31565fdc14509978d993e95c1873c5a04db). Main/stable remains0.3.13. Milestone installations use Platform → Installations → Add installation → Axiom Engineer CAD → Refresh. Activate the experimental version, then Load Demos. The current candidate catalog contains E4.M5 Assembly Analysis and Versions only; existing user projects are preserved.
 
-## Install milestone builds from Platform
+Develop with npm run context, [PROJECT_CONTEXT](docs/PROJECT_CONTEXT.md) and [selective verification](docs/VERIFICATION.md). Final delivery requires exact-head Windows/Linux acceptance and actual public installation/hardware evidence.
 
-Every completed review milestone is delivered as an experimental prepared installation. In Platform 0.1.12+, open **Installations → Add installation → Axiom Engineer CAD → Refresh**, select the published experimental build, download/install and activate. Then create an Engineer project. Source PRs and passing tests alone are not installable publications. See [milestone delivery](docs/MILESTONE_DELIVERY.md) for the publication and verification gate.
-
-**Current demo:** **E4.M3 Mates and Motion**. Install and activate the selected build, then use **Load Demos**. Last verified immutable delivery: [0.4.3 / PR25](https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-25-97c62f5a48e08531ad1f60cce1626f1ce8ceb2d9).
+## Historical implementation notes
 
 The 0.1.8 workbench adds live primitive previews, persistent Snap (hold Ctrl to bypass), atomic relation cleanup, all geometric constraints in Parameter Manager, searchable binding/value controls, repairable conflict/missing-reference lists, intuitive signed dimensions and planar-face sketch supports. New Sketch previews normal/right orientation; Exit Sketch returns selection to its source. Conservative planar geometry witnesses require explicit repair when the supporting face changes. [Technical decisions and compatibility](docs/architecture/ADR-025-SKETCH-INTERACTION-AND-PLANAR-SUPPORT.md).
 

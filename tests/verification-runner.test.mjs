@@ -60,7 +60,7 @@ test('focused catalogue reuses real exports and known demo fixtures; complete co
     assert.equal(typeof (await import(scenario.module))[scenario.entry], 'function');
     for (const fixture of scenario.fixtures) assert.ok(known.has(fixture.id), fixture.id);
   }
-  assert.deepEqual(constructionScenarios, ['components', 'mates-motion', 'mates-legacy', 'project', 'production', 'step', 'parameters', 'finishing', 'operation-ux', 'feature-refinements', 'feature-construction', 'versioned-assemblies']);
+  assert.deepEqual(constructionScenarios, ['components', 'mates-motion', 'mates-legacy', 'project', 'production', 'step', 'parameters', 'finishing', 'operation-ux', 'feature-refinements', 'feature-construction', 'versioned-assemblies', 'assembly-analysis', 'version-lifecycle']);
   for (const area of Object.values(areas)) for (const id of area.browser) assert.ok(ids.has(id));
   assert.equal(constructionLaunchOptions(false).args.includes('--enable-unsafe-webgpu'), true);
   assert.equal(constructionLaunchOptions(true).args, undefined);

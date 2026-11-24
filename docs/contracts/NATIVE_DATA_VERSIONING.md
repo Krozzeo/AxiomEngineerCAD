@@ -36,22 +36,19 @@ A reference to another document carries:
 
 A missing/moved/offline source preserves the last verified effective state while reporting a visible unresolved dependency. Never invent, silently choose a new definition, silently retarget a face or mutate historical publications. Cycles among documents/definitions are rejected before commit. Version resolution is independent of the transport or the UI mode.
 
-## 4. Version semantics
+## 4. Current Main version series (owner revision2026-11-24)
 
-- **Working revision:** an editable committed state with monotonically advancing causal revision and expected-revision write validation.
-- **Recovery snapshot:** durable crash/recovery checkpoint; not publication.
-- **Immutable version:** content-stable state with identity, dependency manifest and reproducibility metadata.
-- **Published version:** immutable version admitted to the Latest resolver on a declared branch/channel.
-- **Drawing revision:** documentation state independently revised but referring to explicit effective model/assembly versions.
-- **Configuration:** parameter/suppression variant, not a historical version. MVP supports one active configuration but keeps data-model identity extensible.
+ADR033 and Master section6 supersede former publication/branch consumer policy. Each file has one editable Main and ordered retained version identities. + archives Main and creates its copy as the new Main. Promotion preserves the former Main. Named node identity differs from immutable content identity; snapshots remain checksum-verified. Source history uses the recoverable series sidecar plus immutable objects. Old branch/publication data remains readable historical evidence, not a current publication requirement.
 
-Latest is a **candidate update** in a working consumer, never a background destructive rewrite. The resolver must select a uniquely ordered compatible published version. If ordering/channel/compatibility is ambiguous, return a pending/conflict state; E0.M4 must establish policy design, E4.M4 implements complete product behavior. Pinned never moves automatically. Historical published assembly/version retains the entire effective dependency closure, including drawing/BOM model sources.
+Latest follows source Main; Pinned selects any retained version. Per-instance choices can share identical immutable bindings without coupling later choices. Bindings retain source identity, logical node ID, effective content hash/snapshot and relative locator. Valid updates resolve exact references and native geometry. Broken relations require explicit disable-or-retain-for-repair choice; invalid native geometry is still rejected.
 
-## 5. Publication and atomicity
+Deleting a used version warns with its consumers and records its successor above the deleted row. Deleting Main chooses the newest survivor; the sole Main is protected. Current working consumers resolve successor chains and acknowledge replacement once. Archived assembly closures remain unchanged and their immutable data is not physically erased.
 
-Document writes require a writer lease, expected revision, operation ID, integrity validation, staged durable storage and a receipt. Reject inconsistent/cancelled/stale/unauthorized updates. A crash after persistence but before acknowledgment is reconciled using operation receipts, never blind replay.
+## 5. Atomicity and compatibility
 
-A publication captures immutable dependency closure, feature/parameter/source metadata, document/shape/schema provenance and supported runtime/kernel/solver/translator attribution. For multi-document changes, require either a tested coherent multi-resource transaction or explicit staged publication with partial/pending states and safe recovery. Single-document atomic replace is not sufficient to guarantee cross-document atomicity.
+Keep writer leases, expected revisions, scoped operation identities, checksums, cancellation and stale-base protection. Series/document changes use a recoverable pending record around atomic native save and sidecar replacement. Multi-document updates remain staged with explicit pending decisions; do not claim global atomicity.
+
+E4.M5-version-binding/1 adds logical source nodes, deleted-version notices and bounded pending decision metadata. E4.M5-spatial/1 adds disabled relations and explicit Conflict/MissingReference diagnostics. A disabled or explicitly unresolved relation does not participate in the valid solver subset; its geometry is never silently retargeted. Older profiles remain accepted; older readers must safely reject extensions they cannot interpret. Kernel/solver pins are unchanged.
 
 ## 6. Historical shape reproduction
 

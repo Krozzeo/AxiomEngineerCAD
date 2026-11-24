@@ -70,3 +70,5 @@ References: [Master §21](../../MASTER_DESIGN.md#21-risks-experiments-and-archit
 - [ADR031 — Responsive assembly motion](ADR-031-RESPONSIVE-ASSEMBLY-MOTION.md): E4.M3 constrained pointer projection, native mate preview and shared relation trees.
 
 - [ADR032 — Grouped motion and published components](ADR-032-MOTION-SESSIONS-PUBLISHED-COMPONENTS.md): E4.M4 staged poses, GPU transforms and immutable Latest/Pinned updates.
+
+- [ADR033 — Main series and assembly analysis](ADR-033-SIMPLE-VERSIONS-ASSEMBLY-ANALYSIS.md): owner-approved Main save points, deletion successors, explicit relation decisions and exact physical analysis.

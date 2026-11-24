@@ -85,3 +85,5 @@ body.constructing-feature #inspector-content>:not(#feature-operation-editor){dis
 .parameter-completion-menu .formula-function,.search-select-menu .formula-function{background:#174c80;color:#e5f2ff}.parameter-completion-menu .formula-function:hover,.search-select-menu .formula-function:hover,.search-select-menu .formula-function[aria-selected=true]{background:#2677bc}
 
 #dependencies-content{height:100%;min-height:0;overflow:auto;padding:10px;background:#122030;color:#e5edf6;font-size:12px}#dependencies-content .dependency-heading{display:flex;align-items:center;gap:12px;flex-wrap:wrap}#dependencies-content h3{margin:0}#dependencies-content .dependency-controls{display:flex;gap:8px}#dependencies-content table{border-collapse:collapse;width:100%}#dependencies-content td,#dependencies-content th{border:1px solid #34485e;padding:4px;text-align:left}#dependencies-content th{background:#1e3249}
+
+#component-version-table select{width:100%;border:0;background:transparent;box-shadow:none;color:inherit}#component-version-table tr{cursor:pointer}#component-version-table tbody tr:hover{background:#29465e}
