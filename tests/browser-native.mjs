@@ -1,4 +1,4 @@
-import {waitEditorIdle} from './browser-support.mjs';
+import {waitEditorIdle,saveAndWait} from './browser-support.mjs';
 import assert from 'node:assert/strict';
 import {readFile,writeFile,readdir} from 'node:fs/promises';
 import {join,dirname} from 'node:path';
@@ -22,7 +22,7 @@ export async function verifyNativeUI({hub,context,host,evidence,observe,report})
     }
     await item.row.getByText('Closed',{exact:true}).waitFor();
   };
-  const save=async page=>{const response=page.waitForResponse(r=>r.url().endsWith('/v1/save'));await page.locator('#save').click();assert.equal((await response).status(),200);};
+  const save=saveAndWait;
   const verify=async(page,candidate=false)=>{await waitEditorIdle(page);await page.locator(candidate?'#native-check-candidate':'#native-verify').click();await page.locator('#native-status').filter({hasText:'Validation passed'}).waitFor();};
   const entry=host.manager.catalog().recents.find(r=>r.name===name);assert.ok(entry);assert.ok(host.manager.catalog().recents.find(r=>r.name===sourceName));let consumer=await open(name),p=consumer.page;
   const original=JSON.parse(await readFile(entry.path)),oldVersion=original.native.versions[0].id,oldSource=original.native.graph.dependencies[0].effectiveVersion;

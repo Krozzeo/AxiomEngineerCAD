@@ -26,3 +26,14 @@ export async function waitCurrentViewport(page){
   }catch(error){if(error.name==='AbortError')return false;throw error;}
  });
 }
+
+// A successful save response precedes the automatic rebuild. Positive UI flows
+// wait for the editor's completion signal and worker idleness before more work.
+export async function saveAndWait(page){
+ await waitEditorIdle(page);
+ const owner=typeof page.page==='function'?page.page():page,response=owner.waitForResponse(r=>r.url().endsWith('/v1/save'));
+ await page.locator('#save').click();const result=await response;
+ if(result.status()!==200)throw Error('Save rejected: '+await result.text());
+ await page.waitForFunction(()=>document.querySelector('#message')?.textContent==='Document saved locally.');
+ await waitEditorIdle(page);return result;
+}
