@@ -1,30 +1,11 @@
 # Compact Engineer context
 
-Current batch: **0.3.13 / E3 closure corrections**. Owner explicitly authorized corrected stable integration into main, followed by E4.M1. Import/Export are Right dock panels; missing STEP units require an explicit retained source-unit choice, valid spaced metadata is recognized; positive finite material density accepts integers/fractions with English validation; Navigation is in the View ribbon. Read docs/E3_M6_PRODUCTION.md. Exact-head PR/main CI, stable publication and real public installation remain delivery gates; none are claimed by this source update. E4.M1 has not yet been implemented.
+Current candidate **0.4.6 / E4.M5**, branch engineer/e4-m5-versions-properties. Read E4_M5_ASSEMBLY_ANALYSIS.md, ADR033 and the retained owner request. Main series replaces publication/branch UI: + freezes former Main and makes a copy Main; promotion retains former Main; deletion resolves recorded successor chains and warns once. Parameter Manager owns per-instance Latest/retained choices. Broken updates retain old geometry pending explicit disable-or-repair decision. Legacy objects and historical closures remain preserved.
 
-Previous batch: **0.3.11 / E3.M5 STEP interoperability**, plus the standalone Bottom Dependencies panel driven by Parameter Manager selection. E3.M4/0.3.10 was delivered publicly and accepted by the owner. Read [M5 scope and demo checks](E3_M5_INTEROPERABILITY.md). Complete exact-head acceptance/public installation are required; owner M5 acceptance is pending. Main/stable remain 0.2.6.
+M5 adds exact B-Rep interference/clearance, mass/COM/inertia with missing-density warnings and a shared paged ReadOnly agent tool. Native profile extensions are versioned; kernel/solver/Platform pins remain unchanged. Grouped motion/GPU transforms from M4 remain, with authoritative native confirmation on CPU.
 
+Last immutable delivery0.4.5/PR28 passed exact-head Windows/Linux394 native tests each, full browser/PDF/36 STEP/performance and actual public Platform0.1.13 install/Chrome157/NVIDIA GTX1650.581 packaged source files matched, no page/renderer errors. Main/stable0.3.13 remains unchanged. Current M5 complete acceptance/public installation is pending; local focused evidence is not delivery acceptance.
 
-Start with `npm run context`. `PROJECT_STATE.json` records the reviewed Master hash (UTF-8 with CRLF normalized to LF) and last immutable delivery. A matching hash permits targeted reading under AGENTS1; a mismatch requires full design review. The Master remains authoritative. A brief is navigation, never proof of implementation.
+Start with npm run context and selective verification plan. Master0.3 has been fully reviewed and revised for the explicit November24 owner decision; its normalized hash is in PROJECT_STATE.json. Platform owns lifecycle/credentials/AI review; Engineer owns geometry, references, versions, solvers and drawings. Preserve source identities, immutable history, authorization, revision checks, human AI Apply and atomic persistence. No arbitrary-surface tangency, collision avoidance or universal convergence claim.
 
-Platform owns generic local lifecycle, credentials and shared AI/review SDK. Engineer owns exact geometry, sketch solving, native history, assemblies, drawings and semantic CAD operations. Source mutations share revision-checked commands; GPU triangles and pixel IDs never establish native identity. Keep immutable builds/user files and human authorization boundaries intact.
-
-E0/E1 established the exact native foundation; E2 is closed as 0.2.6 stable. E3.M1–M4 are delivered and owner-accepted through 0.3.10. E3.M5 adds bounded exact STEP import/export, original source and translation reports, independent native CAD round trips, imported-face native additions and a standalone selection-driven Dependencies panel. Historical tests use explicit fixtures outside the production demo catalog.
-
-Current implemented bounds include part-local extrusion/revolution histories, exact boolean operations and feature transforms, typed sketch constraints/equations, referenced planes/axes/coordinate systems, inline Parameter Manager, docking and separate windows. Conservative geometry witnesses require explicit repair when their source disappears. Existing documents retain their sign and face-refinement semantics. Older strict readers reject new source extensions. General assemblies, broad drawing generation and a general nonlinear 3D datum constraint solver remain outside this batch.
-
-Select a narrow entry point:
-
-| Change | Read first | Focused evidence |
-| --- | --- | --- |
-| Sketch interaction/Inspector | `app/sketch-workbench.mjs`, sketch references and intent | `scripts/check-sketch-interactions-ui.mjs` |
-| Constraints/drag/signs | `src/sketch/`, command reducer/session | Relevant sketch tests; `tests/sketch-interactions.test.mjs` |
-| Supports/extrusion | `src/extrusion/`, `src/sketch/support.mjs`, ADR025 | Extrusion/support tests plus actual Model picking |
-| Parameters/tables | `src/parameters/`, `app/parameter-manager.mjs` | Parameter tests and browser table/value cases |
-| Viewport/panels | `app/proof.mjs`, GPU view, camera, panel channel | Actual camera/picking/separate-window checks; delayed-response ordering regression |
-| Native/AI authority | `src/native/`, `src/commands/`, relevant contracts | Native/version/permission/atomicity tests |
-| Delivery | `docs/MILESTONE_DELIVERY.md`, pinned SDK publication context | Exact PR acceptance, immutable package and actual Platform installation |
-
-The complete acceptance entry points remain `npm run check` and `npm run test:browser`, on Windows/Linux, with independent PDF verification. Focused checks support diagnosis; they never replace publication acceptance. Use real hardware for hardware claims and label unsupported/software/fault-injection paths separately.
-
-The compact context and workflow are developer infrastructure. Read the current task separately, use `DEVELOPMENT_WORKFLOW.md`, and preserve delivered evidence while reviewing process and CAD changes independently.
+Affected map: workspace/version-series.mjs and version-bindings.mjs; assembly/analysis.mjs, reconcile.mjs and native-profile.mjs; app versions-panel/component-versions/insert-component/assembly-analysis; existing motion/selection neighbors. New tests e4-m5-*.test.mjs and browser assembly-analysis/version-lifecycle. Impact rules live in scripts/verification-map.mjs. Use focused cases and inspect failed files first; complete exact-head cross-platform/public-install gates remain required. Final immutable delivery facts belong outside the accepted commit, not in a cosmetic follow-up.

@@ -1,3 +1,4 @@
+import {constructionScenarios, constructionLaunchOptions, runBrowserScenario} from './browser-scenarios.mjs';
 import {prepareModernUI} from './modern-ui-support.mjs';
 import {waitEditorIdle} from './browser-support.mjs';
 import assert from 'node:assert/strict';
@@ -36,14 +37,14 @@ try {
     await unavailable.waitForTimeout(1000);assert.ok(failures>0);await unavailable.close();
   }
   report.criteria.push('Unavailable startup context/catalog/document/history services report disconnection without unhandled promise rejection');
-  direct = await context.newPage(); observe(direct); await direct.goto((ready.editorUrl).replace('/#','/?workspace=labs#'));await waitEditorIdle(direct);
+  direct = await context.newPage(); observe(direct); await direct.goto((ready.editorUrl).replace('/#','/?workspace=labs#'));await direct.waitForFunction(()=>!!window.engineerProjectBrowser);assert.equal(await direct.evaluate(()=>window.engineerWorkspace.empty),true);await direct.locator('.wb-menubar details').filter({has:direct.getByText('Create',{exact:true})}).locator('summary').click();await direct.getByRole('button',{name:'New part/assembly',exact:true}).click();await direct.locator('#project-icons .inline-name').fill('Direct lifecycle study');await direct.locator('#project-icons .inline-name').press('Enter');await direct.waitForFunction(()=>window.engineerWorkspace&&!window.engineerWorkspace.empty);await waitEditorIdle(direct);
   await direct.locator('#name:not([disabled])').waitFor();
   assert.equal(await direct.locator('#name').inputValue(), 'Direct lifecycle study');
   await direct.locator('#notes').fill('Provisional design intent: preserve this note after reopening.');
   await direct.locator('#save').click(); await direct.locator('#message').filter({hasText:'projectBusy'}).waitFor();
   await direct.locator('#apply').click(); await direct.locator('#message').filter({hasText:'Properties applied'}).waitFor();
-  await direct.locator('#save').click(); await direct.locator('#message').filter({hasText:'Document saved locally'}).waitFor();
-  const nativePath = join(root, 'direct', 'study', 'project.engineer-provisional.json');
+  await direct.locator('#save').click(); await direct.locator('#message').filter({hasText:'Document saved locally'}).waitFor();await waitEditorIdle(direct);
+  const nativePath = join(root, 'direct', 'study', 'Direct lifecycle study.engineer.json');
   assert.match(JSON.parse(await readFile(nativePath)).metadata.notes, /preserve this note/);
   report.criteria.push('Direct CLI launches an authenticated browser editor; pending fields block save; applied properties persist');
   await direct.locator('#spatial-lab > summary').click();
@@ -56,8 +57,8 @@ try {
   await direct.mouse.move(canvasBox.x+canvasBox.width/2,canvasBox.y+canvasBox.height/2);await direct.mouse.down();await direct.mouse.move(canvasBox.x+canvasBox.width/2,canvasBox.y+canvasBox.height/2-40);await direct.mouse.up();
   await direct.locator('#assembly-status').filter({hasText:'UnderDefined · DOF 2 · drag accepted'}).waitFor();
   await direct.waitForFunction(()=>!document.querySelector('#assembly-pose').textContent.includes('35.000000'));
-  await direct.locator('#assembly-keep').click();await direct.locator('#revision').filter({hasText:'2'}).waitFor();
-  const spatialSaved=direct.waitForResponse(r=>r.url().endsWith('/v1/save'));await direct.locator('#save').click();await spatialSaved;
+  await direct.locator('#assembly-keep').click();await direct.locator('.dock-tabs [data-panel=history]').click();await direct.locator('#revision').filter({hasText:'2'}).waitFor();
+  const spatialSaved=direct.waitForResponse(r=>r.url().endsWith('/v1/save'));await direct.locator('#save').click();await spatialSaved;await direct.locator('#message').filter({hasText:'Document saved locally'}).waitFor();await waitEditorIdle(direct);
   assert.ok(JSON.parse(await readFile(nativePath)).assembly.bodies[1].pose.position[2]>35);
   await direct.locator('#assembly-suite').click();await direct.locator('#assembly-suite-summary').filter({hasText:'Passed 28 / 28'}).waitFor();
   await direct.locator('#assembly-suite-details > summary').click();
@@ -77,9 +78,9 @@ try {
   await direct.locator('#lab-width').fill('60');await direct.locator('#lab-build').click();
   await direct.locator('#lab-status').filter({hasText:'Completed geometry'}).waitFor();
   await direct.locator('#lab-metrics').filter({hasText:'17434.513322'}).waitFor();
-  await direct.locator('#lab-keep').click();await direct.locator('#revision').filter({hasText:'3'}).waitFor();
+  await direct.locator('#lab-keep').click();await direct.locator('.dock-tabs [data-panel=history]').click();await direct.locator('#revision').filter({hasText:'3'}).waitFor();
   const persisted=direct.waitForResponse(r=>r.url().endsWith('/v1/save'));
-  await direct.locator('#save').click();await persisted;await direct.locator('#message').filter({hasText:'Document saved locally'}).waitFor();
+  await direct.locator('#save').click();await persisted;await direct.locator('#message').filter({hasText:'Document saved locally'}).waitFor();await waitEditorIdle(direct);
   assert.equal(JSON.parse(await readFile(nativePath)).experiment.spec.width,60);
   await direct.locator('#lab-scenario').selectOption('invalid-profile');await direct.locator('#lab-build').click();
   await direct.locator('#lab-status').filter({hasText:'failed'}).waitFor();
@@ -145,26 +146,18 @@ try {
   await hub.getByRole('button',{name:'Load Demos',exact:true}).click();
   await hub.waitForFunction(()=>document.querySelector('.load-demos')?.textContent==='Load Demos');const {seedHistoricalFixtures}=await import('../scripts/acceptance-demo-fixtures.mjs');await seedHistoricalFixtures(host);
   {
-    const {verifyFeatureConstructionUI}=await import('./browser-feature-construction.mjs');
     // Keep the no-GPU/failure corpus in its original context. Physical picking
     // requires an actual renderer; CI uses explicitly labelled SwiftShader.
     // Linux canvas/shared-image interop needs ANGLE and Dawn to share the
     // SwiftShader Vulkan instance (Chromium issue 575926500).
-    const constructionArgs=process.platform==='linux'
-      ?['--enable-unsafe-webgpu','--use-angle=swiftshader','--enable-unsafe-swiftshader','--use-vulkan=swiftshader','--enable-features=Vulkan']
-      :['--enable-unsafe-webgpu','--use-webgpu-adapter=swiftshader','--disable-gpu-watchdog','--enable-dawn-features=allow_unsafe_apis','--disable-dawn-features=use_dxc','--enable-webgpu-developer-features','--use-gpu-in-tests','--enable-accelerated-2d-canvas'];
-    const softwareBrowser=process.env.ENGINEER_HARDWARE==='1'?null:await chromium.launch({channel:'chromium',headless:true,ignoreDefaultArgs:['--disable-gpu-compositing'],args:constructionArgs});
+    const constructionOptions=constructionLaunchOptions(false);
+    const constructionArgs=constructionOptions.args;
+    const softwareBrowser=process.env.ENGINEER_HARDWARE==='1'?null:await chromium.launch(constructionOptions);
     try{
       const constructionContext=softwareBrowser?await softwareBrowser.newContext({viewport:{width:1440,height:960}}):context;
       if(softwareBrowser)constructionContext.on('page',observe);
       report.featureConstructionRenderer={softwareForced:!!softwareBrowser,flags:softwareBrowser?constructionArgs:[]};
-      const {verifyM6UI}=await import('./browser-e3-m6.mjs');await verifyM6UI({context:constructionContext,host,observe,evidence,report});
-      const {verifyM5UI}=await import('./browser-e3-m5.mjs');await verifyM5UI({context:constructionContext,host,observe,evidence,report});
-      const {verifyM4UI}=await import('./browser-m4.mjs');await verifyM4UI({context:constructionContext,host,observe,evidence,report});
-      const {verifyM3UI}=await import('./browser-m3.mjs');await verifyM3UI({context:constructionContext,host,observe,evidence,report});
-      const {verifyOperationUX}=await import('./browser-operation-ux.mjs');await verifyOperationUX({context:constructionContext,host,observe,evidence,report});
-      const {verifyFeatureRefinementsUI}=await import('./browser-feature-refinements.mjs');await verifyFeatureRefinementsUI({context:constructionContext,host,observe,evidence,report});
-      await verifyFeatureConstructionUI({context:constructionContext,host,observe,evidence,report});
+      for (const id of constructionScenarios) await runBrowserScenario(id,{context:constructionContext,host,observe,evidence,report});
     }finally{await softwareBrowser?.close();}
   }
 
@@ -193,6 +186,7 @@ try {
   const {verifyReviewUI}=await import('./browser-review.mjs');await verifyReviewUI({hub,context,host,evidence,observe,report});
   const {verifyProofUI}=await import('./browser-proof.mjs');await verifyProofUI({hub,context,host,evidence,observe,report});if(process.env.ENGINEER_HARDWARE==='1')assert.equal(report.proof.gpu.classification,'hardware-adapter');
   const {verifyIntegrationUI}=await import('./browser-integration.mjs');await verifyIntegrationUI({hub,context,host,evidence,observe,report});
+  const {verifyStartupRecovery}=await import('./browser-startup.mjs');await verifyStartupRecovery({context,host,observe,report});
   const {verifyWorkbenchUI}=await import('./browser-workbench.mjs');await verifyWorkbenchUI({hub,context,host,evidence,observe,report});assert.deepEqual(report.pageErrors, []); report.passed = true;
 } catch (error) { report.failure = error.stack; if (direct) await direct.screenshot({path:join(evidence, 'failure.png')}).catch(() => {}); throw error; }
 finally {

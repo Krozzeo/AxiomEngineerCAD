@@ -2,25 +2,26 @@
   "schemaVersion": 1,
   "canonical": {
     "path": "MASTER_DESIGN.md",
-    "version": "0.2",
+    "version": "0.3",
     "normalization": "utf8-lf",
-    "sha256": "9c2f3857a4a7f1156b1c10b82d2e76680604393b7f5799081f6fd22694502de6"
+    "sha256": "fbd12010459af520daa591069e398755ff31e52b8ff15ace742df430d1fe985d"
   },
   "milestone": {
-    "current": "E3.M6",
-    "status": "0.3.13 corrected E3 stable candidate; owner authorized main integration and E4.M1 start",
-    "ownerAcceptance": "Owner requested corrected stable integration and advancement; delivery gates pending",
-    "next": "After corrected stable delivery, E4.M1 definitions, instances, hierarchy and in-place part modeling"
+    "current": "E4.M5 interference, physical assembly properties and Main version series",
+    "status": "Frozen implementation candidate; focused native and actual hardware UI passed; exact-head Windows/Linux acceptance and public installation pending",
+    "ownerAcceptance": "Owner authorized M5 and November24 version redesign with explicit save-point, promotion and deletion-successor rules; M5 demo review pending",
+    "next": "Exact-head acceptance, experimental publication and actual public Platform installation; then owner M5 demo review"
   },
   "lastDelivered": {
-    "version": "0.2.6",
-    "commit": "21842a0a4c1e8843e3091afbfa4f7731ee13bdfa",
-    "pullRequest": 18,
-    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/v0.2.6",
-    "acceptanceRun": 42399474320,
-    "publicationRun": 42400464406,
-    "artifactSha256": "31e653ebfa0f25ee929618fa367640b38f5e78aa858aeb023e521dff9832b30c",
-    "verification": "Owner accepted E2. Windows and Ubuntu exact main acceptance passed. Stable 0.2.6 published and independently installed from the public Platform 0.1.13 catalog, including assistant and PDF regression."
+    "version": "0.4.5",
+    "commit": "0353c31565fdc14509978d993e95c1873c5a04db",
+    "pullRequest": 28,
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-28-0353c31565fdc14509978d993e95c1873c5a04db",
+    "acceptanceRun": 45297135286,
+    "publicationRun": 45299778228,
+    "artifactBytes": 100547879,
+    "artifactSha256": "f9bb9148388527979f2d11a70bb322d644bbc552dddd019a0273b11c1109fdc4",
+    "verification": "Exact-head Windows/Linux394 native tests each; full browser/PDF/36 STEP round trips/performance. Actual public Platform0.1.13 download/install/activation/launch; Chrome157/NVIDIA GTX1650,581 source files matched, no page/renderer errors."
   },
   "constraints": [
     "MASTER_DESIGN is intent; implementation requires code and matching evidence.",
@@ -33,23 +34,25 @@
     "implementation": "IMPLEMENTATION_STATUS.md",
     "handoff": "AI_HANDOFF.md",
     "architecture": "docs/architecture/ADR_REGISTER.md",
-    "currentCadScope": "docs/E3_M6_PRODUCTION.md",
-    "deliveryGate": "docs/MILESTONE_DELIVERY.md"
+    "currentCadScope": "docs/E4_M5_ASSEMBLY_ANALYSIS.md",
+    "deliveryGate": "docs/MILESTONE_DELIVERY.md",
+    "verification": "docs/VERIFICATION.md"
   },
   "candidate": {
-    "version": "0.3.13",
-    "branch": "engineer/e3-m1-sketch-breadth",
-    "status": "Right Import/Export panels, explicit missing STEP units, positive density and View navigation; stable integration authorized, exact CI pending"
+    "version": "0.4.6",
+    "branch": "engineer/e4-m5-versions-properties",
+    "status": "Frozen implementation candidate; focused native and actual hardware UI passed; exact-head Windows/Linux acceptance and public installation pending"
   },
   "previousDelivered": {
-    "version": "0.2.5",
-    "commit": "b8bd3c7b99cb0d7a4a8db208608389b78237c1b7",
-    "pullRequest": 18,
-    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-18-b8bd3c7b99cb0d7a4a8db208608389b78237c1b7",
-    "acceptanceRun": 42384834832,
-    "publicationRun": 42385651870,
-    "artifactSha256": "266e6cb581df1e9cc5eb31be93a4bf464a1d15c2187e6077ce80aa1e77448da0",
-    "verification": "Windows and Ubuntu acceptance, public Platform installation and UI review. Owner verified live SVG reconstruction and model-to-drawing; exported A4 landscape with two views and 48 and 12 mm dimensions."
+    "version": "0.4.4",
+    "commit": "863daea5c96f165c917914fa3124f387e613fba3",
+    "pullRequest": 26,
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-26-863daea5c96f165c917914fa3124f387e613fba3",
+    "acceptanceRun": 45240534757,
+    "publicationRun": 45243129752,
+    "artifactBytes": 100500777,
+    "artifactSha256": "a630e9bc7b96d381187d4f3ff6e643a6bb28695cb2cc66a77992f0595a98edf1",
+    "verification": "Exact-head Windows/Linux379 native tests each; full browser/PDF/36 independent STEP round trips/performance; actual public Platform0.1.13 discovery/install/activation/launch,561 source files matched, Chrome157/NVIDIA GTX1650 current demo passed with zero page/renderer errors."
   },
   "earlierDelivered": {
     "version": "0.1.8",
@@ -101,5 +104,57 @@
     "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-19-a6f9fd3e804c4f0294f673cd561559884c6b0bbe",
     "artifactSha256": "8b92cd952bfc7efb4441c124f0d0aa5a5e3cbc11307bc869c1d0d913cc3b0493",
     "verification": "Windows/Linux 336 tests each, full browser/PDF/36 independent STEP cases and actual public Platform 0.1.13 Chrome/NVIDIA installation passed."
-  }
+  },
+  "mainIntegration": {
+    "version": "0.3.13",
+    "commit": "861e6ff936c77fb3a4eba1d8cdd8239d151c5f73",
+    "pullRequests": [
+      19,
+      20,
+      21
+    ],
+    "mainAcceptanceRun": 43760510442,
+    "status": "stable 0.3.13 published and publicly installed/validated",
+    "publicationRun": 43761813724
+  },
+  "development": {
+    "branch": "engineer/e4-m4-versioned-assemblies",
+    "base": "b4f471adbbcdac5ea5e99de3a9ccc51dcb9a9663",
+    "scope": "docs/requests/E4_M4_OWNER_CHANGES_2026_11_23.md",
+    "design": "docs/architecture/ADR-032-MOTION-SESSIONS-PUBLISHED-COMPONENTS.md"
+  },
+  "previousStableDelivered": {
+    "version": "0.2.6",
+    "commit": "21842a0a4c1e8843e3091afbfa4f7731ee13bdfa",
+    "pullRequest": 18,
+    "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/v0.2.6",
+    "acceptanceRun": 42399474320,
+    "publicationRun": 42400464406,
+    "artifactSha256": "31e653ebfa0f25ee929618fa367640b38f5e78aa858aeb023e521dff9832b30c",
+    "verification": "Owner accepted E2. Windows and Ubuntu exact main acceptance passed. Stable 0.2.6 published and independently installed from the public Platform 0.1.13 catalog, including assistant and PDF regression."
+  },
+  "deliveryHistory": [
+    {
+      "version": "0.4.2",
+      "commit": "dc2541e92a158799448b33e8b12cae09e970bbbb",
+      "pullRequest": 24,
+      "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-24-dc2541e92a158799448b33e8b12cae09e970bbbb",
+      "acceptanceRun": 44297236874,
+      "publicationRun": 45078355142,
+      "artifactBytes": 100435613,
+      "artifactSha256": "649ecacafc7dcd0ddaf4c9c7460b011d662636a7da2bf7a6e5c11dd3728c4085",
+      "verification": "Exact-head Windows/Linux358 native tests each, complete browser/PDF/STEP/performance passed; actual public Platform0.1.13 install and Chrome157/NVIDIA demo passed;541 source files matched; zero page/renderer errors."
+    },
+    {
+      "version": "0.4.3",
+      "commit": "97c62f5a48e08531ad1f60cce1626f1ce8ceb2d9",
+      "pullRequest": 25,
+      "releaseUrl": "https://github.com/Krozzeo/AxiomEngineerCAD/releases/tag/experimental-pr-25-97c62f5a48e08531ad1f60cce1626f1ce8ceb2d9",
+      "acceptanceRun": 45104971025,
+      "publicationRun": 45106380535,
+      "artifactBytes": 100474857,
+      "artifactSha256": "5389160a8758bb777d2c5108de2a7ff10b972490896e64a95b8770fc60a097ce",
+      "verification": "Windows/Linux372 native tests each, full browser/PDF/STEP/performance; actual public Platform0.1.13 install,553 source files matched; NVIDIA GTX1650 UI passed without page/renderer errors."
+    }
+  ]
 }

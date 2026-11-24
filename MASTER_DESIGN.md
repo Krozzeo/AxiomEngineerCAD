@@ -1,7 +1,7 @@
 # Axiom Engineer CAD — Master Design Document
 
-**Document version:** 0.2.0 (architecture-hardening revision)  
-**Date:** 2026-10-28  
+**Document version:** 0.3.0 (owner-approved Main version series)
+**Date:** 2026-11-24
 **Product:** Axiom Engineer CAD  
 **Repository:** https://github.com/Krozzeo/AxiomEngineerCAD  
 **Status:** Approved MVP functional scope, revised staged engineering contracts and risk gates; **E0 measured baseline accepted for E1 progression2026-10-31; E1.M1/0.1.0 workbench is a review candidate; broad CAD functionality remains in its scheduled milestones** (see IMPLEMENTATION_STATUS.md)
@@ -202,7 +202,7 @@ Use Platform's published product lifecycle, service boundaries, SDK and review p
 
 ### 5.1 User-level rule
 
-A part, assembly and drawing are **not separate mandatory file classes**. They are work modes and collections inside one parent **Engineering Document**. One file/project may contain a modeled body, several components and subassemblies, associated drawings, and in-place component design while viewing an assembly. The user switches Model / Assembly / Drawing presentation modes; this does not convert the native document into another type.
+**Owner revision 2026-11-16:** a Project is a folder/container managed by the Project panel and can contain independent native part/assembly documents, folders and their version histories. New projects start empty. Each part/assembly remains a hybrid engineering document: it can contain modeled bodies, component instances/subassemblies and associated drawings. Model / Assembly / Drawing are work modes inside the active document, rather than conversions between mandatory native file classes. Open part tabs choose the editing workspace; in-place component editing keeps the surrounding assembly context. Existing one-document projects and immutable versions are preserved. See [ADR029](docs/architecture/ADR-029-PROJECT-WORKSPACE.md) and the [owner request](docs/requests/PROJECT_WORKSPACE_2026_11_16.md).
 
 Definitions and instances remain distinct internally. Reusing one bolt definition as eight instances must not duplicate eight independently edited solids. A multibody component and an assembly of instances are both possible.
 
@@ -251,48 +251,33 @@ References may never rely solely on absolute filesystem paths, transient kernel 
 
 See [native data/version contract](docs/contracts/NATIVE_DATA_VERSIONING.md).
 
-## 6. Revisioning, versions and dependency policy
+## 6. Revisions, Main versions and component dependencies
+
+Owner-approved replacement2026-11-24 (ADR033 and retained request): the following supersedes branch/publication UX and resolver requirements in earlier revisions. Original immutable objects, receipts, legacy branch archives and released artifacts remain preserved compatibility data.
 
 ### 6.1 Distinct concepts
 
-- **Save / working revision:** durable edit state with monotonic revision/causal receipt; not a published component version.
-- **Immutable version:** identifiable snapshot of a definition or assembly, preserving dependencies and geometry intent.
-- **Published version:** immutable version eligible for consumers following Latest; publishing is an explicit, validated action.
-- **Drawing revision:** documentation revision that can change independently of modeled geometry.
-- **Configuration/variant:** alternative parameter state of one definition, **not** the same as a historical version. Data-model extensibility is required now; advanced configuration-management UI is deferred.
+A working revision is the causally ordered editing/persistence state. A version is a named save point with a stable logical identity. Exactly one version is Main and editable; all other versions retain immutable geometry/dependency snapshots. Saving does not create a new version. The + command archives the former Main and creates its copy as the new Main. Promoting another version preserves the former Main and moves the chosen version to the top. Remaining versions are ordered newest to oldest. Configuration and drawing revision remain separate concepts.
 
-### 6.2 Versioned subobjects within a unified document
+### 6.2 Consumer choice
 
-The parent document owns version history of component definitions, assemblies and drawings. A component instance records definition identity, dependency policy and effective resolved revision; a drawing records its model dependency and its own revision. A published assembly is a reproducible snapshot of **effective resolved component versions** even if its working successor follows new Latest versions.
+A component link in an assembly selects Latest (the source Main) or a specific existing version (Pinned). No publication step or independent Working policy is required. Choices belong to consumer instances, not source definitions. Identical links may share an immutable dependency snapshot; editing one instance must not change another instance's choice. Each link records source document/definition, logical version identity, effective immutable content, relative locator and resolution state. Historical assembly snapshots preserve their effective closure.
 
-### 6.3 Approved dependency policies
+### 6.3 Updates and relation decisions
 
-| Policy | Behavior |
-| --- | --- |
-| `Latest` (default) | Follow latest **published** compatible component version in working assemblies |
-| `Pinned` | Refer to one explicit immutable component version until changed deliberately |
+Resolve and validate current source geometry and stable references before adopting a candidate. Valid Latest working consumers follow Main. If an update loses references or creates relation conflicts, retain the previous working geometry until the user chooses to apply while disabling affected relations or to apply while retaining explicit diagnostics for manual repair. Invalid B-Rep, unauthorized, cyclic, stale or cancelled changes remain rejected. Never substitute another geometric reference silently. Disabled relations do not participate in solving; missing and conflicting relations remain visible and repairable.
 
-On new publication, a working assembly with Latest dependency attempts a **candidate update**: resolve references, regenerate, validate mates, check new interference and derived drawings, then apply if all required gates pass. If it fails, preserve the previous effective state and show pending/conflict with exact causes. Do not silently change an already published assembly, release baseline or drawing revision. Do not silently choose a branch/version if Latest is ambiguous; define publication channel and ordering in E4.
+### 6.4 Deletion
 
-### 6.4 Required UX and tools
+Allow deleting in-use versions after warning with project consumer information. Record the successor that was immediately above the deleted row. If Main is deleted, designate the newest remaining version as Main. A consuming working assembly resolves the recorded successor chain and warns once when replacing a deleted selection. Never delete the only remaining Main. Removing a version from the selectable list does not erase the immutable objects needed by retained historical assemblies or recovery.
 
-Inspect version graph; compare geometry/parameters/features/drawings; list consumers of a definition; pin/unpin; publish; restore old version as a **new** working revision; show effective versions and update impact; preview updates and report dependencies/invalidations. Provide revision-aware undo/redo, stale write rejection and receipts. Published history is immutable; recovery never rewrites earlier published identities.
+### 6.5 UI, insertion and persistence
 
-### 6.5 Change and conflict semantics
+Manager owns the Versions tab and selected-version Inspector (Name, Description, usage, Open/Close, Make Main, Delete). Parameter Manager owns assembly component/version rows. Enter or leaving an edited row confirms its change; dependency validation is internal, not a separate Preview/Apply workflow. Insert Component chooses source, Latest or retained version, and absolute-origin or initial reference placement without creating a mate. Copy preserves the source instance's choice. Dragging a source with other versions opens Insert; a Main-only source inserts Latest directly.
 
-Capture expected document revision plus dependency versions on every mutation. A previously accepted AI proposal cannot overwrite newer manual edits; require rebase/review. Store content hashes, actor/action provenance, tested kernel/solver versions and meaningful change summaries. Deleting an in-use definition/version is blocked or explicitly resolved. Snapshot restoration must retain the ability to reproduce prior drawings and BOM.
+Keep expected revisions, immutable content hashes, single-writer authorization, atomic/recoverable saves, stale proposal rejection and tested migration. Main/retained series metadata uses a versioned per-file history sidecar; old branch objects remain available to the compatibility reader. Current native binding and spatial extensions must be refused by older readers that cannot interpret them. Multi-file updates are staged, not falsely claimed globally atomic.
 
 ---
-
-### 6.6 Formal version resolution and reproducibility
-
-A *working revision* is an editable, causally ordered persistence state. A *recovery snapshot* protects data after failure. An *immutable version* names a content-stable definition/assembly/drawing state. *Publication* makes an immutable version eligible for Latest consumers. These are distinct types and tests; an E0 recovery snapshot does not prove E4 publication/version-following support.
-
-For each external or internal dependency, record (a) source document/definition, (b) policy Latest/Pinned, (c) effective resolved immutable version, (d) resolution status and (e) verified source/geometry provenance. Latest means a **candidate** update to a working consumer; a published assembly's full effective dependency closure stays immutable. Define branch/channel ordering and compatibility predicate in a reviewed ADR before any automatic-follow feature is accepted.
-
-Store enough original parametric definitions, dependency closure, exact geometry baseline or pinned kernel/solver+converter provenance to verify or safely reconstruct a historical release after application/kernel upgrades. A geometrically equivalent shape with different face lineage is not automatically reference-compatible. A multi-document publication/update must be either transactionally coherent or explicitly staged with recoverable pending outcomes; one-document atomic save does not confer global atomicity.
-
-See [native data/version contract](docs/contracts/NATIVE_DATA_VERSIONING.md).
 
 ## 7. Geometry, numerical foundations and topology
 
@@ -397,7 +382,7 @@ Free components drag in 3D with constraints preserved; fully fixed components ca
 
 ### 10.4 Version-update acceptance
 
-Assembly with at least three definition types and repeated instances: publish a revised part; Latest consumers update after validated regeneration; Pinned consumers stay unchanged. A changed/missing mating face fails safely and preserves prior effective assembly. Published older assembly reproduces previous geometry/BOM. Version updates never silently mutate historical drawings.
+Assembly with at least three definition types and repeated instances: edit source Main; Latest consumers update after validated regeneration; Pinned consumers stay unchanged. A changed/missing mating face requires an explicit disable-or-repair decision before changing the prior effective assembly. Published older assembly reproduces previous geometry/BOM. Version updates never silently mutate historical drawings.
 
 ---
 
@@ -803,7 +788,7 @@ Implementation note (2026-11-01): the owner also requested physical dimension pl
 - **Depends:** E4.M2, E0.M4.
 
 #### E4.M5 — Interference, physical assembly properties
-- **Deliver:** bounded exact interference and clearance check, materials/density, mass/center of mass/inertia aggregate, missing-material warnings.
+- **Deliver:** bounded exact interference and clearance check, materials/density, mass/center of mass/inertia aggregate, missing-material warnings; owner-approved Main version-series, Manager/Parameter Manager/Insert restructuring and relation/save corrections in ADR033.
 - **Verify:** overlapping solids detected, touching distinguished, repeated instances mass counted correctly and absent density never yields fabricated mass.
 - **Depends:** E4.M3–E4.M4.
 
@@ -907,7 +892,7 @@ Create a bracket/flange with at least several dependent sketches, additive/subtr
 
 ### Project C — Constrained multi-component assembly
 
-Reuse definitions as multiple instances; position using coincident/concentric/distance/angle/width or other appropriate mates; ground one component; observe remaining DOF/movement; detect interference; compute assembled mass with materials; publish a part version, prove Latest/Pinned semantics, reject broken update, reopen historical effective assembly. Produce correct BOM source data.
+Reuse definitions as multiple instances; position using coincident/concentric/distance/angle/width or other appropriate mates; ground one component; observe remaining DOF/movement; detect interference; compute assembled mass with materials; create a Main save point, prove Latest/Pinned semantics, resolve broken-update choices and deleted-version successors, reopen historical effective assembly. Produce correct BOM source data.
 
 ### Project D — AI drawing from existing moderate part
 
@@ -1049,3 +1034,7 @@ This is **master v0.2.0**, not a software release or milestone acceptance. Futur
 Implementation evidence update2026-10-31: E0.M7 review candidate0.0.7 connects the bounded sketch/solid/face/mate/drawing/proposal/native chain. [Report](docs/milestones/E0_M7_REPORT.md), [ADR012](docs/architecture/ADR-012-INTEGRATED-E0-GATE.md). Implementation progress only; approved MVP unchanged, owner Go/Redesign/Stop and E1 authorization remain pending.
 
 Owner update2026-10-31: Go for E1/0.1.0 recorded in [decision](docs/architecture/E0_OWNER_GO_2026_10_31.json); measured E0 corpus is preserved. [E1.M1](docs/milestones/E1_M1_REPORT.md) implements the workbench foundation, with [ADR016](docs/architecture/ADR-016-E1-WORKBENCH.md). E1.M2–M5 and later generations remain planned. No MVP scope change.
+
+Owner-requested structural extension 2026-11-16: Project file browser and document tabs, empty-project startup, per-component Model/Entire Part/Hide visibility, transparent edit context, component/group drag organization, Insert/Move operation split and per-document branch/version tree with validated conflict-aware merges are authorized before continuing E4.M2. Group replaces the former Assembly group label. This authorization does not claim completion of mate solving, published Latest/Pinned updates or final assembly drawing/export scope. ADR029 records persistence, migration and authority constraints.
+
+Owner revision2026-11-24: branches and component publications are replaced by the Main series in section6, delivered alongside E4.M5. The retained request and ADR033 specify save-point creation, promotion, deletion successor warnings, per-instance Latest/retained choice, explicit relation decisions, source-preserving migration and shared UI/tool behavior. Earlier publication references describe historical contracts, not the current user workflow.

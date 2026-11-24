@@ -1,3 +1,4 @@
+import {mountComponentVersions} from './component-versions.mjs';
 import {setDependencySelection,openDependencies,subscribeDependencies,dependencySelection} from './dependency-channel.mjs';
 import {functionCompletions} from '/parameters/functions.mjs';
 import {completionRange as expressionRange} from './expression-completion.mjs';
@@ -148,3 +149,7 @@ async function openDimensionSource({parameterId,sketchId,constraintId,featureId,
  window.addEventListener('engineer-open-parameter',event=>run(()=>open(event.detail)));window.addEventListener('engineer-document-changed',event=>{if(!working&&panel.getBoundingClientRect().width)refresh({revision:event.detail.document.revision}).catch(error=>message(error.message,'error'));});window.engineerParameterManager={open};window.addEventListener('engineer-panel-ready',event=>{if(event.detail==='parameters')refresh().catch(error=>message(error.message,'error'));});
 
 window.addEventListener('engineer-panel-activated',event=>{if(event.detail==='parameters')refresh().catch(error=>message(error.message,'error'));});await refresh().catch(error=>message(error.message,'error'));
+
+window.addEventListener("engineer-workspace-activated",()=>{draft=null;selectedRow=null;diagnosticRevision=-1;diagnosticStates.clear();if(panel.getBoundingClientRect().width)refresh({force:true}).catch(error=>message(error.message,"error"));});
+
+mountComponentVersions({document,panel});

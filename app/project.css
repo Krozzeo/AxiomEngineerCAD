@@ -1,0 +1,105 @@
+/* Project browser adapted from Axiom Game Engine fc261324, MIT. */
+#project-content.dock-panel {display:grid;grid-template-rows:auto minmax(0,1fr);}
+#project-content.dock-panel .dock-panel-controls {grid-column:1/-1;}
+#project-content { display:grid;grid-template-columns:minmax(200px,1fr) 1fr;gap:10px;padding:8px; }
+#project-files details { margin-left:12px; }
+#project-files button { display:block;text-align:left;margin:3px 0; }
+#project-content {height:calc(100% - 35px);grid-template-columns:180px minmax(0,1fr);gap:0;padding:0;}
+#project-files {overflow:auto;border-right:1px solid #30435c;padding:4px;}
+#project-files button {width:100%;padding:2px 6px;border:0;margin:0;font-size:12px;border-radius:0;}
+#project-files .selected {background:#294d71;}
+.project-browser {overflow:auto;min-width:0;}
+#project-breadcrumb {padding:5px 10px;background:#182538;font-size:12px;border-bottom:1px solid #30435c;}
+#project-icons {display:grid;grid-template-columns:repeat(auto-fill,minmax(95px,1fr));align-content:start;gap:8px;padding:10px;}
+.project-file {display:flex;flex-direction:column;align-items:center;gap:5px;background:transparent;border:1px solid transparent;padding:5px;min-width:0;font-size:11px;}
+.project-file .file-symbol {font-size:34px;color:#9fc7e6;}
+.project-file .file-name {width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.project-file.selected {border-color:#5eb5f7;background:#224b70;}
+.project-tree-row{display:flex;align-items:center;gap:4px;padding:2px 4px;min-height:24px;cursor:pointer;width:100%;border:0;background:transparent;text-align:left;}
+.project-tree-row .project-icon{width:18px;height:18px;object-fit:contain}
+.project-icon{width:42px;height:42px;object-fit:contain}
+.project-tree-row.selected,.project-file.selected{background:#294d71}
+.project-tree-row>.file-name{background:transparent;border:0;padding:0;text-align:left;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#project-content.dock-panel{height:100%;grid-template-rows:minmax(0,1fr);}
+.project-browser{display:flex;flex-direction:column;min-height:0;}
+#project-icons{flex:1;overflow:auto;min-height:0;box-sizing:border-box;}
+#project-files .project-tree-row{display:flex;}
+#project-files .tree-toggle{width:18px;flex:0 0 18px;padding:0;}
+#project-files .file-name{width:auto;min-width:0;}
+#project-file-preview{max-height:60px;flex-shrink:0;}
+#project-breadcrumb{border:0;background:transparent;padding:5px 8px;}
+#project-back{width:24px;height:25px;margin:0 0 0 4px;padding:3px;border:0;background:transparent;flex-shrink:0;}
+#project-back img{width:16px;height:16px;}
+#project-content .drag-target{outline:2px solid #6ec7ff;outline-offset:-2px;background:#285678;}
+.project-tree .tree-toggle,#project-tree .tree-toggle{font-size:18px;min-width:20px}
+#project-files .tree-toggle{font-size:18px;width:20px;flex-basis:20px}
+#project-breadcrumb button{border:0;padding:0 3px;background:transparent;color:inherit;}
+#project-content{display:flex;flex-direction:column;height:100%;min-height:0;padding:6px}.project-browser{display:grid;grid-template-columns:150px minmax(0,1fr);flex:1;min-height:0;gap:8px}#project-files,#project-icons{overflow:auto;min-height:0}#project-icons{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));align-content:start;gap:8px}.project-file{position:relative;display:flex;flex-direction:column;align-items:center;min-width:0;padding:8px;background:#142435;color:#d9e7f6;border:1px solid #344e65;border-radius:4px}.project-file.selected,.project-tree-row.selected{background:#254861;border-color:#5bbcf2}.project-file .part-preview{width:140px;height:108px;object-fit:contain}.project-file .file-name{overflow-wrap:anywhere}.project-close-part{position:absolute;right:4px;top:2px;padding:2px 6px;font-size:18px}.project-toolbar{display:flex;gap:5px;align-items:center}#project-breadcrumb{display:flex;align-items:center;gap:4px;flex:1}#project-breadcrumb button{padding:3px}.part-tabs{display:flex;gap:3px;padding:3px 8px;background:#101c2a;min-height:28px;border-block:1px solid #334b61;overflow:auto}.part-tab{display:flex;align-items:center;gap:16px;white-space:nowrap;padding:4px 8px;border:1px solid #334b61;background:#182a3b;color:inherit}.part-tab[aria-selected=true]{border-bottom:2px solid #5fc7f3;background:#234158}.part-tab-close{padding:0 4px}.project-context-menu{position:fixed;z-index:2000;background:#152333;border:1px solid #45617b;padding:5px;min-width:180px}.project-context-menu button{display:block;width:100%;text-align:left;padding:6px}.workspace-empty-message{padding:20px;color:#afc8db}.workspace-empty .command-ribbon [data-operations]:not([data-operations=View]) button{pointer-events:none;opacity:.4}
+
+#versions-content{padding:8px;overflow:auto}.versions-toolbar{display:flex;gap:6px;flex-wrap:wrap}[data-version-tree] button{display:block;width:calc(100% - 12px);text-align:left;border:0;background:transparent;padding:6px;overflow-wrap:anywhere}[data-version-tree] [aria-selected=true]{background:#254861;border:1px solid #5bbcf2}[data-version-tree] details>summary{display:flex}.version-node{font-size:12px}.viewing-version .part-tabs{border-color:#e2be54}.viewing-version .operation-page:not([data-operations=View]) button{opacity:.4;pointer-events:none}[data-version-conflicts] table{font-size:11px;table-layout:fixed;overflow-wrap:anywhere;width:100%}
+
+.assembly-cancel{margin-left:auto}.assembly-mode-buttons{display:flex;gap:5px;margin:10px 0}.assembly-mode-buttons button[aria-pressed=true],#assembly-operation tr[aria-selected=true]{background:#245c7e}.assembly-mode-buttons svg{width:24px;height:24px}
+
+.component-edit-bar strong{color:#24374a}
+
+#project-content.dock-panel{display:flex;flex-direction:column;gap:0;min-height:0;overflow:hidden}#project-content .project-toolbar{flex:none}#project-content .project-browser{display:grid;grid-template-columns:150px minmax(0,1fr);flex:1;min-height:0;overflow:hidden}#project-error:empty{display:none}
+
+.editor-startup-error{position:fixed;inset:12px 12px auto;z-index:10000;padding:14px 18px;border:1px solid #d38a8a;border-radius:4px;background:#142232;color:#e6edf5;box-shadow:0 4px 24px #0008}.editor-startup-error p{margin:0 0 10px}
+
+/* Compact project navigation; targets remain usable at narrow dock widths. */
+.part-tabs{min-height:0;height:27px;padding:0 4px;gap:2px;align-items:stretch;flex-shrink:0;font:inherit}
+.part-tabs .part-tab,.part-tabs .part-picker-button{font:inherit;font-size:12px;line-height:18px;padding:2px 7px;gap:10px;border-radius:0}
+.part-tab-close{padding:0 2px}.part-picker-button{margin-left:auto;position:sticky;right:0;background:#182a3b;flex-shrink:0}
+.part-tab-thumbnail,.part-tab-picker{position:fixed;z-index:2100;border:1px solid #45617b;background:#101e2d;box-shadow:0 5px 18px #0007;padding:8px}
+.part-tab-thumbnail{pointer-events:none;width:210px;height:150px}.part-tab-thumbnail img{width:100%;height:100%;object-fit:contain}
+.part-tab-picker{width:min(300px,90vw)}.part-tab-picker label{display:flex;align-items:center;gap:5px;margin-bottom:6px}.part-tab-picker input[type=search]{width:100%;box-sizing:border-box}.part-picker-list{max-height:320px;overflow:auto}.part-picker-list button{display:block;width:100%;text-align:left;padding:6px}.tab-drop-before{box-shadow:inset 3px 0 #65caff}
+.feature-context-name{font-size:12px;line-height:18px;margin:0 0 3px;padding:0 4px}#wb-tree-items{padding-top:0}
+.project-toolbar{min-height:24px;gap:2px;padding:0}.project-toolbar button,#project-breadcrumb{padding:1px 3px;margin:0;min-height:22px}#project-refresh,[data-version-refresh]{width:26px;height:24px;padding:3px;flex-shrink:0}#project-refresh svg,[data-version-refresh] svg{width:16px;height:16px}
+.project-browser{grid-template-columns:minmax(80px,35%) minmax(0,1fr);gap:4px}#project-icons{grid-template-columns:repeat(auto-fit,minmax(min(100%,70px),1fr));gap:4px;container-type:inline-size}.project-file{padding:4px;max-width:145px;justify-self:stretch}.project-file .part-preview{width:min(98px,100%);height:auto;aspect-ratio:140/108;max-height:76px}.project-file .project-icon:not(.part-preview){width:min(34px,100%);height:auto}.project-file .file-name{max-width:100%;font-size:12px;line-height:16px}#project-files .project-tree-row{min-width:0}#project-files .file-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#project-files .project-icon{width:18px;height:18px;flex-shrink:0}
+.project-context-menu{padding:4px;min-width:180px}.project-context-menu button{background:transparent;border:0;border-radius:0;color:inherit}.project-context-menu button:hover{background:#26435e}
+.cad-feature-menu details{position:relative}.cad-feature-menu details>summary{cursor:pointer;list-style:none;padding:6px 10px}.cad-feature-menu details>summary:after{content:'▸';float:right}.cad-feature-menu details[open]>.cad-menu-submenu{position:absolute;left:100%;top:0;min-width:150px;padding:4px;background:#142435;border:1px solid #45617b}.cad-feature-menu button[aria-pressed=true]{background:#284a65}
+.component-drop-inside{outline:2px solid #6ec7ff;outline-offset:-2px;background:#285678!important}.component-drop-before{box-shadow:0 -2px #6ec7ff}.component-edit-bar{z-index:15}.component-edit-bar[hidden]{display:none}
+
+.project-browser{container:project-browser/inline-size}@container project-browser (max-width:260px){#project-icons{grid-template-columns:repeat(auto-fit,minmax(min(100%,35px),1fr))}.project-file .file-name{font-size:11px}.project-close-part{font-size:12px;padding:0 3px}}
+
+.part-tabs{height:25px}.part-tabs .part-tab,.part-tabs .part-picker-button{height:24px;font-size:11px;line-height:17px;padding:3px 9px}.docked-cad #history-content{gap:0;padding-top:4px}.component-edit-bar strong{color:inherit}
+
+.part-tabs{max-height:25px;flex-wrap:nowrap;align-items:center}.part-tabs .part-tab,.part-tabs .part-picker-button{flex-shrink:0}.part-tabs span{font:inherit;margin:0;color:inherit}
+
+.docked-cad .command-ribbon .ribbon-tabs button,.docked-cad .part-tabs .part-tab,.docked-cad .part-tabs .part-picker-button{height:24px;font-size:11px;line-height:17px;padding:3px 9px}.docked-cad .part-tabs{height:25px;max-height:25px}
+
+/* Shared context heading: the sketch temporarily owns this one viewport bar. */
+.component-edit-bar strong{color:#23374c}
+.editing-sketch .component-edit-bar{display:none}.editing-component #edit-sketch-editor .sketch-heading{top:0}
+.sketch-heading #edit-sketch-exit{margin-left:auto}
+.cad-feature-menu details>summary:hover{background:#294d71;color:#e4f1ff}
+.cad-menu-submenu button{display:block;width:100%;text-align:left;box-sizing:border-box}
+.cad-menu-submenu button[aria-pressed=true]{background:#215773;border-left:3px solid #6ccfff}
+.cad-menu-submenu button:hover{background:#35516b}
+#project-content .project-browser{grid-template-columns:var(--project-tree-width,150px) 6px minmax(0,1fr);gap:0;container-type:normal}
+.project-tree-divider{cursor:col-resize;touch-action:none;background:#30435c}.project-tree-divider:hover{background:#63bfee}
+#project-icons{grid-template-columns:repeat(auto-fill,var(--project-tile-size,100px));justify-content:start;align-content:start;align-items:start}
+.project-file{width:var(--project-tile-size,100px);max-width:none;box-sizing:border-box}
+.project-file .part-preview{width:100%;height:auto;max-height:none}.project-file .project-icon:not(.part-preview){max-height:calc(var(--project-tile-size,100px)*.65)}
+
+.operation-value-table tr[aria-selected=true]{background:#285d80;color:#fff}.operation-value-table tr.preselected{background:#35506b}
+
+.assembly-gizmo{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:18;touch-action:none}.assembly-gizmo[hidden]{display:none}
+
+/* E4.M3: persistent tree divider can clip the file pane; resizing never changes its position. */
+#project-content .project-browser{overflow:hidden}#project-icons{min-width:0}
+.project-close-part{top:0;right:0;background:rgb(0 0 0 / 50%);font-size:22px;font-weight:800;line-height:22px;padding:0 4px;border-radius:0}
+.part-tab-close{display:inline-flex;align-items:center;justify-content:center;background:rgb(0 0 0 / 50%);font-size:18px;font-weight:800;line-height:20px;min-width:20px;height:20px;padding:0}
+.component-edit-bar #component-exit-edit{margin-left:auto}
+.assembly-mode-buttons{display:grid;grid-template-columns:repeat(auto-fit,minmax(36px,1fr));max-width:100%}
+.operation-value-table tr[aria-selected=true]{outline:2px solid #1786ff;outline-offset:-2px}.operation-value-table tr.preselected{outline:2px solid #ff8000;outline-offset:-2px}
+.assembly-relative-toggle{display:flex;align-items:center;gap:8px}.assembly-relative-toggle input{appearance:none;width:34px;height:18px;border-radius:12px;background:#33475b;position:relative;flex:none;cursor:pointer}
+.assembly-relative-toggle input:before{content:'';position:absolute;width:12px;height:12px;top:2px;left:3px;border-radius:50%;background:#d9e7f5}.assembly-relative-toggle input:checked{background:#267ba8}.assembly-relative-toggle input:checked:before{left:17px}
+body.assembly-constructing .proof-inspector,body.assembly-constructing .assembly-diagnostics{display:none!important}
+.mate-tree-row{display:flex;align-items:center;gap:4px}.mate-tree-row>button{flex:1}.component-fixed{margin-left:auto;display:inline-flex}.component-fixed svg{width:14px;height:14px}
+
+#project-files{max-width:var(--project-pane-width,100%);box-sizing:border-box}
+
+/* Shared mate/motion relation controls keep vector glyphs centered. */
+.assembly-mode-buttons button {display:inline-flex;align-items:center;justify-content:center;}
+.assembly-mode-buttons button svg {display:block;flex:none;margin:0;}

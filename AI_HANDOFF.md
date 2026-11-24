@@ -1,11 +1,26 @@
-# Engineer handoff — E3.M5 STEP / 0.3.11 candidate
+# Current: E4.M5 /0.4.6 candidate
 
-Current batch: **0.3.13 / E3 closure corrections**. Owner explicitly authorized corrected stable integration into main, followed by E4.M1. Import/Export are Right dock panels; missing STEP units require an explicit retained source-unit choice, valid spaced metadata is recognized; positive finite material density accepts integers/fractions with English validation; Navigation is in the View ribbon. Read docs/E3_M6_PRODUCTION.md. Exact-head PR/main CI, stable publication and real public installation remain delivery gates; none are claimed by this source update. E4.M1 has not yet been implemented.
+Owner authorized full M5 and Main-series/Manager/Parameter Manager/Insert/constraint/save changes. Read docs/E4_M5_ASSEMBLY_ANALYSIS.md, ADR033 and docs/requests/E4_M5_OWNER_CHANGES_2026_11_24.md. Focused native and actual Chrome/NVIDIA UI paths cover save points, per-instance versions, exact analysis, lost-reference choices, deletion notices, mate toggles and insertion. Complete final exact-head acceptance/public installation remains pending. Main/stable0.3.13 unchanged.
 
-Previous batch: **0.3.11 / E3.M5 STEP interoperability**, plus the standalone Bottom Dependencies panel driven by Parameter Manager selection. E3.M4/0.3.10 was delivered publicly and accepted by the owner. Read [M5 scope and demo checks](docs/E3_M5_INTEROPERABILITY.md). Complete exact-head acceptance/public installation are required; owner M5 acceptance is pending. Main/stable remain 0.2.6.
+Latest follows Main; Pinned selects any retained version. Old branch/publication objects remain compatibility data. New M5 bindings and diagnostic mates are explicit profiles. Review source integrity, pending decisions, save/reopen and GPU evidence; never claim software rendering as physical proof. Detailed measured development logs are ignored under .axiom. Last delivered0.4.5 is0353c31565fdc14509978d993e95c1873c5a04db, PR28, acceptance45297135286/publication45299778228; see PROJECT_STATE.
+
+Historical implementation records follow and do not describe the current candidate gates.
+
+# Current: E4.M4 /0.4.5 candidate
+
+Owner authorized published versions/Latest/Pinned and assembly corrections, and selected grouped motion sessions. See [M4 scope/demo](docs/E4_M4_VERSIONS.md), ADR032, the request map and docs/PROJECT_STATE.json. Branch `engineer/e4-m4-versioned-assemblies` includes the selective verification tooling. Motion stages privately and confirms one revision/Undo entry; native validation remains authoritative. GPU rigid buffers and a reduced worker solve address measured preview cost. Published updates preserve Pinned/historical closures and block lost/conflicting native mates.
+
+Focused domain and actual Chrome/NVIDIA UI checks passed, including direct dragging, Mate/trees, publication, policy preview/Apply and renderer recovery. Full exact-head Windows/Linux acceptance and immutable public installation remain mandatory and are not yet claimed. Last delivered CAD0.4.4 is `863daea5c96f165c917914fa3124f387e613fba3` (PR26, acceptance45240534757, publication45243129752). Main/stable0.3.13 unchanged.
+
+Historical implementation notes follow; their pending gates describe those earlier candidates, not the current delivery.
+
+# Engineer handoff — E4.M1 component hierarchy development
+
+Historical0.4.2 implementation record: **0.4.2 / E4.M1 workspace interaction refinements**, branch `engineer/workspace-interactions`, based on delivered 0.4.1 (PR23, `91fe145548511ae03c1edf1f7dcd2980da2012fc`). Scope and verification are in [workspace interaction notes](docs/WORKSPACE_INTERACTIONS_0_4_2.md). Focused domain and actual Chrome/NVIDIA workspace checks passed. The candidate is frozen for complete exact-head Windows/Linux CI and actual public installation; neither gate is claimed complete here. This is an owner-requested M1 refinement, not E4.M2 or a stable merge. Main/stable remains0.3.13.
+Previous batch: **0.3.11 / E3.M5 STEP interoperability**, plus the standalone Bottom Dependencies panel driven by Parameter Manager selection. E3.M4/0.3.10 was delivered publicly and accepted by the owner. Read [M5 scope and demo checks](docs/E3_M5_INTEROPERABILITY.md). Complete exact-head acceptance/public installation are required; owner M5 acceptance is pending. At that historical delivery, main/stable were 0.2.6.
 
 
-0.3.9 was publicly installed and verified at 2bab5cdb3ce89cbe32001dbe6ad1478a41cd89cb. The owner requested M4 with functions, chamfer modes and selection-table feedback. Read docs/E3_M4_DEPENDENCIES.md for semantics, compatibility, tests and manual checks. Main/stable remain 0.2.6.
+0.3.9 was publicly installed and verified at 2bab5cdb3ce89cbe32001dbe6ad1478a41cd89cb. The owner requested M4 with functions, chamfer modes and selection-table feedback. Read docs/E3_M4_DEPENDENCIES.md for semantics, compatibility, tests and manual checks. At that historical delivery, main/stable were 0.2.6.
 
 Start with `npm run context`, AGENTS.md, [compact context](docs/PROJECT_CONTEXT.md) and the [integration notes](docs/PRE_E3_ASSISTANT.md). Read docs/E3_M5_INTEROPERABILITY.md for the current batch. E3.M2 construction remains a retained regression fixture.
 
